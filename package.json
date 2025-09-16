@@ -1,10 +1,6 @@
 {
   "name": "questify",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
   "scripts": {
     "dev:nuxt": "pnpm --filter nuxt dev",
     "dev:worker": "ts-node apps/worker/src/index.ts",
