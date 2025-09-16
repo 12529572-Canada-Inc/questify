@@ -24,6 +24,9 @@ pnpm db:migrate
 # Prisma Client auto-updates on install, or run:
 pnpm prisma:generate
 
+# Seed the database
+pnpm db:seed
+
 # Dev Nuxt
 pnpm dev:nuxt
 
