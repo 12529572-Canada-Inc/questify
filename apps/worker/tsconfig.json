@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "ESNext",
+    "strict": true,
+    "esModuleInterop": true,
+    "outDir": "dist",
+    "types": ["@types/node"],
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["../../packages/shared/*"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}
