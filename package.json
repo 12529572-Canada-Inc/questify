@@ -3,9 +3,10 @@
   "private": true,
   "scripts": {
     "dev:nuxt": "pnpm --filter nuxt dev",
-    "dev:worker": "ts-node apps/worker/src/index.ts",
-    "prisma:generate": "pnpm --filter prisma exec prisma generate",
-    "db:migrate": "pnpm --filter prisma exec prisma migrate dev"
+    "dev:worker": "pnpm --filter worker dev",
+    "prisma:generate": "pnpm --filter prisma generate",
+    "db:migrate": "pnpm --filter prisma migrate",
+    "build": "pnpm --parallel build"
   },
   "devDependencies": {
     "typescript": "^5.0.0",
