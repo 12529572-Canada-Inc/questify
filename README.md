@@ -12,14 +12,17 @@ This monorepo uses **Nuxt 3** for the frontend + API layer, **Prisma** for the d
 
 ## Getting Started
 ```bash
-# Install deps
-pnpm install
-
 # Start infra
 docker-compose up -d
 
+# Install deps (auto-runs prisma generate)
+pnpm install
+
 # Run Prisma migrations
 pnpm db:migrate
+
+# Prisma Client auto-updates on install, or run:
+pnpm prisma:generate
 
 # Dev Nuxt
 pnpm dev:nuxt

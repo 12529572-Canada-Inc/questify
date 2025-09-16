@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "generate": "prisma generate",
-    "migrate": "prisma migrate dev"
+    "migrate": "prisma migrate dev",
+    "prepare": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^5.0.0"
