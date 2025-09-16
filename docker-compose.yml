@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: questify
+      POSTGRES_PASSWORD: questify
+      POSTGRES_DB: questify
+    ports:
+      - "5432:5432"
+  redis:
+    image: redis:7
+    restart: always
+    ports:
+      - "6379:6379"
