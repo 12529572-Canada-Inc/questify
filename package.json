@@ -5,7 +5,7 @@
     "dev:nuxt": "pnpm --filter nuxt dev",
     "dev:worker": "pnpm --filter worker dev",
     "prisma:generate": "pnpm --filter prisma generate",
-    "db:migrate": "pnpm --filter prisma migrate dev",
+    "db:migrate": "pnpm --filter prisma migrate",
     "db:seed": "pnpm --filter prisma seed",
     "prepare": "pnpm --filter prisma prepare",
     "build": "pnpm --parallel build"
