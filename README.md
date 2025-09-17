@@ -59,7 +59,7 @@ pnpm dev:nuxt
 
 ## Development
 
-pnpm dev:nuxt → run Nuxt frontend
-pnpm dev:worker → run background worker
-pnpm db:migrate → apply DB migrations
-pnpm db:seed → seed DB with demo data
+- `pnpm dev:nuxt` → run Nuxt frontend
+- `pnpm dev:worker` → run background worker
+- `pnpm db:migrate` → apply DB migrations
+- `pnpm db:seed` → seed DB with demo data
