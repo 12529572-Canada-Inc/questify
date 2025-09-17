@@ -1,14 +1,22 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const title = ref('')
 const description = ref('')
-const userId = ref('') // For now, manually enter or use a fixed test user
+const userId = ref('')
+const users = ref([])
 
 const loading = ref(false)
 const error = ref<string | null>(null)
+
+onMounted(async () => {
+  users.value = await $fetch('/api/users')
+  if (users.value.length > 0) {
+    userId.value = users.value[0].id // default to first user
+  }
+})
 
 async function submit() {
   loading.value = true
@@ -40,45 +48,25 @@ async function submit() {
     <form @submit.prevent="submit" class="space-y-4">
       <div>
         <label class="block mb-1 font-medium">Title</label>
-        <input
-          v-model="title"
-          type="text"
-          class="w-full p-2 border rounded"
-          placeholder="Climb Mt. Everest"
-          required
-        />
+        <input v-model="title" type="text" class="w-full p-2 border rounded" required />
       </div>
 
       <div>
         <label class="block mb-1 font-medium">Description</label>
-        <textarea
-          v-model="description"
-          class="w-full p-2 border rounded"
-          placeholder="Prepare, train, and conquer the summit!"
-        />
+        <textarea v-model="description" class="w-full p-2 border rounded" />
       </div>
 
       <div>
-        <label class="block mb-1 font-medium">User ID</label>
-        <input
-          v-model="userId"
-          type="text"
-          class="w-full p-2 border rounded"
-          placeholder="Paste your userId here (e.g., from seed)"
-          required
-        />
-        <p class="text-sm text-gray-500 mt-1">
-          Tip: Use the <code>id</code> from <code>test@example.com</code> in the seed data.
-        </p>
+        <label class="block mb-1 font-medium">Select User</label>
+        <select v-model="userId" class="w-full p-2 border rounded">
+          <option v-for="u in users" :key="u.id" :value="u.id">
+            {{ u.name || u.email }}
+          </option>
+        </select>
       </div>
 
-      <button
-        type="submit"
-        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-        :disabled="loading"
-      >
-        <span v-if="loading">Creating...</span>
-        <span v-else>Create Quest</span>
+      <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">
+        Create Quest
       </button>
 
       <p v-if="error" class="text-red-500 mt-2">{{ error }}</p>
