@@ -1,4 +1,3 @@
-// server/plugins/quest-queue.ts
 import { Queue } from 'bullmq'
 
 export default defineNitroPlugin((nitroApp) => {
@@ -12,6 +11,8 @@ export default defineNitroPlugin((nitroApp) => {
     }
   })
 
-  // Attach to Nitro so it’s available everywhere in server routes
-  nitroApp.locals.questQueue = questQueue
+  // Register the queue in Nitro's context
+  nitroApp.hooks.hook('request', (event) => {
+    event.context.questQueue = questQueue
+  })
 })

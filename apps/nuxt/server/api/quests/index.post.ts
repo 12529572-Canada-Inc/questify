@@ -1,4 +1,3 @@
-// server/api/quests/index.post.ts
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
@@ -7,8 +6,9 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const { title, description, userId } = body
 
-  // Access queue from Nitro’s locals
-  const questQueue = event.node.req.context.nitro.locals.questQueue
+  // Access the queue from the event context
+  // TODO: deretmine potentially better way to access this
+  const questQueue = event.context.questQueue
 
   const quest = await prisma.quest.create({
     data: { title, description, ownerId: userId }
