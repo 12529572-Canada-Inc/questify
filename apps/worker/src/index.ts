@@ -1,9 +1,10 @@
 import { Worker } from 'bullmq'
 import { PrismaClient } from '@prisma/client'
 import OpenAI from 'openai'
+import { config } from './config'
 
 const prisma = new PrismaClient()
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+const openai = new OpenAI({ apiKey: config.openaiApiKey })
 
 const questWorker = new Worker('quests', async job => {
   if (job.name === 'decompose') {
@@ -32,6 +33,6 @@ const questWorker = new Worker('quests', async job => {
 
     await prisma.quest.update({ where: { id: questId }, data: { status: 'active' } })
   }
-}, { connection: { host: 'redis', port: 6379 } })
+}, { connection: { host: config.redisHost, port: config.redisPort } })
 
 console.log("Questify worker is running...")
