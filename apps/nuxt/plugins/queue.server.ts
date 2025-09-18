@@ -12,9 +12,6 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
   })
 
-  // Optionally, you could also attach to nuxtApp so other parts of app can access
-  nuxtApp.provide('questQueue', questQueue)
-
   // Return something if needed
   return {
     provide: {
