@@ -6,8 +6,6 @@ import { config } from './config'
 const prisma = new PrismaClient()
 const openai = new OpenAI({ apiKey: config.openaiApiKey })
 
-console.log("OpenAI: ", openai);
-
 const questWorker = new Worker('quests', async job => {
   if (job.name === 'decompose') {
     console.log("Decomposing quest:", job.data)
