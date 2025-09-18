@@ -8,17 +8,23 @@ const openai = new OpenAI({ apiKey: config.openaiApiKey })
 
 const questWorker = new Worker('quests', async job => {
   if (job.name === 'decompose') {
+    console.log("Decomposing quest:", job.data)
     const { questId, title, description } = job.data
 
-    const prompt = `Decompose the quest "${title}" into ordered sub-tasks. 
+    const prompt = `Decompose the quest "${title}: ${description}" into ordered sub-tasks. 
     Return as JSON array of {title, details}.`
+    console.log("Prompt:", prompt)
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [{ role: "user", content: prompt }]
     })
 
+    console.log("OpenAI response:", response);
+
     const tasks = JSON.parse(response.choices[0].message?.content || '[]')
+
+    console.log("Parsed tasks:", tasks);
 
     for (let i = 0; i < tasks.length; i++) {
       await prisma.task.create({
