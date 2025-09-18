@@ -1,9 +1,9 @@
+// server/plugins/quest-queue.ts
 import { Queue } from 'bullmq'
 
-export default defineNuxtPlugin((nuxtApp) => {
+export default defineNitroPlugin((nitroApp) => {
   const config = useRuntimeConfig()
 
-  // Create the queue
   const questQueue = new Queue('quests', {
     connection: {
       host: config.redis.host,
@@ -12,10 +12,6 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
   })
 
-  // Return something if needed
-  return {
-    provide: {
-      questQueue
-    }
-  }
+  // Attach to Nitro so it’s available everywhere in server routes
+  nitroApp.locals.questQueue = questQueue
 })
