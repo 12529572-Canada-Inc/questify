@@ -7,6 +7,7 @@
     "prisma:generate": "pnpm --filter prisma generate",
     "db:migrate": "pnpm --filter prisma migrate",
     "db:seed": "pnpm --filter prisma seed",
+    "db:reset": "pnpm --filter prisma exec -- prisma migrate reset --force && pnpm db:seed",
     "prepare": "pnpm --filter prisma prepare",
     "build": "pnpm --parallel build"
   },
