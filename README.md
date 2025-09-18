@@ -13,56 +13,126 @@ This monorepo uses **Nuxt 3** for the frontend + API layer, **Prisma** for the d
 - `packages/prisma` — Prisma schema & client
 - `packages/shared` — Shared types & utilities
 
-## Setup
+# Development Setup
 
-1. Clone the repository:
-```
-git clone https://github.com/your-org/questify.git
+## Prerequisites
+
+- [Node.js](https://nodejs.org/) (>=18.x)
+- [pnpm](https://pnpm.io/) (>=8.x)
+- [Docker](https://www.docker.com/) (for Postgres + Redis)
+
+---
+
+## 1. Clone & Install
+
+```bash
+git clone https://github.com/YOUR_ORG/questify.git
 cd questify
-```
-
-2. Install dependencies:
-
-```
 pnpm install
 ```
 
-3. Copy environment files:
+---
 
-```
+## 2. Environment Variables
+
+Copy `.env.example` to `.env` in the **root**:
+
+```bash
 cp .env.example .env
-cp packages/prisma/.env.example packages/prisma/.env
 ```
 
-4. Start database with Docker:
+Example contents:
 
-```
-docker-compose up -d
+```env
+# Database
+DATABASE_URL=postgresql://questify:questify@localhost:5432/questify
+
+# Redis
+REDIS_HOST=localhost
+REDIS_PORT=6379
+# REDIS_PASSWORD=optional_password
 ```
 
-5. Run database migrations:
+---
 
+## 3. Start Postgres & Redis
+
+Using Docker Compose:
+
+```bash
+docker compose up -d
 ```
+
+This will start:
+- **Postgres** on port `5432`
+- **Redis** on port `6379`
+
+---
+
+## 4. Database Setup
+
+Run Prisma migrations + seed:
+
+```bash
 pnpm db:migrate
-```
-
-6. Seed the database:
-
-```
 pnpm db:seed
 ```
 
-7. Start Nuxt app:
+---
 
-```
+## 5. Nuxt Development
+
+Start the Nuxt 3 frontend + API:
+
+```bash
 pnpm dev:nuxt
 ```
 
-8. Open http://localhost:3000
+Available at:  
+👉 http://localhost:3000
 
-## Development
+---
 
-- `pnpm dev:nuxt` → run Nuxt frontend
-- `pnpm dev:worker` → run background worker
-- `pnpm db:migrate` → apply DB migrations
-- `pnpm db:seed` → seed DB with demo data
+## 6. Redis Queue Plugin (BullMQ)
+
+Questify uses [BullMQ](https://docs.bullmq.io/) for background job processing.  
+
+- The queue is initialized in a Nuxt **server plugin**:  
+  `apps/nuxt/plugins/queue.server.ts`
+
+- Config is loaded from Nuxt runtime config:
+
+```ts
+export default defineNuxtConfig({
+  runtimeConfig: {
+    redis: {
+      host: process.env.REDIS_HOST || 'localhost',
+      port: process.env.REDIS_PORT || '6379',
+      password: process.env.REDIS_PASSWORD || ''
+    }
+  }
+})
+```
+
+- Access inside API routes or server code:
+
+```ts
+const { $questQueue } = useNuxtApp()
+await $questQueue.add('decompose', { questId, title, description })
+```
+
+---
+
+## 7. TypeScript Support
+
+Custom types for Nuxt app injections are declared in:  
+`apps/nuxt/plugins/types.d.ts`
+
+This ensures `$questQueue` is strongly typed across the app.
+
+---
+
+✅ With this setup, contributors can:  
+- Run Postgres + Redis locally  
+- Use Prisma migrations and seed data  
+- Develop Nuxt + BullMQ integrated features  
