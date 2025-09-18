@@ -1,19 +1,11 @@
 import { PrismaClient } from '@prisma/client'
-import { Queue } from 'bullmq'
 
 const prisma = new PrismaClient()
 
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig()
+  const questQueue = useNuxtApp().$questQueue
 
-  const questQueue = new Queue('quests', {
-    connection: {
-      host: config.redis.host,
-      port: Number(config.redis.port),
-      password: config.redis.password || undefined
-    }
-  })
-
+  // read body
   const body = await readBody(event)
   const { title, description, userId } = body
 
