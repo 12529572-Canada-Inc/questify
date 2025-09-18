@@ -2,6 +2,7 @@ import { Worker } from 'bullmq'
 import { PrismaClient } from '@prisma/client'
 import OpenAI from 'openai'
 import { config } from './config'
+import { parseJsonFromModel } from './helpers'
 
 const prisma = new PrismaClient()
 const openai = new OpenAI({ apiKey: config.openaiApiKey })
@@ -22,7 +23,11 @@ const questWorker = new Worker('quests', async job => {
 
       console.log("OpenAI response:", response);
 
-      const tasks = JSON.parse(response.choices[0].message?.content || '[]')
+      const content = response.choices[0].message?.content || '';
+      console.log("OpenAI content:", content);
+
+      // Use the helper function to parse JSON
+      const tasks = parseJsonFromModel(content)
 
       console.log("Parsed tasks:", tasks);
 
