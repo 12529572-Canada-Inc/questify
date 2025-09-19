@@ -11,7 +11,7 @@ const handler = defineEventHandler(async (event) => {
   const questQueue = event.context.questQueue
 
   const quest = await prisma.quest.create({
-    data: { title, description, ownerId: userId }
+    data: { title, description, ownerId: userId },
   })
 
   await questQueue.add('decompose', { questId: quest.id, title, description })
