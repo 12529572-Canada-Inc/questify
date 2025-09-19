@@ -63,7 +63,7 @@ async function submit() {
           type="text"
           class="w-full p-2 border rounded"
           required
-        >
+        />
       </div>
 
       <div>
