@@ -6,10 +6,9 @@
     "dev": "nuxt dev",
     "build": "nuxt build",
     "start": "nuxt start",
-    "lint": "nuxt eslint",
-    "lint:fix": "nuxt eslint --fix",
-    "format": "prettier --write .",
-    "test": "vitest run"
+    "lint": "eslint . --ext .js,.ts,.vue",
+    "lint:fix": "eslint . --ext .js,.ts,.vue --fix",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@prisma/client": "^5.0.0",
