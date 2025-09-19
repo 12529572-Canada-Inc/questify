@@ -8,13 +8,13 @@ const router = useRouter()
 const title = ref('')
 const description = ref('')
 const userId = ref('')
-const users = ref<UsersResponse[]>([])
+const users = ref<UsersResponse>([])
 
 const loading = ref(false)
 const error = ref<string | null>(null)
 
 onMounted(async () => {
-  users.value = await $fetch<UsersResponse[]>('/api/users')
+  users.value = await $fetch<UsersResponse>('/api/users')
   if (users.value.length > 0) {
     userId.value = users.value[0].id // default to first user
   }

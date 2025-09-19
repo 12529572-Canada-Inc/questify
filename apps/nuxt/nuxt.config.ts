@@ -1,6 +1,6 @@
 export default defineNuxtConfig({
   nitro: {
-    compatibilityDate: '2025-09-17' // update this every 3 months
+    compatibilityDate: '2025-09-17', // update this every 3 months
   },
   runtimeConfig: {
     redis: {
@@ -8,5 +8,5 @@ export default defineNuxtConfig({
       port: process.env.REDIS_PORT || '6379',
       password: process.env.REDIS_PASSWORD || ''
     }
-  }
+  },
 })
