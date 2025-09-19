@@ -10,9 +10,5 @@
     "db:reset": "pnpm --filter prisma exec -- prisma migrate reset --force && pnpm db:seed",
     "prepare": "pnpm --filter prisma prepare",
     "build": "pnpm --parallel build"
-  },
-  "devDependencies": {
-    "typescript": "^5.0.0",
-    "ts-node": "^10.9.1"
   }
 }
