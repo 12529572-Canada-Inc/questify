@@ -6,8 +6,8 @@
     "dev": "nuxt dev",
     "build": "nuxt build",
     "start": "nuxt start",
-    "lint": "eslint . --ext .js,.ts,.vue",
-    "lint:fix": "eslint . --ext .js,.ts,.vue --fix",
+    "lint": "nuxt eslint",
+    "lint:fix": "nuxt eslint --fix",
     "format": "prettier --write .",
     "test": "vitest run"
   },
