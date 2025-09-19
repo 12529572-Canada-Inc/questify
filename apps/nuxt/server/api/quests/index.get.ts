@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-export default defineEventHandler(async () => {
+const handler = defineEventHandler(async () => {
   const quests = await prisma.quest.findMany({
     include: {
       owner: true,
@@ -12,3 +12,7 @@ export default defineEventHandler(async () => {
 
   return quests
 })
+
+export default handler
+
+export type QuestsResponse = Awaited<ReturnType<typeof handler>>

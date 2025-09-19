@@ -1,5 +1,7 @@
 <script setup lang="ts">
-const { data: quests, pending, error } = await useFetch('/api/quests')
+import type { QuestsResponse } from '~/server/api/quests/index.get'
+
+const { data: quests, pending, error } = await useFetch<QuestsResponse>('/api/quests')
 </script>
 
 <template>
