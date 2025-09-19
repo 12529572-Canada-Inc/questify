@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "feature/*"
+      - "develop"
+  pull_request:
+    branches:
+      - "develop"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build apps
+        if: github.ref == 'refs/heads/develop'
+        run: |
+          pnpm --filter nuxt build
+          pnpm --filter worker build
