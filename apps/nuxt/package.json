@@ -6,8 +6,8 @@
     "dev": "nuxt dev",
     "build": "nuxt build",
     "start": "nuxt start",
-    "lint": "eslint --ext .js,.ts,.vue ./",
-    "lint:fix": "eslint --ext .js,.ts,.vue ./ --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "test": "vitest run"
   },
@@ -19,9 +19,6 @@
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.9.0",
-    "@nuxt/eslint-config": "^1.9.0",
-    "@typescript-eslint/eslint-plugin": "^8.44.0",
-    "@typescript-eslint/parser": "^8.44.0",
     "eslint": "^9.36.0",
     "eslint-plugin-vue": "^10.4.0",
     "typescript": "^5.0.0"

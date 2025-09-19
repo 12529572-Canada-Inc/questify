@@ -3,6 +3,15 @@ export default defineNuxtConfig({
     compatibilityDate: "2025-09-17", // update this every 3 months
   },
   modules: ["@nuxt/eslint"],
+  eslint: {
+    // optional: settings
+    config: {
+      stylistic: true, // if you want stylistic rules
+      // you can also override rules here or via further config
+    },
+    checker: true, // optional: run ESLint alongside your dev server
+  },
+  // rest of your config...
   runtimeConfig: {
     redis: {
       host: process.env.REDIS_HOST || "localhost",

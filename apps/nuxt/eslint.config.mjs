@@ -1,11 +1,7 @@
-import nuxt from "@nuxt/eslint-config";
+import withNuxt from "./.nuxt/eslint.config.mjs";
 
-export default [
-  ...nuxt(), // invoke it so you get a config object
-  {
-    rules: {
-      // Custom rules can be added here
-      //   'vue/multi-word-component-names': 'off',
-    },
+export default withNuxt({
+  rules: {
+    // Custom rules can be added here
   },
-];
+});
