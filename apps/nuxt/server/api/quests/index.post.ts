@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-export default defineEventHandler(async (event) => {
+const handler = defineEventHandler(async (event) => {
   const body = await readBody(event)
   const { title, description, userId } = body
 
@@ -18,3 +18,7 @@ export default defineEventHandler(async (event) => {
 
   return { success: true, quest }
 })
+
+export default handler
+
+export type CreateQuestResponse = Awaited<ReturnType<typeof handler>>
