@@ -1,9 +1,8 @@
-import withNuxt from './.nuxt/eslint.config.mjs';
+import { createConfigForNuxt } from '@nuxt/eslint-config/flat';
 
-export default withNuxt({
-  extends: ['plugin:prettier/recommended'],
+export default createConfigForNuxt({
   rules: {
-    // Custom rules can be added here
-    // 'vue/html-self-closing': 'off',
+    // 'vue/html-self-closing': ['error', { html: { void: 'always' } }],
+    // Add other custom rules here
   },
 });

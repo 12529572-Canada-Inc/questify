@@ -1,15 +1,15 @@
 export default defineNuxtConfig({
-  modules: ["@nuxt/eslint"],
+  modules: ['@nuxt/eslint'],
   // rest of your config...
   runtimeConfig: {
     redis: {
-      host: process.env.REDIS_HOST || "localhost",
-      port: process.env.REDIS_PORT || "6379",
-      password: process.env.REDIS_PASSWORD || "",
+      host: process.env.REDIS_HOST || 'localhost',
+      port: process.env.REDIS_PORT || '6379',
+      password: process.env.REDIS_PASSWORD || '',
     },
   },
   nitro: {
-    compatibilityDate: "2025-09-17", // update this every 3 months
+    compatibilityDate: '2025-09-17', // update this every 3 months
   },
   eslint: {
     // optional: settings
