@@ -27,8 +27,9 @@ const { data: quests, pending, error } = await useFetch('/api/quests')
             :key="task.id"
             class="text-gray-700"
           >
-            {{ task.order + 1 }}. {{ task.title }} —
-            <span class="italic">{{ task.status }}</span>
+            <span class="font-medium">{{ task.order + 1 }}. {{ task.title }}</span> —
+            <span class="text-gray-500">{{ task.details }}</span>
+            <span class="italic"> ({{ task.status }})</span>
           </li>
         </ul>
       </div>
