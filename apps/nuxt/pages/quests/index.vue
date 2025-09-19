@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import type { QuestsResponse } from '~/server/api/quests/index.get'
+import type { QuestsResponse } from "~/server/api/quests/index.get";
 
-const { data: quests, pending, error } = await useFetch<QuestsResponse>('/api/quests')
+const {
+  data: quests,
+  pending,
+  error,
+} = await useFetch<QuestsResponse>("/api/quests");
 </script>
 
 <template>
@@ -24,12 +28,11 @@ const { data: quests, pending, error } = await useFetch<QuestsResponse>('/api/qu
         </p>
 
         <ul class="mt-3 list-disc pl-5 space-y-1">
-          <li
-            v-for="task in quest.tasks"
-            :key="task.id"
-            class="text-gray-700"
-          >
-            <span class="font-medium">{{ task.order + 1 }}. {{ task.title }}</span> —
+          <li v-for="task in quest.tasks" :key="task.id" class="text-gray-700">
+            <span class="font-medium"
+              >{{ task.order + 1 }}. {{ task.title }}</span
+            >
+            —
             <span class="text-gray-500">{{ task.details }}</span>
             <span class="italic"> ({{ task.status }})</span>
           </li>

@@ -1,44 +1,48 @@
 <script setup lang="ts">
-import type { UsersResponse } from '~/server/api/users/index.get'
-import type { CreateQuestResponse } from '~/server/api/quests/index.post'
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import type { UsersResponse } from "~/server/api/users/index.get";
+import type { CreateQuestResponse } from "~/server/api/quests/index.post";
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
 
-const router = useRouter()
-const title = ref('')
-const description = ref('')
-const userId = ref('')
-const users = ref<UsersResponse>([])
+const router = useRouter();
+const title = ref("");
+const description = ref("");
+const userId = ref("");
+const users = ref<UsersResponse>([]);
 
-const loading = ref(false)
-const error = ref<string | null>(null)
+const loading = ref(false);
+const error = ref<string | null>(null);
 
 onMounted(async () => {
-  users.value = await $fetch<UsersResponse>('/api/users')
+  users.value = await $fetch<UsersResponse>("/api/users");
   if (users.value.length > 0) {
-    userId.value = users.value[0].id // default to first user
+    userId.value = users.value[0].id; // default to first user
   }
-})
+});
 
 async function submit() {
-  loading.value = true
-  error.value = null
+  loading.value = true;
+  error.value = null;
 
   try {
-    const res = await $fetch<CreateQuestResponse>('/api/quests', {
-      method: 'POST',
-      body: { title: title.value, description: description.value, userId: userId.value }
-    })
+    const res = await $fetch<CreateQuestResponse>("/api/quests", {
+      method: "POST",
+      body: {
+        title: title.value,
+        description: description.value,
+        userId: userId.value,
+      },
+    });
 
     if (res.success) {
-      router.push('/quests')
+      router.push("/quests");
     } else {
-      error.value = 'Failed to create quest'
+      error.value = "Failed to create quest";
     }
   } catch (e: any) {
-    error.value = e.message || 'Error creating quest'
+    error.value = e.message || "Error creating quest";
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 </script>
@@ -50,7 +54,12 @@ async function submit() {
     <form @submit.prevent="submit" class="space-y-4">
       <div>
         <label class="block mb-1 font-medium">Title</label>
-        <input v-model="title" type="text" class="w-full p-2 border rounded" required />
+        <input
+          v-model="title"
+          type="text"
+          class="w-full p-2 border rounded"
+          required
+        />
       </div>
 
       <div>
