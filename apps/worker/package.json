@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "ts-node src/index.ts",
-    "lint": "eslint . --ext .ts",
+    "lint": "eslint --ext .ts,.js ./src",
+    "format": "eslint --ext .ts,.js --fix ./src",
     "test": "vitest run"
   },
   "dependencies": {

@@ -7,7 +7,7 @@
     "build": "nuxt build",
     "start": "nuxt start",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "format": "eslint . --fix",
     "test": "vitest run"
   },
   "dependencies": {
