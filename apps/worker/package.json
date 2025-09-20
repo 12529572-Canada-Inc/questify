@@ -6,7 +6,9 @@
     "dev": "ts-node src/index.ts",
     "lint": "eslint --ext .ts,.js ./src",
     "format": "eslint --ext .ts,.js --fix ./src",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@prisma/client": "^5.0.0",
