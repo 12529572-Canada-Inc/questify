@@ -58,7 +58,7 @@
     <form class="space-y-4" @submit.prevent="submit">
       <div>
         <label class="block mb-1 font-medium">Title</label>
-        <input v-model="title" type="text" class="w-full p-2 border rounded" required >
+        <input v-model="title" type="text" class="w-full p-2 border rounded" required />
       </div>
 
       <div>
