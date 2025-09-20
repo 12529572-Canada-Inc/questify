@@ -1,19 +1,22 @@
+import tseslint from "@typescript-eslint/eslint-plugin";
+import tsParser from "@typescript-eslint/parser";
+
 export default [
   {
     files: ["**/*.ts", "**/*.js"],
     languageOptions: {
-      parser: "@typescript-eslint/parser",
+      parser: tsParser,
       parserOptions: {
         ecmaVersion: "latest",
         sourceType: "module",
-        project: "./tsconfig.json", // adjust path if worker has its own tsconfig
+        project: "./tsconfig.json", // adjust path if needed
       },
     },
     plugins: {
-      "@typescript-eslint": require("@typescript-eslint/eslint-plugin"),
+      "@typescript-eslint": tseslint,
     },
     rules: {
-      // Formatting / stylistic rules (mirroring your Nuxt config)
+      // Formatting / stylistic rules
       semi: ["error", "always"],
       quotes: ["error", "single", { avoidEscape: true }],
       indent: ["error", 2, { SwitchCase: 1 }],
@@ -32,7 +35,7 @@ export default [
       ],
       "no-trailing-spaces": ["error"],
 
-      // TS-specific
+      // TS-specific rules
       "@typescript-eslint/no-unused-vars": [
         "warn",
         { argsIgnorePattern: "^_" },
