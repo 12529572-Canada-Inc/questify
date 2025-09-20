@@ -148,6 +148,7 @@ Add the following to `.vscode/settings.json` for automatic ESLint fixes on save:
 ```json
 {
   "editor.formatOnSave": true,
+  "editor.defaultFormatter": "dbaeumer.vscode-eslint",
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "always"
   },
