@@ -8,18 +8,18 @@ This monorepo uses **Nuxt 3** for the frontend + API layer, **Prisma** for the d
 
 ## Structure
 
-- `apps/nuxt` — Frontend & API
-- `apps/worker` — Worker for background jobs
-- `packages/prisma` — Prisma schema & client
-- `packages/shared` — Shared types & utilities
+* `apps/nuxt` — Frontend & API
+* `apps/worker` — Worker for background jobs
+* `packages/prisma` — Prisma schema & client
+* `packages/shared` — Shared types & utilities
 
 # Development Setup
 
 ## Prerequisites
 
-- [Node.js](https://nodejs.org/) (>=18.x)
-- [pnpm](https://pnpm.io/) (>=8.x)
-- [Docker](https://www.docker.com/) (for Postgres + Redis)
+* [Node.js](https://nodejs.org/) (>=18.x)
+* [pnpm](https://pnpm.io/) (>=8.x)
+* [Docker](https://www.docker.com/) (for Postgres + Redis)
 
 ---
 
@@ -65,8 +65,8 @@ docker compose up -d
 
 This will start:
 
-- **Postgres** on port `5432`
-- **Redis** on port `6379`
+* **Postgres** on port `5432`
+* **Redis** on port `6379`
 
 ---
 
@@ -89,8 +89,8 @@ Start the Nuxt 3 frontend + API:
 pnpm dev:nuxt
 ```
 
-Available at:  
-👉 http://localhost:3000
+Available at:
+👉 [http://localhost:3000](http://localhost:3000)
 
 ---
 
@@ -98,10 +98,10 @@ Available at:
 
 Questify uses [BullMQ](https://docs.bullmq.io/) for background job processing.
 
-- The queue is initialized in a Nuxt **server plugin**:  
+* The queue is initialized in a Nuxt **server plugin**:
   `apps/nuxt/plugins/queue.server.ts`
 
-- Config is loaded from Nuxt runtime config:
+* Config is loaded from Nuxt runtime config:
 
 ```ts
 export default defineNuxtConfig({
@@ -115,7 +115,7 @@ export default defineNuxtConfig({
 });
 ```
 
-- Access inside API routes or server code:
+* Access inside API routes or server code:
 
 ```ts
 const { $questQueue } = useNuxtApp();
@@ -126,20 +126,81 @@ await $questQueue.add("decompose", { questId, title, description });
 
 ## 7. TypeScript Support
 
-Custom types for Nuxt app injections are declared in:  
+Custom types for Nuxt app injections are declared in:
 `apps/nuxt/plugins/types.d.ts`
 
 This ensures `$questQueue` is strongly typed across the app.
 
 ---
 
+# Release & Hotfix Workflow
+
+Questify follows **Git Flow** conventions.
+
+## 1. Creating a Release
+
+```bash
+# Make sure you're on develop
+git checkout develop
+git pull origin develop
+
+# Start a release branch
+git flow release start X.Y.Z
+
+# Update changelog and version
+# Commit any release-specific changes
+git add .
+git commit -m "Release X.Y.Z"
+
+# Finish the release (merges into main & develop, tags it)
+git flow release finish X.Y.Z
+
+# Push changes and tags
+git push origin main
+git push origin develop
+git push origin --tags
+```
+
+> The GitHub Actions workflow will automatically deploy on push tags like `v*.*.*`.
+
+---
+
+## 2. Creating a Hotfix
+
+Hotfixes fix urgent production issues.
+
+```bash
+# Start a hotfix branch from main
+git checkout main
+git pull origin main
+git flow hotfix start X.Y.Z
+
+# Apply your hotfix changes
+# Commit them
+git add .
+git commit -m "Hotfix: describe the fix"
+
+# Finish the hotfix (merges into main & develop, tags it)
+git flow hotfix finish X.Y.Z
+
+# Push changes and tags
+git push origin main
+git push origin develop
+git push origin --tags
+```
+
+> The release pipeline will run automatically for the new hotfix tag.
+
+---
+
 ✅ With this setup, contributors can:
 
-- Run Postgres + Redis locally
-- Use Prisma migrations and seed data
-- Develop Nuxt + BullMQ integrated features
+* Run Postgres + Redis locally
+* Use Prisma migrations and seed data
+* Develop Nuxt + BullMQ integrated features
+* Follow a clear **release & hotfix process**
 
-# Development Environment
+---
 
 ## VSCode Settings
 
@@ -154,4 +215,5 @@ Add the following to `.vscode/settings.json` for automatic ESLint fixes on save:
   },
   "eslint.validate": ["javascript", "typescript", "vue"]
 }
+
 ```
