@@ -34,16 +34,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
-    
-      # --- Create Env Files ---
-      - name: Create .env for Nuxt
-        run: |
-          cat <<EOF > ./apps/nuxt/.env
-          DATABASE_URL=${{ secrets.DATABASE_URL }}
-          REDIS_HOST=${{ secrets.REDIS_HOST }}
-          REDIS_PORT=${{ secrets.REDIS_PORT }}
-          REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
-          EOF
 
       # --- Prisma Database Setup ---
       - name: Generate Prisma Client
@@ -60,7 +50,12 @@ jobs:
 
       - name: Deploy Nuxt (Vercel)
         if: success()
-        run: npx vercel --prod --token=$VERCEL_TOKEN
+        run: |
+          npx vercel --prod \
+            --token=$VERCEL_TOKEN \
+            -e REDIS_HOST="${{ secrets.REDIS_HOST }}" \
+            -e REDIS_PORT="${{ secrets.REDIS_PORT }}" \
+            -e REDIS_PASSWORD="${{ secrets.REDIS_PASSWORD }}"
 
       - name: Deploy Worker (Docker)
         if: success()
