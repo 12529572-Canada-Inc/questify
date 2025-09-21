@@ -49,7 +49,7 @@ jobs:
           npx vercel deploy --prod --yes --confirm \
             --token="${{ secrets.VERCEL_TOKEN }}" \
             --scope="${{ secrets.VERCEL_ORG_ID }}" \
-            --project "${{ secrets.VERCEL_PROJECT_ID }}" \
+            --cwd=apps/nuxt \
             -e REDIS_HOST="${{ secrets.REDIS_HOST }}" \
             -e REDIS_PORT="${{ secrets.REDIS_PORT }}" \
             -e REDIS_PASSWORD="${{ secrets.REDIS_PASSWORD }}"
