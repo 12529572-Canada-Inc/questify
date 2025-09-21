@@ -25,3 +25,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed TypeScript ESLint errors in Worker `vitest.config.ts`.
 
 ---
+
+## [1.0.0] - 2025-09-20
+
+### Added
+- Official release of Nuxt app with Redis integration.
+- Worker service fully deployed with OpenAI and Redis secrets.
+- Prisma migrations applied and database initialized.
+- GitHub Actions pipeline for automated release deployment.
+
+### Changed
+- Version bump for all packages to match release v1.0.0.
+
+### Fixed
+- Minor test failures corrected.
+- Pipeline issues with `tsconfig` resolved for CI environment.
+
+---
