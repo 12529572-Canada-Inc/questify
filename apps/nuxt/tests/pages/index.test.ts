@@ -7,6 +7,6 @@ describe('Index Page', () => {
     const component = await mountSuspended(
       defineAsyncComponent(() => import('~/pages/index.vue')),
     )
-    expect(component.html()).toContain('Welcome')
+    expect(component.html()).toContain('Welcome to Questify 🎯')
   })
 })
