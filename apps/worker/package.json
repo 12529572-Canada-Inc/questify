@@ -1,10 +1,12 @@
 {
   "name": "worker",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "ts-node src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
     "lint": "eslint --ext .ts,.js ./src",
     "format": "eslint --ext .ts,.js --fix ./src",
     "test": "vitest run",
