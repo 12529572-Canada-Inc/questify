@@ -58,7 +58,7 @@ jobs:
         if: success()
         run: |
           # Build the Docker image using the worker Dockerfile
-          docker build -f apps/worker/Dockerfile -t questify-worker ./apps/worker
+          docker build -f apps/worker/Dockerfile -t questify-worker .
 
           # Log in to Docker Hub
           echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
