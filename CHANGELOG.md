@@ -11,6 +11,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.8] - 2025-09-21
+
+### Features
+- **Worker Deployment**: Added initial `Dockerfile`, `docker-entrypoint`, and `fly.toml` to support deploying the worker application on Fly.io.
+
+### Refactors
+- **Worker Dockerfile**: Streamlined by removing unnecessary build stages and optimizing dependency installation. 
+- **Release Workflow**: Replaced Docker Hub deployment with Fly.io GitHub Action for worker deployment.
+- **Fly.io Config**: Simplified `fly.toml` by removing unused options and ensuring `NODE_ENV` is set. 
+- **Cleanup**: Removed unused Dockerfile for worker application.
+
+### Chores
+- Updated CHANGELOG for version `1.1.7` with prior fixes and refactors.
+
+
+## [1.1.7] - 2025-09-21
+
+### Fixes
+- **Release Workflow**: Updated Docker build context to correctly reference worker app directory.  
+- **Worker Dockerfile**: Removed package upgrade step to avoid build warnings and improve stability.  
+
+### Refactors
+- Simplified `Dockerfile` by removing the multi-stage builder and unnecessary steps for a leaner image.  
+
+### Chore
+- Bumped version to **1.1.7** in `package.json` files for Nuxt, Worker, and Prisma packages. 
+
+---
+
 ## [1.1.6] - 2025-09-21
 
 ### Fixed
