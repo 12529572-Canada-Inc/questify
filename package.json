@@ -6,7 +6,6 @@
     "dev:worker": "pnpm --filter worker dev",
     "prisma:generate": "pnpm --filter prisma generate",
     "prisma:migrate": "pnpm --filter prisma migrate",
-    "prisma:deploy": "pnpm --filter prisma deploy",
     "prisma:seed": "pnpm --filter prisma seed",
     "prisma:reset": "pnpm --filter prisma reset",
     "lint": "pnpm lint:nuxt && pnpm lint:worker",
