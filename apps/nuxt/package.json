@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "nuxt dev",
+    "dev:prepare": "nuxt prepare",
     "build": "nuxt build",
     "start": "nuxt start",
     "lint": "eslint .",
