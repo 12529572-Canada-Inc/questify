@@ -11,6 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.9] - 2025-09-21
+### Fix
+- Update build configuration to use **Dockerfile** instead of Heroku buildpack
+
+### Chore
+- Bump package versions to **1.1.9** for Nuxt, Worker, and Prisma
+
+---
+
 ## [1.1.8] - 2025-09-21
 
 ### Features
@@ -25,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Chores
 - Updated CHANGELOG for version `1.1.7` with prior fixes and refactors.
 
+---
 
 ## [1.1.7] - 2025-09-21
 
