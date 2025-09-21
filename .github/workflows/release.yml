@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - "v*.*.*" # e.g. v1.0.0
+      - "v*.*.*" # e.g., v1.0.0
 
 env:
   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -13,6 +13,7 @@ env:
   REDIS_HOST: ${{ secrets.REDIS_HOST }}
   REDIS_PORT: ${{ secrets.REDIS_PORT }}
   REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
 jobs:
   release:
@@ -34,6 +35,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      # --- Prisma Database Setup ---
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Apply Prisma Migrations
+        run: npx prisma migrate deploy
+
+      # --- Build and Deploy Apps ---
       - name: Build apps
         run: |
           pnpm --filter nuxt build
