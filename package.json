@@ -8,6 +8,15 @@
     "db:migrate": "pnpm --filter prisma migrate",
     "db:seed": "pnpm --filter prisma seed",
     "db:reset": "pnpm --filter prisma exec -- prisma migrate reset --force && pnpm db:seed",
+    "lint": "pnpm lint:nuxt && pnpm lint:worker",
+    "lint:nuxt": "pnpm --filter nuxt lint",
+    "lint:worker": "pnpm --filter worker lint",
+    "format": "pnpm format:nuxt && pnpm format:worker",
+    "format:nuxt": "pnpm --filter nuxt format",
+    "format:worker": "pnpm --filter worker format",
+    "test": "pnpm test:nuxt && pnpm test:worker",
+    "test:nuxt": "pnpm --filter nuxt test",
+    "test:worker": "pnpm --filter worker test",
     "prepare": "pnpm --filter prisma prepare",
     "build": "pnpm --parallel build"
   }

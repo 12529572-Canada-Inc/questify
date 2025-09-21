@@ -9,6 +9,7 @@ pnpm-debug.log*
 dist/
 .build/
 .nuxt/
+.output/
 out/
 
 # Logs

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Questify transforms goals into epic quests.  
+Questify transforms goals into epic quests.
 
 This monorepo uses **Nuxt 3** for the frontend + API layer, **Prisma** for the database, and a **Worker** for AI-driven quest decomposition.
 
@@ -64,6 +64,7 @@ docker compose up -d
 ```
 
 This will start:
+
 - **Postgres** on port `5432`
 - **Redis** on port `6379`
 
@@ -95,7 +96,7 @@ Available at:
 
 ## 6. Redis Queue Plugin (BullMQ)
 
-Questify uses [BullMQ](https://docs.bullmq.io/) for background job processing.  
+Questify uses [BullMQ](https://docs.bullmq.io/) for background job processing.
 
 - The queue is initialized in a Nuxt **server plugin**:  
   `apps/nuxt/plugins/queue.server.ts`
@@ -106,19 +107,19 @@ Questify uses [BullMQ](https://docs.bullmq.io/) for background job processing.
 export default defineNuxtConfig({
   runtimeConfig: {
     redis: {
-      host: process.env.REDIS_HOST || 'localhost',
-      port: process.env.REDIS_PORT || '6379',
-      password: process.env.REDIS_PASSWORD || ''
-    }
-  }
-})
+      host: process.env.REDIS_HOST || "localhost",
+      port: process.env.REDIS_PORT || "6379",
+      password: process.env.REDIS_PASSWORD || "",
+    },
+  },
+});
 ```
 
 - Access inside API routes or server code:
 
 ```ts
-const { $questQueue } = useNuxtApp()
-await $questQueue.add('decompose', { questId, title, description })
+const { $questQueue } = useNuxtApp();
+await $questQueue.add("decompose", { questId, title, description });
 ```
 
 ---
@@ -132,7 +133,25 @@ This ensures `$questQueue` is strongly typed across the app.
 
 ---
 
-✅ With this setup, contributors can:  
-- Run Postgres + Redis locally  
-- Use Prisma migrations and seed data  
-- Develop Nuxt + BullMQ integrated features  
+✅ With this setup, contributors can:
+
+- Run Postgres + Redis locally
+- Use Prisma migrations and seed data
+- Develop Nuxt + BullMQ integrated features
+
+# Development Environment
+
+## VSCode Settings
+
+Add the following to `.vscode/settings.json` for automatic ESLint fixes on save:
+
+```json
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always"
+  },
+  "eslint.validate": ["javascript", "typescript", "vue"]
+}
+```
