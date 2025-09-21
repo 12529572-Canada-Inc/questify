@@ -68,6 +68,9 @@ importers:
       bullmq:
         specifier: ^4.0.0
         version: 4.18.3
+      dotenv:
+        specifier: ^17.2.2
+        version: 17.2.2
       openai:
         specifier: ^4.0.0
         version: 4.104.0(ws@8.18.3)
