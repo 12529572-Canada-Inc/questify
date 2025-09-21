@@ -11,6 +11,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.6] - 2025-09-21
+
+### Fixed
+- Update Docker deployment steps in release workflow for clarity and efficiency
+- Add missing build and start scripts in `package.json` for worker
+
+### Added
+- Dockerfile for building and running the worker application
+
+### Changed
+- Bump version to 1.1.6 in `package.json` files for Nuxt, Worker, and Prisma
+
+---
+
 ## [1.1.5] - 2025-09-21
 
 ### Fixed
