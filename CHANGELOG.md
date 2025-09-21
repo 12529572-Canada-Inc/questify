@@ -52,3 +52,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Resolved issues with pipeline failing due to missing `pnpm` installation and database configuration.
 
 ---
+
+## [1.1.1] - 2025-09-20
+
+### Fixed
+- Corrected Prisma schema path in release pipeline so `prisma generate` and `prisma migrate deploy` work in CI/CD.
+- Ensured Prisma commands explicitly point to `packages/prisma/schema.prisma` in `release.yml`.
+
+---
