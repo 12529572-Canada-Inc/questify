@@ -5,16 +5,6 @@ on:
     tags:
       - "v*.*.*" # e.g., v1.0.0
 
-env:
-  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-  REDIS_HOST: ${{ secrets.REDIS_HOST }}
-  REDIS_PORT: ${{ secrets.REDIS_PORT }}
-  REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
-  DATABASE_URL: ${{ secrets.DATABASE_URL }}
-
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -42,7 +32,10 @@ jobs:
         run: pnpm prisma:generate
 
       - name: Deploy Prisma Migrations
-        run: pnpm prisma:deploy
+        working-directory: packages/prisma
+        run: pnpm run deploy
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       # --- Build and Deploy Apps ---
       - name: Build apps
@@ -54,7 +47,7 @@ jobs:
         if: success()
         run: |
           npx vercel --prod \
-            --token=$VERCEL_TOKEN \
+            --token="${{ secrets.VERCEL_TOKEN }}" \
             -e REDIS_HOST="${{ secrets.REDIS_HOST }}" \
             -e REDIS_PORT="${{ secrets.REDIS_PORT }}" \
             -e REDIS_PASSWORD="${{ secrets.REDIS_PASSWORD }}"
@@ -66,11 +59,11 @@ jobs:
           docker build -t questify-worker ./apps/worker
 
           # Log in to Docker
-          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
           # Push the image to Docker Hub
-          docker tag questify-worker:latest $DOCKER_USERNAME/questify-worker:latest
-          docker push $DOCKER_USERNAME/questify-worker:latest
+          docker tag questify-worker:latest ${{ secrets.DOCKER_USERNAME }}/questify-worker:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/questify-worker:latest
 
           # Run the container with secrets injected at runtime
           docker run -d \
@@ -79,5 +72,5 @@ jobs:
             -e REDIS_PORT="${{ secrets.REDIS_PORT }}" \
             -e REDIS_PASSWORD="${{ secrets.REDIS_PASSWORD }}" \
             -e OPENAI_API_KEY="${{ secrets.OPENAI_API_KEY }}" \
-            --name questify-worker $DOCKER_USERNAME/questify-worker:latest
+            --name questify-worker ${{ secrets.DOCKER_USERNAME }}/questify-worker:latest
 
