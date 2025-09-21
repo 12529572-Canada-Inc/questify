@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.10] - 2025-09-21
+
+### Fixed
+- Bump package versions to 1.1.10 for `nuxt`, `worker`, and `prisma`
+- Update Dockerfile path in `fly.toml` configuration
+
+---
+
 ## [1.1.9] - 2025-09-21
 ### Fix
 - Update build configuration to use **Dockerfile** instead of Heroku buildpack
