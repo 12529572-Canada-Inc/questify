@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.12] – 2025-09-21
+
+### Fixed
+- Updated deployment configuration for worker app in release workflow and Dockerfile
+
+### Chore
+- Bumped package versions to `1.1.12` for Nuxt, worker, and Prisma
+
+---
+
 ## [1.1.11] – 2025-09-21
 
 ### Fixed
