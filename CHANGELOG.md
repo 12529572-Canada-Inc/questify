@@ -74,3 +74,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bump version to 1.1.2 for Nuxt, Worker, and Prisma packages
 
 ---
+
+# [1.1.3] - 2025-09-20
+
+## Refactor
+- Streamline environment variable usage in release workflow and update Prisma deployment steps
+- Remove unused `prisma:deploy` script from package.json
+
+## Chore
+- Bump version to 1.1.3 in package.json files for Nuxt, Worker, and Prisma packages
+
+---
