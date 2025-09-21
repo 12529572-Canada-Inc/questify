@@ -1,16 +1,16 @@
 import { defineConfig } from 'vitest/config'
-import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 export default defineConfig({
   test: {
+    environment: 'nuxt', // 🔑 use Nuxt test environment
     globals: true,
-    environment: 'happy-dom',
     include: ['tests/**/*.test.ts'],
   },
   resolve: {
     alias: {
-      '~': path.resolve(__dirname), // root of the Nuxt app
-      '@': path.resolve(__dirname), // same as Nuxt’s default
+      '~': fileURLToPath(new URL('./', import.meta.url)),
+      '@': fileURLToPath(new URL('./', import.meta.url)),
     },
   },
 })
