@@ -11,6 +11,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.4] - 2025-09-21
+
+### Fixed
+- Updated Vercel deployment command to include `--scope` and `--project` parameters for proper project targeting.
+
+### Added
+- Introduced Vercel configuration file for improved deployment consistency.
+
+### Changed
+- Reorganized `CHANGELOG.md` for clarity and improved versioning structure.
+
+### Chore
+- Bumped version to **1.1.4** across `nuxt`, `worker`, and `prisma` packages.
+
+---
+
 # [1.1.3] - 2025-09-20
 
 ## Refactor
