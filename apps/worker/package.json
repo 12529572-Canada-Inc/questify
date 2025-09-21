@@ -2,6 +2,7 @@
   "name": "worker",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "ts-node src/index.ts",
     "lint": "eslint --ext .ts,.js ./src",
