@@ -11,7 +11,7 @@ importers:
   apps/nuxt:
     dependencies:
       '@prisma/client':
-        specifier: ^5.0.0
+        specifier: 5.22.0
         version: 5.22.0(prisma@5.22.0)
       bullmq:
         specifier: ^4.0.0
@@ -63,7 +63,7 @@ importers:
   apps/worker:
     dependencies:
       '@prisma/client':
-        specifier: ^5.0.0
+        specifier: 5.22.0
         version: 5.22.0(prisma@5.22.0)
       bullmq:
         specifier: ^4.0.0
@@ -100,14 +100,14 @@ importers:
   packages/prisma:
     dependencies:
       '@prisma/client':
-        specifier: ^5.0.0
+        specifier: 5.22.0
         version: 5.22.0(prisma@5.22.0)
     devDependencies:
       '@types/node':
         specifier: ^24.5.1
         version: 24.5.1
       prisma:
-        specifier: ^5.0.0
+        specifier: 5.22.0
         version: 5.22.0
       ts-node:
         specifier: ^10.9.1

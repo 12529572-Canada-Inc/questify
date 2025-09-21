@@ -60,3 +60,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ensured Prisma commands explicitly point to `packages/prisma/schema.prisma` in `release.yml`.
 
 ---
+
+# [1.1.2] - 2025-09-20
+
+### Refactor
+- Update Prisma commands in workflows and package scripts
+
+### Fixes
+- Update `@prisma/client` version to 5.22.0 in `pnpm-lock.yaml`
+- Update `@prisma/client` and `prisma` version to 5.22.0 in `package.json` files
+
+### Chores
+- Bump version to 1.1.2 for Nuxt, Worker, and Prisma packages
+
+---
