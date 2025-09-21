@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.5] - 2025-09-21
+
+### Fixed
+- Corrected Vercel deployment command by removing invalid `--project` parameter and replacing with the proper usage.
+- Bumped version to `1.1.5` across Nuxt, Worker, and Prisma packages.
+
+---
+
 ## [1.1.4] - 2025-09-21
 
 ### Fixed
