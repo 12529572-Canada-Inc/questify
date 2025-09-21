@@ -5,8 +5,10 @@
   "scripts": {
     "generate": "prisma generate",
     "migrate": "prisma migrate dev",
+    "deploy": "prisma migrate deploy",
     "prepare": "prisma generate",
-    "seed": "ts-node seed.ts"
+    "seed": "ts-node seed.ts",
+    "reset": "prisma migrate reset --force && pnpm seed"
   },
   "dependencies": {
     "@prisma/client": "5.22.0"

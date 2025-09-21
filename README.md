@@ -75,8 +75,8 @@ This will start:
 Run Prisma migrations + seed:
 
 ```bash
-pnpm db:migrate
-pnpm db:seed
+pnpm prisma:migrate
+pnpm prisma:seed
 ```
 
 ---
