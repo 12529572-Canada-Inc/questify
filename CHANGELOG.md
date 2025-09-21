@@ -11,6 +11,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.11] – 2025-09-21
+
+### Fixed
+- Bump package versions to 1.1.11 for `nuxt`, `worker`, and `prisma`
+- Updated `dotenv` dependency to version `17.2.2` in `package.json` and `pnpm-lock.yaml`
+
+### Changed
+- Removed `node_modules` from `.dockerignore`  
+- Removed `"type"` field from `package.json` to avoid ES module issues  
+- Simplified worker `Dockerfile` and removed entrypoint script
+
+---
+
 ## [1.1.10] - 2025-09-21
 
 ### Fixed
