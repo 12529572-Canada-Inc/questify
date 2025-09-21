@@ -8,7 +8,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 
 # Copy the already built worker app from release pipeline
-COPY . .
+COPY ./apps/worker .
 
 # Default command to run the app
 CMD ["npm", "run", "start"]
