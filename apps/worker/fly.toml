@@ -8,9 +8,3 @@ primary_region = 'yyz'
 
 [build]
   dockerfile = "Dockerfile"
-
-[env]
-  NODE_ENV = "production"
-
-[processes]
-  worker = "node dist/index.js"
