@@ -57,22 +57,13 @@ jobs:
       - name: Deploy Worker (Docker)
         if: success()
         run: |
-          # Build the Docker image
-          docker build -t questify-worker ./apps/worker
+          # Build the Docker image using the worker Dockerfile
+          docker build -f apps/worker/Dockerfile -t questify-worker ./apps/worker
 
-          # Log in to Docker
+          # Log in to Docker Hub
           echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-          # Push the image to Docker Hub
+          # Tag and push the image
           docker tag questify-worker:latest ${{ secrets.DOCKER_USERNAME }}/questify-worker:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/questify-worker:latest
-
-          # Run the container with secrets injected at runtime
-          docker run -d \
-            -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
-            -e REDIS_HOST="${{ secrets.REDIS_HOST }}" \
-            -e REDIS_PORT="${{ secrets.REDIS_PORT }}" \
-            -e REDIS_PASSWORD="${{ secrets.REDIS_PASSWORD }}" \
-            -e OPENAI_API_KEY="${{ secrets.OPENAI_API_KEY }}" \
-            --name questify-worker ${{ secrets.DOCKER_USERNAME }}/questify-worker:latest
 
