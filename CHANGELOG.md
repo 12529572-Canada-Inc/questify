@@ -42,3 +42,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Pipeline issues with `tsconfig` resolved for CI environment.
 
 ---
+
+## [1.1.0] - 2025-09-20
+
+### Added
+- Updated `README.md` with release and hotfix instructions.
+
+### Fixed
+- Resolved issues with pipeline failing due to missing `pnpm` installation and database configuration.
+
+---
