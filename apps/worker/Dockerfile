@@ -27,10 +27,10 @@ WORKDIR /app
 
 RUN corepack enable
 
-# Copy only what we need
+# Copy minimal files
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/worker/package.json ./apps/worker/
-COPY apps/worker/dist ./apps/worker/dist
+COPY --from=builder /app/apps/worker/dist ./apps/worker/dist
 COPY packages/prisma ./packages/prisma
 
 # Install only production deps for worker
@@ -39,7 +39,8 @@ RUN pnpm install --filter worker --prod --frozen-lockfile
 WORKDIR /app/apps/worker
 ENV NODE_ENV=production
 
-# 🔍 Debug: confirm bullmq is present in node_modules
-RUN ls -R /app/node_modules | grep bullmq || echo "⚠️ bullmq not found!"
+# Debug: check bullmq
+RUN ls -l /app/node_modules/.pnpm | grep bullmq || echo "⚠️ bullmq not found!"
 
 CMD ["node", "dist/index.js"]
+
