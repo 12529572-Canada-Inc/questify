@@ -13,7 +13,7 @@ COPY tsconfig.json ./
 RUN corepack enable
 
 # Install dependencies (only what's needed for build)
-RUN pnpm install --filter worker --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 
 # Generate Prisma client inside the container
 WORKDIR /app/packages/prisma
