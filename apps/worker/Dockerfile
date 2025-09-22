@@ -23,11 +23,13 @@ WORKDIR /app
 
 RUN corepack enable
 
-# Copy only worker + deps with pnpm deploy
+# Copy the entire workspace (so pnpm knows about it)
 COPY --from=builder /app ./
-RUN pnpm deploy --filter worker --prod --no-frozen-lockfile --dir /app/worker
 
-WORKDIR /app/worker
+# Deploy only the worker app + its runtime deps
+RUN pnpm deploy --filter worker --prod --no-frozen-lockfile --dir /app/apps/worker
+
+WORKDIR /app/apps/worker
 
 ENV NODE_ENV=production
 
