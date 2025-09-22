@@ -13,9 +13,6 @@ RUN corepack enable
 # Install all dependencies (workspace-aware)
 RUN pnpm install --frozen-lockfile
 
-# Generate Prisma client
-RUN pnpm --filter prisma generate
-
 # Build worker
 RUN pnpm --filter worker build
 
@@ -24,10 +21,13 @@ FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-COPY --from=builder /app/apps/worker/dist ./dist
-COPY --from=builder /app/apps/worker/package.json ./
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/packages/prisma ./prisma
+RUN corepack enable
+
+# Copy only worker + deps with pnpm deploy
+COPY --from=builder /app ./
+RUN pnpm deploy --filter worker --prod --no-frozen-lockfile --dir /app/worker
+
+WORKDIR /app/worker
 
 ENV NODE_ENV=production
 
