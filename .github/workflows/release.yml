@@ -58,7 +58,7 @@ jobs:
         if: success()
         uses: superfly/flyctl-actions@1.4
         with:
-          args: "deploy --local-only --config ./apps/worker/fly.toml"
+          args: "deploy --local-only --config ./apps/worker/fly.toml --dockerfile ./apps/worker/Dockerfile --context ./"
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 

@@ -7,8 +7,15 @@ FROM node:${NODE_VERSION}-slim AS base
 WORKDIR /app
 ENV NODE_ENV=production
 
-# Copy the already built worker app from release pipeline
-COPY ./apps/worker .
+# Copy only worker package.json (for runtime deps)
+COPY apps/worker/package.json ./
+COPY pnpm-lock.yaml ./
 
-# Default command to run the app
-CMD ["npm", "run", "start"]
+# Install only production deps
+RUN npm install --omit=dev
+
+# Copy prebuilt worker output
+COPY apps/worker/dist ./dist
+
+# Start worker
+CMD ["node", "dist/index.js"]
