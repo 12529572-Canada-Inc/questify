@@ -9,6 +9,7 @@ COPY . .
 RUN corepack enable
 
 # Install all dependencies
+ENV CI=true
 RUN pnpm install --frozen-lockfile
 
 # Generate Prisma client
