@@ -27,7 +27,7 @@ RUN corepack enable
 COPY --from=builder /app ./
 
 # Deploy only the worker app + its runtime deps
-RUN pnpm deploy --filter worker --prod --no-frozen-lockfile --dir /app/apps/worker
+RUN pnpm deploy --filter worker --prod --no-frozen-lockfile /app/apps/worker
 
 WORKDIR /app/apps/worker
 
