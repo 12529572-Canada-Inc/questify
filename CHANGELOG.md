@@ -11,6 +11,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.13] - 2025-09-21
+
+### Fixes
+- **Deployment**: Updated Fly.io deployment args to explicitly include `Dockerfile` and build `context` for more reliable deployments. 
+- **Dependencies**: Bumped package versions to `1.1.13` for **nuxt**, **worker**, and **prisma** apps.
+- **Docker**:  
+  - Added `node_modules` to `.dockerignore` to reduce image size. 
+  - Updated `Dockerfile` to copy only necessary files and set production environment.
+- **Worker App**: Adjusted TypeScript config for Node.js types:  
+  - Added Node types.
+  - Removed Node types to fix compatibility.
+
+---
+
+
 ## [1.1.12] – 2025-09-21
 
 ### Fixed
