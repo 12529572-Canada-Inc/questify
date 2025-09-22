@@ -1,36 +1,36 @@
-# Stage 1: Builder
+# --- Builder Stage ---
 FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY tsconfig.json ./
-COPY apps/worker ./apps/worker
-COPY packages ./packages
-
+# Enable corepack (so pnpm is available)
 RUN corepack enable
 
-# Install all dependencies (workspace-aware)
+# Copy only package manager files first (better cache)
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+
+# Copy the rest of the repo
+COPY . .
+
+# Install all dependencies (needed to build worker)
 RUN pnpm install --frozen-lockfile
 
-# Build worker
+# Build the worker app
 RUN pnpm --filter worker build
 
-# Stage 2: Runtime
+# Deploy worker with production dependencies only
+RUN pnpm deploy --filter worker --prod --no-frozen-lockfile /app/worker
+
+# --- Runtime Stage ---
 FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-RUN corepack enable
+# Copy production worker bundle from builder
+COPY --from=builder /app/worker ./
 
-# Copy the entire workspace (so pnpm knows about it)
-COPY --from=builder /app ./
-
-# Deploy only the worker app + its runtime deps
-RUN pnpm deploy --filter worker --prod --no-frozen-lockfile /app/apps/worker
-
-WORKDIR /app/apps/worker
-
+# Set environment to production
 ENV NODE_ENV=production
 
+# Run worker
 CMD ["node", "dist/index.js"]
