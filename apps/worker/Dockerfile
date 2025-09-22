@@ -3,7 +3,7 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy all files
+# Copy all files for building
 COPY . .
 
 # Enable pnpm
@@ -12,7 +12,7 @@ RUN corepack enable
 # Set CI to avoid TTY errors
 ENV CI=true
 
-# Install all workspace dependencies
+# Install all dependencies (for build)
 RUN pnpm install --frozen-lockfile
 
 # Generate Prisma client
@@ -23,18 +23,26 @@ RUN pnpm prisma generate
 WORKDIR /app/apps/worker
 RUN pnpm build
 
-# Stage 2: Runtime
+# Stage 2: Runtime (Production)
 FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-# Copy built worker + dependencies + prisma client
+# Copy built worker
 COPY --from=builder /app/apps/worker/dist ./dist
-COPY --from=builder /app/apps/worker/package.json ./
-COPY --from=builder /app/node_modules ./node_modules
+COPY apps/worker/package.json ./package.json
+COPY pnpm-workspace.yaml ./
+COPY pnpm-lock.yaml ./
+
+# Enable pnpm & install **production dependencies only**
+RUN corepack enable \
+    && CI=true \
+    && pnpm install --prod
+
+# Copy Prisma client
 COPY --from=builder /app/packages/prisma ./prisma
 
 ENV NODE_ENV=production
 
-# Fly.io runs as root by default, so we can keep CMD simple
+# Run worker
 CMD ["node", "dist/index.js"]
