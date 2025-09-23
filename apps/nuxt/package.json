@@ -11,9 +11,7 @@
     "format": "eslint . --fix",
     "test": "vitest run",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest run --coverage",
-    "copy:prisma": "mkdir -p prisma && cp ../../packages/prisma/schema.prisma ./prisma/schema.prisma",
-    "postinstall": "pnpm run copy:prisma && prisma generate --schema ./prisma/schema.prisma"
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@prisma/client": "5.22.0",
