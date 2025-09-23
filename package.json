@@ -19,5 +19,8 @@
     "test:worker": "pnpm --filter worker test",
     "prepare": "pnpm --filter prisma prepare",
     "build": "pnpm --parallel build"
+  },
+  "prisma": {
+    "schema": "packages/prisma/schema.prisma"
   }
 }
