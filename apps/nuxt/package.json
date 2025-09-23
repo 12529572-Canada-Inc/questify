@@ -12,7 +12,8 @@
     "test": "vitest run",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
-    "postinstall": "prisma generate --schema ../../packages/prisma/schema.prisma"
+    "copy:prisma": "mkdir -p prisma && cp ../../packages/prisma/schema.prisma ./prisma/schema.prisma",
+    "postinstall": "pnpm run copy:prisma && prisma generate --schema ./prisma/schema.prisma"
   },
   "dependencies": {
     "@prisma/client": "5.22.0",
