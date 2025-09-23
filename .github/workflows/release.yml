@@ -50,9 +50,7 @@ jobs:
             --scope="${{ secrets.VERCEL_ORG_ID }}" \
             --cwd=. \
             -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
-            -e REDIS_HOST="${{ secrets.REDIS_HOST }}" \
-            -e REDIS_PORT="${{ secrets.REDIS_PORT }}" \
-            -e REDIS_PASSWORD="${{ secrets.REDIS_PASSWORD }}"
+            -e REDIS_URL="${{ secrets.REDIS_URL }}"
 
       - name: Deploy Worker to Fly.io
         if: success()
@@ -61,5 +59,7 @@ jobs:
           args: "deploy --local-only --config ./apps/worker/fly.toml"
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          REDIS_URL: ${{ secrets.REDIS_URL }}
 
 
