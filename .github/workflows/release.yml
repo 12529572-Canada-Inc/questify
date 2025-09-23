@@ -27,8 +27,8 @@ jobs:
         run: pnpm install
 
       # --- Prisma Database Setup ---
-    #   - name: Generate Prisma Client
-    #     run: pnpm prisma:generate
+      - name: Generate Prisma Client
+        run: pnpm prisma:generate
 
       - name: Deploy Prisma Migrations
         working-directory: packages/prisma
