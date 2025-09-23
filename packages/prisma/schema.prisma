@@ -17,13 +17,13 @@ model User {
 
 model Quest {
   id        String   @id @default(cuid())
-  ownerId   String
+  ownerId   String?   // make optional until we have auth
   title     String
   description String?
   status    String   @default("draft") // draft, active, completed
   tasks     Task[]
   createdAt DateTime @default(now())
-  owner     User     @relation(fields: [ownerId], references: [id])
+  owner     User?     @relation(fields: [ownerId], references: [id])
 }
 
 model Task {
