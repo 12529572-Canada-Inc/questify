@@ -4,7 +4,8 @@
     "module": "CommonJS",
     "target": "ESNext",
     "strict": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "composite": true
   },
   "include": ["."],
   "exclude": ["node_modules", "dist"]

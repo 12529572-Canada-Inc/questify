@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import OpenAI from 'openai';
 import { config } from './config';
 import { parseJsonFromModel } from './helpers';
-import { parseRedisUrl } from 'shared/redis';
+import { parseRedisUrl } from 'shared';
 
 const prisma = new PrismaClient();
 const openai = new OpenAI({ apiKey: config.openaiApiKey });
