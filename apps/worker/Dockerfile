@@ -15,12 +15,9 @@ RUN pnpm install --frozen-lockfile
 # Generate Prisma client
 RUN pnpm --filter prisma generate
 
-# Build worker
-RUN pnpm --filter worker build
+# Build apps
+RUN pnpm build
 
 WORKDIR /app/apps/worker
-
-# Debug: check bullmq
-# RUN ls -l /app/node_modules/.pnpm | grep bullmq || echo "⚠️ bullmq not found!"
 
 CMD ["node", "dist/index.js"]
