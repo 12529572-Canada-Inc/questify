@@ -58,14 +58,14 @@ new Worker(
       }
     }
   },
-  { 
-    connection: parseRedisUrl(config.redisUrl) || { 
+  {
+    connection: parseRedisUrl(config.redisUrl) || {
       host: config.redisHost,
       port: config.redisPort,
       password: config.redisPassword || undefined,
-      tls: config.redisTls ? {} : undefined
-    }
-  }
+      tls: config.redisTls ? {} : undefined,
+    },
+  },
 );
 
 console.log('Questify worker is running...');
