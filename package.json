@@ -18,6 +18,9 @@
     "test:nuxt": "pnpm --filter nuxt test",
     "test:worker": "pnpm --filter worker test",
     "prepare": "pnpm --filter prisma prepare",
-    "build": "pnpm --parallel build"
+    "build": "pnpm --recursive build"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
   }
 }

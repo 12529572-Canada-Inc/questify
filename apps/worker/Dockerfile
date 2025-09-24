@@ -1,21 +1,23 @@
-# syntax = docker/dockerfile:1
-
-# Use a small Node.js image
-ARG NODE_VERSION=20.17.0
-FROM node:${NODE_VERSION}-slim AS base
+FROM node:24-alpine
 
 WORKDIR /app
-ENV NODE_ENV=production
 
-# Copy only worker package.json (for runtime deps)
-COPY apps/worker/package.json ./
-COPY pnpm-lock.yaml ./
+RUN corepack enable
 
-# Install only production deps
-RUN npm install --omit=dev
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY tsconfig.json ./
+COPY apps/worker ./apps/worker/
+COPY packages ./packages/
 
-# Copy prebuilt worker output
-COPY apps/worker/dist ./dist
+# Install all dependencies
+RUN pnpm install --frozen-lockfile
 
-# Start worker
+# Generate Prisma client
+RUN pnpm --filter prisma generate
+
+# Build apps
+RUN pnpm build
+
+WORKDIR /app/apps/worker
+
 CMD ["node", "dist/index.js"]

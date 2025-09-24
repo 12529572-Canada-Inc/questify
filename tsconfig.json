@@ -1,7 +1,13 @@
 {
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "shared": ["packages/shared/src"],
+      "shared/*": ["packages/shared/src/*"]
+    }
+  },
   "files": [],
   "references": [
-    { "path": "./apps/nuxt" },
     { "path": "./apps/worker" },
     { "path": "./packages/prisma" },
     { "path": "./packages/shared" }

@@ -40,3 +40,6 @@ coverage/
 # Docker
 docker-data/
 .vercel
+
+# Ignore copied prisma schema in Nuxt
+apps/nuxt/prisma/*
