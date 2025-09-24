@@ -21,9 +21,6 @@ jobs:
       - name: Enable Corepack (for pnpm)
         run: corepack enable
 
-      - name: Install pnpm dependencies
-        run: pnpm install
-
       - name: Install dependencies
         run: pnpm install
 
@@ -39,9 +36,7 @@ jobs:
 
       # --- Build and Deploy Apps ---
       - name: Build apps
-        run: |
-          pnpm --filter nuxt build
-          pnpm --filter worker build
+        run: pnpm build
 
       - name: Deploy Nuxt (Vercel)
         if: success()
@@ -49,16 +44,15 @@ jobs:
           npx vercel deploy --prod --yes --confirm \
             --token="${{ secrets.VERCEL_TOKEN }}" \
             --scope="${{ secrets.VERCEL_ORG_ID }}" \
-            --cwd=apps/nuxt \
-            -e REDIS_HOST="${{ secrets.REDIS_HOST }}" \
-            -e REDIS_PORT="${{ secrets.REDIS_PORT }}" \
-            -e REDIS_PASSWORD="${{ secrets.REDIS_PASSWORD }}"
+            --cwd=. \
+            -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
+            -e REDIS_URL="${{ secrets.REDIS_URL }}"
 
       - name: Deploy Worker to Fly.io
         if: success()
         uses: superfly/flyctl-actions@1.4
         with:
-          args: "deploy --local-only --config ./apps/worker/fly.toml --dockerfile ./apps/worker/Dockerfile --context ./"
+          args: "deploy --local-only --config ./apps/worker/fly.toml"
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
