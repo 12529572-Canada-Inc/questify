@@ -38,9 +38,7 @@ jobs:
 
       # --- Build and Deploy Apps ---
       - name: Build apps
-        run: |
-          pnpm --filter nuxt build
-          pnpm --filter worker build
+        run: pnpm build
 
       - name: Deploy Nuxt (Vercel)
         if: success()
