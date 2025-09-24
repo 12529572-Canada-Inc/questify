@@ -11,6 +11,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.14] - 2025-09-24
+
+### Fixes
+- **Worker App**: Corrected formatting of connection object during initialization.
+- **Index Page**: Simplified and enhanced component styling for better clarity, responsiveness, and visual appeal.
+- **Release Workflow**: Restored tag-based trigger to ensure proper release flow.
+- **Deployment**:  
+  - Removed unnecessary environment variables from Fly.io deployment step.  
+  - Corrected start script path in `package.json` and aligned Dockerfile `CMD` with `npm start`.  
+  - Adjusted Fly.io deployment args to remove redundant Dockerfile/context options.  
+- **Nuxt App**: Added `rootDir` to `tsconfig.json` for proper TypeScript resolution.  
+- **CI**: Set `CI` environment variable in Dockerfile for consistent builds.  
+
+### Refactors
+- **Dockerfile & Build Process**:  
+  - Consolidated build steps and reorganized structure for clarity and caching.  
+  - Optimized dependency installation and enabled `corepack` earlier.  
+  - Cleaned up and standardized comments, removed unused steps, and reduced image size.  
+- **TypeScript & Nuxt**:  
+  - Added TypeScript as a devDependency.  
+  - Removed unused compiler options and updated `tsconfig` references for Nuxt.  
+- **Shared Package & Redis**:  
+  - Introduced `shared` package and updated imports across apps.  
+  - Added `parseRedisUrl` utility and streamlined Redis environment configuration.  
+- **Quest Model (Database)**: Made `ownerId` optional in schema, migration, and logic (defaults to `null` if undefined).  
+- **Prisma Configuration**:  
+  - Simplified schema handling in `postinstall` scripts.  
+  - Cleaned up generator output paths and related dependencies.  
+  - Standardized Prisma setup across Nuxt, Worker, and release workflow.  
+- **Vercel Deployment**: Improved configuration by adding `DATABASE_URL` and adjusting directory context.  
+
+### Chores
+- Bumped package versions to **1.1.14** for Nuxt, Worker, and Prisma apps.
+- Updated Prisma dependency to version `5.22.0` in `pnpm-lock.yaml`.
+
+---
+
 ## [1.1.13] - 2025-09-21
 
 ### Fixes
