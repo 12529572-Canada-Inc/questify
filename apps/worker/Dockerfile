@@ -25,7 +25,4 @@ COPY --from=builder /app/package.json ./package.json
 
 WORKDIR /app/apps/worker
 
-# ✅ Ensure dist exists
-RUN ls -l dist || (echo "⚠️ dist missing!" && exit 1)
-
-CMD ["npm", "start"]
+CMD ["node", "dist/index.js"]
