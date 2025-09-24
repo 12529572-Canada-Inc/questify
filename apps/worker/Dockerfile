@@ -28,4 +28,4 @@ WORKDIR /app/apps/worker
 # ✅ Ensure dist exists
 RUN ls -l dist || (echo "⚠️ dist missing!" && exit 1)
 
-CMD ["node", "dist/index.js"]
+CMD ["node", "start"]
