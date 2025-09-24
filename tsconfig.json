@@ -8,7 +8,6 @@
   },
   "files": [],
   "references": [
-    { "path": "./apps/nuxt" },
     { "path": "./apps/worker" },
     { "path": "./packages/prisma" },
     { "path": "./packages/shared" }

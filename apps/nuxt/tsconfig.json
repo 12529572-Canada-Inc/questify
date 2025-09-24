@@ -1,8 +1,4 @@
 {
   "extends": "./.nuxt/tsconfig.json",
-  "compilerOptions": {
-    "composite": true,
-    "noEmit": true
-  },
   "references": [{ "path": "../../packages/shared" }]
 }
