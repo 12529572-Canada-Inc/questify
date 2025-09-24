@@ -1,5 +1,5 @@
 import { Queue } from 'bullmq'
-import { parseRedisUrl } from '~/utils/parseRedisUrl'
+import { parseRedisUrl } from 'shared/redis'
 
 export default defineNitroPlugin((nitroApp) => {
   const config = useRuntimeConfig()

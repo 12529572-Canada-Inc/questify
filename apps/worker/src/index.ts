@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import OpenAI from 'openai';
 import { config } from './config';
 import { parseJsonFromModel } from './helpers';
+import { parseRedisUrl } from 'shared/redis';
 
 const prisma = new PrismaClient();
 const openai = new OpenAI({ apiKey: config.openaiApiKey });
@@ -57,7 +58,14 @@ new Worker(
       }
     }
   },
-  { connection: { host: config.redisHost, port: config.redisPort } },
+  { 
+    connection: parseRedisUrl(config.redisUrl) || { 
+      host: config.redisHost,
+      port: config.redisPort,
+      password: config.redisPassword || undefined,
+      tls: config.redisTls ? {} : undefined
+    }
+  }
 );
 
 console.log('Questify worker is running...');
