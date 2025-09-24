@@ -32,6 +32,7 @@
     "eslint-plugin-vue": "^10.4.0",
     "happy-dom": "^18.0.1",
     "typescript": "^5.0.0",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "vuetify-nuxt-module": "^0.18.7"
   }
 }
