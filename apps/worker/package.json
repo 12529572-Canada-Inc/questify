@@ -2,6 +2,7 @@
   "name": "worker",
   "version": "1.1.14",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "ts-node src/index.ts",
     "build": "tsc -p tsconfig.json",
