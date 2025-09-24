@@ -2,10 +2,8 @@ name: Release
 
 on:
   push:
-    # tags:
-    #   - "v*.*.*" # e.g., v1.0.0
-    branches:
-      - "**" # Trigger on any branch push
+    tags:
+      - "v*.*.*" # e.g., v1.0.0
 
 jobs:
   release:
