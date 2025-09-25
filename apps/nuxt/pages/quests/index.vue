@@ -1,57 +1,71 @@
 <script setup lang="ts">
-import type { QuestsResponse } from '~/server/api/quests/index.get'
+import { useQuests } from '~/composables/useQuest'
 
-const { data: quests, pending, error } = await useFetch<QuestsResponse>('/api/quests')
+const { data: quests } = await useQuests()
 </script>
 
 <template>
-  <div class="p-6">
-    <h1 class="text-3xl font-bold mb-4">
-      Quests
-    </h1>
-
-    <div
-      v-if="pending"
-      class="text-gray-500"
+  <v-container class="py-6">
+    <v-row
+      justify="space-between"
+      align="center"
+      class="mb-4"
     >
-      Loading quests...
-    </div>
-    <div
-      v-else-if="error"
-      class="text-red-500"
-    >
-      Failed to load quests
-    </div>
+      <v-col cols="auto">
+        <h2 class="text-h5 font-weight-bold text-white">
+          Quests
+        </h2>
+      </v-col>
+      <v-col cols="auto">
+        <v-btn
+          :to="`/quests/new`"
+        >
+          Create Quest
+        </v-btn>
+      </v-col>
+    </v-row>
 
-    <div v-else>
-      <div
+    <v-row>
+      <v-col
         v-for="quest in quests"
         :key="quest.id"
-        class="mb-6 p-4 border rounded-lg shadow-sm bg-white"
+        cols="12"
+        sm="6"
+        md="4"
       >
-        <h2 class="text-xl font-semibold">
-          {{ quest.title }}
-        </h2>
-        <p class="text-gray-600 mb-2">
-          {{ quest.description }}
-        </p>
-        <p class="text-sm text-gray-400">
-          Owner: {{ quest.owner?.name || quest.owner?.email }}
-        </p>
+        <v-card>
+          <v-card-title>{{ quest.title }}</v-card-title>
+          <v-card-text>
+            <p>{{ quest.description }}</p>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn :to="`/quests/${quest.id}`">
+              View Details
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+    </v-row>
 
-        <ul class="mt-3 list-disc pl-5 space-y-1">
-          <li
-            v-for="task in quest.tasks"
-            :key="task.id"
-            class="text-gray-700"
-          >
-            <span class="font-medium">{{ task.order + 1 }}. {{ task.title }}</span>
-            —
-            <span class="text-gray-500">{{ task.details }}</span>
-            <span class="italic"> ({{ task.status }})</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
+    <!-- Floating Action Button (FAB) for mobile -->
+    <v-btn
+      color="success"
+      class="fab"
+      icon="mdi-plus"
+      :to="`/quests/new`"
+    />
+  </v-container>
 </template>
+
+<style scoped>
+/* Floating Action Button positioning */
+.fab {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  z-index: 1000;
+}
+</style>

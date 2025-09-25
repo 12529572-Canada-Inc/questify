@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-  modules: ['@nuxt/eslint'],
+  modules: ['@nuxt/eslint', 'vuetify-nuxt-module'],
   // rest of your config...
   runtimeConfig: {
     redis: {
@@ -10,7 +10,17 @@ export default defineNuxtConfig({
       tls: process.env.REDIS_TLS === 'true',
     },
   },
-  nitro: {
-    compatibilityDate: '2025-09-17', // update this every 3 months
+  compatibilityDate: '2025-09-25',
+  typescript: {
+    strict: true,
+    typeCheck: true,
+  },
+  vuetify: {
+    moduleOptions: {
+      // Optional module-specific flags
+    },
+    vuetifyOptions: {
+      // Custom Vuetify options (themes, icons, etc.)
+    },
   },
 })

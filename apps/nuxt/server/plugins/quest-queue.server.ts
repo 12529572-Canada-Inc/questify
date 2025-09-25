@@ -2,6 +2,11 @@ import { Queue } from 'bullmq'
 import { parseRedisUrl } from 'shared'
 
 export default defineNitroPlugin((nitroApp) => {
+  if (process.env.NODE_ENV === 'test') {
+    console.log('Skipping quest queue setup in test environment')
+    return
+  }
+
   const config = useRuntimeConfig()
 
   const connection = parseRedisUrl(config.redis.url) || {

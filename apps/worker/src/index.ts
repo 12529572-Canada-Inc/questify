@@ -1,8 +1,8 @@
 import { Worker } from 'bullmq';
 import { PrismaClient } from '@prisma/client';
 import OpenAI from 'openai';
-import { config } from './config';
-import { parseJsonFromModel } from './helpers';
+import { config } from './config.js';
+import { parseJsonFromModel } from './helpers.js';
 import { parseRedisUrl } from 'shared';
 
 const prisma = new PrismaClient();

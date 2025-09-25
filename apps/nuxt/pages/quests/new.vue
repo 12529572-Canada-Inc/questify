@@ -1,24 +1,16 @@
 <script setup lang="ts">
-import type { UsersResponse } from '~/server/api/users/index.get'
 import type { CreateQuestResponse } from '~/server/api/quests/index.post'
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const title = ref('')
 const description = ref('')
 const userId = ref('')
-const users = ref<UsersResponse>([])
 
+const valid = ref(false)
 const loading = ref(false)
 const error = ref<string | null>(null)
-
-onMounted(async () => {
-  users.value = await $fetch<UsersResponse>('/api/users')
-  if (users.value.length > 0) {
-    userId.value = users.value[0].id // default to first user
-  }
-})
 
 async function submit() {
   loading.value = true
@@ -56,62 +48,98 @@ async function submit() {
 </script>
 
 <template>
-  <div class="p-6 max-w-xl mx-auto">
-    <h1 class="text-2xl font-bold mb-4">
-      Create a New Quest
-    </h1>
-
-    <form
-      class="space-y-4"
-      @submit.prevent="submit"
+  <v-container class="fill-height d-flex justify-center align-center">
+    <v-row
+      class="w-100"
+      justify="center"
     >
-      <div>
-        <label class="block mb-1 font-medium">Title</label>
-        <input
-          v-model="title"
-          type="text"
-          class="w-full p-2 border rounded"
-          required
+      <v-col
+        cols="12"
+        sm="10"
+        md="8"
+        lg="6"
+      >
+        <v-card
+          elevation="3"
+          class="pa-6"
         >
-      </div>
+          <v-card-title class="text-h5 text-md-h4 font-weight-bold mb-6 text-center">
+            Create a New Quest
+          </v-card-title>
 
-      <div>
-        <label class="block mb-1 font-medium">Description</label>
-        <textarea
-          v-model="description"
-          class="w-full p-2 border rounded"
-        />
-      </div>
-
-      <div>
-        <label class="block mb-1 font-medium">Select User</label>
-        <select
-          v-model="userId"
-          class="w-full p-2 border rounded"
-        >
-          <option
-            v-for="u in users"
-            :key="u.id"
-            :value="u.id"
+          <v-form
+            v-model="valid"
+            @submit.prevent="submit"
           >
-            {{ u.name || u.email }}
-          </option>
-        </select>
-      </div>
+            <v-text-field
+              v-model="title"
+              label="Title"
+              :rules="[v => !!v || 'Title is required']"
+              required
+            />
 
-      <button
-        type="submit"
-        class="px-4 py-2 bg-blue-600 text-white rounded"
-      >
-        Create Quest
-      </button>
+            <v-textarea
+              v-model="description"
+              label="Description"
+              :rules="[v => !!v || 'Description is required']"
+              required
+              auto-grow
+              rows="3"
+            />
 
-      <p
-        v-if="error"
-        class="text-red-500 mt-2"
-      >
-        {{ error }}
-      </p>
-    </form>
-  </div>
+            <v-row
+              class="mt-4"
+              justify="center"
+              align="center"
+            >
+              <v-col
+                cols="12"
+                sm="6"
+              >
+                <v-btn
+                  type="submit"
+                  color="primary"
+                  block
+                  :loading="loading"
+                  :disabled="!valid || loading"
+                >
+                  Create Quest
+                </v-btn>
+              </v-col>
+            </v-row>
+
+            <!-- New Button to go to Quest List -->
+            <v-row
+              class="mt-2"
+              justify="center"
+              align="center"
+            >
+              <v-col
+                cols="12"
+                sm="6"
+              >
+                <v-btn
+                  color="secondary"
+                  block
+                  :to="`/quests`"
+                >
+                  Back to Quests
+                </v-btn>
+              </v-col>
+            </v-row>
+
+            <v-alert
+              v-if="error"
+              type="error"
+              class="mt-4"
+              border="start"
+              prominent
+            >
+              {{ error }}
+            </v-alert>
+          </v-form>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>

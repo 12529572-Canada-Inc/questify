@@ -1,25 +1,37 @@
 <template>
-  <div class="p-6 text-center">
-    <h1 class="text-3xl font-bold">
+  <v-card
+    elevation="3"
+    class="pa-6 text-center"
+    max-width="600"
+  >
+    <!-- Title -->
+    <v-card-title class="text-h5 text-md-h4 font-weight-bold justify-center">
       Welcome to Questify 🎯
-    </h1>
-    <p class="mt-2 text-gray-600">
-      Create and track your quests powered by AI.
-    </p>
+    </v-card-title>
 
-    <div class="mt-6 space-x-4">
-      <NuxtLink
+    <!-- Subtitle -->
+    <v-card-text>
+      <p class="text-body-1">
+        Create and track your quests powered by AI.
+      </p>
+    </v-card-text>
+
+    <!-- Actions -->
+    <v-card-actions class="flex-column">
+      <v-btn
+        block
+        color="primary"
         to="/quests"
-        class="px-4 py-2 bg-blue-600 text-white rounded"
       >
         View Quests
-      </NuxtLink>
-      <NuxtLink
+      </v-btn>
+      <v-btn
+        block
+        color="success"
         to="/quests/new"
-        class="px-4 py-2 bg-green-600 text-white rounded"
       >
         Create Quest
-      </NuxtLink>
-    </div>
-  </div>
+      </v-btn>
+    </v-card-actions>
+  </v-card>
 </template>
