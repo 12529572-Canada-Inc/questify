@@ -1,26 +1,18 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
-import { ref } from 'vue'
+import { useQuest } from '~/composables/useQuest'
 
 const route = useRoute()
+const id = Number(route.params.id)
 
-// Mock data (replace with API call later)
-const quests = [
-  { id: 1, title: 'Slay the Dragon', status: 'Active', description: 'Defeat the dragon in the dark forest.' },
-  { id: 2, title: 'Gather Herbs', status: 'Pending', description: 'Collect 10 healing herbs for the village healer.' },
-]
+const { data: quest, refresh } = await useQuest(id)
 
-const quest = ref<unknown>(
-  quests.find(q => q.id === Number(route.params.id)) || {
-    id: 0,
-    title: 'Quest Not Found',
-    status: 'N/A',
-    description: 'This quest does not exist.',
-  },
-)
-
-function completeQuest() {
-  // quest.value.status = 'Completed'
+async function completeQuest() {
+  await $fetch(`/api/quests/${id}`, {
+    method: 'PATCH',
+    body: { status: 'Completed' },
+  })
+  await refresh()
 }
 </script>
 
@@ -28,13 +20,11 @@ function completeQuest() {
   <v-container class="py-6">
     <v-row>
       <v-col cols="12">
-        <v-card>
+        <v-card v-if="quest">
           <v-card-title class="text-h5">
             {{ quest.title }}
           </v-card-title>
-          <v-card-subtitle class="mb-2">
-            Status: <strong>{{ quest.status }}</strong>
-          </v-card-subtitle>
+          <v-card-subtitle>Status: <strong>{{ quest.status }}</strong></v-card-subtitle>
           <v-card-text>
             <p>{{ quest.description }}</p>
           </v-card-text>
@@ -57,6 +47,14 @@ function completeQuest() {
             </v-btn>
           </v-card-actions>
         </v-card>
+
+        <v-alert
+          v-else
+          type="error"
+          title="Quest Not Found"
+        >
+          This quest does not exist.
+        </v-alert>
       </v-col>
     </v-row>
   </v-container>
