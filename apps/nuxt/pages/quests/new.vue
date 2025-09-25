@@ -48,10 +48,13 @@ async function submit() {
 </script>
 
 <template>
-  <v-container class="py-6">
-    <h1 class="text-h4 font-weight-bold mb-6">
+  <v-card
+    elevation="3"
+    class="pa-6"
+  >
+    <v-card-title class="text-h4 font-weight-bold mb-6">
       Create a New Quest
-    </h1>
+    </v-card-title>
 
     <v-form
       v-model="valid"
@@ -80,5 +83,5 @@ async function submit() {
         Create
       </v-btn>
     </v-form>
-  </v-container>
+  </v-card>
 </template>
