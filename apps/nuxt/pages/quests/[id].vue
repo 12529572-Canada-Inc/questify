@@ -48,12 +48,11 @@ async function completeQuest() {
                 v-for="task in quest.tasks"
                 :key="task.id"
               >
-                <v-list-item-content>
-                  <v-list-item-title>{{ task.title }}</v-list-item-title>
-                  <v-list-item-subtitle>Status: {{ task.status }}</v-list-item-subtitle>
-                  <v-list-item-details>{{ task.details }}</v-list-item-details>
-                </v-list-item-content>
-
+                <v-list-item-title>{{ task.title }}</v-list-item-title>
+                <div class="text-body-2">
+                  {{ task.details }}
+                </div>
+                <v-list-item-subtitle>Status: {{ task.status }}</v-list-item-subtitle>
                 <v-list-item-action>
                   <v-btn
                     v-if="task.status !== 'completed'"
