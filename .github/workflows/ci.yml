@@ -1,44 +1,50 @@
 name: CI
 
 on:
-  push:
-    branches:
-      - "feature/*"
-      - "develop"
-  pull_request:
-    branches:
-      - "develop"
+    push:
+        branches:
+            - "feature/*"
+            - "develop"
+    pull_request:
+        branches:
+            - "develop"
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+    build:
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
 
-      - name: Enable Corepack (for pnpm)
-        run: corepack enable
+            - name: Enable Corepack (for pnpm)
+              run: corepack enable
 
-      - name: Install pnpm dependencies
-        run: pnpm install
+            - name: Install pnpm dependencies
+              run: pnpm install
 
-      - name: Generate Nuxt types
-        run: pnpm --filter nuxt dev:prepare
+            - name: Generate Nuxt types
+              run: pnpm --filter nuxt dev:prepare
 
-      - name: Lint
-        run: pnpm lint
+            - name: Build shared package
+              run: pnpm --filter shared build
 
-      - name: Test
-        run: pnpm test
+            - name: Lint types
+              run: pnpm --filter nuxt lint:types
 
-      - name: Build apps
-        if: github.ref == 'refs/heads/develop'
-        run: |
-          pnpm --filter nuxt build
-          pnpm --filter worker build
+            - name: Lint
+              run: pnpm lint
+
+            - name: Test
+              run: pnpm test
+
+            - name: Build apps
+              if: github.ref == 'refs/heads/develop'
+              run: |
+                  pnpm --filter nuxt build
+                  pnpm --filter worker build

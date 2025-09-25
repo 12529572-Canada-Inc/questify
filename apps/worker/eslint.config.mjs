@@ -1,7 +1,17 @@
 import tseslint from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
+import eslintPluginImport from 'eslint-plugin-import';
+import { FlatCompat } from '@eslint/eslintrc';
+
+const compat = new FlatCompat({
+  baseDirectory: import.meta.dirname, // needed for relative paths
+  recommendedConfig: false, // don’t pull in ESLint’s defaults
+});
 
 export default [
+  // 👇 If you want to extend any old-style configs (like "plugin:import/recommended"):
+  ...compat.extends('plugin:import/recommended'),
+
   {
     languageOptions: {
       parser: tsParser,
@@ -13,6 +23,7 @@ export default [
     },
     plugins: {
       '@typescript-eslint': tseslint,
+      import: eslintPluginImport,
     },
     rules: {
       // Formatting / stylistic rules
@@ -41,6 +52,36 @@ export default [
       ],
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
+
+      // Import rules
+      'import/extensions': [
+        'error',
+        'ignorePackages',
+        {
+          ts: 'never',   // don’t allow `.ts`
+          tsx: 'never',
+          js: 'always',  // require `.js`
+          jsx: 'always',
+        },
+      ],
+      'import/no-unresolved': [
+        'error',
+        {
+          ignore: ['^shared'], // keep workspace modules safe
+        },
+      ],
+      'import/prefer-default-export': 'off',
+
+    },
+    settings: {
+      'import/resolver': {
+        typescript: {
+          alwaysTryTypes: true,
+        },
+        node: {
+          extensions: ['.js', '.ts'],
+        },
+      },
     },
   },
 ];
