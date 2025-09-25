@@ -10,9 +10,7 @@ export default defineNuxtConfig({
       tls: process.env.REDIS_TLS === 'true',
     },
   },
-  nitro: {
-    compatibilityDate: '2025-09-17', // update this every 3 months
-  },
+  compatibilityDate: '2025-09-25',
   typescript: {
     strict: true,
     typeCheck: true,
