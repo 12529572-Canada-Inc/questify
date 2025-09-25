@@ -108,6 +108,26 @@ async function submit() {
               </v-col>
             </v-row>
 
+            <!-- New Button to go to Quest List -->
+            <v-row
+              class="mt-2"
+              justify="center"
+              align="center"
+            >
+              <v-col
+                cols="12"
+                sm="6"
+              >
+                <v-btn
+                  color="secondary"
+                  block
+                  :to="`/quests`"
+                >
+                  Back to Quests
+                </v-btn>
+              </v-col>
+            </v-row>
+
             <v-alert
               v-if="error"
               type="error"
