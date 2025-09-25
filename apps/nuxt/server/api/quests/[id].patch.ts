@@ -7,12 +7,25 @@ export default defineEventHandler(async (event) => {
 
   const body = await readBody<{ status?: string }>(event)
 
-  const quest = await prisma.quest.update({
-    where: { id },
-    data: {
-      status: body.status,
-    },
-  })
+  if (body.status === 'completed') {
+    // Transaction: complete quest + all tasks
+    const [quest] = await prisma.$transaction([
+      prisma.quest.update({
+        where: { id },
+        data: { status: 'completed' },
+      }),
+      prisma.task.updateMany({
+        where: { questId: id },
+        data: { status: 'completed' },
+      }),
+    ])
 
-  return quest
+    return quest
+  }
+
+  // fallback if status is something else
+  return prisma.quest.update({
+    where: { id },
+    data: { status: body.status },
+  })
 })
