@@ -10,6 +10,7 @@ const description = ref('')
 const userId = ref('')
 const users = ref<UsersResponse>([])
 
+const valid = ref(false)
 const loading = ref(false)
 const error = ref<string | null>(null)
 
@@ -56,62 +57,37 @@ async function submit() {
 </script>
 
 <template>
-  <div class="p-6 max-w-xl mx-auto">
-    <h1 class="text-2xl font-bold mb-4">
+  <v-container class="py-6">
+    <h1 class="text-h4 font-weight-bold mb-6">
       Create a New Quest
     </h1>
 
-    <form
-      class="space-y-4"
+    <v-form
+      v-model="valid"
       @submit.prevent="submit"
     >
-      <div>
-        <label class="block mb-1 font-medium">Title</label>
-        <input
-          v-model="title"
-          type="text"
-          class="w-full p-2 border rounded"
-          required
-        >
-      </div>
+      <v-text-field
+        v-model="title"
+        label="Quest Title"
+        :rules="[v => !!v || 'Title is required']"
+        required
+      />
 
-      <div>
-        <label class="block mb-1 font-medium">Description</label>
-        <textarea
-          v-model="description"
-          class="w-full p-2 border rounded"
-        />
-      </div>
+      <v-textarea
+        v-model="description"
+        label="Quest Description"
+        :rules="[v => !!v || 'Description is required']"
+        required
+      />
 
-      <div>
-        <label class="block mb-1 font-medium">Select User</label>
-        <select
-          v-model="userId"
-          class="w-full p-2 border rounded"
-        >
-          <option
-            v-for="u in users"
-            :key="u.id"
-            :value="u.id"
-          >
-            {{ u.name || u.email }}
-          </option>
-        </select>
-      </div>
-
-      <button
+      <v-btn
         type="submit"
-        class="px-4 py-2 bg-blue-600 text-white rounded"
+        color="primary"
+        class="mt-4"
+        :disabled="!valid"
       >
-        Create Quest
-      </button>
-
-      <p
-        v-if="error"
-        class="text-red-500 mt-2"
-      >
-        {{ error }}
-      </p>
-    </form>
-  </div>
+        Create
+      </v-btn>
+    </v-form>
+  </v-container>
 </template>
