@@ -7,6 +7,14 @@ const id = route.params.id as string
 
 const { data: quest, refresh } = await useQuest(id)
 
+async function markTaskCompleted(taskId: string) {
+  await $fetch(`/api/tasks/${taskId}`, {
+    method: 'PATCH',
+    body: { status: 'completed' },
+  })
+  await refresh()
+}
+
 async function completeQuest() {
   await $fetch(`/api/quests/${id}`, {
     method: 'PATCH',
@@ -29,7 +37,35 @@ async function completeQuest() {
             <p>{{ quest.description }}</p>
           </v-card-text>
 
-          <v-divider />
+          <v-divider class="my-4" />
+
+          <v-card-text>
+            <h3 class="text-h6 mb-2">
+              Tasks
+            </h3>
+            <v-list>
+              <v-list-item
+                v-for="task in quest.tasks"
+                :key="task.id"
+              >
+                <v-list-item-content>
+                  <v-list-item-title>{{ task.title }}</v-list-item-title>
+                  <v-list-item-subtitle>Status: {{ task.status }}</v-list-item-subtitle>
+                </v-list-item-content>
+
+                <v-list-item-action>
+                  <v-btn
+                    v-if="task.status !== 'completed'"
+                    size="small"
+                    color="success"
+                    @click="markTaskCompleted(task.id)"
+                  >
+                    Complete
+                  </v-btn>
+                </v-list-item-action>
+              </v-list-item>
+            </v-list>
+          </v-card-text>
 
           <v-card-actions>
             <v-btn
