@@ -13,6 +13,10 @@ export default defineNuxtConfig({
   nitro: {
     compatibilityDate: '2025-09-17', // update this every 3 months
   },
+  typescript: {
+    strict: true,
+    typeCheck: true,
+  },
   vuetify: {
     moduleOptions: {
       // Optional module-specific flags
