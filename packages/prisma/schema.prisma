@@ -32,7 +32,7 @@ model Task {
   title     String
   details   String?
   order     Int
-  status    String @default("todo")
+  status    String @default("todo") // todo, in-progress, done
   createdAt DateTime @default(now())
   quest     Quest  @relation(fields: [questId], references: [id])
 }

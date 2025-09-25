@@ -10,7 +10,7 @@ const { data: quest, refresh } = await useQuest(id)
 async function completeQuest() {
   await $fetch(`/api/quests/${id}`, {
     method: 'PATCH',
-    body: { status: 'Completed' },
+    body: { status: 'completed' },
   })
   await refresh()
 }
