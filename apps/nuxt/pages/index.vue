@@ -1,28 +1,33 @@
 <template>
-  <v-container class="fill-height d-flex flex-column justify-center align-center">
+  <v-container class="fill-height d-flex flex-column justify-center align-center pa-4">
     <v-card
       elevation="3"
-      class="pa-6"
+      class="pa-6 text-center"
       max-width="600"
     >
-      <v-card-title class="text-h4 font-weight-bold">
+      <!-- Title -->
+      <v-card-title class="text-h5 text-md-h4 font-weight-bold justify-center">
         Welcome to Questify 🎯
       </v-card-title>
 
+      <!-- Subtitle -->
       <v-card-text>
-        <p>
+        <p class="text-body-1">
           Create and track your quests powered by AI.
         </p>
       </v-card-text>
 
-      <v-card-actions class="justify-center mt-4">
+      <!-- Actions -->
+      <v-card-actions class="flex-column">
         <v-btn
+          block
           color="primary"
           to="/quests"
         >
           View Quests
         </v-btn>
         <v-btn
+          block
           color="success"
           to="/quests/new"
         >
