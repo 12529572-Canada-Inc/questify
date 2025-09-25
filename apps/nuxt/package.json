@@ -25,6 +25,7 @@
     "@nuxt/eslint-config": "^1.9.0",
     "@nuxt/eslint-plugin": "^1.9.0",
     "@nuxt/test-utils": "^3.19.2",
+    "@types/vue-router": "^2.0.0",
     "@vitest/coverage-v8": "^3.2.4",
     "@vitest/ui": "^3.2.4",
     "@vue/test-utils": "^2.4.6",
