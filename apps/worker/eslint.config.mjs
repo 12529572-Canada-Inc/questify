@@ -49,12 +49,15 @@ export default [
         'error',
         'ignorePackages',
         {
-          ts: 'never',   // ✅ don't allow ".ts" in imports
+          ts: 'never',   // ❌ forbid ".ts"
           tsx: 'never',
-          js: 'always',  // ✅ require ".js" when importing local files
+          js: 'always',  // ✅ require ".js"
           jsx: 'always',
         },
       ],
+
+      // NEW: let ESLint autofix missing/incorrect extensions
+      'import/no-unresolved': 'error',
     },
     settings: {
       'import/resolver': {
