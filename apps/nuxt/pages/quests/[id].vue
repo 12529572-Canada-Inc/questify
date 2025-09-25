@@ -3,7 +3,7 @@ import { useRoute } from 'vue-router'
 import { useQuest } from '~/composables/useQuest'
 
 const route = useRoute()
-const id = Number(route.params.id)
+const id = route.params.id as string
 
 const { data: quest, refresh } = await useQuest(id)
 

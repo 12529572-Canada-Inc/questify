@@ -1,4 +1,4 @@
-export function useQuest(id: number) {
+export function useQuest(id: string) {
   return useFetch(`/api/quests/${id}`)
 }
 
