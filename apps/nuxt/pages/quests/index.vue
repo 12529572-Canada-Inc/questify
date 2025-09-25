@@ -13,7 +13,7 @@ const { data: quests } = await useQuests()
     >
       <v-col cols="auto">
         <h2 class="text-h5 font-weight-bold text-white">
-          Your Quests
+          Quests
         </h2>
       </v-col>
       <v-col cols="auto">
