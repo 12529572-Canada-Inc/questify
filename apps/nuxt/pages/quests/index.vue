@@ -5,53 +5,72 @@ const { data: quests, pending, error } = await useFetch<QuestsResponse>('/api/qu
 </script>
 
 <template>
-  <div class="p-6">
-    <h1 class="text-3xl font-bold mb-4">
-      Quests
-    </h1>
+  <v-container class="py-6">
+    <v-row>
+      <v-col cols="12">
+        <h1 class="text-h4 font-weight-bold">
+          Quests
+        </h1>
+      </v-col>
+    </v-row>
 
-    <div
-      v-if="pending"
-      class="text-gray-500"
-    >
-      Loading quests...
-    </div>
-    <div
-      v-else-if="error"
-      class="text-red-500"
-    >
-      Failed to load quests
-    </div>
-
-    <div v-else>
-      <div
+    <v-row>
+      <v-col
+        v-if="pending"
+        cols="12"
+        class="text-center"
+      >
+        <v-progress-circular
+          indeterminate
+          color="primary"
+        />
+      </v-col>
+      <v-col
+        v-else-if="error"
+        cols="12"
+        class="text-center"
+      >
+        <v-alert type="error">
+          Failed to load quests
+        </v-alert>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col
         v-for="quest in quests"
         :key="quest.id"
-        class="mb-6 p-4 border rounded-lg shadow-sm bg-white"
+        cols="12"
+        md="6"
+        lg="4"
       >
-        <h2 class="text-xl font-semibold">
-          {{ quest.title }}
-        </h2>
-        <p class="text-gray-600 mb-2">
-          {{ quest.description }}
-        </p>
-        <p class="text-sm text-gray-400">
-          Owner: {{ quest.owner?.name || quest.owner?.email }}
-        </p>
+        <v-card>
+          <v-card-title>{{ quest.title }}</v-card-title>
+          <v-card-subtitle>{{ quest.status }}</v-card-subtitle>
+          <v-card-text>{{ quest.description }}</v-card-text>
+          <v-card-actions>
+            <v-btn
+              color="primary"
+              :to="`/quests/${quest.id}`"
+            >
+              View
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+    </v-row>
 
-        <ul class="mt-3 list-disc pl-5 space-y-1">
-          <li
-            v-for="task in quest.tasks"
-            :key="task.id"
-            class="text-gray-700"
-          >
-            <span class="font-medium">{{ task.order + 1 }}. {{ task.title }}</span>
-            —
-            <span class="text-gray-500">{{ task.details }}</span>
-            <span class="italic"> ({{ task.status }})</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
+    <v-row>
+      <v-col
+        cols="12"
+        class="text-center mt-4"
+      >
+        <v-btn
+          color="success"
+          :to="`/quests/new`"
+        >
+          Create New Quest
+        </v-btn>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
