@@ -1,5 +1,6 @@
 import tseslint from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
+import eslintPluginImport from 'eslint-plugin-import';
 
 export default [
   {
@@ -13,6 +14,7 @@ export default [
     },
     plugins: {
       '@typescript-eslint': tseslint,
+      'import': eslintPluginImport,
     },
     rules: {
       // Formatting / stylistic rules
@@ -41,6 +43,26 @@ export default [
       ],
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
+
+      // Import rules
+      'import/extensions': [
+        'error',
+        'ignorePackages',
+        {
+          'ts': 'always',
+          'tsx': 'always',
+          'js': 'always',
+          'jsx': 'always',
+        },
+      ],
+    },
+    settings: {
+      'import/resolver': {
+        'typescript': true,
+        'node': {
+          'extensions': ['.js', '.ts'],
+        },
+      },
     },
   },
 ];
