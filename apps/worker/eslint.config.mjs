@@ -14,7 +14,7 @@ export default [
     },
     plugins: {
       '@typescript-eslint': tseslint,
-      'import': eslintPluginImport,
+      import: eslintPluginImport,
     },
     rules: {
       // Formatting / stylistic rules
@@ -44,23 +44,25 @@ export default [
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
 
-      // Import rules
+      // Import rules (ESM/NodeNext style)
       'import/extensions': [
         'error',
         'ignorePackages',
         {
-          'ts': 'always',
-          'tsx': 'always',
-          'js': 'always',
-          'jsx': 'always',
+          ts: 'never',   // ✅ don't allow ".ts" in imports
+          tsx: 'never',
+          js: 'always',  // ✅ require ".js" when importing local files
+          jsx: 'always',
         },
       ],
     },
     settings: {
       'import/resolver': {
-        'typescript': true,
-        'node': {
-          'extensions': ['.js', '.ts'],
+        typescript: {
+          alwaysTryTypes: true,
+        },
+        node: {
+          extensions: ['.js', '.ts'],
         },
       },
     },
