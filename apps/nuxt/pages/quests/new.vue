@@ -48,40 +48,78 @@ async function submit() {
 </script>
 
 <template>
-  <v-card
-    elevation="3"
-    class="pa-6"
-  >
-    <v-card-title class="text-h4 font-weight-bold mb-6">
-      Create a New Quest
-    </v-card-title>
-
-    <v-form
-      v-model="valid"
-      @submit.prevent="submit"
+  <v-container class="fill-height d-flex justify-center align-center">
+    <v-row
+      class="w-100"
+      justify="center"
     >
-      <v-text-field
-        v-model="title"
-        label="Quest Title"
-        :rules="[v => !!v || 'Title is required']"
-        required
-      />
-
-      <v-textarea
-        v-model="description"
-        label="Quest Description"
-        :rules="[v => !!v || 'Description is required']"
-        required
-      />
-
-      <v-btn
-        type="submit"
-        color="primary"
-        class="mt-4"
-        :disabled="!valid"
+      <v-col
+        cols="12"
+        sm="10"
+        md="8"
+        lg="6"
       >
-        Create
-      </v-btn>
-    </v-form>
-  </v-card>
+        <v-card
+          elevation="3"
+          class="pa-6"
+        >
+          <v-card-title class="text-h5 text-md-h4 font-weight-bold mb-6 text-center">
+            Create a New Quest
+          </v-card-title>
+
+          <v-form
+            v-model="valid"
+            @submit.prevent="submit"
+          >
+            <v-text-field
+              v-model="title"
+              label="Title"
+              :rules="[v => !!v || 'Title is required']"
+              required
+            />
+
+            <v-textarea
+              v-model="description"
+              label="Description"
+              :rules="[v => !!v || 'Description is required']"
+              required
+              auto-grow
+              rows="3"
+            />
+
+            <v-row
+              class="mt-4"
+              justify="center"
+              align="center"
+            >
+              <v-col
+                cols="12"
+                sm="6"
+              >
+                <v-btn
+                  type="submit"
+                  color="primary"
+                  block
+                  :loading="loading"
+                  :disabled="!valid || loading"
+                >
+                  Create Quest
+                </v-btn>
+              </v-col>
+            </v-row>
+
+            <v-alert
+              v-if="error"
+              type="error"
+              class="mt-4"
+              border="start"
+              prominent
+            >
+              {{ error }}
+            </v-alert>
+          </v-form>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
