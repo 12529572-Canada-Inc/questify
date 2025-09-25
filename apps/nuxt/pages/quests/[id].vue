@@ -39,7 +39,7 @@ async function completeQuest() {
               Back to Quests
             </v-btn>
             <v-btn
-              v-if="quest.status !== 'Completed'"
+              v-if="quest.status !== 'completed'"
               color="success"
               @click="completeQuest"
             >
