@@ -25,6 +25,7 @@
     "@nuxt/eslint-config": "^1.9.0",
     "@nuxt/eslint-plugin": "^1.9.0",
     "@nuxt/test-utils": "^3.19.2",
+    "@types/node": "^20.0.0",
     "@types/vue-router": "^2.0.0",
     "@vitest/coverage-v8": "^3.2.4",
     "@vitest/ui": "^3.2.4",
@@ -34,6 +35,8 @@
     "happy-dom": "^18.0.1",
     "typescript": "^5.0.0",
     "vitest": "^3.2.4",
+    "vue-tsc": "^1.8.27",
+    "vue-router": "^4.3.0",
     "vuetify-nuxt-module": "^0.18.7"
   }
 }

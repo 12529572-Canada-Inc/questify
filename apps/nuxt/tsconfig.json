@@ -1,12 +1,14 @@
 {
   "extends": "./.nuxt/tsconfig.json",
   "compilerOptions": {
+    "baseUrl": ".",
     "paths": {
       "~/*": ["./*"],
       "@/*": ["./*"],
       "shared": ["../../packages/shared/src"],
       "shared/*": ["../../packages/shared/src/*"]
-    }
+    },
+    "types": ["@types/node", "vue-router"]
   },
   "include": [
     "nuxt.config.ts",
@@ -14,6 +16,8 @@
     "pages/**/*.vue",
     "components/**/*.vue",
     "composables/**/*.ts",
+    "plugins/**/*.ts",
     ".nuxt/**/*.ts"
-  ], 
+  ],
+  "exclude": ["node_modules", "dist"]
 }
