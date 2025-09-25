@@ -11,196 +11,64 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.1.14] - 2025-09-24
+## [1.2.0] - 2025-09-25
 
-### Fixes
-- **Worker App**: Corrected formatting of connection object during initialization.
-- **Index Page**: Simplified and enhanced component styling for better clarity, responsiveness, and visual appeal.
-- **Release Workflow**: Restored tag-based trigger to ensure proper release flow.
-- **Deployment**:  
-  - Removed unnecessary environment variables from Fly.io deployment step.  
-  - Corrected start script path in `package.json` and aligned Dockerfile `CMD` with `npm start`.  
-  - Adjusted Fly.io deployment args to remove redundant Dockerfile/context options.  
-- **Nuxt App**: Added `rootDir` to `tsconfig.json` for proper TypeScript resolution.  
-- **CI**: Set `CI` environment variable in Dockerfile for consistent builds.  
+### 🚀 Features
+- **Quest Management**
+  - Added quest detail page with task list and completion logic.
+  - Implemented quest update and retrieval API endpoints.
+  - Enhanced `useQuest` composable to include tasks.
+  - Added task update endpoint and task completion functionality.
+  - Implemented quest completion transaction to update quests and associated tasks.
 
-### Refactors
-- **Dockerfile & Build Process**:  
-  - Consolidated build steps and reorganized structure for clarity and caching.  
-  - Optimized dependency installation and enabled `corepack` earlier.  
-  - Cleaned up and standardized comments, removed unused steps, and reduced image size.  
-- **TypeScript & Nuxt**:  
-  - Added TypeScript as a devDependency.  
-  - Removed unused compiler options and updated `tsconfig` references for Nuxt.  
-- **Shared Package & Redis**:  
-  - Introduced `shared` package and updated imports across apps.  
-  - Added `parseRedisUrl` utility and streamlined Redis environment configuration.  
-- **Quest Model (Database)**: Made `ownerId` optional in schema, migration, and logic (defaults to `null` if undefined).  
-- **Prisma Configuration**:  
-  - Simplified schema handling in `postinstall` scripts.  
-  - Cleaned up generator output paths and related dependencies.  
-  - Standardized Prisma setup across Nuxt, Worker, and release workflow.  
-- **Vercel Deployment**: Improved configuration by adding `DATABASE_URL` and adjusting directory context.  
+- **UI / UX Enhancements**
+  - Migrated quest pages and layouts to Vuetify components for improved design.
+  - Added floating action button (FAB) for creating new quests.
+  - Added navigation buttons between quest list and quest creation views.
+  - Introduced default layout and gradient app styling.
+  - Enhanced homepage and quest creation layouts for better responsiveness.
 
-### Chores
-- Bumped package versions to **1.1.14** for Nuxt, Worker, and Prisma apps.
-- Updated Prisma dependency to version `5.22.0` in `pnpm-lock.yaml`.
+### 🛠 Fixes
+- Standardized quest status handling (lowercase, consistent checks).
+- Fixed type definitions in `useQuest` composable and quest patch handler.
+- Updated import statements to include file extensions for NodeNext resolution.
+- Added `@types/vue-router` for proper type recognition.
+- Fixed Nuxt compatibility date warning by adding `compatibilityDate` to config.
 
----
+### 🎨 Style & Refactors
+- Improved task display structure in quest details.
+- Simplified quest retrieval logic and display.
+- Refactored CI workflow and ESLint configuration for clarity and maintainability.
+- Added `eslint-plugin-import` and standardized import rules.
 
-## [1.1.13] - 2025-09-21
-
-### Fixes
-- **Deployment**: Updated Fly.io deployment args to explicitly include `Dockerfile` and build `context` for more reliable deployments. 
-- **Dependencies**: Bumped package versions to `1.1.13` for **nuxt**, **worker**, and **prisma** apps.
-- **Docker**:  
-  - Added `node_modules` to `.dockerignore` to reduce image size. 
-  - Updated `Dockerfile` to copy only necessary files and set production environment.
-- **Worker App**: Adjusted TypeScript config for Node.js types:  
-  - Added Node types.
-  - Removed Node types to fix compatibility.
+### ⚙️ Tooling & Configuration
+- Updated package versions from **1.1.14 → 1.2.0**.
+- Enhanced TypeScript configuration for NodeNext and path resolution.
+- Added build step for shared packages in CI.
+- Updated Vitest configuration for SSR module resolution.
+- Added test environment check to skip quest queue setup.
 
 ---
 
+## [1.1.x Maintenance Releases] - 2025-09-20-2025-09-24
 
-## [1.1.12] – 2025-09-21
+Between **v1.1.0** and **v1.1.14**, multiple incremental updates were released focusing on:
 
-### Fixed
-- Updated deployment configuration for worker app in release workflow and Dockerfile
+- **Bug Fixes**
+  - Improved ESLint and TypeScript configuration.
+  - Fixed path resolution and import handling across packages.
+  - Adjusted compatibility settings for Nuxt and Node.
 
-### Chore
-- Bumped package versions to `1.1.12` for Nuxt, worker, and Prisma
+- **Styling & Layout**
+  - Iterative improvements to quest creation and list layouts.
+  - Refactoring to improve readability, maintainability, and consistency.
 
----
+- **Tooling**
+  - CI/CD workflow enhancements.
+  - Version bumps across dependencies.
+  - Initial setup for shared package builds.
 
-## [1.1.11] – 2025-09-21
-
-### Fixed
-- Bump package versions to 1.1.11 for `nuxt`, `worker`, and `prisma`
-- Updated `dotenv` dependency to version `17.2.2` in `package.json` and `pnpm-lock.yaml`
-
-### Changed
-- Removed `node_modules` from `.dockerignore`  
-- Removed `"type"` field from `package.json` to avoid ES module issues  
-- Simplified worker `Dockerfile` and removed entrypoint script
-
----
-
-## [1.1.10] - 2025-09-21
-
-### Fixed
-- Bump package versions to 1.1.10 for `nuxt`, `worker`, and `prisma`
-- Update Dockerfile path in `fly.toml` configuration
-
----
-
-## [1.1.9] - 2025-09-21
-### Fix
-- Update build configuration to use **Dockerfile** instead of Heroku buildpack
-
-### Chore
-- Bump package versions to **1.1.9** for Nuxt, Worker, and Prisma
-
----
-
-## [1.1.8] - 2025-09-21
-
-### Features
-- **Worker Deployment**: Added initial `Dockerfile`, `docker-entrypoint`, and `fly.toml` to support deploying the worker application on Fly.io.
-
-### Refactors
-- **Worker Dockerfile**: Streamlined by removing unnecessary build stages and optimizing dependency installation. 
-- **Release Workflow**: Replaced Docker Hub deployment with Fly.io GitHub Action for worker deployment.
-- **Fly.io Config**: Simplified `fly.toml` by removing unused options and ensuring `NODE_ENV` is set. 
-- **Cleanup**: Removed unused Dockerfile for worker application.
-
-### Chores
-- Updated CHANGELOG for version `1.1.7` with prior fixes and refactors.
-
----
-
-## [1.1.7] - 2025-09-21
-
-### Fixes
-- **Release Workflow**: Updated Docker build context to correctly reference worker app directory.  
-- **Worker Dockerfile**: Removed package upgrade step to avoid build warnings and improve stability.  
-
-### Refactors
-- Simplified `Dockerfile` by removing the multi-stage builder and unnecessary steps for a leaner image.  
-
-### Chore
-- Bumped version to **1.1.7** in `package.json` files for Nuxt, Worker, and Prisma packages. 
-
----
-
-## [1.1.6] - 2025-09-21
-
-### Fixed
-- Update Docker deployment steps in release workflow for clarity and efficiency
-- Add missing build and start scripts in `package.json` for worker
-
-### Added
-- Dockerfile for building and running the worker application
-
-### Changed
-- Bump version to 1.1.6 in `package.json` files for Nuxt, Worker, and Prisma
-
----
-
-## [1.1.5] - 2025-09-21
-
-### Fixed
-- Corrected Vercel deployment command by removing invalid `--project` parameter and replacing with the proper usage.
-- Bumped version to `1.1.5` across Nuxt, Worker, and Prisma packages.
-
----
-
-## [1.1.4] - 2025-09-21
-
-### Fixed
-- Updated Vercel deployment command to include `--scope` and `--project` parameters for proper project targeting.
-
-### Added
-- Introduced Vercel configuration file for improved deployment consistency.
-
-### Changed
-- Reorganized `CHANGELOG.md` for clarity and improved versioning structure.
-
-### Chore
-- Bumped version to **1.1.4** across `nuxt`, `worker`, and `prisma` packages.
-
----
-
-# [1.1.3] - 2025-09-20
-
-## Refactor
-- Streamline environment variable usage in release workflow and update Prisma deployment steps
-- Remove unused `prisma:deploy` script from package.json
-
-## Chore
-- Bump version to 1.1.3 in package.json files for Nuxt, Worker, and Prisma packages
-
----
-
-# [1.1.2] - 2025-09-20
-
-### Refactor
-- Update Prisma commands in workflows and package scripts
-
-### Fixes
-- Update `@prisma/client` version to 5.22.0 in `pnpm-lock.yaml`
-- Update `@prisma/client` and `prisma` version to 5.22.0 in `package.json` files
-
-### Chores
-- Bump version to 1.1.2 for Nuxt, Worker, and Prisma packages
-
----
-
-## [1.1.1] - 2025-09-20
-
-### Fixed
-- Corrected Prisma schema path in release pipeline so `prisma generate` and `prisma migrate deploy` work in CI/CD.
-- Ensured Prisma commands explicitly point to `packages/prisma/schema.prisma` in `release.yml`.
+These changes were primarily focused on stability, tooling improvements, and preparing the codebase for the **v1.2.0** feature release.
 
 ---
 
