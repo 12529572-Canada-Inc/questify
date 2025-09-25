@@ -6,7 +6,11 @@ export default defineVitestConfig({
     environment: 'nuxt',
     globals: true,
     deps: {
-      inline: [/shared/], // force Vitest to resolve shared
+      optimizer: {
+        ssr: {
+          include: ['shared'],
+        },
+      },
     },
   },
   resolve: {
