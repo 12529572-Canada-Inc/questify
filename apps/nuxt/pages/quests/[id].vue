@@ -51,6 +51,7 @@ async function completeQuest() {
                 <v-list-item-content>
                   <v-list-item-title>{{ task.title }}</v-list-item-title>
                   <v-list-item-subtitle>Status: {{ task.status }}</v-list-item-subtitle>
+                  <v-list-item-details>{{ task.details }}</v-list-item-details>
                 </v-list-item-content>
 
                 <v-list-item-action>
