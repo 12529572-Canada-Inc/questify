@@ -1,59 +1,57 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - "v*.*.*" # e.g., v1.0.0
+    push:
+        tags:
+            - "v*.*.*" # e.g., v1.0.0
 
 jobs:
-  release:
-    runs-on: ubuntu-latest
+    release:
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
 
-      - name: Enable Corepack (for pnpm)
-        run: corepack enable
+            - name: Enable Corepack (for pnpm)
+              run: corepack enable
 
-      - name: Install dependencies
-        run: pnpm install
+            - name: Install dependencies
+              run: pnpm install
 
-      # --- Prisma Database Setup ---
-      - name: Generate Prisma Client
-        run: pnpm prisma:generate
+            # --- Prisma Database Setup ---
+            - name: Generate Prisma Client
+              run: pnpm prisma:generate
 
-      - name: Deploy Prisma Migrations
-        working-directory: packages/prisma
-        run: pnpm run deploy
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+            - name: Deploy Prisma Migrations
+              working-directory: packages/prisma
+              run: pnpm run deploy
+              env:
+                  DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
-      # --- Build and Deploy Apps ---
-      - name: Build apps
-        run: pnpm build
+            # --- Build and Deploy Apps ---
+            - name: Build apps
+              run: pnpm build
 
-      - name: Deploy Nuxt (Vercel)
-        if: success()
-        run: |
-          npx vercel deploy --prod --yes --confirm \
-            --token="${{ secrets.VERCEL_TOKEN }}" \
-            --scope="${{ secrets.VERCEL_ORG_ID }}" \
-            --cwd=. \
-            -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
-            -e REDIS_URL="${{ secrets.REDIS_URL }}"
+            - name: Deploy Nuxt (Vercel)
+              if: success()
+              run: |
+                  pnpm vercel deploy --prod --yes \
+                    --token="${{ secrets.VERCEL_TOKEN }}" \
+                    --scope="${{ secrets.VERCEL_ORG_ID }}" \
+                    --cwd=. \
+                    -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
+                    -e REDIS_URL="${{ secrets.REDIS_URL }}"
 
-      - name: Deploy Worker to Fly.io
-        if: success()
-        uses: superfly/flyctl-actions@1.4
-        with:
-          args: "deploy --local-only --config ./apps/worker/fly.toml"
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-
-
+            - name: Deploy Worker to Fly.io
+              if: success()
+              uses: superfly/flyctl-actions@1.4
+              with:
+                  args: "deploy --local-only --config ./apps/worker/fly.toml"
+              env:
+                  FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

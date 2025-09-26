@@ -68,19 +68,36 @@ async function completeQuest() {
           </v-card-text>
 
           <v-card-actions>
-            <v-btn
-              color="primary"
-              :to="`/quests`"
+            <v-row
+              class="w-100"
+              dense
             >
-              Back to Quests
-            </v-btn>
-            <v-btn
-              v-if="quest.status !== 'completed'"
-              color="success"
-              @click="completeQuest"
-            >
-              Mark as Completed
-            </v-btn>
+              <v-col
+                cols="12"
+                sm="6"
+              >
+                <v-btn
+                  block
+                  color="primary"
+                  :to="`/quests`"
+                >
+                  Back to Quests
+                </v-btn>
+              </v-col>
+              <v-col
+                cols="12"
+                sm="6"
+              >
+                <v-btn
+                  v-if="quest.status !== 'completed'"
+                  block
+                  color="success"
+                  @click="completeQuest"
+                >
+                  Mark as Completed
+                </v-btn>
+              </v-col>
+            </v-row>
           </v-card-actions>
         </v-card>
 

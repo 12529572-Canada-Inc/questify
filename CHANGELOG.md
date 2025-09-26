@@ -11,6 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.1] - 2025-09-25
+
+### Hotfixes & Improvements
+- **Style:** Enhanced button layout and responsiveness in quest completion actions for improved mobile and desktop experience.
+- **Fix:** Updated deployment command for Nuxt to use `pnpm` instead of deprecated arguments.
+- **Fix:** Removed deprecated `confirm` argument from Vercel Nuxt deploy command.
+- **Dev:** Implemented `tsx` package to enable running the worker in development mode without errors.
+- **Chore:** Bumped package versions from `1.2.0` to `1.2.1` across multiple packages.
+- **General:** Additional code changes to enhance functionality and improve performance.
+
+---
+
 ## [1.2.0] - 2025-09-25
 
 ### 🚀 Features
