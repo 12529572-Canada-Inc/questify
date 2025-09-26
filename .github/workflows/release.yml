@@ -41,7 +41,7 @@ jobs:
             - name: Deploy Nuxt (Vercel)
               if: success()
               run: |
-                  npx vercel deploy --prod --yes \
+                  pnpm vercel deploy --prod --yes \
                     --token="${{ secrets.VERCEL_TOKEN }}" \
                     --scope="${{ secrets.VERCEL_ORG_ID }}" \
                     --cwd=. \
