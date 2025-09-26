@@ -7,6 +7,7 @@
     "prisma:generate": "pnpm --filter prisma generate",
     "prisma:migrate": "pnpm --filter prisma migrate",
     "prisma:seed": "pnpm --filter prisma seed",
+    "prisma:clear": "pnpm --filter prisma clear",
     "prisma:reset": "pnpm --filter prisma reset",
     "lint": "pnpm lint:nuxt && pnpm lint:worker",
     "lint:nuxt": "pnpm --filter nuxt lint",
