@@ -16,7 +16,6 @@
   },
   "dependencies": {
     "@prisma/client": "5.22.0",
-    "auth-utils": "^1.0.0",
     "bullmq": "^4.0.0",
     "nuxt": "^3.13.0",
     "shared": "workspace:*",

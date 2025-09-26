@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-  modules: ['@nuxt/eslint', 'auth-utils/nuxt', 'vuetify-nuxt-module'],
+  modules: ['@nuxt/eslint', 'vuetify-nuxt-module'],
   // rest of your config...
   runtimeConfig: {
     redis: {
@@ -14,14 +14,6 @@ export default defineNuxtConfig({
   typescript: {
     strict: true,
     typeCheck: true,
-  },
-  auth: {
-    baseURL: '/api/auth', // our custom API routes
-    cookie: {
-      name: 'auth.session',
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-    },
   },
   vuetify: {
     moduleOptions: {
