@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-  modules: ['@nuxt/eslint', 'vuetify-nuxt-module'],
+  modules: ['@nuxt/eslint', '@sidebase/nuxt-auth', 'vuetify-nuxt-module'],
   // rest of your config...
   runtimeConfig: {
     redis: {
@@ -14,6 +14,10 @@ export default defineNuxtConfig({
   typescript: {
     strict: true,
     typeCheck: true,
+  },
+  auth: {
+    baseURL: '/api/auth', // where your API endpoints live
+    globalAppMiddleware: true, // protect routes by default
   },
   vuetify: {
     moduleOptions: {
