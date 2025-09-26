@@ -20,6 +20,9 @@ importers:
       '@prisma/client':
         specifier: 5.22.0
         version: 5.22.0(prisma@5.22.0)
+      auth-utils:
+        specifier: ^1.0.0
+        version: 1.0.0
       bullmq:
         specifier: ^4.0.0
         version: 4.18.3
@@ -2239,6 +2242,9 @@ packages:
 
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
+
+  auth-utils@1.0.0:
+    resolution: {integrity: sha512-cwYLm0fsIz/I0vDYb792L33mpyE8qtK+58SisRfxQOd4RtDVzV+Xxug5iASs5h3txtcNOhd8rRzEQ+SgsAf6Hw==}
 
   autoprefixer@10.4.21:
     resolution: {integrity: sha512-O+A6LWV5LDHSJD3LjHYoNi4VLsj/Whi7k6zG12xTYaU4cQ8oxQGckXNX8cRHK5yOZ/ppVHe0ZBXGzSV9jXdVbQ==}
@@ -8115,6 +8121,8 @@ snapshots:
   async@3.2.6: {}
 
   asynckit@0.4.0: {}
+
+  auth-utils@1.0.0: {}
 
   autoprefixer@10.4.21(postcss@8.5.6):
     dependencies:
