@@ -1,5 +1,4 @@
 <script setup lang="ts">
-const { signUp } = useAuth()
 const name = ref('')
 const email = ref('')
 const password = ref('')
@@ -7,11 +6,14 @@ const error = ref<string | null>(null)
 
 async function submit() {
   try {
-    await signUp({ name: name.value, email: email.value, password: password.value })
-    navigateTo('/quests')
+    await $fetch('/api/auth/custom-signup', {
+      method: 'POST',
+      body: { email: email.value, password: password.value, name: name.value },
+    })
+    navigateTo('/auth/login')
   }
-  catch {
-    error.value = 'Sign up failed'
+  catch (e) {
+    error.value = e instanceof Error ? e.message : 'Signup failed'
   }
 }
 </script>
