@@ -7,6 +7,7 @@
     "dev:prepare": "nuxt prepare",
     "build": "nuxt build",
     "start": "nuxt start",
+    "clean": "rm -rf .nuxt .output .cache",
     "lint": "eslint .",
     "lint:types": "npx nuxi typecheck",
     "format": "eslint . --fix",

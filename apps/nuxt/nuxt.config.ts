@@ -1,5 +1,3 @@
-import { authorize } from './server/utils/auth'
-
 export default defineNuxtConfig({
   modules: ['@nuxt/eslint', '@sidebase/nuxt-auth', 'vuetify-nuxt-module'],
   // rest of your config...
@@ -12,7 +10,24 @@ export default defineNuxtConfig({
       tls: process.env.REDIS_TLS === 'true',
     },
   },
+  build: {
+    transpile: ['@sidebase/nuxt-auth'],
+  },
   compatibilityDate: '2025-09-25',
+  vite: {
+    optimizeDeps: {
+      include: [
+        '@sidebase/nuxt-auth',
+        '@sidebase/nuxt-auth/dist/runtime',
+      ],
+    },
+    ssr: {
+      noExternal: [
+        '@sidebase/nuxt-auth',
+        '@sidebase/nuxt-auth/dist/runtime',
+      ],
+    },
+  },
   typescript: {
     strict: true,
     typeCheck: true,
@@ -25,7 +40,6 @@ export default defineNuxtConfig({
     defaultProvider: 'credentials',
     provider: {
       type: 'credentials',
-      authorize,
     },
   },
   vuetify: {
