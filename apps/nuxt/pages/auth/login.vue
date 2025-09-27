@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { useAuth } from 'auth-utils'
-
 const { signIn } = useAuth()
 const email = ref('')
 const password = ref('')

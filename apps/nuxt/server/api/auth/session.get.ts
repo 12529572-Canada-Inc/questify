@@ -1,4 +1,4 @@
-import { getUserSession } from 'auth-utils/server'
+import { getUserSession } from '#auth'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)

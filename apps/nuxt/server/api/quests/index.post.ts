@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import { getUserSession } from 'auth-utils/server'
+import { getUserSession } from '#auth'
 
 const prisma = new PrismaClient()
 

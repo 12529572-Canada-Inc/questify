@@ -1,4 +1,4 @@
-import { clearUserSession } from 'auth-utils/server'
+import { clearUserSession } from '#auth'
 
 export default defineEventHandler(async (event) => {
   await clearUserSession(event)
