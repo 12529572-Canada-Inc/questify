@@ -13,10 +13,6 @@ export default defineNuxtConfig({
       url: process.env.REDIS_URL || '',
       tls: process.env.REDIS_TLS === 'true',
     },
-    session: {
-      // optional overrides, e.g. maxAge
-      maxAge: 60 * 60 * 24 * 7, // one week
-    },
   },
   compatibilityDate: '2025-09-25',
   typescript: {

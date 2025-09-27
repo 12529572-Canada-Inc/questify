@@ -1,12 +1,19 @@
 <script setup lang="ts">
-const { signIn, error } = useAuth()
+const { fetch: refreshSession } = useUserSession()
+const router = useRouter()
+
 const email = ref('')
 const password = ref('')
+const error = ref<string | null>(null)
 
 async function submit() {
-  const res = await signIn('credentials', { email: email.value, password: password.value })
-  if (res?.ok) {
-    navigateTo('/quests')
+  try {
+    await $fetch('/api/auth/login', { method: 'POST', body: { email: email.value, password: password.value } })
+    await refreshSession()
+    router.push('/quests')
+  }
+  catch (e) {
+    error.value = e instanceof Error ? e.message : 'Login failed'
   }
 }
 </script>

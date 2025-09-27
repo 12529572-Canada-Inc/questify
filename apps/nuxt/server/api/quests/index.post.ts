@@ -1,19 +1,9 @@
 import { PrismaClient } from '@prisma/client'
-import { getServerSession } from '#auth'
 
 const prisma = new PrismaClient()
 
 const handler = defineEventHandler(async (event) => {
-  const session = await getServerSession(event)
-  if (!session?.user) {
-    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
-  }
-
-  // Look up the user in the database
-  const user = await prisma.user.findUnique({ where: { email: session.user.email || '' } })
-  if (!user) {
-    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
-  }
+  const { user } = await requireUserSession(event) // 👈 forces login
 
   const body = await readBody(event)
   const { title, description } = body
