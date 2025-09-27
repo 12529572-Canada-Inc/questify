@@ -1,5 +1,9 @@
 export default defineNuxtConfig({
-  modules: ['@nuxt/eslint', 'vuetify-nuxt-module'],
+  modules: [
+    '@nuxt/eslint',
+    'vuetify-nuxt-module',
+    'nuxt-auth-utils',
+  ],
   // rest of your config...
   runtimeConfig: {
     redis: {
