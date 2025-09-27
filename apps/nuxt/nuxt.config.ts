@@ -1,3 +1,5 @@
+import { authorize } from './server/utils/auth'
+
 export default defineNuxtConfig({
   modules: ['@nuxt/eslint', '@sidebase/nuxt-auth', 'vuetify-nuxt-module'],
   // rest of your config...
@@ -23,15 +25,7 @@ export default defineNuxtConfig({
     defaultProvider: 'credentials',
     provider: {
       type: 'credentials',
-      authorize: async (credentials: { email: string, password: string }) => {
-        // Call your custom login API
-        const user = await $fetch('/api/auth/login', {
-          method: 'POST',
-          body: credentials,
-        })
-        if (user) return user
-        return null
-      },
+      authorize,
     },
   },
   vuetify: {
