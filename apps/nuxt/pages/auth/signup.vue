@@ -46,6 +46,12 @@ async function submit() {
       >
         Create Account
       </v-btn>
+      <v-btn
+        variant="text"
+        to="/auth/login"
+      >
+        Already have an account? Log in
+      </v-btn>
       <v-alert
         v-if="error"
         type="error"
@@ -54,11 +60,5 @@ async function submit() {
         {{ error }}
       </v-alert>
     </v-card>
-    <v-btn
-      variant="text"
-      to="/auth/login"
-    >
-      Already have an account? Log in
-    </v-btn>
   </v-container>
 </template>
