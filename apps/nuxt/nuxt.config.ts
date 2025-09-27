@@ -1,4 +1,4 @@
-import type { Credentials } from 'auth'
+import type { Credentials } from '#auth'
 
 export default defineNuxtConfig({
   modules: ['@nuxt/eslint', '@sidebase/nuxt-auth', 'vuetify-nuxt-module'],
