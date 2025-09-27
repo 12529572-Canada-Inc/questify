@@ -6,7 +6,7 @@ const error = ref<string | null>(null)
 
 async function submit() {
   try {
-    await $fetch('/api/auth/custom-signup', {
+    await $fetch('/api/auth/signup', {
       method: 'POST',
       body: { email: email.value, password: password.value, name: name.value },
     })
