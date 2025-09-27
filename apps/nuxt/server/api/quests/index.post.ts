@@ -1,11 +1,11 @@
 import { PrismaClient } from '@prisma/client'
-import { getUserSession } from '#auth'
+import { getServerSession } from '#auth'
 
 const prisma = new PrismaClient()
 
 const handler = defineEventHandler(async (event) => {
-  const session = await getUserSession(event)
-  if (!session?.user) {
+  const session = await getServerSession(event)
+  if (!session?.user?.id) {
     throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
   }
 
