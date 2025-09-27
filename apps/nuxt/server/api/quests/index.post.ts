@@ -5,7 +5,13 @@ const prisma = new PrismaClient()
 
 const handler = defineEventHandler(async (event) => {
   const session = await getServerSession(event)
-  if (!session?.user?.id) {
+  if (!session?.user) {
+    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
+  }
+
+  // Look up the user in the database
+  const user = await prisma.user.findUnique({ where: { email: session.user.email || '' } })
+  if (!user) {
     throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
   }
 
@@ -20,7 +26,7 @@ const handler = defineEventHandler(async (event) => {
     data: {
       title,
       description,
-      ownerId: session.user.id,
+      ownerId: user.id,
     },
   })
 
