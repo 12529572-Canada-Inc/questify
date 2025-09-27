@@ -1,16 +1,12 @@
 <script setup lang="ts">
-const { signIn } = useAuth()
+const { signIn, error } = useAuth()
 const email = ref('')
 const password = ref('')
-const error = ref<string | null>(null)
 
 async function submit() {
-  try {
-    await signIn({ email: email.value, password: password.value })
+  const res = await signIn('credentials', { email: email.value, password: password.value })
+  if (res?.ok) {
     navigateTo('/quests')
-  }
-  catch {
-    error.value = 'Login failed'
   }
 }
 </script>
@@ -28,12 +24,13 @@ async function submit() {
       />
       <v-text-field
         v-model="password"
-        label="Password"
         type="password"
+        label="Password"
       />
       <v-btn
         block
         color="primary"
+        class="mt-4"
         @click="submit"
       >
         Login
