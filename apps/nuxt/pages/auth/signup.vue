@@ -10,7 +10,8 @@ async function submit() {
       method: 'POST',
       body: { email: email.value, password: password.value, name: name.value },
     })
-    navigateTo('/auth/login')
+    // Redirect to quest list after successful signup
+    await useRouter().push('/quests')
   }
   catch (e) {
     error.value = e instanceof Error ? e.message : 'Signup failed'
