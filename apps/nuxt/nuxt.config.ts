@@ -4,6 +4,9 @@ export default defineNuxtConfig({
     'vuetify-nuxt-module',
     'nuxt-auth-utils',
   ],
+  imports: {
+    dirs: ['middleware'],
+  },
   // rest of your config...
   runtimeConfig: {
     redis: {
