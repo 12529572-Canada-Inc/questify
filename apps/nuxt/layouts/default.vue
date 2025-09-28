@@ -12,10 +12,10 @@ async function logout() {
   <v-main>
     <v-app-bar
       app
-      color="primary"
-      dark
     >
-      <v-toolbar-title>Questify 🎯</v-toolbar-title>
+      <v-app-bar-title>
+        Questify 🎯
+      </v-app-bar-title>
       <v-spacer />
 
       <template v-if="loggedIn">
