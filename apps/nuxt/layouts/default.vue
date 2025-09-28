@@ -1,10 +1,23 @@
 <script setup lang="ts">
-const { loggedIn } = useUserSession()
+const { clear, loggedIn } = useUserSession()
 const router = useRouter()
 
 async function logout() {
-  await clearSession()
-  router.push('/auth/login')
+  try {
+    // Call your API logout endpoint
+    await $fetch('/api/auth/logout', {
+      method: 'POST',
+    })
+
+    // Clear local session state (if you’re storing it via auth-utils)
+    clear()
+
+    // Redirect to login
+    router.push('/auth/login')
+  }
+  catch (e) {
+    console.error('Logout failed:', e)
+  }
 }
 </script>
 
