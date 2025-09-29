@@ -1,11 +1,22 @@
-import { describe, it, expect } from 'vitest'
-import { clearUserSession } from '#auth-utils/server'
+import { describe, it, beforeAll, afterAll, expect } from 'vitest'
+import request from 'supertest'
+import type { Server } from 'http'
+import { startTestServer, stopTestServer } from '../../utils/testServer'
+
+let server: Server
 
 describe('Auth Logout API', () => {
-  it('clears the session', async () => {
-    const mockEvent = {} as Parameters<typeof clearUserSession>[0] // mock event for testing
+  beforeAll(async () => {
+    server = await startTestServer()
+  })
 
-    const result = await clearUserSession(mockEvent)
-    expect(result).toBeUndefined()
+  afterAll(async () => {
+    await stopTestServer()
+  })
+
+  it('logs out a user', async () => {
+    const res = await request(server).post('/api/auth/logout')
+    expect(res.status).toBe(200)
+    expect(res.body).toHaveProperty('success', true)
   })
 })

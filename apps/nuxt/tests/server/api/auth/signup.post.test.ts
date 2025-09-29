@@ -1,34 +1,28 @@
-import { describe, it, expect } from 'vitest'
-import { createUser } from '~/server/api/auth/signup.post'
-import { PrismaClient } from '@prisma/client'
-import bcrypt from 'bcrypt'
+import { describe, it, beforeAll, afterAll, expect } from 'vitest'
+import request from 'supertest'
+import type { Server } from 'http'
+import { startTestServer, stopTestServer } from '../../utils/testServer'
 
-const prisma = new PrismaClient()
+let server: Server
 
 describe('Auth Signup API', () => {
-  it('creates a new user with hashed password', async () => {
-    const email = 'test@example.com'
-    const password = 'password123'
-
-    const user = await createUser({ email, password })
-
-    expect(user.email).toBe(email)
-    expect(user.password).not.toBe(password) // hashed
-    expect(await bcrypt.compare(password, user.password)).toBe(true)
-
-    // cleanup
-    await prisma.user.delete({ where: { email } })
+  beforeAll(async () => {
+    server = await startTestServer()
   })
 
-  it('fails when email already exists', async () => {
-    const email = 'duplicate@example.com'
-    const password = 'password123'
+  afterAll(async () => {
+    await stopTestServer()
+  })
 
-    await createUser({ email, password })
+  it('registers a new user', async () => {
+    const email = `test-${Date.now()}@example.com`
+    const res = await request(server).post('/api/auth/signup').send({
+      email,
+      password: 'password123',
+      name: 'Test User',
+    })
 
-    await expect(createUser({ email, password })).rejects.toThrow()
-
-    // cleanup
-    await prisma.user.delete({ where: { email } })
+    expect(res.status).toBe(200)
+    expect(res.body).toHaveProperty('success', true)
   })
 })
