@@ -1,5 +1,5 @@
 import { loadNitro } from 'nitropack'
-import { listen } from 'listen'
+import { listen } from 'listhen'
 
 let server: ReturnType<typeof listen> | null
 let nitro: Awaited<ReturnType<typeof loadNitro>>

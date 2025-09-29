@@ -1,7 +1,7 @@
 import { describe, it, beforeAll, afterAll, expect } from 'vitest'
 import request from 'supertest'
 import type { Server } from 'http'
-import { startTestServer, stopTestServer } from '../../utils/testServer'
+import { startTestServer, stopTestServer } from '~/tests/utils/testServer'
 
 let server: Server
 
