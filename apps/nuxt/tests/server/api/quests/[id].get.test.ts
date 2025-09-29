@@ -24,8 +24,10 @@ describe('Quests/[ID] GET API', () => {
   })
 
   afterAll(async () => {
-    await prisma.quest.delete({ where: { id: questId } })
-    await prisma.user.delete({ where: { email: 'quest-owner@example.com' } })
+    if (questId) {
+      await prisma.quest.delete({ where: { id: questId } })
+    }
+    await prisma.user.deleteMany({ where: { email: { contains: 'quest-owner@' } } })
   })
 
   it('retrieves quest by ID', async () => {
