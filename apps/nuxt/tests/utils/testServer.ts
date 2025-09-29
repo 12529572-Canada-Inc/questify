@@ -1,11 +1,11 @@
-import { loadNitro } from 'nitropack'
+import { createNitro } from 'nitropack'
 import { listen } from 'listhen'
 
 let server: ReturnType<typeof listen> | null
 let nitro: Awaited<ReturnType<typeof loadNitro>>
 
 export async function startTestServer() {
-  nitro = await loadNitro({ dev: false, rootDir: process.cwd() })
+  nitro = await createNitro({ dev: false, rootDir: process.cwd() })
   await nitro.init()
   server = await listen(nitro.server, { port: 0 }) // random port
   return server
