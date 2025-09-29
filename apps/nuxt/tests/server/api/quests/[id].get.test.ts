@@ -14,7 +14,7 @@ describe('Quests/[ID] GET API', () => {
         status: 'draft',
         owner: {
           create: {
-            email: 'quest-owner@example.com',
+            email: `quest-owner-${Date.now()}@example.com`,
             password: 'hashed-password',
           },
         },

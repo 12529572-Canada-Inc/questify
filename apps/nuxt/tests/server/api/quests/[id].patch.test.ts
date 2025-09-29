@@ -14,7 +14,7 @@ describe('Quests/[ID] PATCH API', () => {
         status: 'draft',
         owner: {
           create: {
-            email: 'quest-owner@example.com',
+            email: `quest-owner-${Date.now()}@example.com`,
             password: 'hashed-password',
           },
         },
@@ -27,7 +27,7 @@ describe('Quests/[ID] PATCH API', () => {
     if (questId) {
       await prisma.quest.delete({ where: { id: questId } })
     }
-    await prisma.user.deleteMany({ where: { email: { contains: 'quest-owner@' } } })
+    await prisma.user.deleteMany({ where: { email: { contains: 'quest-owner-' } } })
   })
 
   it('marks quest as completed', async () => {
