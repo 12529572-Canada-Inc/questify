@@ -36,6 +36,7 @@
     "eslint": "^9.36.0",
     "eslint-plugin-vue": "^10.4.0",
     "happy-dom": "^18.0.1",
+    "supertest": "^7.1.4",
     "typescript": "^5.0.0",
     "vitest": "^3.2.4",
     "vue-router": "^4.3.0",
