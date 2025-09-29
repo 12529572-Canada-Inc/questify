@@ -1,7 +1,9 @@
 import { describe, it, expect } from 'vitest'
 import { createUser } from '~/server/api/auth/signup.post'
-import prisma from 'shared/prisma'
+import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcrypt'
+
+const prisma = new PrismaClient()
 
 describe('Auth Signup API', () => {
   it('creates a new user with hashed password', async () => {

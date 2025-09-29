@@ -1,7 +1,9 @@
 import { describe, it, expect } from 'vitest'
 import { loginUser } from '~/server/api/auth/login.post'
-import prisma from 'shared/prisma'
+import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcrypt'
+
+const prisma = new PrismaClient()
 
 describe('Auth Login API', () => {
   const email = 'login@example.com'
