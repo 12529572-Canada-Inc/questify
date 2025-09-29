@@ -1,13 +1,18 @@
 import { createNitro } from 'nitropack'
 import { listen } from 'listhen'
 
-let server: ReturnType<typeof listen> | null
-let nitro: Awaited<ReturnType<typeof loadNitro>>
+let nitro: Awaited<ReturnType<typeof createNitro>>
+let server: Awaited<ReturnType<typeof listen>> | null
 
 export async function startTestServer() {
-  nitro = await createNitro({ dev: false, rootDir: process.cwd() })
-  await nitro.init()
-  server = await listen(nitro.server, { port: 0 }) // random port
+  nitro = await createNitro({
+    dev: false,
+    rootDir: process.cwd(),
+  })
+
+  // In Nitro 2.12.6, no .init() or .prepare() needed
+  // Just use nitro.h3App directly
+  server = await listen(nitro.h3App, { port: 0 })
   return server
 }
 
@@ -17,7 +22,9 @@ export async function stopTestServer() {
     server = null
   }
   if (nitro) {
-    await nitro.close()
+    if (typeof nitro.close === 'function') {
+      await nitro.close()
+    }
     nitro = null
   }
 }
