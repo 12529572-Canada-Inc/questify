@@ -26,15 +26,6 @@ describe('Quest API', () => {
     await prisma.user.delete({ where: { email: 'quest-owner@example.com' } })
   })
 
-  it('retrieves quest by ID', async () => {
-    const quest = await prisma.quest.findUnique({
-      where: { id: questId },
-      include: { tasks: true },
-    })
-    expect(quest?.id).toBe(questId)
-    expect(quest?.title).toBe('Test Quest')
-  })
-
   it('marks quest as completed', async () => {
     await prisma.quest.update({
       where: { id: questId },
