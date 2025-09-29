@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import prisma from 'shared/prisma'
 
-describe('Quest API', () => {
+describe('Quests/[ID] PATCH API', () => {
   let questId: string
 
   beforeAll(async () => {

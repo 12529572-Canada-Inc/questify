@@ -3,7 +3,7 @@ import { createUser } from '~/server/api/auth/signup.post'
 import prisma from 'shared/prisma'
 import bcrypt from 'bcrypt'
 
-describe('Auth Signup', () => {
+describe('Auth Signup API', () => {
   it('creates a new user with hashed password', async () => {
     const email = 'test@example.com'
     const password = 'password123'

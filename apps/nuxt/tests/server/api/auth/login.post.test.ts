@@ -3,7 +3,7 @@ import { loginUser } from '~/server/api/auth/login.post'
 import prisma from 'shared/prisma'
 import bcrypt from 'bcrypt'
 
-describe('Auth Login', () => {
+describe('Auth Login API', () => {
   const email = 'login@example.com'
   const password = 'mypassword'
 
