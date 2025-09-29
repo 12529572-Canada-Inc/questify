@@ -1,8 +1,7 @@
 import { createNitro } from 'nitropack'
-import { listen } from 'listhen'
+import { toNodeListener } from 'h3'
 
-let nitro: Awaited<ReturnType<typeof createNitro>>
-let server: Awaited<ReturnType<typeof listen>> | null
+let nitro: ReturnType<typeof createNitro> | null = null
 
 export async function startTestServer() {
   nitro = await createNitro({
@@ -10,17 +9,11 @@ export async function startTestServer() {
     rootDir: process.cwd(),
   })
 
-  // In Nitro 2.12.6, no .init() or .prepare() needed
-  // Just use nitro.h3App directly
-  server = await listen(nitro.h3App, { port: 0 })
-  return server
+  // Convert h3 app into a Node.js handler for Supertest
+  return toNodeListener(nitro.h3App)
 }
 
 export async function stopTestServer() {
-  if (server) {
-    await server.close()
-    server = null
-  }
   if (nitro) {
     if (typeof nitro.close === 'function') {
       await nitro.close()
