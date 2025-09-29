@@ -1,23 +1,27 @@
-import { createNitro } from 'nitropack'
+import { fileURLToPath } from 'node:url'
+import { dirname, resolve } from 'node:path'
 import { toNodeListener } from 'h3'
 
-let nitro: ReturnType<typeof createNitro> | null = null
+// This points to Nuxt’s Nitro output after `nuxi prepare`/`nuxi build`
+const __dirname = dirname(fileURLToPath(import.meta.url))
+const nitroEntry = resolve(__dirname, '../../.output/server/index.mjs')
+
+let server: unknown = null
 
 export async function startTestServer() {
-  nitro = await createNitro({
-    dev: false,
-    rootDir: process.cwd(),
-  })
+  // dynamically import Nitro’s built server entry
+  const mod = await import(nitroEntry)
+  const handler = mod.default || mod.handler || mod.app
 
-  // Convert h3 app into a Node.js handler for Supertest
-  return toNodeListener(nitro.h3App)
+  if (!handler) {
+    throw new Error('Failed to load Nitro server handler from entry')
+  }
+
+  // Wrap the h3 handler as a Node listener for supertest
+  server = toNodeListener(handler)
+  return server
 }
 
 export async function stopTestServer() {
-  if (nitro) {
-    if (typeof nitro.close === 'function') {
-      await nitro.close()
-    }
-    nitro = null
-  }
+  server = null
 }
