@@ -25,5 +25,8 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  return { success: true }
+  return {
+    success: true,
+    user: { id: user.id, email: user.email, name: user.name },
+  }
 })

@@ -22,6 +22,7 @@ describe('Auth Login API', async () => {
     })
 
     expect(res).toHaveProperty('success', true)
-    expect(res).toHaveProperty('token')
+    expect(res).toHaveProperty('user')
+    expect(res.user).toHaveProperty('email', email)
   })
 })

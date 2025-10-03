@@ -16,6 +16,7 @@ describe('Auth Signup API', async () => {
     })
 
     expect(res).toHaveProperty('success', true)
-    // Optionally also check that a user record exists in your database, etc.
+    expect(res).toHaveProperty('user')
+    expect(res.user).toHaveProperty('email')
   })
 })

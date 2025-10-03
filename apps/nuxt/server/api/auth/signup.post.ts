@@ -30,5 +30,8 @@ export default defineEventHandler(async (event) => {
     // optionally add extra fields
   })
 
-  return { user: { id: user.id, email: user.email, name: user.name } }
+  return {
+    success: true,
+    user: { id: user.id, email: user.email, name: user.name },
+  }
 })
