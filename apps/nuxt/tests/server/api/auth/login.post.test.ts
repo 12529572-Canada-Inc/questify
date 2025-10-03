@@ -1,31 +1,22 @@
-import { describe, it, beforeAll, afterAll, expect } from 'vitest'
-import { createTest } from '@nuxt/test-utils'
+import { describe, it, expect } from 'vitest'
+import { $fetch, setup } from '@nuxt/test-utils/e2e'
 
-let ctx: Awaited<ReturnType<typeof createTest>>
-
-describe('Auth Login API', () => {
-  beforeAll(async () => {
-    ctx = await createTest({
-      rootDir: process.cwd(), // adjust if needed (e.g. resolve to apps/nuxt)
-      server: true,
-    })
-  }, 60_000)
-
-  afterAll(async () => {
-    await ctx.close?.()
+describe('Auth Login API', async () => {
+  await setup({
+    // test context options
   })
 
   it('logs in an existing user', async () => {
     const email = `login-${Date.now()}@example.com`
 
     // First create a user
-    await ctx.$fetch('/api/auth/signup', {
+    await $fetch('/api/auth/signup', {
       method: 'POST',
       body: { email, password: 'password123', name: 'Login Test' },
     })
 
     // Then attempt login
-    const res = await ctx.$fetch('/api/auth/login', {
+    const res = await $fetch('/api/auth/login', {
       method: 'POST',
       body: { email, password: 'password123' },
     })
