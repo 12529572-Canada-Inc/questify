@@ -77,20 +77,19 @@ jobs:
                     sleep 2
                   done
 
-            - name: Generate Prisma client
-              run: pnpm --filter nuxt prisma generate
+            - name: Generate Prisma Client
+              run: pnpm prisma:generate
 
-            - name: Run migrations
-              run: pnpm --filter nuxt prisma migrate deploy
+            - name: Deploy Prisma Migrations
+              working-directory: packages/prisma
+              run: pnpm run deploy
 
             # - name: Seed database (optional, if you need test fixtures)
             #   run: pnpm --filter nuxt db:seed
 
-            - name: Test
-              run: pnpm test
-
             - name: Build apps
               if: github.ref == 'refs/heads/develop'
-              run: |
-                  pnpm --filter nuxt build
-                  pnpm --filter worker build
+              run: pnpm build
+
+            - name: Test
+              run: pnpm test
