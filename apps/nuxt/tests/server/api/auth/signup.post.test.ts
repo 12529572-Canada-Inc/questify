@@ -1,10 +1,12 @@
 import { describe, it, beforeAll, afterAll, expect } from 'vitest'
-import { $fetch } from '@nuxt/test-utils'
 import { startTestServer, stopTestServer } from '~/tests/utils/testServer'
+
+let $fetch: (path: string, opts?: unknown) => Promise<unknown>
 
 describe('Auth Signup API', () => {
   beforeAll(async () => {
-    await startTestServer()
+    const ctx = await startTestServer()
+    $fetch = ctx.$fetch
   }, 60_000)
 
   afterAll(async () => {
