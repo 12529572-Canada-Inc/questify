@@ -1,3 +1,4 @@
+version: "3.9"
 services:
   postgres:
     image: postgres:15
@@ -8,8 +9,25 @@ services:
       POSTGRES_DB: questify
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  postgres_test:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: questify
+      POSTGRES_PASSWORD: questify
+      POSTGRES_DB: questify_test
+    ports:
+      - "5433:5432" # expose test DB on a different port
+    tmpfs: /var/lib/postgresql/data # makes it ephemeral & fast
+
   redis:
     image: redis:7
     restart: always
     ports:
       - "6379:6379"
+
+volumes:
+  postgres_data:
