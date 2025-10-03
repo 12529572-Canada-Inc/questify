@@ -13,6 +13,25 @@ jobs:
     build:
         runs-on: ubuntu-latest
 
+        services:
+            postgres:
+                image: postgres:15
+                ports:
+                    - 5432:5432
+                env:
+                    POSTGRES_USER: postgres
+                    POSTGRES_PASSWORD: postgres
+                    POSTGRES_DB: questify_test
+                options: >-
+                    --health-cmd="pg_isready -U postgres"
+                    --health-interval=10s
+                    --health-timeout=5s
+                    --health-retries=5
+
+        env:
+            DATABASE_URL: postgresql://postgres:postgres@localhost:5432/questify_test
+            NODE_ENV: test
+
         steps:
             - name: Checkout repo
               uses: actions/checkout@v4
@@ -26,7 +45,7 @@ jobs:
               run: corepack enable
 
             - name: Install pnpm dependencies
-              run: pnpm install
+              run: pnpm install --frozen-lockfile
 
             - name: Generate Nuxt types
               run: pnpm --filter nuxt dev:prepare
@@ -39,6 +58,12 @@ jobs:
 
             - name: Lint
               run: pnpm lint
+
+            - name: Run migrations
+              run: pnpm --filter nuxt prisma migrate deploy
+
+            # - name: Seed database (optional, if you need test fixtures)
+            #   run: pnpm --filter nuxt db:seed
 
             - name: Test
               run: pnpm test
