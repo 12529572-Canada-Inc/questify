@@ -70,15 +70,15 @@ jobs:
             - name: Lint
               run: pnpm lint
 
-            - name: Generate Prisma client
-              run: pnpm --filter nuxt prisma generate
-
             - name: Wait for Postgres
               run: |
                   until pg_isready -h localhost -p 5432 -U postgres; do
-                  echo "Waiting for Postgres..."
-                  sleep 2
+                    echo "Waiting for Postgres..."
+                    sleep 2
                   done
+
+            - name: Generate Prisma client
+              run: pnpm --filter nuxt prisma generate
 
             - name: Run migrations
               run: pnpm --filter nuxt prisma migrate deploy
