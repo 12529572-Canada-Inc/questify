@@ -1,21 +1,38 @@
 import { describe, it, beforeAll, afterAll, expect } from 'vitest'
-import { $fetch } from '@nuxt/test-utils'
-import { startTestServer, stopTestServer } from '~/tests/utils/testServer'
+import { createTest } from '@nuxt/test-utils'
+
+let ctx: Awaited<ReturnType<typeof createTest>>
 
 describe('Auth Logout API', () => {
   beforeAll(async () => {
-    await startTestServer()
+    ctx = await createTest({
+      rootDir: process.cwd(), // adjust if needed
+      server: true,
+    })
   }, 60_000)
 
   afterAll(async () => {
-    await stopTestServer()
+    await ctx.close?.()
   })
 
   it('logs out a user', async () => {
-    const res = await $fetch('/api/auth/logout', {
+    // Register & login to get a token
+    const email = `logout-${Date.now()}@example.com`
+    await ctx.$fetch('/api/auth/signup', {
       method: 'POST',
+      body: { email, password: 'password123', name: 'Logout Test' },
+    })
+    const loginRes = await ctx.$fetch('/api/auth/login', {
+      method: 'POST',
+      body: { email, password: 'password123' },
     })
 
-    expect(res).toHaveProperty('success')
+    // Call logout with token (if your API requires auth header)
+    const res = await ctx.$fetch('/api/auth/logout', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${loginRes.token}` },
+    })
+
+    expect(res).toHaveProperty('success', true)
   })
 })

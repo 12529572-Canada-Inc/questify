@@ -1,31 +1,36 @@
 import { describe, it, beforeAll, afterAll, expect } from 'vitest'
-import { $fetch } from '@nuxt/test-utils'
-import { startTestServer, stopTestServer } from '~/tests/utils/testServer'
+import { createTest } from '@nuxt/test-utils'
+
+let ctx: Awaited<ReturnType<typeof createTest>>
 
 describe('Auth Login API', () => {
   beforeAll(async () => {
-    await startTestServer()
+    ctx = await createTest({
+      rootDir: process.cwd(), // adjust if needed (e.g. resolve to apps/nuxt)
+      server: true,
+    })
   }, 60_000)
 
   afterAll(async () => {
-    await stopTestServer()
+    await ctx.close?.()
   })
 
   it('logs in an existing user', async () => {
     const email = `login-${Date.now()}@example.com`
 
-    // Create user first
-    await $fetch('/api/auth/signup', {
+    // First create a user
+    await ctx.$fetch('/api/auth/signup', {
       method: 'POST',
       body: { email, password: 'password123', name: 'Login Test' },
     })
 
-    // Try login
-    const res = await $fetch('/api/auth/login', {
+    // Then attempt login
+    const res = await ctx.$fetch('/api/auth/login', {
       method: 'POST',
       body: { email, password: 'password123' },
     })
 
-    expect(res).toHaveProperty('success')
+    expect(res).toHaveProperty('success', true)
+    expect(res).toHaveProperty('token')
   })
 })
