@@ -40,7 +40,7 @@ jobs:
         env:
             DATABASE_URL: postgresql://postgres:postgres@localhost:5432/questify_test
             REDIS_URL: redis://localhost:6379
-            NUXT_SESSION_PASSWORD: super-secret-password
+            NUXT_SESSION_PASSWORD: this-is-a-super-long-test-session-password-123456
             NODE_ENV: test
 
         steps:
@@ -72,6 +72,13 @@ jobs:
 
             - name: Generate Prisma client
               run: pnpm --filter nuxt prisma generate
+
+            - name: Wait for Postgres
+              run: |
+                  until pg_isready -h localhost -p 5432 -U postgres; do
+                  echo "Waiting for Postgres..."
+                  sleep 2
+                  done
 
             - name: Run migrations
               run: pnpm --filter nuxt prisma migrate deploy
