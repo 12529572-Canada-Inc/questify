@@ -1,27 +1,34 @@
-import { fileURLToPath } from 'node:url'
-import { dirname, resolve } from 'node:path'
-import { toNodeListener } from 'h3'
+import { setupTest, getNuxt, type Nuxt } from '@nuxt/test-utils'
 
-// This points to Nuxt’s Nitro output after `nuxi prepare`/`nuxi build`
-const __dirname = dirname(fileURLToPath(import.meta.url))
-const nitroEntry = resolve(__dirname, '../../.output/server/index.mjs')
+let nuxt: Nuxt
 
-let server: unknown = null
-
+/**
+ * Start the Nuxt test server (in-memory) before calling endpoints.
+ */
 export async function startTestServer() {
-  // dynamically import Nitro’s built server entry
-  const mod = await import(nitroEntry)
-  const handler = mod.default || mod.handler || mod.app
+  // This `setupTest` call will build and start Nuxt in test mode.
+  nuxt = await setupTest({
+    // optional: specify options
+    server: true,
+    build: true,
+    // other config overrides if needed
+  })
 
-  if (!handler) {
-    throw new Error('Failed to load Nitro server handler from entry')
+  // get the URL (base) that Nuxt server is listening on
+  const { url } = getNuxt()
+
+  return {
+    url,
+    nuxt,
   }
-
-  // Wrap the h3 handler as a Node listener for supertest
-  server = toNodeListener(handler)
-  return server
 }
 
+/**
+ * Shutdown the test server.
+ */
 export async function stopTestServer() {
-  server = null
+  if (nuxt && typeof nuxt.close === 'function') {
+    await nuxt.close()
+  }
+  nuxt = null
 }
