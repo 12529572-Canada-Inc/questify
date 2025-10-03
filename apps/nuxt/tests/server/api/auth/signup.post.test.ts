@@ -5,8 +5,8 @@ let $fetch: unknown
 
 describe('Auth Signup API', () => {
   beforeAll(async () => {
-    const ctx = await startTestServer()
-    $fetch = ctx.$fetch
+    const server = await startTestServer()
+    $fetch = server.$fetch
   }, 60_000)
 
   afterAll(async () => {
@@ -19,6 +19,6 @@ describe('Auth Signup API', () => {
       method: 'POST',
       body: { email, password: 'password123', name: 'Test User' },
     })
-    expect(res).toHaveProperty('success')
+    expect(res).toHaveProperty('success', true)
   })
 })

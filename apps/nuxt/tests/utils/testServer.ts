@@ -1,23 +1,23 @@
-import { createTest, $fetch as nuxtFetch } from '@nuxt/test-utils'
+import { createTest, fetch } from '@nuxt/test-utils'
 
-let ctx: null | Awaited<ReturnType<typeof createTest>> = null
+let ctx: unknown
 
 export async function startTestServer() {
   ctx = await createTest({
-    rootDir: process.cwd(), // adjust if needed (e.g., apps/nuxt)
+    rootDir: process.cwd(), // or apps/nuxt if monorepo
     server: true,
   })
 
-  return {
-    ...ctx,
-    $fetch: nuxtFetch,
-    url: ctx.url,
-  }
+  // create a bound $fetch that uses ctx.url
+  const $fetch = (path: string, opts?: unknown) =>
+    fetch(ctx.url(path), opts)
+
+  return { ctx, $fetch }
 }
 
 export async function stopTestServer() {
   if (ctx) {
-    await ctx.close?.() // clean shutdown
+    await ctx.close?.()
     ctx = null
   }
 }
