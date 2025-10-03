@@ -6,6 +6,7 @@
     "generate": "prisma generate",
     "migrate": "prisma migrate dev",
     "deploy": "prisma migrate deploy",
+    "deploy:test": "dotenv -e .env.test -- prisma migrate deploy",
     "prepare": "prisma generate",
     "seed": "ts-node seed.ts",
     "clear": "prisma migrate reset --force",
@@ -16,6 +17,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.5.1",
+    "dotenv-cli": "^10.0.0",
     "prisma": "5.22.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.0"
