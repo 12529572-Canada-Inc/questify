@@ -1,18 +1,23 @@
-import { setup } from '@nuxt/test-utils/e2e'
+import { createTest, $fetch as nuxtFetch } from '@nuxt/test-utils'
 
-let ctx: Awaited<ReturnType<typeof setup>>
+let ctx: null | Awaited<ReturnType<typeof createTest>> = null
 
 export async function startTestServer() {
-  ctx = await setup({
-    rootDir: process.cwd(), // or apps/nuxt if your tests live at monorepo root
+  ctx = await createTest({
+    rootDir: process.cwd(), // adjust if needed (e.g., apps/nuxt)
     server: true,
   })
 
-  return ctx
+  return {
+    ...ctx,
+    $fetch: nuxtFetch,
+    url: ctx.url,
+  }
 }
 
 export async function stopTestServer() {
-  if (ctx && typeof ctx.close === 'function') {
-    await ctx.close()
+  if (ctx) {
+    await ctx.close?.() // clean shutdown
+    ctx = null
   }
 }
