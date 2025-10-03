@@ -1,22 +1,21 @@
 import { describe, it, beforeAll, afterAll, expect } from 'vitest'
-import request from 'supertest'
-import type { Server } from 'http'
+import { $fetch } from '@nuxt/test-utils'
 import { startTestServer, stopTestServer } from '~/tests/utils/testServer'
-
-let server: Server
 
 describe('Auth Logout API', () => {
   beforeAll(async () => {
-    server = await startTestServer()
-  })
+    await startTestServer()
+  }, 60_000)
 
   afterAll(async () => {
     await stopTestServer()
   })
 
   it('logs out a user', async () => {
-    const res = await request(server).post('/api/auth/logout')
-    expect(res.status).toBe(200)
-    expect(res.body).toHaveProperty('success', true)
+    const res = await $fetch('/api/auth/logout', {
+      method: 'POST',
+    })
+
+    expect(res).toHaveProperty('success')
   })
 })

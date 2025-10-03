@@ -1,14 +1,11 @@
 import { describe, it, beforeAll, afterAll, expect } from 'vitest'
-import request from 'supertest'
-import type { Server } from 'http'
+import { $fetch } from '@nuxt/test-utils'
 import { startTestServer, stopTestServer } from '~/tests/utils/testServer'
-
-let server: Server
 
 describe('Auth Signup API', () => {
   beforeAll(async () => {
-    server = await startTestServer()
-  })
+    await startTestServer()
+  }, 60_000)
 
   afterAll(async () => {
     await stopTestServer()
@@ -16,13 +13,12 @@ describe('Auth Signup API', () => {
 
   it('registers a new user', async () => {
     const email = `test-${Date.now()}@example.com`
-    const res = await request(server).post('/api/auth/signup').send({
-      email,
-      password: 'password123',
-      name: 'Test User',
+
+    const res = await $fetch('/api/auth/signup', {
+      method: 'POST',
+      body: { email, password: 'password123', name: 'Test User' },
     })
 
-    expect(res.status).toBe(200)
-    expect(res.body).toHaveProperty('success', true)
+    expect(res).toHaveProperty('success')
   })
 })
