@@ -5,7 +5,6 @@ import { execSync } from 'node:child_process'
 config({ path: '.env.test' })
 
 beforeAll(() => {
-  console.log('Resetting Prisma test DB...')
   execSync('pnpm --filter nuxt prisma migrate reset --force --skip-generate', {
     stdio: 'inherit',
     env: {
