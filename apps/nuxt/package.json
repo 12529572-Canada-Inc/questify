@@ -11,7 +11,7 @@
     "lint": "eslint .",
     "lint:types": "npx nuxi typecheck",
     "format": "eslint . --fix",
-    "test": "vitest run",
+    "test": "vitest run --silent",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage"
   },
