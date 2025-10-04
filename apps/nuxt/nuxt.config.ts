@@ -7,7 +7,6 @@ export default defineNuxtConfig({
   imports: {
     dirs: ['middleware'],
   },
-  // rest of your config...
   runtimeConfig: {
     redis: {
       host: process.env.REDIS_HOST || 'localhost',
