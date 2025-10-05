@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
-import fs from "fs";
+import { hashPassword } from 'shared'
+import fs from 'fs';
 
 const prisma = new PrismaClient()
 
@@ -11,7 +12,7 @@ async function main() {
     data: {
       name: "Test User",
       email: "test@example.com",
-      password: "password123",
+      password: hashPassword("password123"),
     },
   })
 

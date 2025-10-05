@@ -8,7 +8,7 @@
     "deploy": "prisma migrate deploy",
     "deploy:test": "dotenv -e .env.test -- prisma migrate deploy",
     "prepare": "prisma generate",
-    "seed": "ts-node seed.ts",
+    "seed": "ts-node -r tsconfig-paths/register seed.ts",
     "seed:generate": "ts-node utils/generateSeedData.ts",
     "clear": "prisma migrate reset --force",
     "reset": "pnpm clear && pnpm seed"

@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import { verifyPassword } from 'shared'
 
 const prisma = new PrismaClient()
 
@@ -11,7 +12,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: 'Invalid credentials' })
   }
 
-  const ok = await verifyPassword(user.password, password)
+  const ok = verifyPassword(password, user.password)
   if (!ok) {
     throw createError({ statusCode: 401, statusMessage: 'Invalid credentials' })
   }

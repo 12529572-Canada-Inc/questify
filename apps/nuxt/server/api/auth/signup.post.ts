@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import { hashPassword } from 'shared'
 
 const prisma = new PrismaClient()
 
@@ -11,7 +12,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 409, statusMessage: 'User already exists' })
   }
 
-  const hashed = await hashPassword(password)
+  const hashed = hashPassword(password)
   const user = await prisma.user.create({
     data: {
       email,
