@@ -17,6 +17,19 @@ export default defineNuxtConfig({
     },
   },
   compatibilityDate: '2025-09-25',
+  vite: {
+    server: {
+      watch: {
+        ignored: [
+          '**/node_modules/**',
+          '**/.git/**',
+          '**/dist/**',
+          '**/.turbo/**',
+          '**/.output/**',
+        ],
+      },
+    },
+  },
   typescript: {
     strict: true,
     typeCheck: true,
