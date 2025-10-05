@@ -8,14 +8,13 @@
     "deploy": "prisma migrate deploy",
     "deploy:test": "dotenv -e .env.test -- prisma migrate deploy",
     "prepare": "prisma generate",
-    "seed": "ts-node seed.mjs",
+    "seed": "ts-node seed.ts",
     "seed:generate": "ts-node utils/generateSeedData.ts",
     "clear": "prisma migrate reset --force",
     "reset": "pnpm clear && pnpm seed"
   },
   "dependencies": {
-    "@prisma/client": "5.22.0",
-    "oslo": "^1.2.1"
+    "@prisma/client": "5.22.0"
   },
   "devDependencies": {
     "@types/node": "^24.5.1",
