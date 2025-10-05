@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Task } from '@prisma/client'
 import fs, { stat } from "fs";
 
 const prisma = new PrismaClient()
@@ -13,6 +13,7 @@ async function main() {
     create: {
       email: "test@example.com",
       name: "Test User",
+      password: "testpassword123", // Add a suitable password here
     }
   })
 
@@ -29,10 +30,10 @@ async function main() {
         description: quest.description,
         status: "active",
         tasks: {
-          create: quest.tasks.map((t) => ({
-            title: t.title,
-            details: t.details,
-            order: t.order,
+          create: quest.tasks.map((task: Task) => ({
+            title: task.title,
+            details: task.details,
+            order: task.order,
             status: "todo",
           })),
         },
