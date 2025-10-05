@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import fs, { stat } from "fs";
 
 const prisma = new PrismaClient()
 
@@ -15,34 +16,41 @@ async function main() {
     }
   })
 
-  // Create a quest
-  const quest = await prisma.quest.create({
-    data: {
-      title: "Climb Mt. Everest",
-      description: "Prepare, train, and conquer the summit!",
-      ownerId: user.id,
-      status: "active",
-      tasks: {
-        create: [
-          { title: "Research climb logistics", order: 0 },
-          { title: "Train for endurance", order: 1 },
-          { title: "Acquire climbing gear", order: 2 },
-          { title: "Book permits and travel", order: 3 }
-        ]
-      }
-    },
-    include: { tasks: true }
-  })
-
   console.log("✅ User created:", user)
-  console.log("✅ Quest created:", quest)
+
+  // Load the merged seed data
+  const data = JSON.parse(fs.readFileSync("./seed-data.json", "utf8"));
+
+  for (const quest of data) {
+    await prisma.quest.create({
+      data: {
+        ownerId: user.id,
+        title: quest.title,
+        description: quest.description,
+        status: "active",
+        tasks: {
+          create: quest.tasks.map((t) => ({
+            title: t.title,
+            details: t.details,
+            order: t.order,
+            status: "todo",
+          })),
+        },
+      },
+    });
+
+    console.log("✅ Quest created:", quest)
+  }
+
+  console.log("✅ Done seeding!");
+
 }
 
 main()
   .catch((e) => {
-    console.error(e)
-    process.exit(1)
+    console.error("❌ Error during seed:", e);
+    process.exit(1);
   })
   .finally(async () => {
-    await prisma.$disconnect()
-  })
+    await prisma.$disconnect();
+  });
