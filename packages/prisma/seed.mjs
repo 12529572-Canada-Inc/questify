@@ -1,20 +1,33 @@
-import { PrismaClient, Task } from '@prisma/client'
-import fs, { stat } from "fs";
+import { PrismaClient } from '@prisma/client'
+import fs from "fs";
+import { Scrypt } from 'oslo/password'
 
 const prisma = new PrismaClient()
+const scrypt = new Scrypt()
 
 async function main() {
   console.log("🌱 Seeding database...")
 
-  // Create a test user
-  const user = await prisma.user.upsert({
-    where: { email: "test@example.com" },
-    update: {},
-    create: {
-      email: "test@example.com",
+  // Hash the test password
+  const hashedPassword = await scrypt.hash('testpassword123')
+  console.log('Hashed password:', hashedPassword)
+
+  // 🔒 Inline check — ensure correct format
+  if (!hashedPassword.startsWith('$scrypt$')) {
+    throw new Error(
+      `❌ Invalid hash format. Expected "$scrypt$", got "${hashedPassword.slice(0, 20)}..." \n` +
+      'Make sure you are importing { Scrypt } from "oslo/password".'
+    )
+  }
+
+  console.log('Hashed password:', hashedPassword)
+
+  const user = await prisma.user.create({
+    data: {
       name: "Test User",
-      password: "testpassword123",
-    }
+      email: "test@example.com",
+      password: hashedPassword,
+    },
   })
 
   console.log("✅ User created:", user)
@@ -30,7 +43,7 @@ async function main() {
         description: quest.description,
         status: "active",
         tasks: {
-          create: quest.tasks.map((task: Task) => ({
+          create: quest.tasks.map((task) => ({
             title: task.title,
             details: task.details,
             order: task.order,
