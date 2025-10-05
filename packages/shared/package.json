@@ -8,13 +8,15 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json"
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run"
   },
   "dependencies": {
     "crypto": "^1.0.1"
   },
   "devDependencies": {
     "@types/node": "^24.6.2",
-    "tsconfig-paths": "^4.2.0"
+    "tsconfig-paths": "^4.2.0",
+    "vitest": "^3.2.4"
   }
 }
