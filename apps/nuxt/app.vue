@@ -10,7 +10,7 @@
 
 <style scoped>
 .app-background {
-  background: linear-gradient(135deg, #4f46e5, #3b82f6, #22d3ee);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   background-size: 400% 400%;
   animation: gradientShift 15s ease infinite;
   min-height: 100vh;
