@@ -13,7 +13,7 @@ async function main() {
     create: {
       email: "test@example.com",
       name: "Test User",
-      password: "testpassword123", // Add a suitable password here
+      password: "testpassword123",
     }
   })
 
