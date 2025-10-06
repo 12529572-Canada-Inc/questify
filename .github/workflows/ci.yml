@@ -13,6 +13,36 @@ jobs:
     build:
         runs-on: ubuntu-latest
 
+        services:
+            postgres:
+                image: postgres:15
+                ports:
+                    - 5432:5432
+                env:
+                    POSTGRES_USER: postgres
+                    POSTGRES_PASSWORD: postgres
+                    POSTGRES_DB: questify_test
+                options: >-
+                    --health-cmd="pg_isready -U postgres"
+                    --health-interval=10s
+                    --health-timeout=5s
+                    --health-retries=5
+            redis:
+                image: redis:7
+                ports:
+                    - 6379:6379
+                options: >-
+                    --health-cmd "redis-cli ping"
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 5
+
+        env:
+            DATABASE_URL: postgresql://postgres:postgres@localhost:5432/questify_test
+            REDIS_URL: redis://localhost:6379
+            NUXT_SESSION_PASSWORD: this-is-a-super-long-test-session-password-123456
+            NODE_ENV: test
+
         steps:
             - name: Checkout repo
               uses: actions/checkout@v4
@@ -26,7 +56,7 @@ jobs:
               run: corepack enable
 
             - name: Install pnpm dependencies
-              run: pnpm install
+              run: pnpm install --frozen-lockfile
 
             - name: Generate Nuxt types
               run: pnpm --filter nuxt dev:prepare
@@ -40,11 +70,26 @@ jobs:
             - name: Lint
               run: pnpm lint
 
-            - name: Test
-              run: pnpm test
+            - name: Wait for Postgres
+              run: |
+                  until pg_isready -h localhost -p 5432 -U postgres; do
+                    echo "Waiting for Postgres..."
+                    sleep 2
+                  done
+
+            - name: Generate Prisma Client
+              run: pnpm prisma:generate
+
+            - name: Deploy Prisma Migrations
+              working-directory: packages/prisma
+              run: pnpm run deploy
+
+            # - name: Seed database (optional, if you need test fixtures)
+            #   run: pnpm --filter nuxt db:seed
 
             - name: Build apps
               if: github.ref == 'refs/heads/develop'
-              run: |
-                  pnpm --filter nuxt build
-                  pnpm --filter worker build
+              run: pnpm build
+
+            - name: Test
+              run: pnpm test

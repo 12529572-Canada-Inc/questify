@@ -1,6 +1,12 @@
 export default defineNuxtConfig({
-  modules: ['@nuxt/eslint', 'vuetify-nuxt-module'],
-  // rest of your config...
+  modules: [
+    '@nuxt/eslint',
+    'vuetify-nuxt-module',
+    'nuxt-auth-utils',
+  ],
+  imports: {
+    dirs: ['middleware'],
+  },
   runtimeConfig: {
     redis: {
       host: process.env.REDIS_HOST || 'localhost',
@@ -11,6 +17,19 @@ export default defineNuxtConfig({
     },
   },
   compatibilityDate: '2025-09-25',
+  vite: {
+    server: {
+      watch: {
+        ignored: [
+          '**/node_modules/**',
+          '**/.git/**',
+          '**/dist/**',
+          '**/.turbo/**',
+          '**/.output/**',
+        ],
+      },
+    },
+  },
   typescript: {
     strict: true,
     typeCheck: true,

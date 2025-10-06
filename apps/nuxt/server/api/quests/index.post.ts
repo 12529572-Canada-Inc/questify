@@ -3,8 +3,10 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 const handler = defineEventHandler(async (event) => {
+  const { user } = await requireUserSession(event) // 👈 forces login
+
   const body = await readBody(event)
-  const { title, description, userId } = body
+  const { title, description } = body
 
   // Access the queue from the event context
   // TODO: deretmine potentially better way to access this
@@ -14,7 +16,7 @@ const handler = defineEventHandler(async (event) => {
     data: {
       title,
       description,
-      ownerId: userId || null, // Set to null if userId is undefined
+      ownerId: user.id,
     },
   })
 

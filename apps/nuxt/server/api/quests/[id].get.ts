@@ -7,7 +7,13 @@ export default defineEventHandler(async (event) => {
 
   const quest = await prisma.quest.findUnique({
     where: { id },
-    include: { tasks: true },
+    include: { tasks: true, owner: {
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+    } },
   })
 
   if (!quest) {

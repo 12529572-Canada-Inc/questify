@@ -5,6 +5,7 @@ export default defineVitestConfig({
   test: {
     environment: 'nuxt',
     globals: true,
+    setupFiles: ['./vitest.setup.ts'],
     deps: {
       optimizer: {
         ssr: {

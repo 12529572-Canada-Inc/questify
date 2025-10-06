@@ -49,7 +49,7 @@ const { data: quests } = await useQuests()
 
     <!-- Floating Action Button (FAB) for mobile -->
     <v-btn
-      color="success"
+      color="primary"
       class="fab"
       icon="mdi-plus"
       :to="`/quests/new`"

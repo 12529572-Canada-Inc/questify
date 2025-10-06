@@ -5,8 +5,8 @@
     "target": "ESNext",
     "strict": true,
     "esModuleInterop": true,
-    "composite": true
+    "composite": true,
   },
-  "include": ["."],
+  "include": [".", "../shared/src/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

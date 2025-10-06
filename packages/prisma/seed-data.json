@@ -1,0 +1,378 @@
+[
+  {
+    "title": "Plan a Party",
+    "description": "Plan a birthday party",
+    "tasks": [
+      {
+        "title": "Set the Date and Time",
+        "details": "Choose a suitable date and time for the birthday party that works for the birthday person and key guests.",
+        "order": 0
+      },
+      {
+        "title": "Select a Venue",
+        "details": "Decide whether to host the party at home, rent a venue, or have it outdoors, considering capacity and location.",
+        "order": 1
+      },
+      {
+        "title": "Create a Guest List",
+        "details": "Compile a list of friends, family, and anyone else the birthday person wants to invite.",
+        "order": 2
+      },
+      {
+        "title": "Send Invitations",
+        "details": "Choose how to send invitations (e.g., digital, printed) and ensure they include the date, time, venue, and RSVP details.",
+        "order": 3
+      },
+      {
+        "title": "Plan the Theme",
+        "details": "Select a theme for the party (if desired), such as colors, decorations, or a specific concept that reflects the birthday person's interests.",
+        "order": 4
+      },
+      {
+        "title": "Organize Food and Drinks",
+        "details": "Decide on the menu, including snacks, main dishes, and beverages. Consider dietary restrictions and preferences.",
+        "order": 5
+      },
+      {
+        "title": "Arrange Entertainment",
+        "details": "Plan activities and entertainment such as games, music, or hiring a performer. Create a playlist if applicable.",
+        "order": 6
+      },
+      {
+        "title": "Order a Cake",
+        "details": "Choose a cake that fits the theme and preferences of the birthday person, and place an order in advance.",
+        "order": 7
+      },
+      {
+        "title": "Decorate the Venue",
+        "details": "Purchase or create decorations that match the chosen theme and set them up ahead of time.",
+        "order": 8
+      },
+      {
+        "title": "Prepare Party Favors",
+        "details": "Select and prepare small gifts or party favors for guests to take home as a thank-you.",
+        "order": 9
+      },
+      {
+        "title": "Confirm RSVP and Finalize Details",
+        "details": "Follow up with guests who haven’t responded, confirm the final headcount, and finalize arrangements for food, seating, and entertainment.",
+        "order": 10
+      },
+      {
+        "title": "Host the Party",
+        "details": "Ensure everything runs smoothly during the event, greeting guests, managing activities, and enjoying the celebration.",
+        "order": 11
+      },
+      {
+        "title": "Wrap-Up and Thank You",
+        "details": "After the party, send thank-you notes to guests, and review any important notes for future events.",
+        "order": 12
+      }
+    ]
+  },
+  {
+    "title": "Bake a Cake",
+    "description": "Bake a vanilla cake with buttercream icing",
+    "tasks": [
+      {
+        "title": "Gather Ingredients",
+        "details": "Collect all necessary ingredients for the vanilla cake and buttercream icing. This includes flour, sugar, eggs, butter, baking powder, vanilla extract, milk, and powdered sugar.",
+        "order": 0
+      },
+      {
+        "title": "Preheat Oven",
+        "details": "Preheat the oven to 350°F (175°C) to prepare for baking the cake.",
+        "order": 1
+      },
+      {
+        "title": "Prepare Cake Batter",
+        "details": "In a mixing bowl, cream together butter and sugar until light and fluffy. Add eggs one at a time, followed by vanilla extract. In a separate bowl, mix flour and baking powder, then gradually add to the wet mixture along with milk, blending until smooth.",
+        "order": 2
+      },
+      {
+        "title": "Prepare Baking Pans",
+        "details": "Grease and flour two 9-inch round cake pans to prevent the cake from sticking.",
+        "order": 3
+      },
+      {
+        "title": "Bake the Cake",
+        "details": "Pour the cake batter evenly into the prepared pans and bake in the preheated oven for 25-30 minutes, or until a toothpick inserted into the center comes out clean.",
+        "order": 4
+      },
+      {
+        "title": "Cool the Cakes",
+        "details": "Once baked, remove the cakes from the oven and let them cool in the pans for about 10 minutes. Then, transfer them to wire racks to cool completely.",
+        "order": 5
+      },
+      {
+        "title": "Prepare Buttercream Icing",
+        "details": "In a mixing bowl, beat together softened butter and powdered sugar, then add vanilla extract and milk until reaching desired consistency. Adjust with more powdered sugar or milk as needed.",
+        "order": 6
+      },
+      {
+        "title": "Assemble the Cake",
+        "details": "Once the cakes have cooled, place one layer on a serving plate. Spread a layer of buttercream icing on top, then place the second layer on top and cover the entire cake with remaining buttercream icing.",
+        "order": 7
+      },
+      {
+        "title": "Decorate the Cake",
+        "details": "Optionally, decorate the cake with sprinkles, fruits, or additional icing designs to enhance its appearance.",
+        "order": 8
+      },
+      {
+        "title": "Slice and Serve",
+        "details": "Slice the cake into pieces and serve to enjoy your homemade vanilla cake with buttercream icing.",
+        "order": 9
+      }
+    ]
+  },
+  {
+    "title": "Penguin Locator",
+    "description": "Find them birds!",
+    "tasks": [
+      {
+        "title": "Define Search Area",
+        "details": "Determine the geographical location where penguins are expected to be found.",
+        "order": 0
+      },
+      {
+        "title": "Select Tools and Methods",
+        "details": "Choose the appropriate tools (e.g., GPS, binoculars) and methods (e.g., hiking, boat) for locating penguins.",
+        "order": 1
+      },
+      {
+        "title": "Research Penguin Habitats",
+        "details": "Gather information on the natural habitats of various penguin species to understand their preferences.",
+        "order": 2
+      },
+      {
+        "title": "Plan Route",
+        "details": "Create a detailed route based on the chosen search area and known penguin habitats.",
+        "order": 3
+      },
+      {
+        "title": "Gather Supplies",
+        "details": "Collect necessary supplies, including food, water, and safety equipment for the search expedition.",
+        "order": 4
+      },
+      {
+        "title": "Assemble Team",
+        "details": "Gather a team of individuals who will assist in the search, ensuring they have the necessary skills and equipment.",
+        "order": 5
+      },
+      {
+        "title": "Conduct Preliminary Survey",
+        "details": "Perform a preliminary survey of the area to assess accessibility and identify potential penguin sightings.",
+        "order": 6
+      },
+      {
+        "title": "Execute Search",
+        "details": "Begin the search according to the planned route, utilizing tools and methods identified earlier.",
+        "order": 7
+      },
+      {
+        "title": "Document Findings",
+        "details": "Take notes and/or photos of penguins and their environment, documenting sightings and behavior.",
+        "order": 8
+      },
+      {
+        "title": "Evaluate Results",
+        "details": "Analyze the findings to determine the success of the search and gather insights for future expeditions.",
+        "order": 9
+      },
+      {
+        "title": "Report Findings",
+        "details": "Compile a report with details of the expedition, including locations of penguin sightings and suggestions for future searches.",
+        "order": 10
+      }
+    ]
+  },
+  {
+    "title": "RPG Prep",
+    "description": "Prepare to GM my next RPG Session",
+    "tasks": [
+      {
+        "title": "Review Player Characters",
+        "details": "Examine the backgrounds, motivations, and current status of each player character to tailor the session to their narratives.",
+        "order": 1
+      },
+      {
+        "title": "Draft Session Outline",
+        "details": "Create a rough outline of the session's structure, including key scenes, encounters, and transitions.",
+        "order": 2
+      },
+      {
+        "title": "Prepare Encounter Details",
+        "details": "Design and detail encounters (combat, puzzles, roleplay) including stats, mechanics, and any special rules.",
+        "order": 3
+      },
+      {
+        "title": "Create NPCs",
+        "details": "Develop non-player characters that will be featured in the session, including personalities, motivations, and relationships to the players.",
+        "order": 4
+      },
+      {
+        "title": "Determine Session Objectives",
+        "details": "Identify the goals of the upcoming RPG session, including major plot points and character development opportunities.",
+        "order": 0
+      },
+      {
+        "title": "Prepare for Reflection and Feedback",
+        "details": "Plan how to gather player feedback after the session to improve future gameplay experiences.",
+        "order": 12
+      },
+      {
+        "title": "Plan for Potential Player Actions",
+        "details": "Anticipate possible player decisions and outcomes to prepare for dynamic storytelling and ensure the session remains engaging.",
+        "order": 7
+      },
+      {
+        "title": "Set Up the Game Table",
+        "details": "Organize the physical or virtual game space, ensuring all players have access to necessary materials, tools, and tech.",
+        "order": 8
+      },
+      {
+        "title": "Review Game Rules and Mechanics",
+        "details": "Refresh knowledge on relevant rules and mechanics that will be utilized during the session to ensure smooth gameplay.",
+        "order": 9
+      },
+      {
+        "title": "World Building and Setting Preparation",
+        "details": "Gather information and update any relevant lore, locations, and world-building elements that will be important during the session.",
+        "order": 5
+      },
+      {
+        "title": "Schedule Check-in with Players",
+        "details": "Reach out to players to confirm attendance and address any last-minute questions or character concerns.",
+        "order": 10
+      },
+      {
+        "title": "Conduct a Final Review",
+        "details": "Review all prepared materials and outlines one more time to ensure readiness for the session.",
+        "order": 11
+      },
+      {
+        "title": "Gather Resources and Materials",
+        "details": "Collect any physical or digital resources needed for the session, such as maps, game books, miniatures, or player handouts.",
+        "order": 6
+      }
+    ]
+  },
+  {
+    "title": "Train a Dragon",
+    "description": "Teach my legendary creature",
+    "tasks": [
+      {
+        "title": "Research Dragon Training Techniques",
+        "details": "Gather information on various methods and techniques for training dragons, including best practices used by experienced trainers.",
+        "order": 0
+      },
+      {
+        "title": "Establish Trust with the Dragon",
+        "details": "Spend time with the dragon to build a bond, ensuring it feels safe and secure around you.",
+        "order": 1
+      },
+      {
+        "title": "Set Training Goals",
+        "details": "Define specific skills or abilities that you want the dragon to learn, such as flying, breathing fire, or responding to commands.",
+        "order": 2
+      },
+      {
+        "title": "Create a Training Schedule",
+        "details": "Develop a structured training plan that outlines daily or weekly sessions, including duration and focus areas.",
+        "order": 3
+      },
+      {
+        "title": "Start with Basic Commands",
+        "details": "Introduce simple commands and cues to the dragon, using positive reinforcement to encourage learning.",
+        "order": 4
+      },
+      {
+        "title": "Incorporate Flying Practice",
+        "details": "Gradually introduce flying exercises, ensuring the dragon is comfortable and confident in the air.",
+        "order": 5
+      },
+      {
+        "title": "Teach Advanced Skills",
+        "details": "Once basic commands are mastered, progress to more complex skills such as fire control, agility drills, or tricks.",
+        "order": 6
+      },
+      {
+        "title": "Monitor Progress and Adjust Training",
+        "details": "Regularly assess the dragon's learning and adapt training methods or goals as necessary to suit its needs.",
+        "order": 7
+      },
+      {
+        "title": "Introduce Socialization Opportunities",
+        "details": "Facilitate interactions with other dragons or creatures to help the dragon develop social skills and confidence.",
+        "order": 8
+      },
+      {
+        "title": "Celebrate Milestones",
+        "details": "Acknowledge and reward the dragon's achievements to reinforce positive behavior and maintain motivation.",
+        "order": 9
+      }
+    ]
+  },
+  {
+    "title": "Start a Kubb Championship",
+    "description": "Start a friendly Kubb championship at my party",
+    "tasks": [
+      {
+        "title": "Create Teams",
+        "details": "Invite guests to participate and divide them into teams, ensuring an even number of players.",
+        "order": 2
+      },
+      {
+        "title": "Gather Supplies",
+        "details": "Collect all the necessary Kubb equipment, including Kubb blocks, batons, and a king.",
+        "order": 0
+      },
+      {
+        "title": "Set Up the Field",
+        "details": "Mark the boundaries of the Kubb playing field and position the Kubb blocks and king accordingly.",
+        "order": 3
+      },
+      {
+        "title": "Establish Rules",
+        "details": "Brief all participants on the basic rules of Kubb to ensure everyone understands how to play.",
+        "order": 4
+      },
+      {
+        "title": "Schedule Matches",
+        "details": "Organize a schedule of matches, including time slots for each team to play against each other.",
+        "order": 5
+      },
+      {
+        "title": "Set Up Scoring System",
+        "details": "Determine how points will be scored and track the progress of each team throughout the championship.",
+        "order": 6
+      },
+      {
+        "title": "Kick Off Championship",
+        "details": "Start the first match and ensure that everyone is engaged and enjoying the competition.",
+        "order": 7
+      },
+      {
+        "title": "Monitor Matches",
+        "details": "Oversee the matches to ensure the rules are followed and assist teams as needed.",
+        "order": 8
+      },
+      {
+        "title": "Crown the Winner",
+        "details": "Announce the team that wins the championship and consider a small prize or trophy for them.",
+        "order": 9
+      },
+      {
+        "title": "Celebrate and Wrap Up",
+        "details": "Conclude the Kubb championship with a toast or celebration, thanking everyone for participating.",
+        "order": 10
+      },
+      {
+        "title": "Choose Location",
+        "details": "Select a suitable outdoor space at the party venue for the Kubb game.",
+        "order": 1
+      }
+    ]
+  }
+]
