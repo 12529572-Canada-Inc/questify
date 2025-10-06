@@ -9,6 +9,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 🚀 Features
+- **Authentication**
+    - Added user authentication flow with login, logout, and registration endpoints.
+    - Integrated JWT-based session management for secure API access.
+    - Implemented authentication middleware for protected routes.
+    - Added user profile endpoint and UI for viewing/updating account details.
+
+- **UI / UX Enhancements**
+    - Added authentication forms (login, register) with validation and error handling.
+    - Updated navigation to show user status and provide logout option.
+    - Improved error messaging for failed authentication attempts.
+
+### 🛠 Fixes
+- Fixed issues with route guards and redirect logic for unauthenticated users.
+- Resolved edge cases in token refresh and session expiration handling.
+- Addressed minor UI inconsistencies in authentication-related components.
+
+### ⚙️ Tooling & Configuration
+- Added environment variables for authentication secrets and token expiry.
+- Updated API documentation to include authentication endpoints and usage.
+- Refactored user model and database schema to support authentication features.
+
+### 🧹 Chore
+- Updated tests to cover authentication flows and protected endpoints.
+- Improved code comments and documentation for new authentication logic.
+- Bumped dependency versions for security and compatibility.
+
 ---
 
 ## [1.2.1] - 2025-09-25
