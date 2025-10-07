@@ -9,6 +9,7 @@ interface TextSegment {
 interface LinkSegment {
   type: 'link'
   value: string
+  display: string
 }
 
 type Segment = TextSegment | LinkSegment
@@ -29,6 +30,16 @@ const attrs = useAttrs()
 
 const urlPattern = /https?:\/\/[^\s]+/g
 
+function summarizeUrl(url: string) {
+  try {
+    const { hostname } = new URL(url)
+    return hostname.replace(/^www\./, '')
+  }
+  catch {
+    return url
+  }
+}
+
 const segments = computed<Segment[]>(() => {
   if (!props.text)
     return []
@@ -44,7 +55,7 @@ const segments = computed<Segment[]>(() => {
     if (index > lastIndex)
       result.push({ type: 'text', value: text.slice(lastIndex, index) })
 
-    result.push({ type: 'link', value: url })
+    result.push({ type: 'link', value: url, display: summarizeUrl(url) })
     lastIndex = index + url.length
   }
 
@@ -76,7 +87,7 @@ const hasContent = computed(() => segments.value.length > 0)
           target="_blank"
           rel="noopener noreferrer"
         >
-          {{ segment.value }}
+          {{ segment.display }}
         </a>
       </template>
     </template>
