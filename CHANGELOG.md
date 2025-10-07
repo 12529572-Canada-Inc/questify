@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Links**
   - Added support for links in quest descriptions and instructions.
 
+### 🛠 Fixes
+- **Redis**
+  - Default the Redis connection port to `6379` when it is omitted from the URL and respect explicitly provided ports.
+
 ---
 
 ## [1.4.0] - 2025-10-07
