@@ -6,11 +6,18 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const title = ref('')
 const description = ref('')
-const userId = ref('')
+const goal = ref('')
+const context = ref('')
+const constraints = ref('')
 
 const valid = ref(false)
 const loading = ref(false)
 const error = ref<string | null>(null)
+
+const rules = {
+  title: [(v: string) => !!v || 'Title is required'],
+  description: [(v: string) => !!v || 'Description is required'],
+}
 
 async function submit() {
   loading.value = true
@@ -22,7 +29,9 @@ async function submit() {
       body: {
         title: title.value,
         description: description.value,
-        userId: userId.value,
+        goal: goal.value,
+        context: context.value,
+        constraints: constraints.value,
       },
     })
 
@@ -74,17 +83,47 @@ async function submit() {
             <v-text-field
               v-model="title"
               label="Title"
-              :rules="[v => !!v || 'Title is required']"
+              :rules="rules.title"
               required
             />
 
             <v-textarea
               v-model="description"
               label="Description"
-              :rules="[v => !!v || 'Description is required']"
+              :rules="rules.description"
               required
               auto-grow
               rows="3"
+            />
+
+            <v-textarea
+              v-model="goal"
+              label="What outcome are you aiming for?"
+              hint="Share the specific result you want this quest to achieve."
+              persistent-hint
+              auto-grow
+              rows="3"
+              class="mb-4"
+            />
+
+            <v-textarea
+              v-model="context"
+              label="Relevant background or context"
+              hint="Include any details, prior work, or information that will help the AI understand the situation."
+              persistent-hint
+              auto-grow
+              rows="3"
+              class="mb-4"
+            />
+
+            <v-textarea
+              v-model="constraints"
+              label="Constraints or preferences"
+              hint="List deadlines, available resources, tone, or other requirements to respect."
+              persistent-hint
+              auto-grow
+              rows="3"
+              class="mb-4"
             />
 
             <v-row

@@ -13,10 +13,23 @@ new Worker(
   async (job) => {
     if (job.name === 'decompose') {
       console.log('Decomposing quest:', job.data);
-      const { questId, title, description } = job.data;
+      const { questId, title, description, goal, context, constraints } = job.data;
 
-      const prompt = `Decompose the quest "${title}: ${description}" into ordered sub-tasks. 
-    Return as JSON array of {title, details}.`;
+      const promptSections = [
+        `Quest Title: ${title}`,
+        description ? `Quest Description: ${description}` : null,
+        goal ? `Desired Outcome: ${goal}` : null,
+        context ? `Additional Context: ${context}` : null,
+        constraints ? `Constraints or Preferences: ${constraints}` : null,
+      ].filter((section): section is string => Boolean(section));
+
+      const prompt = `You are an expert project planner. Based on the following quest information, break the work down into a
+    thoughtfully ordered list of actionable sub-tasks. Each task should be specific enough to execute without additional
+    clarification and collectively lead to the desired outcome.
+
+${promptSections.join('\n')}
+
+Return the plan as a JSON array where each item has the shape {"title": string, "details": string}.`;
       console.log('Prompt:', prompt);
       try {
         const response = await openai.chat.completions.create({
