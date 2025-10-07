@@ -103,6 +103,7 @@ async function submit() {
               persistent-hint
               auto-grow
               rows="3"
+              class="mb-4"
             />
 
             <v-textarea
@@ -112,6 +113,7 @@ async function submit() {
               persistent-hint
               auto-grow
               rows="3"
+              class="mb-4"
             />
 
             <v-textarea
@@ -121,6 +123,7 @@ async function submit() {
               persistent-hint
               auto-grow
               rows="3"
+              class="mb-4"
             />
 
             <v-row
