@@ -28,5 +28,28 @@ describe("parseRedisUrl", () => {
       tls: {},
     })
   })
+
+  it("returns null when url is missing or invalid", () => {
+    expect(parseRedisUrl()).toBeNull()
+    expect(parseRedisUrl("not-a-valid-url")).toBeNull()
+  })
+
+  it("defaults to standard port when an invalid port is provided", () => {
+    expect(parseRedisUrl("redis://localhost:")).toEqual({
+      host: "localhost",
+      port: 6379,
+      password: undefined,
+      tls: undefined,
+    })
+  })
+
+  it("treats empty passwords as undefined", () => {
+    expect(parseRedisUrl("redis://:@localhost:6379")).toEqual({
+      host: "localhost",
+      port: 6379,
+      password: undefined,
+      tls: undefined,
+    })
+  })
 })
 
