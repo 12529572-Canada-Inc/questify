@@ -8,7 +8,7 @@
       "shared": ["../../packages/shared/src"],
       "shared/*": ["../../packages/shared/src/*"]
     },
-    "types": ["@types/node", "vue-router"]
+    "types": ["@types/node", "nuxt-auth-utils", "vue-router"]
   },
   "include": [
     "nuxt.config.ts",

@@ -137,7 +137,7 @@ This ensures `$questQueue` is strongly typed across the app.
 
 Questify follows **Git Flow** conventions.
 
-## 1. Creating a Release
+## 8. Creating a Release
 
 ```bash
 # Make sure you're on develop
@@ -165,7 +165,7 @@ git push origin --tags
 
 ---
 
-## 2. Creating a Hotfix
+## 9. Creating a Hotfix
 
 Hotfixes fix urgent production issues.
 
@@ -202,7 +202,22 @@ git push origin --tags
 
 ---
 
-## VSCode Settings
+## 10. Creating a Database Migration
+
+When you need to change the database schema, create a new Prisma migration:
+
+```bash
+pnpm prisma:migrate
+```
+This will:
+* Create a new migration file in `packages/prisma/migrations`
+* Apply the migration to your local database
+
+Make sure to commit the new migration files to version control.
+
+---
+
+## 11. VSCode Settings
 
 Add the following to `.vscode/settings.json` for automatic ESLint fixes on save:
 
