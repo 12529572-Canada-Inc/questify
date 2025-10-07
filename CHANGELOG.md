@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [1.3.0] - 2025-10-06
+
 ### 🚀 Features
 - **Authentication**
     - Added user authentication flow with login, logout, and registration endpoints.
