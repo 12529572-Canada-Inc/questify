@@ -72,6 +72,7 @@ const hasContent = computed(() => segments.value.length > 0)
   <component
     :is="props.tag"
     v-bind="attrs"
+    class="twl-root"
   >
     <template v-if="hasContent">
       <template
@@ -86,6 +87,7 @@ const hasContent = computed(() => segments.value.length > 0)
           :href="segment.value"
           target="_blank"
           rel="noopener noreferrer"
+          class="twl-link-btn"
         >
           {{ segment.display }}
         </a>
@@ -96,3 +98,25 @@ const hasContent = computed(() => segments.value.length > 0)
     </template>
   </component>
 </template>
+
+<style scoped>
+.twl-link-btn {
+    display: inline-block;
+    padding: 0.35em 0.85em;
+    margin: 0 0.15em;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 0.375em;
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.twl-link-btn:hover {
+    background: #1d4ed8;
+}
+.twl-root {
+    display: inline;
+}
+</style>
