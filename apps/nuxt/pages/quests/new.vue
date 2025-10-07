@@ -14,6 +14,11 @@ const valid = ref(false)
 const loading = ref(false)
 const error = ref<string | null>(null)
 
+const rules = {
+  title: [(v: string) => !!v || 'Title is required'],
+  description: [(v: string) => !!v || 'Description is required'],
+}
+
 async function submit() {
   loading.value = true
   error.value = null
@@ -78,14 +83,14 @@ async function submit() {
             <v-text-field
               v-model="title"
               label="Title"
-              :rules="[v => !!v || 'Title is required']"
+              :rules="rules.title"
               required
             />
 
             <v-textarea
               v-model="description"
               label="Description"
-              :rules="[v => !!v || 'Description is required']"
+              :rules="rules.description"
               required
               auto-grow
               rows="3"
