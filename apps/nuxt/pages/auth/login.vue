@@ -10,8 +10,8 @@ const loading = ref(false)
 const error = ref<string | null>(null)
 
 const rules = {
-  email: (v: string) => !!v || 'Email is required',
-  password: (v: string) => !!v || 'Password is required',
+  email: [(v: string) => !!v || 'Email is required'],
+  password: [(v: string) => !!v || 'Password is required'],
 }
 
 async function submit() {
