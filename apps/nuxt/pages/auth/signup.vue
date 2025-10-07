@@ -2,9 +2,27 @@
 const name = ref('')
 const email = ref('')
 const password = ref('')
+
+const valid = ref(false)
+const loading = ref(false)
 const error = ref<string | null>(null)
 
+const rules = {
+  name: [(v: string) => !!v || 'Name is required'],
+  email: [
+    (v: string) => !!v || 'Email is required',
+    (v: string) => /.+@.+\..+/.test(v) || 'Email must be valid',
+  ],
+  password: [
+    (v: string) => !!v || 'Password is required',
+    (v: string) => v.length >= 6 || 'Password must be at least 6 characters',
+  ],
+}
+
 async function submit() {
+  loading.value = true
+  error.value = null
+
   try {
     await $fetch('/api/auth/signup', {
       method: 'POST',
@@ -26,40 +44,51 @@ async function submit() {
       max-width="400"
     >
       <v-card-title>Sign Up</v-card-title>
-      <v-text-field
-        v-model="name"
-        label="Name"
-      />
-      <v-text-field
-        v-model="email"
-        label="Email"
-      />
-      <v-text-field
-        v-model="password"
-        type="password"
-        label="Password"
-      />
-      <v-btn
-        block
-        color="success"
-        class="mt-4"
-        @click="submit"
+      <v-form
+        v-model="valid"
+        @submit.prevent="submit"
       >
-        Create Account
-      </v-btn>
-      <v-btn
-        variant="text"
-        to="/auth/login"
-      >
-        Already have an account? Log in
-      </v-btn>
-      <v-alert
-        v-if="error"
-        type="error"
-        class="mt-2"
-      >
-        {{ error }}
-      </v-alert>
+        <v-text-field
+          v-model="name"
+          label="Name"
+          required
+          :rules="rules.name"
+        />
+        <v-text-field
+          v-model="email"
+          label="Email"
+          required
+          :rules="rules.email"
+        />
+        <v-text-field
+          v-model="password"
+          type="password"
+          label="Password"
+        />
+        <v-btn
+          type="submit"
+          color="success"
+          block
+          class="mt-4"
+          :loading="loading"
+          :disabled="!valid || loading"
+        >
+          Create Account
+        </v-btn>
+        <v-btn
+          variant="text"
+          to="/auth/login"
+        >
+          Already have an account? Log in
+        </v-btn>
+        <v-alert
+          v-if="error"
+          type="error"
+          class="mt-2"
+        >
+          {{ error }}
+        </v-alert>
+      </v-form>
     </v-card>
   </v-container>
 </template>
