@@ -4,9 +4,13 @@ export function parseRedisUrl(url?: string) {
   try {
     const parsed = new URL(url)
 
+    const defaultPort = 6379
+    const parsedPort = parsed.port !== "" ? Number(parsed.port) : Number.NaN
+    const port = Number.isNaN(parsedPort) ? defaultPort : parsedPort
+
     return {
       host: parsed.hostname,
-      port: Number(parsed.port),
+      port,
       password: parsed.password || undefined,
       tls: parsed.protocol === 'rediss:' ? {} : undefined,
     }
