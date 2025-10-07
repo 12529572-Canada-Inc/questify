@@ -52,24 +52,29 @@ async function submit() {
           v-model="name"
           label="Name"
           required
+          class="mb-2"
           :rules="rules.name"
         />
         <v-text-field
           v-model="email"
           label="Email"
           required
+          class="mb-2"
           :rules="rules.email"
         />
         <v-text-field
           v-model="password"
           type="password"
           label="Password"
+          required
+          class="mb-2"
+          :rules="rules.password"
         />
         <v-btn
           type="submit"
           color="success"
           block
-          class="mt-4"
+          class="mt-4 mb-2"
           :loading="loading"
           :disabled="!valid || loading"
         >
