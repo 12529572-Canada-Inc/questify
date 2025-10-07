@@ -6,7 +6,13 @@ const handler = defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event) // 👈 forces login
 
   const body = await readBody(event)
-  const { title, description } = body
+  const {
+    title,
+    description,
+    goal,
+    context,
+    constraints,
+  } = body
 
   // Access the queue from the event context
   // TODO: deretmine potentially better way to access this
@@ -16,11 +22,21 @@ const handler = defineEventHandler(async (event) => {
     data: {
       title,
       description,
+      goal,
+      context,
+      constraints,
       ownerId: user.id,
     },
   })
 
-  await questQueue.add('decompose', { questId: quest.id, title, description })
+  await questQueue.add('decompose', {
+    questId: quest.id,
+    title,
+    description,
+    goal,
+    context,
+    constraints,
+  })
 
   return { success: true, quest }
 })

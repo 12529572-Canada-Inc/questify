@@ -33,8 +33,42 @@ async function completeQuest() {
             {{ quest.title }}
           </v-card-title>
           <v-card-subtitle>Status: <strong>{{ quest.status }}</strong></v-card-subtitle>
-          <v-card-text>
-            <p>{{ quest.description }}</p>
+          <v-card-text class="d-flex flex-column gap-4">
+            <div>
+              <h3 class="text-subtitle-1 font-weight-medium mb-1">
+                Quest Description
+              </h3>
+              <p class="mb-0">
+                {{ quest.description || 'No description provided.' }}
+              </p>
+            </div>
+
+            <div v-if="quest.goal">
+              <h3 class="text-subtitle-1 font-weight-medium mb-1">
+                Desired Outcome
+              </h3>
+              <p class="mb-0">
+                {{ quest.goal }}
+              </p>
+            </div>
+
+            <div v-if="quest.context">
+              <h3 class="text-subtitle-1 font-weight-medium mb-1">
+                Context
+              </h3>
+              <p class="mb-0">
+                {{ quest.context }}
+              </p>
+            </div>
+
+            <div v-if="quest.constraints">
+              <h3 class="text-subtitle-1 font-weight-medium mb-1">
+                Constraints & Preferences
+              </h3>
+              <p class="mb-0">
+                {{ quest.constraints }}
+              </p>
+            </div>
           </v-card-text>
 
           <v-divider class="my-4" />
