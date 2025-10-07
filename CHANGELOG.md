@@ -11,6 +11,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.0] - 2025-10-07
+
+### 🚀 Features
+
+- **Quest Creation Enhancements**
+  - Added ability to create quests with extra context and detailed instructions (eg. goal, context, constraints, etc.).
+  - Updated quest creation API endpoint to handle new fields.
+  - Enhanced `useQuest` composable to manage additional quest fields.
+
+- **UI / UX Improvements**
+  - Updated all forms to use rules for validation and error handling.
+  - Updated margins and paddings for better spacing and layout consistency.
+
+---
+
 ## [1.3.0] - 2025-10-06
 
 ### 🚀 Features
