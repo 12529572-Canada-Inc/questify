@@ -38,36 +38,45 @@ async function completeQuest() {
               <h3 class="text-subtitle-1 font-weight-medium mb-1">
                 Quest Description
               </h3>
-              <p class="mb-0">
-                {{ quest.description || 'No description provided.' }}
-              </p>
+              <TextWithLinks
+                class="mb-0"
+                tag="p"
+                :text="quest.description"
+                fallback="No description provided."
+              />
             </div>
 
             <div v-if="quest.goal">
               <h3 class="text-subtitle-1 font-weight-medium mb-1">
                 Desired Outcome
               </h3>
-              <p class="mb-0">
-                {{ quest.goal }}
-              </p>
+              <TextWithLinks
+                class="mb-0"
+                tag="p"
+                :text="quest.goal"
+              />
             </div>
 
             <div v-if="quest.context">
               <h3 class="text-subtitle-1 font-weight-medium mb-1">
                 Context
               </h3>
-              <p class="mb-0">
-                {{ quest.context }}
-              </p>
+              <TextWithLinks
+                class="mb-0"
+                tag="p"
+                :text="quest.context"
+              />
             </div>
 
             <div v-if="quest.constraints">
               <h3 class="text-subtitle-1 font-weight-medium mb-1">
                 Constraints & Preferences
               </h3>
-              <p class="mb-0">
-                {{ quest.constraints }}
-              </p>
+              <TextWithLinks
+                class="mb-0"
+                tag="p"
+                :text="quest.constraints"
+              />
             </div>
           </v-card-text>
 
@@ -94,9 +103,12 @@ async function completeQuest() {
                 :key="task.id"
               >
                 <v-list-item-title>{{ task.title }}</v-list-item-title>
-                <div class="text-body-2">
-                  {{ task.details }}
-                </div>
+                <TextWithLinks
+                  v-if="task.details"
+                  class="text-body-2"
+                  tag="div"
+                  :text="task.details"
+                />
                 <v-list-item-subtitle>Status: {{ task.status }}</v-list-item-subtitle>
                 <v-list-item-action>
                   <v-btn
