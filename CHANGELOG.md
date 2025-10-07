@@ -9,6 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 🚀 Features
+- **Quest Collaboration**
+    - Added ability for users to invite collaborators to quests.
+    - Implemented shared quest editing and real-time updates for collaborators.
+    - Added notifications for quest invitations and collaboration events.
+
+- **Activity Feed**
+    - Introduced activity feed showing recent quest updates, completions, and collaboration actions.
+    - Added filtering and sorting options for activity feed.
+
+### 🛠 Fixes
+- Fixed UI bugs in quest collaboration modal and invitation flow.
+- Resolved edge cases with collaborator permissions and access control.
+
+### ⚙️ Tooling & Configuration
+- Updated API documentation to include collaboration endpoints and activity feed usage.
+- Added new environment variables for collaboration features.
+
+### 🧹 Chore
+- Improved test coverage for collaboration and activity feed logic.
+- Updated documentation for new features and usage examples.
+
 ---
 
 ## [1.3.0] - 2025-10-06
