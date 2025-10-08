@@ -1,15 +1,23 @@
-import { describe, it, expect, vi, beforeEach, afterEach, afterAll } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach, afterAll, beforeAll } from 'vitest'
 import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
 import { defineAsyncComponent } from 'vue'
 import { flushPromises } from '@vue/test-utils'
 
+// --- Define mocks ---
 const refreshSessionMock = vi.fn()
 const routerPushMock = vi.fn()
 const useUserSessionMock = vi.fn()
 const useRouterMock = vi.fn()
 
-const restoreUserSession = mockNuxtImport('useUserSession', () => useUserSessionMock)
-const restoreUseRouter = mockNuxtImport('useRouter', () => useRouterMock)
+let restoreUserSession: () => void
+let restoreUseRouter: () => void
+
+// --- Setup before all tests ---
+beforeAll(() => {
+  // mockNuxtImport must run *after* mocks are declared
+  restoreUserSession = mockNuxtImport('useUserSession', () => useUserSessionMock)
+  restoreUseRouter = mockNuxtImport('useRouter', () => useRouterMock)
+})
 
 describe('Auth login page', () => {
   beforeEach(() => {
@@ -50,6 +58,7 @@ describe('Auth login page', () => {
       defineAsyncComponent(() => import('~/pages/auth/login.vue')),
     )
 
+    // Simulate valid credentials
     page.vm.email = 'user@example.com'
     page.vm.password = 'super-secret'
     page.vm.valid = true
@@ -69,8 +78,9 @@ describe('Auth login page', () => {
   })
 })
 
+// --- Cleanup after all tests ---
 afterAll(() => {
-  restoreUserSession()
-  restoreUseRouter()
+  restoreUserSession?.()
+  restoreUseRouter?.()
   vi.unstubAllGlobals()
 })
