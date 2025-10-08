@@ -20,7 +20,7 @@ const tasksLoading = computed(() => {
 })
 
 if (import.meta.client) {
-  let pollTimer: ReturnType<typeof setInterval> | null = null
+  let pollTimer: number | null = null
 
   watch(
     tasksLoading,
