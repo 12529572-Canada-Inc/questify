@@ -11,17 +11,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🚀 Features
 - **Links**
-  - Added support for links in quest descriptions and instructions.
+    - Added support for links in quest descriptions and instructions.
+- **Task Loading**
+    - UI now waits for tasks to finish loading before displaying them, improving user experience and preventing incomplete task lists.
 
 ### 🛠 Fixes
 - **Redis**
-  - Default the Redis connection port to `6379` when it is omitted from the URL and respect explicitly provided ports.
+    - Default the Redis connection port to `6379` when it is omitted from the URL and respect explicitly provided ports.
 
 ### 🧪 Tests
 - **Worker**
-  - Added coverage for the worker entrypoint to verify Redis configuration, OpenAI-driven quest decomposition, and failure handling.
+    - Added coverage for the worker entrypoint to verify Redis configuration, OpenAI-driven quest decomposition, and failure handling.
 - **Shared**
-  - Expanded `parseRedisUrl` tests to capture invalid inputs, TLS behavior, and password normalization cases.
+    - Expanded `parseRedisUrl` tests to capture invalid inputs, TLS behavior, and password normalization cases.
 
 ---
 
