@@ -36,6 +36,22 @@ export default defineNuxtConfig({
         ],
       },
     },
+    resolve: {
+      alias: {
+        // 👇 neutralize both possible forms of the virtual import
+        '/@vite-plugin-checker-runtime-entry': '/dev/null',
+        'virtual:@vite-plugin-checker-runtime-entry': '/dev/null',
+      },
+    },
+    build: {
+      rollupOptions: {
+        external: [
+          // 👇 explicitly tell Rollup to ignore the virtual entry
+          '/@vite-plugin-checker-runtime-entry',
+          'virtual:@vite-plugin-checker-runtime-entry',
+        ],
+      },
+    },
   },
   typescript: {
     strict: true,
