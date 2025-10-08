@@ -1,8 +1,14 @@
-import { describe, it, expect, vi, beforeEach, afterEach, afterAll } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach, beforeAll, afterAll } from 'vitest'
 import { mockNuxtImport } from '@nuxt/test-utils/runtime'
 
 let useFetchMock: ReturnType<typeof vi.fn>
-const restoreUseFetch = mockNuxtImport('useFetch', () => (...args: unknown[]) => useFetchMock(...args))
+let restoreUseFetch: () => void
+
+// --- Setup before all tests ---
+beforeAll(() => {
+  // mockNuxtImport must run after mocks are declared
+  restoreUseFetch = mockNuxtImport('useFetch', () => (...args: unknown[]) => useFetchMock(...args))
+})
 
 describe('useQuest composables', () => {
   beforeEach(() => {
@@ -11,6 +17,7 @@ describe('useQuest composables', () => {
 
   afterEach(() => {
     vi.resetModules()
+    vi.clearAllMocks()
   })
 
   it('requests a specific quest with a stable key', async () => {
@@ -38,6 +45,8 @@ describe('useQuest composables', () => {
   })
 })
 
+// --- Cleanup after all tests ---
 afterAll(() => {
-  restoreUseFetch()
+  restoreUseFetch?.()
+  vi.unstubAllGlobals()
 })
