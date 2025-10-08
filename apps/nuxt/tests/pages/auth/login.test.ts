@@ -39,7 +39,7 @@ describe('Auth login page', () => {
     const html = page.html()
     expect(html).toContain('Login')
     expect(html).toContain('Email')
-    expect(html).toContain("Don't have an account? Sign up")
+    expect(html).toContain('Don\'t have an account? Sign up')
   })
 
   it('submits credentials and redirects to quests', async () => {

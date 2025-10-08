@@ -100,7 +100,7 @@ describe('Quests detail page', () => {
     )
     await flushPromises()
 
-    const completeButton = page.findAll('button').find((btn) => btn.text().includes('Mark as Completed'))
+    const completeButton = page.findAll('button').find(btn => btn.text().includes('Mark as Completed'))
     expect(completeButton).toBeDefined()
     await completeButton!.trigger('click')
     await flushPromises()
