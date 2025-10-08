@@ -15,11 +15,6 @@ const tasksLoading = computed(() => {
 
   const tasks = currentQuest.tasks ?? []
 
-  console.log('Tasks loading check:', {
-    status: currentQuest.status,
-    tasksCount: tasks.length,
-  })
-
   return currentQuest.status === 'draft' && tasks.length === 0
 })
 
@@ -41,12 +36,11 @@ async function completeQuest() {
 
 onMounted(() => {
   const { pause, resume } = useIntervalFn(() => {
-    console.log('Polling for quest updates...')
     refresh()
   }, 2000, { immediate: false })
 
   watch(tasksLoading, (loading) => {
-    if (loading) resume()
+    if (loading && !pending.value) resume()
     else pause()
   }, { immediate: true })
 })
