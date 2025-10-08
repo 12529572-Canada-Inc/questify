@@ -6,11 +6,22 @@ export default defineVitestConfig({
     environment: 'nuxt',
     globals: true,
     setupFiles: ['./vitest.setup.ts'],
+    // 👇 ensures Nuxt macros like mockNuxtImport get transformed
+    testTransformMode: {
+      web: ['\\.jsx$', '\\.tsx$', '\\.js$', '\\.ts$'],
+      ssr: ['\\.jsx$', '\\.tsx$', '\\.js$', '\\.ts$'],
+    },
     deps: {
       optimizer: {
         ssr: {
           include: ['@nuxt/test-utils', 'shared'],
         },
+      },
+    },
+    // Optional, but helps with deprecation warning:
+    server: {
+      deps: {
+        inline: ['@nuxt/test-utils', 'shared'],
       },
     },
   },
