@@ -9,7 +9,7 @@ export default defineVitestConfig({
     deps: {
       optimizer: {
         ssr: {
-          include: ['shared'],
+          include: ['@nuxt/test-utils', 'shared'],
         },
       },
     },
