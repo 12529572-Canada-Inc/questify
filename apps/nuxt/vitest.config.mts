@@ -1,5 +1,4 @@
-import { defineVitestConfig } from '@nuxt/test-utils/config'
-import { NuxtVitestResolver } from '@nuxt/test-utils/resolver'
+import { defineVitestConfig, NuxtVitestResolver } from '@nuxt/test-utils/config'
 import path from 'path'
 
 export default defineVitestConfig({
