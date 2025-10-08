@@ -1,4 +1,5 @@
 import { defineVitestConfig } from '@nuxt/test-utils/config'
+import { NuxtVitestResolver } from '@nuxt/test-utils/resolver'
 import path from 'path'
 
 export default defineVitestConfig({
@@ -16,6 +17,7 @@ export default defineVitestConfig({
   },
   resolve: {
     alias: {
+      ...NuxtVitestResolver(),
       shared: path.resolve(__dirname, '../../packages/shared/src'),
     },
   },
