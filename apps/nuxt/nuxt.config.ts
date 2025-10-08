@@ -22,6 +22,9 @@ export default defineNuxtConfig({
       // Add any Vite plugins here
       ...(process.env.NODE_ENV === 'test' ? [] : []),
     ],
+    optimizeDeps: {
+      exclude: ['vite-plugin-checker'],
+    },
     server: {
       watch: {
         ignored: [
@@ -38,6 +41,18 @@ export default defineNuxtConfig({
     strict: true,
     typeCheck: true,
   },
+  // ✅ prevent vite-plugin-checker and inspector runtime code in tests
+  hooks: process.env.NODE_ENV === 'test'
+    ? {
+        'vite:extendConfig'(config) {
+          config.plugins = (config.plugins || []).filter(
+            p =>
+              !p?.name?.includes?.('vite-plugin-checker')
+              && !p?.name?.includes?.('vite-plugin-inspect'),
+          )
+        },
+      }
+    : {},
   vuetify: {
     moduleOptions: {
       // Optional module-specific flags
