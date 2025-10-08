@@ -2,6 +2,8 @@
 import { useIntervalFn } from '@vueuse/core'
 import { useQuest } from '~/composables/useQuest'
 
+const { isClient } = useNuxtApp()
+
 const route = useRoute()
 const id = route.params.id as string
 
@@ -18,7 +20,7 @@ const tasksLoading = computed(() => {
   return currentQuest.status === 'draft' && tasks.length === 0
 })
 
-if (useBrowser()) {
+if (isClient) {
   // Setup the interval but start it paused
   const { pause, resume } = useIntervalFn(refresh, 2000, { immediate: false })
 
