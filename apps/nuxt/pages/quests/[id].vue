@@ -132,6 +132,7 @@ onMounted(() => {
               <v-progress-circular
                 color="primary"
                 indeterminate
+                class="mr-2"
               />
               <span class="text-body-2">Generating tasks for this quest...</span>
             </div>
