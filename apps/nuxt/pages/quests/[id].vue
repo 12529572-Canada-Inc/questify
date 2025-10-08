@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useIntervalFn } from '@vueuse/core'
 import { useQuest } from '~/composables/useQuest'
 
 const route = useRoute()
@@ -19,33 +18,15 @@ const tasksLoading = computed(() => {
   return currentQuest.status === 'draft' && tasks.length === 0
 })
 
-if (import.meta.client) {
-  let pollTimer: number | null = null
+if (useBrowser()) {
+  // Setup the interval but start it paused
+  const { pause, resume } = useIntervalFn(refresh, 2000, { immediate: false })
 
-  watch(
-    tasksLoading,
-    (loading) => {
-      if (loading) {
-        if (!pollTimer) {
-          pollTimer = window.setInterval(() => {
-            refresh()
-          }, 2000)
-        }
-      }
-      else if (pollTimer) {
-        clearInterval(pollTimer)
-        pollTimer = null
-      }
-    },
-    { immediate: true },
-  )
-
-  onBeforeUnmount(() => {
-    if (pollTimer) {
-      clearInterval(pollTimer)
-      pollTimer = null
-    }
-  })
+  // Watch for loading state
+  watch(tasksLoading, (loading) => {
+    if (loading) resume()
+    else pause()
+  }, { immediate: true })
 }
 
 async function markTaskCompleted(taskId: string) {
