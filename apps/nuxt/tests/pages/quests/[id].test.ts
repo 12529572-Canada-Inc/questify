@@ -1,8 +1,9 @@
-import { describe, it, expect, vi, beforeEach, afterEach, afterAll } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach, beforeAll, afterAll } from 'vitest'
 import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
 import { defineAsyncComponent, ref } from 'vue'
 import { flushPromises } from '@vue/test-utils'
 
+// --- Define mocks first ---
 const useQuestMock = vi.fn()
 const refreshMock = vi.fn()
 const useRouteMock = vi.fn()
@@ -10,6 +11,7 @@ const intervalPauseMock = vi.fn()
 const intervalResumeMock = vi.fn()
 const useIntervalFnMock = vi.fn(() => ({ pause: intervalPauseMock, resume: intervalResumeMock }))
 
+// --- External composable mocks ---
 vi.mock('~/composables/useQuest', () => ({
   useQuest: useQuestMock,
 }))
@@ -18,7 +20,13 @@ vi.mock('@vueuse/core', () => ({
   useIntervalFn: useIntervalFnMock,
 }))
 
-const restoreUseRoute = mockNuxtImport('useRoute', () => useRouteMock)
+let restoreUseRoute: () => void
+
+// --- Setup before all tests ---
+beforeAll(() => {
+  // mockNuxtImport must run after mocks are declared
+  restoreUseRoute = mockNuxtImport('useRoute', () => useRouteMock)
+})
 
 describe('Quests detail page', () => {
   beforeEach(() => {
@@ -102,6 +110,7 @@ describe('Quests detail page', () => {
 
     const completeButton = page.findAll('button').find(btn => btn.text().includes('Mark as Completed'))
     expect(completeButton).toBeDefined()
+
     await completeButton!.trigger('click')
     await flushPromises()
 
@@ -128,7 +137,8 @@ describe('Quests detail page', () => {
   })
 })
 
+// --- Cleanup after all tests ---
 afterAll(() => {
-  restoreUseRoute()
+  restoreUseRoute?.()
   vi.unstubAllGlobals()
 })
