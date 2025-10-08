@@ -1,12 +1,19 @@
-import { describe, it, expect, vi, beforeEach, afterEach, afterAll } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach, beforeAll, afterAll } from 'vitest'
 import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
 import { defineAsyncComponent } from 'vue'
 import { flushPromises } from '@vue/test-utils'
 
+// --- Define mocks first ---
 const routerPushMock = vi.fn()
 const useRouterMock = vi.fn()
 
-const restoreUseRouter = mockNuxtImport('useRouter', () => useRouterMock)
+let restoreUseRouter: () => void
+
+// --- Setup before all tests ---
+beforeAll(() => {
+  // mockNuxtImport must be run after mocks are declared
+  restoreUseRouter = mockNuxtImport('useRouter', () => useRouterMock)
+})
 
 describe('Auth signup page', () => {
   beforeEach(() => {
@@ -43,6 +50,7 @@ describe('Auth signup page', () => {
       defineAsyncComponent(() => import('~/pages/auth/signup.vue')),
     )
 
+    // Simulate valid user input
     page.vm.name = 'Ada Lovelace'
     page.vm.email = 'ada@example.com'
     page.vm.password = 'engines123'
@@ -83,7 +91,8 @@ describe('Auth signup page', () => {
   })
 })
 
+// --- Cleanup after all tests ---
 afterAll(() => {
-  restoreUseRouter()
+  restoreUseRouter?.()
   vi.unstubAllGlobals()
 })
