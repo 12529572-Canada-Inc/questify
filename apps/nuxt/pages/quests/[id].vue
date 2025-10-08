@@ -2,8 +2,6 @@
 import { useIntervalFn } from '@vueuse/core'
 import { useQuest } from '~/composables/useQuest'
 
-const { isClient } = useNuxtApp()
-
 const route = useRoute()
 const id = route.params.id as string
 
@@ -25,20 +23,6 @@ const tasksLoading = computed(() => {
   return currentQuest.status === 'draft' && tasks.length === 0
 })
 
-if (isClient) {
-  // Setup the interval but start it paused
-  const { pause, resume } = useIntervalFn(() => {
-    console.log('Polling for quest updates...')
-    refresh()
-  }, 2000, { immediate: false })
-
-  // Watch for loading state
-  watch(tasksLoading, (loading) => {
-    if (loading) resume()
-    else pause()
-  }, { immediate: true })
-}
-
 async function markTaskCompleted(taskId: string) {
   await $fetch(`/api/tasks/${taskId}`, {
     method: 'PATCH',
@@ -54,6 +38,18 @@ async function completeQuest() {
   })
   await refresh()
 }
+
+onMounted(() => {
+  const { pause, resume } = useIntervalFn(() => {
+    console.log('Polling for quest updates...')
+    refresh()
+  }, 2000, { immediate: false })
+
+  watch(tasksLoading, (loading) => {
+    if (loading) resume()
+    else pause()
+  }, { immediate: true })
+})
 </script>
 
 <template>
