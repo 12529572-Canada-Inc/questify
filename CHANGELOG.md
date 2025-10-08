@@ -24,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Added coverage for the worker entrypoint to verify Redis configuration, OpenAI-driven quest decomposition, and failure handling.
 - **Shared**
     - Expanded `parseRedisUrl` tests to capture invalid inputs, TLS behavior, and password normalization cases.
+- **Nuxt**
+    - Added page, component, and composable tests covering authentication flows, quest creation/detail behaviours, and TextWithLinks rendering.
 
 ---
 
