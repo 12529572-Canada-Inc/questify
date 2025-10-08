@@ -18,6 +18,10 @@ export default defineNuxtConfig({
   },
   compatibilityDate: '2025-09-25',
   vite: {
+    plugins: [
+      // Add any Vite plugins here
+      ...(process.env.NODE_ENV === 'test' ? [] : []),
+    ],
     server: {
       watch: {
         ignored: [
