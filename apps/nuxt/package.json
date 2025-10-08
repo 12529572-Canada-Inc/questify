@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@prisma/client": "5.22.0",
+    "@vueuse/core": "^13.9.0",
     "bullmq": "^4.0.0",
     "nuxt": "^3.13.0",
     "nuxt-auth-utils": "^0.5.25",
