@@ -11,9 +11,9 @@
     "lint": "eslint .",
     "lint:types": "npx nuxi typecheck",
     "format": "eslint . --fix",
-    "test": "vitest run --silent",
-    "test:ui": "vitest --ui",
-    "test:coverage": "vitest run --coverage"
+    "test": "npx nuxi test",
+    "test:ui": "npx nuxi test --ui",
+    "test:coverage": "npx nuxi test --coverage"
   },
   "dependencies": {
     "@prisma/client": "5.22.0",
