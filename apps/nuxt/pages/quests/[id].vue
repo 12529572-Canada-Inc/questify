@@ -1,11 +1,22 @@
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
+import { useIntervalFn } from '@vueuse/core'
 import { useQuest } from '~/composables/useQuest'
 
 const route = useRoute()
 const id = route.params.id as string
 
-const { data: quest, refresh } = await useQuest(id)
+const { data: quest, refresh, pending } = await useQuest(id)
+
+const tasksLoading = computed(() => {
+  const currentQuest = quest.value
+  if (!currentQuest) {
+    return false
+  }
+
+  const tasks = currentQuest.tasks ?? []
+
+  return currentQuest.status === 'draft' && tasks.length === 0
+})
 
 async function markTaskCompleted(taskId: string) {
   await $fetch(`/api/tasks/${taskId}`, {
@@ -22,6 +33,17 @@ async function completeQuest() {
   })
   await refresh()
 }
+
+onMounted(() => {
+  const { pause, resume } = useIntervalFn(() => {
+    refresh()
+  }, 2000, { immediate: false })
+
+  watch(tasksLoading, (loading) => {
+    if (loading && !pending.value) resume()
+    else pause()
+  }, { immediate: true })
+})
 </script>
 
 <template>
@@ -97,31 +119,50 @@ async function completeQuest() {
             <h3 class="text-h6 mb-2">
               Tasks
             </h3>
-            <v-list>
-              <v-list-item
-                v-for="task in quest.tasks"
-                :key="task.id"
+            <div
+              v-if="pending || tasksLoading"
+              class="d-flex align-center gap-3 py-4"
+            >
+              <v-progress-circular
+                color="primary"
+                indeterminate
+                class="mr-2"
+              />
+              <span class="text-body-2">Generating tasks for this quest...</span>
+            </div>
+            <template v-else>
+              <v-list v-if="quest.tasks.length">
+                <v-list-item
+                  v-for="task in quest.tasks"
+                  :key="task.id"
+                >
+                  <v-list-item-title>{{ task.title }}</v-list-item-title>
+                  <TextWithLinks
+                    v-if="task.details"
+                    class="text-body-2"
+                    tag="div"
+                    :text="task.details"
+                  />
+                  <v-list-item-subtitle>Status: {{ task.status }}</v-list-item-subtitle>
+                  <v-list-item-action>
+                    <v-btn
+                      v-if="task.status !== 'completed'"
+                      size="small"
+                      color="success"
+                      @click="markTaskCompleted(task.id)"
+                    >
+                      Complete
+                    </v-btn>
+                  </v-list-item-action>
+                </v-list-item>
+              </v-list>
+              <p
+                v-else
+                class="text-body-2 text-medium-emphasis"
               >
-                <v-list-item-title>{{ task.title }}</v-list-item-title>
-                <TextWithLinks
-                  v-if="task.details"
-                  class="text-body-2"
-                  tag="div"
-                  :text="task.details"
-                />
-                <v-list-item-subtitle>Status: {{ task.status }}</v-list-item-subtitle>
-                <v-list-item-action>
-                  <v-btn
-                    v-if="task.status !== 'completed'"
-                    size="small"
-                    color="success"
-                    @click="markTaskCompleted(task.id)"
-                  >
-                    Complete
-                  </v-btn>
-                </v-list-item-action>
-              </v-list-item>
-            </v-list>
+                No tasks have been generated for this quest yet.
+              </p>
+            </template>
           </v-card-text>
 
           <v-card-actions>
