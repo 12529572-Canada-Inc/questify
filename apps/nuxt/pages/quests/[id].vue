@@ -17,12 +17,20 @@ const tasksLoading = computed(() => {
 
   const tasks = currentQuest.tasks ?? []
 
+  console.log('Tasks loading check:', {
+    status: currentQuest.status,
+    tasksCount: tasks.length,
+  })
+
   return currentQuest.status === 'draft' && tasks.length === 0
 })
 
 if (isClient) {
   // Setup the interval but start it paused
-  const { pause, resume } = useIntervalFn(refresh, 2000, { immediate: false })
+  const { pause, resume } = useIntervalFn(() => {
+    console.log('Polling for quest updates...')
+    refresh()
+  }, 2000, { immediate: false })
 
   // Watch for loading state
   watch(tasksLoading, (loading) => {
