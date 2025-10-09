@@ -43,29 +43,18 @@ describe('Quests new page', () => {
       defineAsyncComponent(() => import('~/pages/quests/new.vue')),
     )
 
-    // 🧠 Use realistic DOM interactions so v-model updates fire properly
-    const titleInput = page.get('input[name="title"]')
-    const descriptionInput = page.get('textarea[name="description"]')
-    const goalInput = page.get('input[name="goal"]')
-    const contextInput = page.get('textarea[name="context"]')
-    const constraintsInput = page.get('textarea[name="constraints"]')
+    // 🧠 Vuetify renders all text inputs/areas with .v-field__input
+    const inputs = page.findAll('.v-field__input')
+    expect(inputs.length).toBeGreaterThanOrEqual(5)
 
-    await titleInput.setValue('New Quest')
-    await titleInput.trigger('input')
+    const [title, description, goal, context, constraints] = inputs
 
-    await descriptionInput.setValue('Embark on a journey')
-    await descriptionInput.trigger('input')
+    await title.setValue('New Quest')
+    await description.setValue('Embark on a journey')
+    await goal.setValue('Win')
+    await context.setValue('Context details')
+    await constraints.setValue('Constraints info')
 
-    await goalInput.setValue('Win')
-    await goalInput.trigger('input')
-
-    await contextInput.setValue('Context details')
-    await contextInput.trigger('input')
-
-    await constraintsInput.setValue('Constraints info')
-    await constraintsInput.trigger('input')
-
-    // Mark form as valid if needed
     page.vm.valid = true
 
     await page.find('form').trigger('submit.prevent')
@@ -92,14 +81,11 @@ describe('Quests new page', () => {
       defineAsyncComponent(() => import('~/pages/quests/new.vue')),
     )
 
-    const titleInput = page.get('input[name="title"]')
-    const descriptionInput = page.get('textarea[name="description"]')
+    const inputs = page.findAll('.v-field__input')
+    const [title, description] = inputs
 
-    await titleInput.setValue('Bad Quest')
-    await titleInput.trigger('input')
-
-    await descriptionInput.setValue('Fails to save')
-    await descriptionInput.trigger('input')
+    await title.setValue('Bad Quest')
+    await description.setValue('Fails to save')
 
     page.vm.valid = true
 
