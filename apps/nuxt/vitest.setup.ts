@@ -43,34 +43,27 @@ vi.mock('#app', () => ({
 // 🩹 Mock vue-router so Nuxt test utils can boot correctly
 vi.mock('vue-router', async (importOriginal) => {
   const actual = await importOriginal()
+  const mockRouter = {
+    push: vi.fn(),
+    replace: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+    go: vi.fn(),
+    beforeEach: vi.fn(),
+    afterEach: vi.fn(),
+    onError: vi.fn(),
+    isReady: vi.fn().mockResolvedValue(true),
+    resolve: vi.fn().mockReturnValue({ href: '/', matched: [] }),
+    currentRoute: { value: { path: '/', params: {}, query: {} } },
+  }
 
   return {
     ...actual,
-    createRouter: vi.fn(() => ({
-      push: vi.fn(),
-      replace: vi.fn(),
-      back: vi.fn(),
-      forward: vi.fn(),
-      go: vi.fn(),
-      beforeEach: vi.fn(),
-      afterEach: vi.fn(),
-      onError: vi.fn(),
-      isReady: vi.fn().mockResolvedValue(true),
-      currentRoute: { value: { path: '/' } },
-    })),
+    createRouter: vi.fn(() => mockRouter),
     createWebHistory: vi.fn(),
     createWebHashHistory: vi.fn(),
-    useRouter: vi.fn(() => ({
-      push: vi.fn(),
-      replace: vi.fn(),
-      back: vi.fn(),
-      currentRoute: { value: { path: '/' } },
-    })),
-    useRoute: vi.fn(() => ({
-      path: '/',
-      params: {},
-      query: {},
-    })),
+    useRouter: vi.fn(() => mockRouter),
+    useRoute: vi.fn(() => mockRouter.currentRoute.value),
   }
 })
 
