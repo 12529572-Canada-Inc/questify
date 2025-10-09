@@ -43,11 +43,29 @@ describe('Quests new page', () => {
       defineAsyncComponent(() => import('~/pages/quests/new.vue')),
     )
 
-    page.vm.title = 'New Quest'
-    page.vm.description = 'Embark on a journey'
-    page.vm.goal = 'Win'
-    page.vm.context = 'Context details'
-    page.vm.constraints = 'Constraints info'
+    // 🧠 Use realistic DOM interactions so v-model updates fire properly
+    const titleInput = page.get('input[name="title"]')
+    const descriptionInput = page.get('textarea[name="description"]')
+    const goalInput = page.get('input[name="goal"]')
+    const contextInput = page.get('textarea[name="context"]')
+    const constraintsInput = page.get('textarea[name="constraints"]')
+
+    await titleInput.setValue('New Quest')
+    await titleInput.trigger('input')
+
+    await descriptionInput.setValue('Embark on a journey')
+    await descriptionInput.trigger('input')
+
+    await goalInput.setValue('Win')
+    await goalInput.trigger('input')
+
+    await contextInput.setValue('Context details')
+    await contextInput.trigger('input')
+
+    await constraintsInput.setValue('Constraints info')
+    await constraintsInput.trigger('input')
+
+    // Mark form as valid if needed
     page.vm.valid = true
 
     await page.find('form').trigger('submit.prevent')
@@ -74,8 +92,15 @@ describe('Quests new page', () => {
       defineAsyncComponent(() => import('~/pages/quests/new.vue')),
     )
 
-    page.vm.title = 'Bad Quest'
-    page.vm.description = 'Fails to save'
+    const titleInput = page.get('input[name="title"]')
+    const descriptionInput = page.get('textarea[name="description"]')
+
+    await titleInput.setValue('Bad Quest')
+    await titleInput.trigger('input')
+
+    await descriptionInput.setValue('Fails to save')
+    await descriptionInput.trigger('input')
+
     page.vm.valid = true
 
     await page.find('form').trigger('submit.prevent')
