@@ -43,17 +43,29 @@ describe('Quests new page', () => {
       defineAsyncComponent(() => import('~/pages/quests/new.vue')),
     )
 
-    // 🧠 Vuetify renders all text inputs/areas with .v-field__input
-    const inputs = page.findAll('.v-field__input')
-    expect(inputs.length).toBeGreaterThanOrEqual(5)
+    // 🧩 Build a map of fields by their visible label text (Vuetify renders labels as <label>Title</label>)
+    const fields = {}
+    page.findAll('.v-input').forEach((inputWrapper) => {
+      const label = inputWrapper.text().trim()
+      const input = inputWrapper.find('.v-field__input')
+      if (label.includes('Title')) fields.title = input
+      else if (label.includes('Description')) fields.description = input
+      else if (label.includes('outcome')) fields.goal = input
+      else if (label.includes('background')) fields.context = input
+      else if (label.includes('Constraints')) fields.constraints = input
+    })
 
-    const [title, description, goal, context, constraints] = inputs
+    // 🧠 Sanity check
+    expect(Object.keys(fields)).toEqual(
+      expect.arrayContaining(['title', 'description', 'goal', 'context', 'constraints']),
+    )
 
-    await title.setValue('New Quest')
-    await description.setValue('Embark on a journey')
-    await goal.setValue('Win')
-    await context.setValue('Context details')
-    await constraints.setValue('Constraints info')
+    // 🧠 Fill the fields
+    await fields.title.setValue('New Quest')
+    await fields.description.setValue('Embark on a journey')
+    await fields.goal.setValue('Win')
+    await fields.context.setValue('Context details')
+    await fields.constraints.setValue('Constraints info')
 
     page.vm.valid = true
 
@@ -81,12 +93,16 @@ describe('Quests new page', () => {
       defineAsyncComponent(() => import('~/pages/quests/new.vue')),
     )
 
-    const inputs = page.findAll('.v-field__input')
-    const [title, description] = inputs
+    const fields = {}
+    page.findAll('.v-input').forEach((inputWrapper) => {
+      const label = inputWrapper.text().trim()
+      const input = inputWrapper.find('.v-field__input')
+      if (label.includes('Title')) fields.title = input
+      else if (label.includes('Description')) fields.description = input
+    })
 
-    await title.setValue('Bad Quest')
-    await description.setValue('Fails to save')
-
+    await fields.title.setValue('Bad Quest')
+    await fields.description.setValue('Fails to save')
     page.vm.valid = true
 
     await page.find('form').trigger('submit.prevent')
