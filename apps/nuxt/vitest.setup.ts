@@ -1,3 +1,4 @@
+import { beforeAll } from 'vitest'
 import { config } from 'dotenv'
 import { execSync } from 'node:child_process'
 
