@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { defineAsyncComponent } from 'vue'
-import { flushPromises } from '@vue/test-utils'
+import { flushPromises, type DOMWrapper } from '@vue/test-utils'
 
 const routerPushMock = vi.fn()
 
@@ -43,8 +43,15 @@ describe('Quests new page', () => {
       defineAsyncComponent(() => import('~/pages/quests/new.vue')),
     )
 
-    // 🧩 Build a map of fields by their visible label text (Vuetify renders labels as <label>Title</label>)
-    const fields = {}
+    // 🧩 Build a map of fields by their visible label text
+    // (Vuetify renders labels as <label>Title</label>)
+    const fields: {
+      title?: DOMWrapper<Element>
+      description?: DOMWrapper<Element>
+      goal?: DOMWrapper<Element>
+      context?: DOMWrapper<Element>
+      constraints?: DOMWrapper<Element>
+    } = {}
     page.findAll('.v-input').forEach((inputWrapper) => {
       const label = inputWrapper.text().trim()
       const input = inputWrapper.find('.v-field__input')
@@ -61,13 +68,11 @@ describe('Quests new page', () => {
     )
 
     // 🧠 Fill the fields
-    await fields.title.setValue('New Quest')
-    await fields.description.setValue('Embark on a journey')
-    await fields.goal.setValue('Win')
-    await fields.context.setValue('Context details')
-    await fields.constraints.setValue('Constraints info')
-
-    page.vm.valid = true
+    await fields.title?.setValue('New Quest')
+    await fields.description?.setValue('Embark on a journey')
+    await fields.goal?.setValue('Win')
+    await fields.context?.setValue('Context details')
+    await fields.constraints?.setValue('Constraints info')
 
     await page.find('form').trigger('submit.prevent')
     await flushPromises()
@@ -93,7 +98,10 @@ describe('Quests new page', () => {
       defineAsyncComponent(() => import('~/pages/quests/new.vue')),
     )
 
-    const fields = {}
+    const fields: {
+      title?: DOMWrapper<Element>
+      description?: DOMWrapper<Element>
+    } = {}
     page.findAll('.v-input').forEach((inputWrapper) => {
       const label = inputWrapper.text().trim()
       const input = inputWrapper.find('.v-field__input')
@@ -101,9 +109,8 @@ describe('Quests new page', () => {
       else if (label.includes('Description')) fields.description = input
     })
 
-    await fields.title.setValue('Bad Quest')
-    await fields.description.setValue('Fails to save')
-    page.vm.valid = true
+    await fields.title?.setValue('Bad Quest')
+    await fields.description?.setValue('Fails to save')
 
     await page.find('form').trigger('submit.prevent')
     await flushPromises()
