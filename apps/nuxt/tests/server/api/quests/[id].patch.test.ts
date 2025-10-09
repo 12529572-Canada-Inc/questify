@@ -25,7 +25,7 @@ describe('Quests/[ID] PATCH API', () => {
 
   afterAll(async () => {
     try {
-      // 1️⃣ Delete the quest first (it references the owner)
+      // 1️⃣ Delete the quests first (it references the owner)
       await prisma.quest.deleteMany({
         where: {
           owner: { email: { contains: 'quest-owner-' } },

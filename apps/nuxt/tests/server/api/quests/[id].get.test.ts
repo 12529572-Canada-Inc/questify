@@ -24,10 +24,25 @@ describe('Quests/[ID] GET API', () => {
   })
 
   afterAll(async () => {
-    if (questId) {
-      await prisma.quest.delete({ where: { id: questId } })
+    try {
+      // 1️⃣ Delete the quests first (it references the owner)
+      await prisma.quest.deleteMany({
+        where: {
+          owner: { email: { contains: 'quest-owner-' } },
+        },
+      })
+
+      // 2️⃣ Then delete any test users
+      await prisma.user.deleteMany({
+        where: { email: { contains: 'quest-owner-' } },
+      })
     }
-    await prisma.user.deleteMany({ where: { email: { contains: 'quest-owner@' } } })
+    catch (e) {
+      console.error('Cleanup error:', e)
+    }
+    finally {
+      await prisma.$disconnect()
+    }
   })
 
   it('retrieves quest by ID', async () => {
