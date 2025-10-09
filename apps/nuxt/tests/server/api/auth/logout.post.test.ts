@@ -13,13 +13,17 @@ describe('Auth Logout API', async () => {
       method: 'POST',
       body: { email, password: 'password123', name: 'Logout Test' },
     })
-    const loginRes = await $fetch('/api/auth/login', {
+    const loginRes: {
+      token: string
+    } = await $fetch('/api/auth/login', {
       method: 'POST',
       body: { email, password: 'password123' },
     })
 
     // Call logout with token (if your API requires auth header)
-    const res = await $fetch('/api/auth/logout', {
+    const res: {
+      success: boolean
+    } = await $fetch('/api/auth/logout', {
       method: 'POST',
       headers: { Authorization: `Bearer ${loginRes.token}` },
     })

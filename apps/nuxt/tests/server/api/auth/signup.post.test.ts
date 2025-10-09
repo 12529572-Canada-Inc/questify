@@ -10,7 +10,10 @@ describe('Auth Signup API', async () => {
     const email = `test-${Date.now()}@example.com`
     const body = { email, password: 'password123', name: 'Test User' }
 
-    const res = await $fetch('/api/auth/signup', {
+    const res: {
+      success: boolean
+      user: { email: string, [key: string]: unknown }
+    } = await $fetch('/api/auth/signup', {
       method: 'POST',
       body,
     })
