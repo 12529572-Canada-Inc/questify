@@ -16,7 +16,10 @@ describe('Auth Login API', async () => {
     })
 
     // Then attempt login
-    const res = await $fetch('/api/auth/login', {
+    const res: {
+      success: boolean
+      user: { email: string, [key: string]: unknown }
+    } = await $fetch('/api/auth/login', {
       method: 'POST',
       body: { email, password: 'password123' },
     })

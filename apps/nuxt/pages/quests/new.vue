@@ -35,8 +35,8 @@ async function submit() {
       },
     })
 
-    if (res.success) {
-      router.push('/quests')
+    if (res.success && res.quest?.id) {
+      router.push(`/quests/${res.quest.id}`)
     }
     else {
       error.value = 'Failed to create quest'
