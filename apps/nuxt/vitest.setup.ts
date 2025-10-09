@@ -40,9 +40,39 @@ vi.mock('#app', () => ({
   useNuxtApp: () => ({ $fetch: vi.fn() }),
 }))
 
-vi.mock('vue-router', () => ({
-  useRouter: () => ({ push: pushMock }),
-}))
+// 🩹 Mock vue-router so Nuxt test utils can boot correctly
+vi.mock('vue-router', async (importOriginal) => {
+  const actual = await importOriginal()
+
+  return {
+    ...actual,
+    createRouter: vi.fn(() => ({
+      push: vi.fn(),
+      replace: vi.fn(),
+      back: vi.fn(),
+      forward: vi.fn(),
+      go: vi.fn(),
+      beforeEach: vi.fn(),
+      afterEach: vi.fn(),
+      onError: vi.fn(),
+      isReady: vi.fn().mockResolvedValue(true),
+      currentRoute: { value: { path: '/' } },
+    })),
+    createWebHistory: vi.fn(),
+    createWebHashHistory: vi.fn(),
+    useRouter: vi.fn(() => ({
+      push: vi.fn(),
+      replace: vi.fn(),
+      back: vi.fn(),
+      currentRoute: { value: { path: '/' } },
+    })),
+    useRoute: vi.fn(() => ({
+      path: '/',
+      params: {},
+      query: {},
+    })),
+  }
+})
 
 // Global $fetch mock stub — can be overridden in individual tests
 vi.stubGlobal('$fetch', vi.fn())
