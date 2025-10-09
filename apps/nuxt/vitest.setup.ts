@@ -23,7 +23,9 @@ beforeAll(() => {
  * 🧩 Initialize Nuxt test runtime (client-side only).
  * Prevents full server boot (faster, avoids network conflicts).
  */
-await setup({ server: false })
+beforeAll(async () => {
+  await setup({ server: false })
+})
 
 /**
  * 🧩 Global mocks for Nuxt composables, router, and fetch.
