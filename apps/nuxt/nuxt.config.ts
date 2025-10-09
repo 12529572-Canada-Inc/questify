@@ -18,13 +18,6 @@ export default defineNuxtConfig({
   },
   compatibilityDate: '2025-09-25',
   vite: {
-    plugins: [
-      // Add any Vite plugins here
-      ...(process.env.NODE_ENV === 'test' ? [] : []),
-    ],
-    optimizeDeps: {
-      exclude: ['vite-plugin-checker'],
-    },
     server: {
       watch: {
         ignored: [
@@ -36,39 +29,11 @@ export default defineNuxtConfig({
         ],
       },
     },
-    resolve: {
-      alias: {
-        // 👇 neutralize both possible forms of the virtual import
-        '/@vite-plugin-checker-runtime-entry': '/dev/null',
-        'virtual:@vite-plugin-checker-runtime-entry': '/dev/null',
-      },
-    },
-    build: {
-      rollupOptions: {
-        external: [
-          // 👇 explicitly tell Rollup to ignore the virtual entry
-          '/@vite-plugin-checker-runtime-entry',
-          'virtual:@vite-plugin-checker-runtime-entry',
-        ],
-      },
-    },
   },
   typescript: {
     strict: true,
     typeCheck: true,
   },
-  // ✅ prevent vite-plugin-checker and inspector runtime code in tests
-  hooks: process.env.NODE_ENV === 'test'
-    ? {
-        'vite:extendConfig'(config) {
-          config.plugins = (config.plugins || []).filter(
-            p =>
-              !p?.name?.includes?.('vite-plugin-checker')
-              && !p?.name?.includes?.('vite-plugin-inspect'),
-          )
-        },
-      }
-    : {},
   vuetify: {
     moduleOptions: {
       // Optional module-specific flags
