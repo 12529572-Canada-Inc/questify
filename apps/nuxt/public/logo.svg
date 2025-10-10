@@ -4,12 +4,27 @@
       .outline { stroke: #1a1a1a; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
       .fill-accent { fill: #f2d7a0; }
       .fill-blue { fill: #4a90e2; }
+      .fill-metal { fill: #c0c0c0; }
+      .fill-gold { fill: #f5b642; }
     </style>
   </defs>
+
+  <!-- Sword behind scroll (diagonal) -->
+  <g transform="rotate(-30,32,32)">
+    <rect x="30" y="8" width="4" height="28" class="fill-metal outline" rx="1"/>
+    <rect x="27" y="6" width="10" height="4" class="fill-gold outline" rx="1"/>
+    <circle cx="32" cy="4" r="2" class="fill-gold outline"/>
+  </g>
+
+  <!-- Scroll -->
   <rect x="20" y="22" width="24" height="20" rx="2" class="fill-accent outline"/>
   <path d="M44 22 q4 2 4 6 q0 4 -4 6" class="fill-accent outline"/>
   <line x1="24" y1="28" x2="40" y2="28" class="outline"/>
   <line x1="24" y1="32" x2="38" y2="32" class="outline"/>
   <line x1="24" y1="36" x2="36" y2="36" class="outline"/>
-  <circle cx="46" cy="22" r="3" class="fill-blue outline"/>
+
+  <!-- Larger star-shaped AI spark -->
+  <g transform="translate(46,22) scale(1.6)">
+    <polygon points="0,-5 1.5,-1.5 5,0 1.5,1.5 0,5 -1.5,1.5 -5,0 -1.5,-1.5" class="fill-blue outline"/>
+  </g>
 </svg>
