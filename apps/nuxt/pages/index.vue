@@ -9,7 +9,7 @@
     >
       <!-- Title -->
       <v-card-title class="text-h5 text-md-h4 font-weight-bold justify-center">
-        Welcome to Questify 🎯
+        Welcome to Questify
       </v-card-title>
 
       <!-- Subtitle -->

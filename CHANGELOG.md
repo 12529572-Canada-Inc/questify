@@ -11,6 +11,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 🖼 Branding & UI Updates
+- **Logo & Header**
+    - Refreshed header logo artwork for improved branding.
+    - Enhanced `logo.svg` by adding sword and scroll elements.
+    - Updated logo size in header for better visibility.
+    - Improved mobile header branding.
+    - Added scroll icon to `logo.svg`.
+- **Favicons & Site Title**
+    - Added SVG and PNG favicons.
+    - Updated site title for consistency.
+- **Welcome Message**
+    - Removed emoji from welcome message in index page and related tests.
+
+---
+
 ## [1.5.0] - 2025-10-08
 
 ### 🚀 Features

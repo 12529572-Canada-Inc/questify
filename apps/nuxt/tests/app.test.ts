@@ -6,6 +6,6 @@ describe('App rendering', async () => {
 
   it('renders the index page', async () => {
     const html = await $fetch('/')
-    expect(html).toContain('Welcome to Questify 🎯')
+    expect(html).toContain('Welcome to Questify')
   })
 })
