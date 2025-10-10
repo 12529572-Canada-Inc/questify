@@ -1,79 +1,102 @@
-import type { defineEventHandler, EventHandlerRequest } from 'h3'
-import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
-import {
-  PrismaClientMock,
-  resetPrismaMocks,
-  taskFindUniqueMock,
-  taskUpdateMock,
-} from '../test-utils/prisma'
+import { describe, it, expect } from 'vitest'
+import { $fetch, setup } from '@nuxt/test-utils/e2e'
 
-type HandlerType = ReturnType<typeof defineEventHandler<any, any>> | ((event: EventHandlerRequest) => any)
+describe('Tasks/[ID] PATCH API', async () => {
+  // Boot up the Nuxt test environment
+  await setup({})
 
-vi.mock('@prisma/client', () => ({
-  PrismaClient: PrismaClientMock,
-}))
+  it('allows the quest owner to update their task', async () => {
+    // Step 1: Sign up and log in as quest owner
+    const email = `owner-${Date.now()}@example.com`
+    const password = 'password123'
 
-const defineEventHandlerMock = vi.fn((handler: HandlerType) => handler)
-const requireUserSessionMock = vi.fn()
-const getRouterParamMock = vi.fn()
-const readBodyMock = vi.fn()
-const createErrorMock = vi.fn((input: { statusCode: number, statusMessage?: string }) =>
-  Object.assign(new Error(input.statusMessage ?? 'Error'), input),
-)
+    const signupRes = await $fetch('/api/auth/signup', {
+      method: 'POST',
+      body: { email, password, name: 'Task Owner' },
+    })
+    expect(signupRes).toHaveProperty('success', true)
 
-let handler: HandlerType
+    const loginRes = await $fetch('/api/auth/login', {
+      method: 'POST',
+      body: { email, password },
+    })
+    expect(loginRes).toHaveProperty('user.email', email)
 
-describe('PATCH /api/tasks/[id]', () => {
-  beforeAll(async () => {
-    vi.stubGlobal('defineEventHandler', defineEventHandlerMock)
-    handler = (await import('~/server/api/tasks/[id].patch')).default
-    vi.unstubAllGlobals()
-  })
+    // Step 2: Create a quest for this owner
+    const questRes: { quest: { id: string } } = await $fetch('/api/quests', {
+      method: 'POST',
+      body: {
+        title: 'Parent Quest',
+        description: 'Quest for testing task patch',
+        goal: 'Finish all tasks',
+      },
+    })
+    expect(questRes).toHaveProperty('quest.id')
+    const questId = questRes.quest.id
 
-  beforeEach(() => {
-    resetPrismaMocks()
-    defineEventHandlerMock.mockClear()
-    requireUserSessionMock.mockReset()
-    getRouterParamMock.mockReset()
-    readBodyMock.mockReset()
-    createErrorMock.mockClear()
+    // Step 3: Create a task under that quest
+    const taskRes: { task: { id: string } } = await $fetch('/api/tasks', {
+      method: 'POST',
+      body: {
+        questId,
+        title: 'Initial Task',
+        details: 'Initial details',
+      },
+    })
+    expect(taskRes).toHaveProperty('task.id')
+    const taskId = taskRes.task.id
 
-    vi.stubGlobal('defineEventHandler', defineEventHandlerMock)
-    vi.stubGlobal('requireUserSession', requireUserSessionMock)
-    vi.stubGlobal('getRouterParam', getRouterParamMock)
-    vi.stubGlobal('readBody', readBodyMock)
-    vi.stubGlobal('createError', createErrorMock)
-  })
+    // Step 4: Patch the task as the owner
+    const updated = await $fetch(`/api/tasks/${taskId}`, {
+      method: 'PATCH',
+      body: { status: 'completed' },
+    })
 
-  afterEach(() => {
-    vi.unstubAllGlobals()
+    expect(updated).toHaveProperty('id', taskId)
+    expect(updated).toHaveProperty('status', 'completed')
   })
 
   it('blocks non-owners from updating a task', async () => {
-    requireUserSessionMock.mockResolvedValue({ user: { id: 'user-2' } })
-    getRouterParamMock.mockReturnValue('task-5')
-    taskFindUniqueMock.mockResolvedValue({ quest: { ownerId: 'owner-7' } })
-    readBodyMock.mockResolvedValue({ status: 'completed' })
+    // Step 1: Create a quest & task under one owner
+    const ownerEmail = `task-owner-${Date.now()}@example.com`
+    const password = 'password123'
 
-    await expect(handler({} as unknown)).rejects.toMatchObject({ statusCode: 403 })
-    expect(taskUpdateMock).not.toHaveBeenCalled()
-  })
+    await $fetch('/api/auth/signup', {
+      method: 'POST',
+      body: { email: ownerEmail, password, name: 'Owner' },
+    })
 
-  it('allows the quest owner to update the task status', async () => {
-    const updatedTask = { id: 'task-5', status: 'completed' }
+    const questRes: { quest: { id: string } } = await $fetch('/api/quests', {
+      method: 'POST',
+      body: {
+        title: 'Owner Quest',
+        description: 'Quest created by owner',
+        goal: 'Complete',
+      },
+    })
+    const questId = questRes.quest.id
 
-    requireUserSessionMock.mockResolvedValue({ user: { id: 'owner-7' } })
-    getRouterParamMock.mockReturnValue('task-5')
-    taskFindUniqueMock.mockResolvedValue({ quest: { ownerId: 'owner-7' } })
-    readBodyMock.mockResolvedValue({ status: 'completed' })
-    taskUpdateMock.mockResolvedValue(updatedTask)
+    const taskRes: { task: { id: string } } = await $fetch('/api/tasks', {
+      method: 'POST',
+      body: { questId, title: 'Owner Task', details: 'Restricted' },
+    })
+    const taskId = taskRes.task.id
 
-    const result = await handler({} as unknown)
+    // Step 2: Log in as a *different* user
+    const intruderEmail = `intruder-${Date.now()}@example.com`
+    await $fetch('/api/auth/signup', {
+      method: 'POST',
+      body: { email: intruderEmail, password, name: 'Intruder' },
+    })
 
-    expect(result).toEqual(updatedTask)
-    expect(taskUpdateMock).toHaveBeenCalledWith({
-      where: { id: 'task-5' },
-      data: { status: 'completed' },
+    // Step 3: Attempt to patch the other user's task
+    await expect(
+      $fetch(`/api/tasks/${taskId}`, {
+        method: 'PATCH',
+        body: { status: 'completed' },
+      }),
+    ).rejects.toMatchObject({
+      data: expect.objectContaining({ statusCode: 403 }),
     })
   })
 })
