@@ -12,15 +12,15 @@ vi.mock('@prisma/client', () => ({
   PrismaClient: PrismaClientMock,
 }))
 
-const defineEventHandlerMock = vi.fn((handler: any) => handler)
+const defineEventHandlerMock = vi.fn((handler: (event: unknown) => Promise<unknown>) => handler)
 const requireUserSessionMock = vi.fn()
 const getRouterParamMock = vi.fn()
 const readBodyMock = vi.fn()
-const createErrorMock = vi.fn((input: { statusCode: number; statusMessage?: string }) =>
+const createErrorMock = vi.fn((input: { statusCode: number, statusMessage?: string }) =>
   Object.assign(new Error(input.statusMessage ?? 'Error'), input),
 )
 
-let handler: (event: any) => Promise<any>
+let handler: (event: unknown) => Promise<unknown>
 
 describe('PATCH /api/quests/[id]', () => {
   beforeAll(async () => {
@@ -54,7 +54,7 @@ describe('PATCH /api/quests/[id]', () => {
     questFindUniqueMock.mockResolvedValue({ ownerId: 'owner-9' })
     readBodyMock.mockResolvedValue({ status: 'completed' })
 
-    await expect(handler({} as any)).rejects.toMatchObject({ statusCode: 403 })
+    await expect(handler({} as unknown)).rejects.toMatchObject({ statusCode: 403 })
     expect(questUpdateMock).not.toHaveBeenCalled()
     expect(taskUpdateManyMock).not.toHaveBeenCalled()
   })
@@ -69,7 +69,7 @@ describe('PATCH /api/quests/[id]', () => {
     questUpdateMock.mockResolvedValue(updatedQuest)
     taskUpdateManyMock.mockResolvedValue({ count: 3 })
 
-    const result = await handler({} as any)
+    const result = await handler({} as unknown)
 
     expect(result).toEqual(updatedQuest)
     expect(transactionMock).toHaveBeenCalledTimes(1)
@@ -86,7 +86,7 @@ describe('PATCH /api/quests/[id]', () => {
     readBodyMock.mockResolvedValue({ status: 'in_progress' })
     questUpdateMock.mockResolvedValue({ id: 'quest-77', status: 'in_progress' })
 
-    const result = await handler({} as any)
+    const result = await handler({} as unknown)
 
     expect(result).toEqual({ id: 'quest-77', status: 'in_progress' })
     expect(transactionMock).not.toHaveBeenCalled()
