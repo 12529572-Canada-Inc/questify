@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <style>
+      .q { fill: none; stroke: #2646CC; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+      .spark { fill: #5AAAFF; }
+    </style>
+  </defs>
+  <!-- Q circle -->
+  <circle cx="32" cy="32" r="20" class="q"/>
+  <!-- Q tail -->
+  <line x1="38" y1="38" x2="46" y2="46" class="q"/>
+  <!-- Spark (star) at the tail end -->
+  <polygon class="spark" points="50,42 52,46 56,48 52,50 50,54 48,50 44,48 48,46"/>
+</svg>
