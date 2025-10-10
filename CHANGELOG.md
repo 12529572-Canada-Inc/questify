@@ -24,6 +24,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Welcome Message**
     - Removed emoji from welcome message in index page and related tests.
 
+### 🧪 Tests
+- Added a Nuxt tsconfig stub and setup guard so quest and task authorization tests run without generated build artifacts.
+
 ---
 
 ## [1.5.0] - 2025-10-08
