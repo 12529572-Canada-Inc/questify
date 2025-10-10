@@ -1,11 +1,9 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   PrismaClientMock,
-  questFindUniqueMock,
-  questUpdateMock,
   resetPrismaMocks,
-  taskUpdateManyMock,
-  transactionMock,
+  taskFindUniqueMock,
+  taskUpdateMock,
 } from '../test-utils/prisma'
 
 vi.mock('@prisma/client', () => ({
@@ -13,7 +11,7 @@ vi.mock('@prisma/client', () => ({
 }))
 
 let handler: (event: any) => Promise<any>
-const handlerImport = import('~/server/api/quests/[id].patch')
+const handlerImport = import('~/server/api/tasks/[id].patch')
 
 const defineEventHandlerMock = vi.fn((handler: any) => handler)
 const requireUserSessionMock = vi.fn()
@@ -38,7 +36,7 @@ declare global {
   var createError: typeof createErrorMock
 }
 
-describe('PATCH /api/quests/[id]', () => {
+describe('PATCH /api/tasks/[id]', () => {
   beforeAll(async () => {
     handler = (await handlerImport).default
   })
@@ -62,51 +60,31 @@ describe('PATCH /api/quests/[id]', () => {
     vi.unstubAllGlobals()
   })
 
-  it('rejects updates from non-owners', async () => {
-    requireUserSessionMock.mockResolvedValue({ user: { id: 'user-1' } })
-    getRouterParamMock.mockReturnValue('quest-1')
-    questFindUniqueMock.mockResolvedValue({ ownerId: 'owner-9' })
+  it('blocks non-owners from updating a task', async () => {
+    requireUserSessionMock.mockResolvedValue({ user: { id: 'user-2' } })
+    getRouterParamMock.mockReturnValue('task-5')
+    taskFindUniqueMock.mockResolvedValue({ quest: { ownerId: 'owner-7' } })
     readBodyMock.mockResolvedValue({ status: 'completed' })
 
     await expect(handler({} as any)).rejects.toMatchObject({ statusCode: 403 })
-    expect(questUpdateMock).not.toHaveBeenCalled()
-    expect(taskUpdateManyMock).not.toHaveBeenCalled()
+    expect(taskUpdateMock).not.toHaveBeenCalled()
   })
 
-  it('completes the quest and all tasks when the owner requests completion', async () => {
-    const updatedQuest = { id: 'quest-42', status: 'completed' }
+  it('allows the quest owner to update the task status', async () => {
+    const updatedTask = { id: 'task-5', status: 'completed' }
 
-    requireUserSessionMock.mockResolvedValue({ user: { id: 'owner-1' } })
-    getRouterParamMock.mockReturnValue('quest-42')
-    questFindUniqueMock.mockResolvedValue({ ownerId: 'owner-1' })
+    requireUserSessionMock.mockResolvedValue({ user: { id: 'owner-7' } })
+    getRouterParamMock.mockReturnValue('task-5')
+    taskFindUniqueMock.mockResolvedValue({ quest: { ownerId: 'owner-7' } })
     readBodyMock.mockResolvedValue({ status: 'completed' })
-    questUpdateMock.mockResolvedValue(updatedQuest)
-    taskUpdateManyMock.mockResolvedValue({ count: 3 })
+    taskUpdateMock.mockResolvedValue(updatedTask)
 
     const result = await handler({} as any)
 
-    expect(result).toEqual(updatedQuest)
-    expect(transactionMock).toHaveBeenCalledTimes(1)
-    expect(taskUpdateManyMock).toHaveBeenCalledWith({
-      where: { questId: 'quest-42' },
+    expect(result).toEqual(updatedTask)
+    expect(taskUpdateMock).toHaveBeenCalledWith({
+      where: { id: 'task-5' },
       data: { status: 'completed' },
-    })
-  })
-
-  it('updates the quest status without affecting tasks for other statuses', async () => {
-    requireUserSessionMock.mockResolvedValue({ user: { id: 'owner-1' } })
-    getRouterParamMock.mockReturnValue('quest-77')
-    questFindUniqueMock.mockResolvedValue({ ownerId: 'owner-1' })
-    readBodyMock.mockResolvedValue({ status: 'in_progress' })
-    questUpdateMock.mockResolvedValue({ id: 'quest-77', status: 'in_progress' })
-
-    const result = await handler({} as any)
-
-    expect(result).toEqual({ id: 'quest-77', status: 'in_progress' })
-    expect(transactionMock).not.toHaveBeenCalled()
-    expect(questUpdateMock).toHaveBeenCalledWith({
-      where: { id: 'quest-77' },
-      data: { status: 'in_progress' },
     })
   })
 })
