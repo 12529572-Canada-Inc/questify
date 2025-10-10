@@ -10,9 +10,6 @@ node-compile-cache/
 dist/
 .build/
 .nuxt/
-!apps/nuxt/.nuxt/
-apps/nuxt/.nuxt/*
-!apps/nuxt/.nuxt/tsconfig.json
 .output/
 out/
 
