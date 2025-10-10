@@ -1,3 +1,4 @@
+import type { EventHandler } from 'h3'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   PrismaClientMock,
@@ -12,7 +13,7 @@ vi.mock('@prisma/client', () => ({
   PrismaClient: PrismaClientMock,
 }))
 
-const defineEventHandlerMock = vi.fn((handler: (event: unknown) => Promise<unknown>) => handler)
+const defineEventHandlerMock = vi.fn((handler: EventHandler) => handler)
 const requireUserSessionMock = vi.fn()
 const getRouterParamMock = vi.fn()
 const readBodyMock = vi.fn()
@@ -20,7 +21,7 @@ const createErrorMock = vi.fn((input: { statusCode: number, statusMessage?: stri
   Object.assign(new Error(input.statusMessage ?? 'Error'), input),
 )
 
-let handler: (event: unknown) => Promise<unknown>
+let handler: EventHandler
 
 describe('PATCH /api/quests/[id]', () => {
   beforeAll(async () => {
