@@ -10,9 +10,6 @@ vi.mock('@prisma/client', () => ({
   PrismaClient: PrismaClientMock,
 }))
 
-let handler: (event: any) => Promise<any>
-const handlerImport = import('~/server/api/tasks/[id].patch')
-
 const defineEventHandlerMock = vi.fn((handler: any) => handler)
 const requireUserSessionMock = vi.fn()
 const getRouterParamMock = vi.fn()
@@ -21,24 +18,13 @@ const createErrorMock = vi.fn((input: { statusCode: number; statusMessage?: stri
   Object.assign(new Error(input.statusMessage ?? 'Error'), input),
 )
 
-;(globalThis as any).defineEventHandler = defineEventHandlerMock
-
-declare global {
-  // eslint-disable-next-line vars-on-top, no-var
-  var defineEventHandler: typeof defineEventHandlerMock
-  // eslint-disable-next-line vars-on-top, no-var
-  var requireUserSession: typeof requireUserSessionMock
-  // eslint-disable-next-line vars-on-top, no-var
-  var getRouterParam: typeof getRouterParamMock
-  // eslint-disable-next-line vars-on-top, no-var
-  var readBody: typeof readBodyMock
-  // eslint-disable-next-line vars-on-top, no-var
-  var createError: typeof createErrorMock
-}
+let handler: (event: any) => Promise<any>
 
 describe('PATCH /api/tasks/[id]', () => {
   beforeAll(async () => {
-    handler = (await handlerImport).default
+    vi.stubGlobal('defineEventHandler', defineEventHandlerMock)
+    handler = (await import('~/server/api/tasks/[id].patch')).default
+    vi.unstubAllGlobals()
   })
 
   beforeEach(() => {

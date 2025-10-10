@@ -23,9 +23,10 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, statusMessage: 'You do not have permission to modify this quest' })
   }
 
-  const body = await readBody<{ status?: string }>(event)
+  const body = await readBody(event)
+  const status = (body as { status?: string } | null | undefined)?.status
 
-  if (body.status === 'completed') {
+  if (status === 'completed') {
     // Transaction: complete quest + all tasks
     const [updatedQuest] = await prisma.$transaction([
       prisma.quest.update({
@@ -44,6 +45,6 @@ export default defineEventHandler(async (event) => {
   // fallback if status is something else
   return prisma.quest.update({
     where: { id },
-    data: { status: body.status },
+    data: { status },
   })
 })

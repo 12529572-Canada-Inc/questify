@@ -27,12 +27,13 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, statusMessage: 'You do not have permission to modify this task' })
   }
 
-  const body = await readBody<{ status?: string }>(event)
+  const body = await readBody(event)
+  const status = (body as { status?: string } | null | undefined)?.status
 
   const task = await prisma.task.update({
     where: { id },
     data: {
-      status: body.status,
+      status,
     },
   })
 
