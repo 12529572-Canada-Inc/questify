@@ -33,8 +33,8 @@ async function logout() {
           <v-img
             src="/logo.svg"
             alt="Questify logo"
-            width="36"
-            height="36"
+            width="50"
+            height="50"
             class="app-title-logo"
             cover
           />
