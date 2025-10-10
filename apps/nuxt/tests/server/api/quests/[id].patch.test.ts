@@ -23,7 +23,7 @@ describe('Quests/[ID] PATCH API', async () => {
     })
 
     // Step 3: create a quest owned by this user
-    const questRes = await $fetch('/api/quests', {
+    const questRes: { quest: { id: string } } = await $fetch('/api/quests', {
       method: 'POST',
       body: {
         title: 'Test Quest',
@@ -48,12 +48,12 @@ describe('Quests/[ID] PATCH API', async () => {
     const ownerEmail = `quest-owner-${Date.now()}@example.com`
     const password = 'password123'
 
-    const ownerSignup = await $fetch('/api/auth/signup', {
+    await $fetch('/api/auth/signup', {
       method: 'POST',
       body: { email: ownerEmail, password, name: 'Owner' },
     })
 
-    const ownerQuest = await $fetch('/api/quests', {
+    const ownerQuest: { quest: { id: string } } = await $fetch('/api/quests', {
       method: 'POST',
       body: {
         title: 'Owner Quest',
