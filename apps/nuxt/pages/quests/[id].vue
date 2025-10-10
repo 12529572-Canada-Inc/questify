@@ -6,6 +6,18 @@ const route = useRoute()
 const id = route.params.id as string
 
 const { data: quest, refresh, pending } = await useQuest(id)
+const { user } = useUserSession()
+
+const isOwner = computed(() => {
+  const currentQuest = quest.value
+  const currentUser = user.value
+
+  if (!currentQuest || !currentUser) {
+    return false
+  }
+
+  return currentQuest.ownerId === currentUser.id
+})
 
 const tasksLoading = computed(() => {
   const currentQuest = quest.value
@@ -19,6 +31,10 @@ const tasksLoading = computed(() => {
 })
 
 async function markTaskCompleted(taskId: string) {
+  if (!isOwner.value) {
+    return
+  }
+
   await $fetch(`/api/tasks/${taskId}`, {
     method: 'PATCH',
     body: { status: 'completed' },
@@ -27,6 +43,10 @@ async function markTaskCompleted(taskId: string) {
 }
 
 async function completeQuest() {
+  if (!isOwner.value) {
+    return
+  }
+
   await $fetch(`/api/quests/${id}`, {
     method: 'PATCH',
     body: { status: 'completed' },
@@ -146,7 +166,7 @@ onMounted(() => {
                   <v-list-item-subtitle>Status: {{ task.status }}</v-list-item-subtitle>
                   <v-list-item-action>
                     <v-btn
-                      v-if="task.status !== 'completed'"
+                      v-if="task.status !== 'completed' && isOwner"
                       size="small"
                       color="success"
                       @click="markTaskCompleted(task.id)"
@@ -188,6 +208,7 @@ onMounted(() => {
               >
                 <v-btn
                   v-if="quest.status !== 'completed'"
+                  :disabled="!isOwner"
                   block
                   color="success"
                   @click="completeQuest"
