@@ -19,7 +19,7 @@ export async function loginAndGetCookie(
 
   // 1️⃣ Try to sign up the user
   try {
-    await $fetch(api('/api/auth/signup'), {
+    await $fetch(api('api/auth/signup'), {
       method: 'POST',
       body: { email, password, name },
     })
@@ -32,7 +32,7 @@ export async function loginAndGetCookie(
   }
 
   // 2️⃣ Log in
-  const res = await fetch(api('/api/auth/login'), {
+  const res = await fetch(api('api/auth/login'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),

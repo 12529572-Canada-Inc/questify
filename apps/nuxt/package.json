@@ -11,7 +11,8 @@
     "lint": "eslint .",
     "lint:types": "npx nuxi typecheck",
     "format": "eslint . --fix",
-    "test": "pnpm dev:prepare && vitest run --silent",
+    "test": "pnpm dev:prepare && vitest run",
+    "test:silent": "pnpm dev:prepare && vitest run --silent",
     "test:ui": "pnpm dev:prepare && vitest --ui",
     "test:coverage": "pnpm dev:prepare && vitest run --coverage"
   },

@@ -1,20 +1,23 @@
-import { setup, useTestContext, type TestContext } from '@nuxt/test-utils/e2e'
+import { setup, useTestContext } from '@nuxt/test-utils/e2e'
 
-export async function setupServer(): Promise<{ baseURL: string, api: (path: string) => string }> {
+export async function setupServer() {
+  // 1️⃣ Start Nuxt in test mode
   await setup({
     server: true,
     dev: false,
   })
 
-  const ctx = useTestContext() as Partial<TestContext>
+  // 2️⃣ Get the active test context
+  const ctx = useTestContext()
 
+  // 3️⃣ Derive URL manually if missing
   let baseURL
-    = ctx?.url
-    // @ts-expect-error older Nuxt nesting
-      || ctx?.options?.url
-      || process.env.NUXT_URL
+    = ctx?.url || process.env.NUXT_URL
 
-  if (!baseURL) throw new Error('❌ No baseURL found from test context.')
+  // 4️⃣ Final fallback for safety
+  if (!baseURL || baseURL === '/') {
+    baseURL = `http://127.0.0.1:${process.env.NUXT_PORT ?? 3000}`
+  }
 
   if (!baseURL.endsWith('/')) baseURL += '/'
   const api = (path: string) => new URL(path, baseURL).toString()

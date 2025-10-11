@@ -20,7 +20,7 @@ describe('Tasks/[ID] PATCH API', () => {
     console.log('🍪 Logged in with cookie:', cookie)
 
     // Attach cookie to all $fetch requests
-    const questRes = await $fetch<{ quest: { id: string } }>(api('/api/quests'), {
+    const questRes = await $fetch<{ quest: { id: string } }>(api('api/quests'), {
       method: 'POST',
       headers: { cookie },
       body: { title: 'Quest Title', description: 'Testing PATCH' },
@@ -28,7 +28,7 @@ describe('Tasks/[ID] PATCH API', () => {
 
     const questId = questRes.quest.id
 
-    const taskRes = await $fetch<{ task: { id: string } }>(api('/api/tasks'), {
+    const taskRes = await $fetch<{ task: { id: string } }>(api('api/tasks'), {
       method: 'POST',
       headers: { cookie },
       body: { questId, title: 'Initial Task', status: 'draft' },
@@ -37,7 +37,7 @@ describe('Tasks/[ID] PATCH API', () => {
     const taskId = taskRes.task.id
 
     const updatedTask = await $fetch<{ task: { id: string, status: string } }>(
-      api(`/api/tasks/${taskId}`),
+      api(`api/tasks/${taskId}`),
       {
         method: 'PATCH',
         headers: { cookie },
