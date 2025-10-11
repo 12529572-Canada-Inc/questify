@@ -1,5 +1,4 @@
-import { $fetch } from '@nuxt/test-utils/e2e'
-
+import { $fetch, url } from '@nuxt/test-utils'
 /**
  * Logs in (creating the user if necessary) and returns the session cookie string.
  * Works in Nuxt E2E test context.
@@ -27,10 +26,11 @@ export async function loginAndGetCookie(
 
   // 1️⃣ Try to sign up the user
   try {
-    await $fetch('api/auth/signup', {
+    const signupRes = await $fetch(url('server/api/auth/signup'), {
       method: 'POST',
       body: { email, password, name },
     })
+    console.log('✅ Signed up new user:', signupRes)
   }
   catch (err: unknown) {
     // Ignore 409 (user already exists)
@@ -40,7 +40,8 @@ export async function loginAndGetCookie(
   }
 
   // 2️⃣ Log in
-  const res = await fetch('api/auth/login', {
+  console.log('login url', url('server/api/auth/login'))
+  const res = await fetch(url('server/api/auth/login'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),

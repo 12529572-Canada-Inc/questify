@@ -17,7 +17,7 @@ describe('Quests/[ID] PATCH API', async () => {
     })
 
     // Step 2: log in to get session cookie
-    await $fetch('/api/auth/login', {
+    await $fetch('server/api/auth/login', {
       method: 'POST',
       body: { email, password },
     })
@@ -34,7 +34,7 @@ describe('Quests/[ID] PATCH API', async () => {
     const questId = questRes.quest.id
 
     // Step 4: patch quest status
-    const patchRes = await $fetch(`/api/quests/${questId}`, {
+    const patchRes = await $fetch(`server/api/quests/${questId}`, {
       method: 'PATCH',
       body: { status: 'completed' },
     })
@@ -48,12 +48,12 @@ describe('Quests/[ID] PATCH API', async () => {
     const ownerEmail = `quest-owner-${Date.now()}@example.com`
     const password = 'password123'
 
-    await $fetch('/api/auth/signup', {
+    await $fetch('server/api/auth/signup', {
       method: 'POST',
       body: { email: ownerEmail, password, name: 'Owner' },
     })
 
-    const ownerQuest: { quest: { id: string } } = await $fetch('/api/quests', {
+    const ownerQuest: { quest: { id: string } } = await $fetch('server/api/quests', {
       method: 'POST',
       body: {
         title: 'Owner Quest',
@@ -67,14 +67,14 @@ describe('Quests/[ID] PATCH API', async () => {
     // Step 2: log in as a different user
     const intruderEmail = `intruder-${Date.now()}@example.com`
 
-    await $fetch('/api/auth/signup', {
+    await $fetch('server/api/auth/signup', {
       method: 'POST',
       body: { email: intruderEmail, password, name: 'Intruder' },
     })
 
     // Step 3: attempt to patch another user's quest
     await expect(
-      $fetch(`/api/quests/${questId}`, {
+      $fetch(`server/api/quests/${questId}`, {
         method: 'PATCH',
         body: { status: 'completed' },
       }),

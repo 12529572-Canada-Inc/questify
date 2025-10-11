@@ -11,13 +11,13 @@ describe('Quests/[ID] GET API', async () => {
     const email = `quest-owner-${Date.now()}@example.com`
     const password = 'password123'
 
-    await $fetch('/api/auth/signup', {
+    await $fetch('server/api/auth/signup', {
       method: 'POST',
       body: { email, password, name: 'Quest Owner' },
     })
 
     // Step 2: Log in
-    await $fetch('/api/auth/login', {
+    await $fetch('server/api/auth/login', {
       method: 'POST',
       body: { email, password },
     })
@@ -35,7 +35,7 @@ describe('Quests/[ID] GET API', async () => {
     const questId = questRes.quest.id
 
     // Step 4: Fetch the quest by ID
-    const fetchedQuest = await $fetch(`/api/quests/${questId}`, {
+    const fetchedQuest = await $fetch(`server/api/quests/${questId}`, {
       method: 'GET',
     })
 
