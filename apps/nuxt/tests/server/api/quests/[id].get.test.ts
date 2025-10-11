@@ -1,56 +1,48 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest'
-import { PrismaClient } from '@prisma/client'
+import { describe, it, expect } from 'vitest'
+import { $fetch, setup } from '@nuxt/test-utils/e2e'
 
-const prisma = new PrismaClient()
-
-describe('Quests/[ID] GET API', () => {
-  let questId: string
-
-  beforeAll(async () => {
-    const quest = await prisma.quest.create({
-      data: {
-        title: 'Test Quest',
-        description: 'Testing quest flow',
-        status: 'draft',
-        owner: {
-          create: {
-            email: `quest-owner-${Date.now()}@example.com`,
-            password: 'hashed-password',
-          },
-        },
-      },
-    })
-    questId = quest.id
-  })
-
-  afterAll(async () => {
-    try {
-      // 1️⃣ Delete the quests first (it references the owner)
-      await prisma.quest.deleteMany({
-        where: {
-          owner: { email: { contains: 'quest-owner-' } },
-        },
-      })
-
-      // 2️⃣ Then delete any test users
-      await prisma.user.deleteMany({
-        where: { email: { contains: 'quest-owner-' } },
-      })
-    }
-    catch (e) {
-      console.error('Cleanup error:', e)
-    }
-    finally {
-      await prisma.$disconnect()
-    }
+describe('Quests/[ID] GET API', async () => {
+  await setup({
+    // test context options
   })
 
   it('retrieves quest by ID', async () => {
-    const quest = await prisma.quest.findUnique({
-      where: { id: questId },
-      include: { tasks: true },
+    // Step 1: Create a user
+    const email = `quest-owner-${Date.now()}@example.com`
+    const password = 'password123'
+
+    await $fetch('/api/auth/signup', {
+      method: 'POST',
+      body: { email, password, name: 'Quest Owner' },
     })
-    expect(quest?.id).toBe(questId)
-    expect(quest?.title).toBe('Test Quest')
+
+    // Step 2: Log in
+    await $fetch('/api/auth/login', {
+      method: 'POST',
+      body: { email, password },
+    })
+
+    // Step 3: Create a quest
+    const questRes: { quest: { id: string } } = await $fetch('/api/quests', {
+      method: 'POST',
+      body: {
+        title: 'Test Quest',
+        description: 'Testing quest flow',
+        goal: 'Complete it all',
+      },
+    })
+
+    const questId = questRes.quest.id
+
+    // Step 4: Fetch the quest by ID
+    const fetchedQuest = await $fetch(`/api/quests/${questId}`, {
+      method: 'GET',
+    })
+
+    // Step 5: Assert the response
+    expect(fetchedQuest).toHaveProperty('id', questId)
+    expect(fetchedQuest).toHaveProperty('title', 'Test Quest')
+    expect(fetchedQuest).toHaveProperty('description', 'Testing quest flow')
+    expect(fetchedQuest).toHaveProperty('goal', 'Complete it all')
   })
 })
