@@ -17,7 +17,7 @@ describe('Tasks/[ID] PATCH API', () => {
   it('allows the quest owner to update their task', async () => {
     const email = `owner-${Date.now()}@example.com`
     const password = 'password123'
-    const cookie = await loginAndGetCookie(email, password)
+    const cookie = await loginAndGetCookie($fetch, email, password)
     console.log('🍪 Logged in with cookie:', cookie)
 
     // Attach cookie to all $fetch requests

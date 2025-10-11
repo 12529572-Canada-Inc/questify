@@ -1,29 +1,18 @@
-import { $fetch } from '@nuxt/test-utils'
 /**
  * Logs in (creating the user if necessary) and returns the session cookie string.
  * Works in Nuxt E2E test context.
  *
+ * @param $fetch - The $fetch function from Nuxt test utils
  * @param email - User email
  * @param password - User password
  * @param name - Optional display name
  */
 export async function loginAndGetCookie(
+  $fetch: typeof globalThis.$fetch,
   email: string,
   password: string,
   name = 'E2E Tester',
 ): Promise<string> {
-  /**
-   * Normalized API builder.
-   * Ensures no accidental double slashes like `/http://...`.
-   */
-  //   const api = (path: string) => {
-  //     const clean = path.startsWith('/') ? path.slice(1) : path
-  //     return new URL(clean, baseURL).toString()
-  //   }
-
-  //   console.log(`🔧 Using baseURL: ${baseURL}`)
-  //   console.log(`🧩 Signup URL: ${api('api/auth/signup')}`)
-
   // 1️⃣ Try to sign up the user
   try {
     const signupRes = await $fetch('/api/auth/signup', {
@@ -40,8 +29,7 @@ export async function loginAndGetCookie(
   }
 
   // 2️⃣ Log in
-  //   console.log('login url', url('api/auth/login'))
-  const res = await fetch('/api/auth/login', {
+  const res = await $fetch.raw('/api/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
