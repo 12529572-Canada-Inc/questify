@@ -2,13 +2,14 @@ import { describe, it, expect, beforeAll } from 'vitest'
 import { setup, $fetch, useTestContext } from '@nuxt/test-utils/e2e'
 
 let baseURL: string
-const api = (path: string) => new URL(path, baseURL).toString()
+let api: (path: string) => string
 
 describe('Tasks/[ID] PATCH API', async () => {
   beforeAll(async () => {
     await setup({})
     const ctx = useTestContext()
     baseURL = ctx.url as string
+    api = (path: string) => new URL(path, baseURL).toString()
   })
 
   async function loginAndGetCookie(email: string, password: string): Promise<string> {
