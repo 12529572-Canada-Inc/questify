@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll } from 'vitest'
 import { setup, $fetch, useTestContext, type TestContext } from '@nuxt/test-utils/e2e'
-import { loginAndGetCookie } from '~/tests/utils/auth-helpers'
+import { loginAndGetCookie } from '../utils/auth-helpers'
 
 describe('Tasks/[ID] PATCH API', () => {
   let baseURL: string
