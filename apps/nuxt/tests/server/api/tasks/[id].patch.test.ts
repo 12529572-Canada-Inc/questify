@@ -4,23 +4,24 @@ import { setupServer } from '../utils/test-server'
 import { loginAndGetCookie } from '../utils/auth-helpers'
 
 describe('Tasks/[ID] PATCH API', () => {
-  let baseURL: string
-  let api: (path: string) => string
+//   let baseURL: string
+//   let api: (path: string) => string
 
   beforeAll(async () => {
-    const server = await setupServer()
-    baseURL = server.baseURL
-    api = server.api
+    await setupServer()
+    // const server = await setupServer()
+    // baseURL = server.baseURL
+    // api = server.api
   })
 
   it('allows the quest owner to update their task', async () => {
     const email = `owner-${Date.now()}@example.com`
     const password = 'password123'
-    const cookie = await loginAndGetCookie(baseURL, email, password)
+    const cookie = await loginAndGetCookie(email, password)
     console.log('🍪 Logged in with cookie:', cookie)
 
     // Attach cookie to all $fetch requests
-    const questRes = await $fetch<{ quest: { id: string } }>(api('api/quests'), {
+    const questRes = await $fetch<{ quest: { id: string } }>('api/quests', {
       method: 'POST',
       headers: { cookie },
       body: { title: 'Quest Title', description: 'Testing PATCH' },
@@ -28,7 +29,7 @@ describe('Tasks/[ID] PATCH API', () => {
 
     const questId = questRes.quest.id
 
-    const taskRes = await $fetch<{ task: { id: string } }>(api('api/tasks'), {
+    const taskRes = await $fetch<{ task: { id: string } }>('api/tasks', {
       method: 'POST',
       headers: { cookie },
       body: { questId, title: 'Initial Task', status: 'draft' },
@@ -36,8 +37,7 @@ describe('Tasks/[ID] PATCH API', () => {
 
     const taskId = taskRes.task.id
 
-    const updatedTask = await $fetch<{ task: { id: string, status: string } }>(
-      api(`api/tasks/${taskId}`),
+    const updatedTask = await $fetch<{ task: { id: string, status: string } }>(`api/tasks/${taskId}`,
       {
         method: 'PATCH',
         headers: { cookie },
