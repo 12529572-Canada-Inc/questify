@@ -1,38 +1,40 @@
 import { describe, it, expect, beforeAll } from 'vitest'
-import { setup, $fetch, useTestContext } from '@nuxt/test-utils/e2e'
+import { setup, $fetch, useTestContext, type TestContext } from '@nuxt/test-utils/e2e'
+import { loginAndGetCookie } from '~/tests/utils/auth-helpers'
 
-let baseURL: string
-let api: (path: string) => string
+describe('Tasks/[ID] PATCH API', () => {
+  let baseURL: string
+  let api: (path: string) => string
 
-describe('Tasks/[ID] PATCH API', async () => {
   beforeAll(async () => {
+    // 1️⃣ Setup Nuxt test environment (does NOT return anything)
     await setup({})
-    const ctx = useTestContext()
-    baseURL = ctx.url as string
+
+    // 2️⃣ Get the context explicitly
+    const runtimeCtx = useTestContext() as Partial<TestContext>
+
+    // 3️⃣ Resolve URL safely
+    const urlFromCtx
+      = runtimeCtx?.url
+      // @ts-expect-error optional in some Nuxt versions
+        || runtimeCtx?.options?.url
+        || process.env.NUXT_URL
+
+    baseURL
+      = urlFromCtx && urlFromCtx.startsWith('http')
+        ? urlFromCtx.endsWith('/')
+          ? urlFromCtx
+          : `${urlFromCtx}/`
+        : 'http://127.0.0.1:3000/'
+
     api = (path: string) => new URL(path, baseURL).toString()
+    console.log('🧩 Using baseURL:', baseURL)
   })
-
-  async function loginAndGetCookie(email: string, password: string): Promise<string> {
-    await $fetch(api('/api/auth/signup'), {
-      method: 'POST',
-      body: { email, password, name: 'E2E Tester' },
-    })
-
-    const res = await fetch(api('/api/auth/login'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    })
-
-    const cookie = res.headers.get('set-cookie')
-    if (!cookie) throw new Error('No cookie returned from login')
-    return cookie
-  }
 
   it('allows the quest owner to update their task', async () => {
     const email = `owner-${Date.now()}@example.com`
     const password = 'password123'
-    const cookie = await loginAndGetCookie(email, password)
+    const cookie = await loginAndGetCookie(baseURL, email, password)
 
     const questRes = await $fetch<{ quest: { id: string } }>(api('/api/quests'), {
       method: 'POST',
