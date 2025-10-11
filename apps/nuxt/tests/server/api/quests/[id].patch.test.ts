@@ -8,10 +8,10 @@ describe('Quests/[ID] PATCH API', async () => {
 
   it('allows the quest owner to update quest status', async () => {
     // Step 1: create a new user
-    const email = `owner-${Date.now()}@example.com`
+    const email = `owner-${Date.now()}@example.com  `
     const password = 'test1234'
 
-    await $fetch('api/auth/signup', {
+    await $fetch('/api/auth/signup', {
       method: 'POST',
       body: { email, password, name: 'Quest Owner' },
     })
@@ -34,7 +34,7 @@ describe('Quests/[ID] PATCH API', async () => {
     const questId = questRes.quest.id
 
     // Step 4: patch quest status
-    const patchRes = await $fetch(`api/quests/${questId}`, {
+    const patchRes = await $fetch(`/api/quests/${questId}`, {
       method: 'PATCH',
       body: { status: 'completed' },
     })
