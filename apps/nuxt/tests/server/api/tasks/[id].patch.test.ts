@@ -17,6 +17,7 @@ describe('Tasks/[ID] PATCH API', () => {
     const email = `owner-${Date.now()}@example.com`
     const password = 'password123'
     const cookie = await loginAndGetCookie(baseURL, email, password)
+    console.log('🍪 Logged in with cookie:', cookie)
 
     // Attach cookie to all $fetch requests
     const questRes = await $fetch<{ quest: { id: string } }>(api('/api/quests'), {
