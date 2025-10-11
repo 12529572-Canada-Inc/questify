@@ -3,39 +3,39 @@ import { setup, $fetch, useTestContext } from '@nuxt/test-utils/e2e'
 
 let baseURL: string
 
-beforeAll(async () => {
-  await setup({})
-  const ctx = useTestContext()
-  baseURL = ctx.url as string
-})
-
-async function loginAndGetCookie(email: string, password: string): Promise<string> {
-  // Step 1: signup
-  await $fetch('/api/auth/signup', {
-    method: 'POST',
-    body: { email, password, name: 'E2E Tester' },
+describe('Tasks/[ID] PATCH API', async () => {
+  beforeAll(async () => {
+    await setup({})
+    const ctx = useTestContext()
+    baseURL = ctx.url as string
   })
 
-  // Step 2: login via raw fetch to capture cookie header
-  const res = await fetch(`${baseURL}/api/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  })
+  // ✅ define helper *after* setup
+  async function loginAndGetCookie(email: string, password: string): Promise<string> {
+    // Use full URL to ensure correct resolution
+    await $fetch(`${baseURL}/api/auth/signup`, {
+      method: 'POST',
+      body: { email, password, name: 'E2E Tester' },
+    })
 
-  const cookie = res.headers.get('set-cookie')
-  if (!cookie) throw new Error('No cookie returned from login')
+    const res = await fetch(`${baseURL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    })
 
-  return cookie
-}
+    const cookie = res.headers.get('set-cookie')
+    if (!cookie) throw new Error('No cookie returned from login')
+    return cookie
+  }
 
-describe('Tasks/[ID] PATCH API', () => {
   it('allows the quest owner to update their task', async () => {
     const email = `owner-${Date.now()}@example.com`
     const password = 'password123'
     const cookie = await loginAndGetCookie(email, password)
 
-    const questRes = await $fetch<{ quest: { id: string } }>('/api/quests', {
+    // Create quest
+    const questRes = await $fetch<{ quest: { id: string } }>(`${baseURL}/api/quests`, {
       method: 'POST',
       headers: { cookie },
       body: { title: 'Quest Title', description: 'Testing PATCH' },
@@ -43,7 +43,8 @@ describe('Tasks/[ID] PATCH API', () => {
 
     const questId = questRes.quest.id
 
-    const taskRes = await $fetch<{ task: { id: string } }>('/api/tasks', {
+    // Create task
+    const taskRes = await $fetch<{ task: { id: string } }>(`${baseURL}/api/tasks`, {
       method: 'POST',
       headers: { cookie },
       body: { questId, title: 'Initial Task', status: 'draft' },
@@ -51,8 +52,9 @@ describe('Tasks/[ID] PATCH API', () => {
 
     const taskId = taskRes.task.id
 
+    // Patch task
     const updatedTask = await $fetch<{ task: { id: string, status: string } }>(
-      `/api/tasks/${taskId}`,
+      `${baseURL}/api/tasks/${taskId}`,
       {
         method: 'PATCH',
         headers: { cookie },
@@ -68,7 +70,7 @@ describe('Tasks/[ID] PATCH API', () => {
     const ownerPass = 'password123'
     const ownerCookie = await loginAndGetCookie(ownerEmail, ownerPass)
 
-    const questRes = await $fetch<{ quest: { id: string } }>('/api/quests', {
+    const questRes = await $fetch<{ quest: { id: string } }>(`${baseURL}/api/quests`, {
       method: 'POST',
       headers: { cookie: ownerCookie },
       body: { title: 'Quest Title', description: 'Testing Permissions' },
@@ -76,7 +78,7 @@ describe('Tasks/[ID] PATCH API', () => {
 
     const questId = questRes.quest.id
 
-    const taskRes = await $fetch<{ task: { id: string } }>('/api/tasks', {
+    const taskRes = await $fetch<{ task: { id: string } }>(`${baseURL}/api/tasks`, {
       method: 'POST',
       headers: { cookie: ownerCookie },
       body: { questId, title: 'Owner Task', status: 'draft' },
@@ -89,7 +91,7 @@ describe('Tasks/[ID] PATCH API', () => {
     const attackerCookie = await loginAndGetCookie(attackerEmail, attackerPass)
 
     await expect(
-      $fetch(`/api/tasks/${taskId}`, {
+      $fetch(`${baseURL}/api/tasks/${taskId}`, {
         method: 'PATCH',
         headers: { cookie: attackerCookie },
         body: { status: 'completed' },
