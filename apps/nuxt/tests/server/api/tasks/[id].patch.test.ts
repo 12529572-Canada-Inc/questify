@@ -1,17 +1,9 @@
-import { describe, it, expect, beforeAll } from 'vitest'
-import { $fetch } from '@nuxt/test-utils'
-import { setupServer } from '../utils/test-server'
-import { loginAndGetCookie } from '../utils/auth-helpers'
+import { loginAndGetCookie } from '../utils/auth'
+import { setupServer } from '../utils/server'
 
 describe('Tasks/[ID] PATCH API', () => {
-//   let baseURL: string
-//   let api: (path: string) => string
-
   beforeAll(async () => {
     await setupServer()
-    // const server = await setupServer()
-    // baseURL = server.baseURL
-    // api = server.api
   })
 
   it('allows the quest owner to update their task', async () => {

@@ -1,5 +1,4 @@
-import { useTestContext } from '@nuxt/test-utils'
-
+import { $fetch } from '@nuxt/test-utils'
 /**
  * Logs in (creating the user if necessary) and returns the session cookie string.
  * Works in Nuxt E2E test context.
@@ -13,14 +12,6 @@ export async function loginAndGetCookie(
   password: string,
   name = 'E2E Tester',
 ): Promise<string> {
-  // ✅ Get the Nuxt test context
-  const ctx = useTestContext()
-
-  // ✅ Retrieve the correct $fetch bound to the Nuxt instance
-  const $fetch = ctx.nuxt?.$fetch || ctx.$fetch
-  if (!$fetch) throw new Error('❌ $fetch is not available — did you call setup() first?')
-
-  console.log('🧩 Using $fetch from context at:', ctx.url)
   // 1️⃣ Try to sign up the user
   try {
     const signupRes = await $fetch('/api/auth/signup', {
