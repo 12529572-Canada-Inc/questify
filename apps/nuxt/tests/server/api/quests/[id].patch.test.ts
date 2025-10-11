@@ -53,7 +53,7 @@ describe('Quests/[ID] PATCH API', async () => {
       body: { email: ownerEmail, password, name: 'Owner' },
     })
 
-    const ownerQuest: { quest: { id: string } } = await $fetch('api/quests', {
+    const ownerQuest: { quest: { id: string } } = await $fetch('/api/quests', {
       method: 'POST',
       body: {
         title: 'Owner Quest',
@@ -74,7 +74,7 @@ describe('Quests/[ID] PATCH API', async () => {
 
     // Step 3: attempt to patch another user's quest
     await expect(
-      $fetch(`api/quests/${questId}`, {
+      $fetch(`/api/quests/${questId}`, {
         method: 'PATCH',
         body: { status: 'completed' },
       }),
