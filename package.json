@@ -28,6 +28,8 @@
     "test:shared": "pnpm --filter shared test"
   },
   "devDependencies": {
+    "@oxc-parser/binding-darwin-arm64": "0.94.0",
+    "@oxc-transform/binding-darwin-arm64": "0.94.0",
     "typescript": "^5.6.3",
     "vercel": "^48.1.6"
   }

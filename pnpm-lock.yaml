@@ -8,6 +8,12 @@ importers:
 
   .:
     devDependencies:
+      '@oxc-parser/binding-darwin-arm64':
+        specifier: 0.94.0
+        version: 0.94.0
+      '@oxc-transform/binding-darwin-arm64':
+        specifier: 0.94.0
+        version: 0.94.0
       typescript:
         specifier: ^5.6.3
         version: 5.9.2
@@ -60,12 +66,6 @@ importers:
       '@nuxt/types':
         specifier: ^2.18.1
         version: 2.18.1
-      '@oxc-parser/binding-darwin-arm64':
-        specifier: 0.94.0
-        version: 0.94.0
-      '@oxc-transform/binding-darwin-arm64':
-        specifier: 0.94.0
-        version: 0.94.0
       '@types/node':
         specifier: ^20.0.0
         version: 20.19.17
