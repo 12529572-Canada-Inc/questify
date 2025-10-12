@@ -24,6 +24,7 @@ model Quest {
   goal        String?
   context     String?
   constraints String?
+  isPublic    Boolean  @default(false)
   status      String   @default("draft") // draft, active, completed
   tasks       Task[]
   createdAt   DateTime @default(now())

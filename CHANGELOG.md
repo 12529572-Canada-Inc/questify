@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🗄️ Database
 - Removed the deprecated quest description column from the Prisma schema, migration, and seed utilities.
+- Added an `isPublic` flag to quests that defaults to private access.
 
 ### 🖼 Branding & UI Updates
 - **Logo & Header**
@@ -39,9 +40,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved owner authorization logic for quest and task updates.
 - Added owner-only controls to reopen completed quests and mark tasks incomplete.
 - Validated quest and task status transitions to safely support reopening flows.
+- Limited quest retrieval APIs to owners unless the quest is explicitly public.
 
 ### 🧪 Tests
 - Added a Nuxt tsconfig stub and setup guard so quest and task authorization tests run without generated build artifacts.
+- Added unit coverage for quest visibility helper logic.
 
 ---
 
