@@ -30,6 +30,16 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const status = (body as { status?: string } | null | undefined)?.status
 
+  if (!status) {
+    throw createError({ statusCode: 400, statusMessage: 'Status is required' })
+  }
+
+  const allowedStatuses = ['todo', 'pending', 'in-progress', 'completed', 'draft'] as const
+
+  if (!allowedStatuses.includes(status as typeof allowedStatuses[number])) {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid task status' })
+  }
+
   const task = await prisma.task.update({
     where: { id },
     data: {

@@ -26,6 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Restricted quest actions and completion to owners in UI.
 - Restricted quest and task completion to quest owners.
 - Improved owner authorization logic for quest and task updates.
+- Added owner-only controls to reopen completed quests and mark tasks incomplete.
+- Validated quest and task status transitions to safely support reopening flows.
 
 ### 🧪 Tests
 - Added a Nuxt tsconfig stub and setup guard so quest and task authorization tests run without generated build artifacts.

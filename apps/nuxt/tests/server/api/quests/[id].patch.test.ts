@@ -1,30 +1,22 @@
 // TODO: Fix tests once upgrade to Nuxt 4 is complete
-import { $fetch, setup } from '@nuxt/test-utils/e2e'
+import { $fetch } from '@nuxt/test-utils/e2e'
+import { setupServer } from '../utils/server'
+import { loginAndGetCookie } from '../utils/auth'
 
 describe.skip('Quests/[ID] PATCH API', async () => {
-  await setup({
-    // test context options
+  beforeAll(async () => {
+    await setupServer()
   })
 
   it('allows the quest owner to update quest status', async () => {
-    // Step 1: create a new user
-    const email = `owner-${Date.now()}@example.com  `
-    const password = 'test1234'
+    const email = `owner-${Date.now()}@example.com`
+    const password = 'password123'
+    const cookie = await loginAndGetCookie(email, password)
+    console.log('🍪 Logged in with cookie:', cookie)
 
-    await $fetch('/api/auth/signup', {
-      method: 'POST',
-      body: { email, password, name: 'Quest Owner' },
-    })
-
-    // Step 2: log in to get session cookie
-    await $fetch('api/auth/login', {
-      method: 'POST',
-      body: { email, password },
-    })
-
-    // Step 3: create a quest owned by this user
     const questRes: { quest: { id: string } } = await $fetch('/api/quests', {
       method: 'POST',
+      headers: { cookie },
       body: {
         title: 'Test Quest',
         description: 'Initial quest description',
@@ -36,6 +28,7 @@ describe.skip('Quests/[ID] PATCH API', async () => {
     // Step 4: patch quest status
     const patchRes = await $fetch(`/api/quests/${questId}`, {
       method: 'PATCH',
+      headers: { cookie },
       body: { status: 'completed' },
     })
 
@@ -44,17 +37,14 @@ describe.skip('Quests/[ID] PATCH API', async () => {
   })
 
   it('prevents non-owners from updating a quest', async () => {
-    // Step 1: create a quest with one user
-    const ownerEmail = `quest-owner-${Date.now()}@example.com`
+    const email = `owner-${Date.now()}@example.com`
     const password = 'password123'
-
-    await $fetch('api/auth/signup', {
-      method: 'POST',
-      body: { email: ownerEmail, password, name: 'Owner' },
-    })
+    const cookie = await loginAndGetCookie(email, password)
+    console.log('🍪 Logged in with cookie:', cookie)
 
     const ownerQuest: { quest: { id: string } } = await $fetch('/api/quests', {
       method: 'POST',
+      headers: { cookie },
       body: {
         title: 'Owner Quest',
         description: 'Owned quest description',
@@ -83,5 +73,17 @@ describe.skip('Quests/[ID] PATCH API', async () => {
         statusCode: 403,
       }),
     })
+  })
+
+  it('reopens a quest and resets completed tasks to todo', async () => {
+    // TODO: Implement test
+  })
+
+  it('completes a quest and propagates the status to every task', async () => {
+    // TODO: Implement test
+  })
+
+  it('rejects invalid quest statuses', async () => {
+    // TODO: Implement test
   })
 })

@@ -7,13 +7,12 @@ describe.skip('Tasks/[ID] PATCH API', () => {
     await setupServer()
   })
 
-  it('allows the quest owner to update their task', async () => {
+  it('allows the task owner to update their task', async () => {
     const email = `owner-${Date.now()}@example.com`
     const password = 'password123'
     const cookie = await loginAndGetCookie(email, password)
     console.log('🍪 Logged in with cookie:', cookie)
 
-    // Attach cookie to all $fetch requests
     const questRes = await $fetch<{ quest: { id: string } }>(`/api/quests`, {
       method: 'POST',
       headers: { cookie },
@@ -39,5 +38,13 @@ describe.skip('Tasks/[ID] PATCH API', () => {
     )
 
     expect(updatedTask.task.status).toBe('completed')
+  })
+
+  it('allows the task owner to revert a task to an unfinished state', async () => {
+    // TODO: Implement test
+  })
+
+  it('rejects invalid task statuses', async () => {
+    // TODO: Implement test
   })
 })

@@ -1,28 +1,19 @@
 // TODO: Fix tests once upgrade to Nuxt 4 is complete
-import { $fetch, setup } from '@nuxt/test-utils/e2e'
+import { $fetch } from '@nuxt/test-utils/e2e'
+import { setupServer } from '../utils/server'
+import { loginAndGetCookie } from '../utils/auth'
 
 describe.skip('Quests/[ID] GET API', async () => {
-  await setup({
-    // test context options
+  beforeAll(async () => {
+    await setupServer()
   })
 
   it('retrieves quest by ID', async () => {
-    // Step 1: Create a user
-    const email = `quest-owner-${Date.now()}@example.com`
+    const email = `owner-${Date.now()}@example.com`
     const password = 'password123'
+    const cookie = await loginAndGetCookie(email, password)
+    console.log('🍪 Logged in with cookie:', cookie)
 
-    await $fetch('/api/auth/signup', {
-      method: 'POST',
-      body: { email, password, name: 'Quest Owner' },
-    })
-
-    // Step 2: Log in
-    await $fetch('/api/auth/login', {
-      method: 'POST',
-      body: { email, password },
-    })
-
-    // Step 3: Create a quest
     const questRes: { quest: { id: string } } = await $fetch('/api/quests', {
       method: 'POST',
       body: {
@@ -37,6 +28,7 @@ describe.skip('Quests/[ID] GET API', async () => {
     // Step 4: Fetch the quest by ID
     const fetchedQuest = await $fetch(`/api/quests/${questId}`, {
       method: 'GET',
+      headers: { cookie },
     })
 
     // Step 5: Assert the response

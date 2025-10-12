@@ -42,6 +42,18 @@ async function markTaskCompleted(taskId: string) {
   await refresh()
 }
 
+async function markTaskIncomplete(taskId: string) {
+  if (!isOwner.value) {
+    return
+  }
+
+  await $fetch(`/api/tasks/${taskId}`, {
+    method: 'PATCH',
+    body: { status: 'todo' },
+  })
+  await refresh()
+}
+
 async function completeQuest() {
   if (!isOwner.value) {
     return
@@ -50,6 +62,18 @@ async function completeQuest() {
   await $fetch(`/api/quests/${id}`, {
     method: 'PATCH',
     body: { status: 'completed' },
+  })
+  await refresh()
+}
+
+async function reopenQuest() {
+  if (!isOwner.value) {
+    return
+  }
+
+  await $fetch(`/api/quests/${id}`, {
+    method: 'PATCH',
+    body: { status: 'active' },
   })
   await refresh()
 }
@@ -165,14 +189,24 @@ onMounted(() => {
                   />
                   <v-list-item-subtitle>Status: {{ task.status }}</v-list-item-subtitle>
                   <v-list-item-action>
-                    <v-btn
-                      v-if="task.status !== 'completed' && isOwner"
-                      size="small"
-                      color="success"
-                      @click="markTaskCompleted(task.id)"
-                    >
-                      Complete
-                    </v-btn>
+                    <template v-if="isOwner">
+                      <v-btn
+                        v-if="task.status !== 'completed'"
+                        size="small"
+                        color="success"
+                        @click="markTaskCompleted(task.id)"
+                      >
+                        Complete
+                      </v-btn>
+                      <v-btn
+                        v-else
+                        size="small"
+                        color="warning"
+                        @click="markTaskIncomplete(task.id)"
+                      >
+                        Mark Incomplete
+                      </v-btn>
+                    </template>
                   </v-list-item-action>
                 </v-list-item>
               </v-list>
@@ -206,15 +240,24 @@ onMounted(() => {
                 cols="12"
                 sm="6"
               >
-                <v-btn
-                  v-if="quest.status !== 'completed'"
-                  :disabled="!isOwner"
-                  block
-                  color="success"
-                  @click="completeQuest"
-                >
-                  Mark as Completed
-                </v-btn>
+                <template v-if="isOwner">
+                  <v-btn
+                    v-if="quest.status !== 'completed'"
+                    block
+                    color="success"
+                    @click="completeQuest"
+                  >
+                    Mark as Completed
+                  </v-btn>
+                  <v-btn
+                    v-else
+                    block
+                    color="warning"
+                    @click="reopenQuest"
+                  >
+                    Reopen Quest
+                  </v-btn>
+                </template>
               </v-col>
             </v-row>
           </v-card-actions>
