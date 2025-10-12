@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-echo "🚀 Starting Nuxt v3 → v4 upgrade for Questify monorepo..."
+echo "🚀 Starting Nuxt upgrade for Questify monorepo..."
 
 # 1. Ensure running from root
 cd "$(dirname "$0")/.."
