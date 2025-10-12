@@ -9,6 +9,8 @@
       "shared/*": ["../../packages/shared/src/*"]
     },
     "types": [
+      "@nuxt/types",
+      "@nuxt/schema",
       "@types/node",
       "nuxt-auth-utils",
       "vue-router",
