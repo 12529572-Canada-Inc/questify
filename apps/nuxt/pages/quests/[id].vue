@@ -107,47 +107,47 @@ onMounted(() => {
   <v-container class="py-6">
     <v-row>
       <v-col cols="12">
-        <v-card v-if="quest">
+        <v-card v-if="questData">
           <v-card-title class="text-h5">
-            {{ quest.title }}
+            {{ questData.title }}
           </v-card-title>
-          <v-card-subtitle>Status: <strong>{{ quest.status }}</strong></v-card-subtitle>
+          <v-card-subtitle>Status: <strong>{{ questData.status }}</strong></v-card-subtitle>
           <v-card-text class="d-flex flex-column gap-4">
-            <div v-if="quest.goal">
+            <div v-if="questData.goal">
               <h3 class="text-subtitle-1 font-weight-medium mb-1">
                 Desired Outcome
               </h3>
               <TextWithLinks
                 class="mb-0"
                 tag="p"
-                :text="quest.goal"
+                :text="questData.goal"
               />
             </div>
 
-            <div v-if="quest.context">
+            <div v-if="questData.context">
               <h3 class="text-subtitle-1 font-weight-medium mb-1">
                 Context
               </h3>
               <TextWithLinks
                 class="mb-0"
                 tag="p"
-                :text="quest.context"
+                :text="questData.context"
               />
             </div>
 
-            <div v-if="quest.constraints">
+            <div v-if="questData.constraints">
               <h3 class="text-subtitle-1 font-weight-medium mb-1">
                 Constraints & Preferences
               </h3>
               <TextWithLinks
                 class="mb-0"
                 tag="p"
-                :text="quest.constraints"
+                :text="questData.constraints"
               />
             </div>
 
             <p
-              v-if="!quest.goal && !quest.context && !quest.constraints"
+              v-if="!questData.goal && !questData.context && !questData.constraints"
               class="text-body-2 text-medium-emphasis mb-0"
             >
               No additional details provided for this quest yet.
@@ -161,7 +161,7 @@ onMounted(() => {
               <h3 class="text-h6 mb-2">
                 Owner Information
               </h3>
-              <p><strong>Name:</strong> {{ quest.owner.name }}</p>
+              <p><strong>Name:</strong> {{ questData.owner.name }}</p>
             </v-card-text>
             <v-divider class="my-4" />
           </div>
@@ -183,9 +183,9 @@ onMounted(() => {
               <span class="text-body-2">Generating tasks for this quest...</span>
             </div>
             <template v-else>
-              <v-list v-if="quest.tasks.length">
+              <v-list v-if="questData.tasks.length">
                 <v-list-item
-                  v-for="task in quest.tasks"
+                  v-for="task in questData.tasks"
                   :key="task.id"
                 >
                   <v-list-item-title>{{ task.title }}</v-list-item-title>
@@ -250,7 +250,7 @@ onMounted(() => {
               >
                 <template v-if="isOwner">
                   <v-btn
-                    v-if="quest.status !== 'completed'"
+                    v-if="questData.status !== 'completed'"
                     block
                     color="success"
                     @click="completeQuest"
