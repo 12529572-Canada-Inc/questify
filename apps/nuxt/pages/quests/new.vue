@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import type { CreateQuestResponse } from '~/server/api/quests/index.post'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const title = ref('')
-const description = ref('')
 const goal = ref('')
 const context = ref('')
 const constraints = ref('')
+const showOptionalFields = ref(false)
 
 const valid = ref(false)
 const loading = ref(false)
@@ -16,8 +16,17 @@ const error = ref<string | null>(null)
 
 const rules = {
   title: [(v: string) => !!v || 'Title is required'],
-  description: [(v: string) => !!v || 'Description is required'],
 }
+
+watch(
+  [goal, context, constraints],
+  (values) => {
+    if (values.some(value => typeof value === 'string' && value.trim().length > 0)) {
+      showOptionalFields.value = true
+    }
+  },
+  { immediate: true },
+)
 
 async function submit() {
   loading.value = true
@@ -28,7 +37,6 @@ async function submit() {
       method: 'POST',
       body: {
         title: title.value,
-        description: description.value,
         goal: goal.value,
         context: context.value,
         constraints: constraints.value,
@@ -87,44 +95,60 @@ async function submit() {
               required
             />
 
-            <v-textarea
-              v-model="description"
-              label="Description"
-              :rules="rules.description"
-              required
-              auto-grow
-              rows="3"
-            />
+            <v-btn
+              v-if="!showOptionalFields"
+              type="button"
+              variant="text"
+              color="primary"
+              class="mt-2"
+              @click="showOptionalFields = true"
+            >
+              Add optional details
+            </v-btn>
 
-            <v-textarea
-              v-model="goal"
-              label="What outcome are you aiming for?"
-              hint="Share the specific result you want this quest to achieve."
-              persistent-hint
-              auto-grow
-              rows="3"
-              class="mb-4"
-            />
+            <v-expand-transition>
+              <div v-if="showOptionalFields">
+                <v-textarea
+                  v-model="goal"
+                  label="What outcome are you aiming for?"
+                  hint="Share the specific result you want this quest to achieve."
+                  persistent-hint
+                  auto-grow
+                  rows="3"
+                  class="mb-4"
+                />
 
-            <v-textarea
-              v-model="context"
-              label="Relevant background or context"
-              hint="Include any details, prior work, or information that will help the AI understand the situation."
-              persistent-hint
-              auto-grow
-              rows="3"
-              class="mb-4"
-            />
+                <v-textarea
+                  v-model="context"
+                  label="Relevant background or context"
+                  hint="Include any details, prior work, or information that will help the AI understand the situation."
+                  persistent-hint
+                  auto-grow
+                  rows="3"
+                  class="mb-4"
+                />
 
-            <v-textarea
-              v-model="constraints"
-              label="Constraints or preferences"
-              hint="List deadlines, available resources, tone, or other requirements to respect."
-              persistent-hint
-              auto-grow
-              rows="3"
-              class="mb-4"
-            />
+                <v-textarea
+                  v-model="constraints"
+                  label="Constraints or preferences"
+                  hint="List deadlines, available resources, tone, or other requirements to respect."
+                  persistent-hint
+                  auto-grow
+                  rows="3"
+                  class="mb-4"
+                />
+
+                <v-btn
+                  type="button"
+                  variant="text"
+                  color="secondary"
+                  class="mb-2"
+                  @click="showOptionalFields = false"
+                >
+                  Hide optional details
+                </v-btn>
+              </div>
+            </v-expand-transition>
 
             <v-row
               class="mt-4"
