@@ -1,4 +1,6 @@
-export default defineNuxtConfig({
+import type { NuxtConfig } from 'nuxt/schema'
+
+const config: NuxtConfig = {
   modules: [
     '@nuxt/eslint',
     'vuetify-nuxt-module',
@@ -46,12 +48,13 @@ export default defineNuxtConfig({
     strict: true,
     typeCheck: true,
   },
-  vuetify: {
-    moduleOptions: {
-      // Optional module-specific flags
-    },
-    vuetifyOptions: {
-      // Custom Vuetify options (themes, icons, etc.)
-    },
-  },
-})
+//   vuetify: {
+//     moduleOptions: {
+//       // Optional module-specific flags
+//     },
+//     vuetifyOptions: {
+//     },
+//   },
+}
+
+export default defineNuxtConfig(config)
