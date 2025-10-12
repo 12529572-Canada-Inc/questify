@@ -1,0 +1,1 @@
+ALTER TABLE "Quest" DROP COLUMN IF EXISTS "description";

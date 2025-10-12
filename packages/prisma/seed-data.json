@@ -1,7 +1,6 @@
 [
   {
     "title": "Plan a Party",
-    "description": "Plan a birthday party",
     "tasks": [
       {
         "title": "Set the Date and Time",
@@ -55,7 +54,7 @@
       },
       {
         "title": "Confirm RSVP and Finalize Details",
-        "details": "Follow up with guests who haven’t responded, confirm the final headcount, and finalize arrangements for food, seating, and entertainment.",
+        "details": "Follow up with guests who haven\u2019t responded, confirm the final headcount, and finalize arrangements for food, seating, and entertainment.",
         "order": 10
       },
       {
@@ -68,11 +67,11 @@
         "details": "After the party, send thank-you notes to guests, and review any important notes for future events.",
         "order": 12
       }
-    ]
+    ],
+    "goal": "Plan a birthday party"
   },
   {
     "title": "Bake a Cake",
-    "description": "Bake a vanilla cake with buttercream icing",
     "tasks": [
       {
         "title": "Gather Ingredients",
@@ -81,7 +80,7 @@
       },
       {
         "title": "Preheat Oven",
-        "details": "Preheat the oven to 350°F (175°C) to prepare for baking the cake.",
+        "details": "Preheat the oven to 350\u00b0F (175\u00b0C) to prepare for baking the cake.",
         "order": 1
       },
       {
@@ -124,11 +123,11 @@
         "details": "Slice the cake into pieces and serve to enjoy your homemade vanilla cake with buttercream icing.",
         "order": 9
       }
-    ]
+    ],
+    "goal": "Bake a vanilla cake with buttercream icing"
   },
   {
     "title": "Penguin Locator",
-    "description": "Find them birds!",
     "tasks": [
       {
         "title": "Define Search Area",
@@ -185,11 +184,11 @@
         "details": "Compile a report with details of the expedition, including locations of penguin sightings and suggestions for future searches.",
         "order": 10
       }
-    ]
+    ],
+    "goal": "Find them birds!"
   },
   {
     "title": "RPG Prep",
-    "description": "Prepare to GM my next RPG Session",
     "tasks": [
       {
         "title": "Review Player Characters",
@@ -256,11 +255,11 @@
         "details": "Collect any physical or digital resources needed for the session, such as maps, game books, miniatures, or player handouts.",
         "order": 6
       }
-    ]
+    ],
+    "goal": "Prepare to GM my next RPG Session"
   },
   {
     "title": "Train a Dragon",
-    "description": "Teach my legendary creature",
     "tasks": [
       {
         "title": "Research Dragon Training Techniques",
@@ -312,11 +311,11 @@
         "details": "Acknowledge and reward the dragon's achievements to reinforce positive behavior and maintain motivation.",
         "order": 9
       }
-    ]
+    ],
+    "goal": "Teach my legendary creature"
   },
   {
     "title": "Start a Kubb Championship",
-    "description": "Start a friendly Kubb championship at my party",
     "tasks": [
       {
         "title": "Create Teams",
@@ -373,6 +372,7 @@
         "details": "Select a suitable outdoor space at the party venue for the Kubb game.",
         "order": 1
       }
-    ]
+    ],
+    "goal": "Start a friendly Kubb championship at my party"
   }
 ]

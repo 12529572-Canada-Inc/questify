@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 🚀 Features
+- Simplified the quest creation form so only the title is required and optional goal/context/constraint inputs stay hidden until requested.
+
+### 🛠 Fixes
+- Trim quest titles and drop empty optional details in the creation API and worker queue payload to avoid persisting blank strings.
+- Surface optional quest details consistently across the quest list, detail view, and worker decomposition prompts.
+- Allow visiting the quest creation page without authentication to support demos and screenshots while keeping other quest routes protected.
+
+### 🗄️ Database
+- Removed the deprecated quest description column from the Prisma schema, migration, and seed utilities.
+
 ### 🖼 Branding & UI Updates
 - **Logo & Header**
     - Refreshed header logo artwork for improved branding.

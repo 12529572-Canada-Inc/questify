@@ -31,7 +31,7 @@ describe('Quests new page', () => {
     const html = page.html()
     expect(html).toContain('Create a New Quest')
     expect(html).toContain('Title')
-    expect(html).toContain('Description')
+    expect(html).toContain('Add optional details')
     expect(html).toContain('Back to Quests')
   })
 
@@ -47,29 +47,34 @@ describe('Quests new page', () => {
     // (Vuetify renders labels as <label>Title</label>)
     const fields: {
       title?: DOMWrapper<Element>
-      description?: DOMWrapper<Element>
       goal?: DOMWrapper<Element>
       context?: DOMWrapper<Element>
       constraints?: DOMWrapper<Element>
     } = {}
+
+    const toggleButton = page
+      .findAll('button')
+      .find(button => button.text().includes('Add optional details'))
+
+    expect(toggleButton).toBeDefined()
+    await toggleButton?.trigger('click')
+
+    await flushPromises()
+
     page.findAll('.v-input').forEach((inputWrapper) => {
       const label = inputWrapper.text().trim()
       const input = inputWrapper.find('.v-field__input')
       if (label.includes('Title')) fields.title = input
-      else if (label.includes('Description')) fields.description = input
       else if (label.includes('outcome')) fields.goal = input
       else if (label.includes('background')) fields.context = input
       else if (label.includes('Constraints')) fields.constraints = input
     })
 
-    // 🧠 Sanity check
     expect(Object.keys(fields)).toEqual(
-      expect.arrayContaining(['title', 'description', 'goal', 'context', 'constraints']),
+      expect.arrayContaining(['title', 'goal', 'context', 'constraints']),
     )
 
-    // 🧠 Fill the fields
     await fields.title?.setValue('New Quest')
-    await fields.description?.setValue('Embark on a journey')
     await fields.goal?.setValue('Win')
     await fields.context?.setValue('Context details')
     await fields.constraints?.setValue('Constraints info')
@@ -81,7 +86,6 @@ describe('Quests new page', () => {
       method: 'POST',
       body: {
         title: 'New Quest',
-        description: 'Embark on a journey',
         goal: 'Win',
         context: 'Context details',
         constraints: 'Constraints info',
@@ -98,19 +102,11 @@ describe('Quests new page', () => {
       defineAsyncComponent(() => import('~/pages/quests/new.vue')),
     )
 
-    const fields: {
-      title?: DOMWrapper<Element>
-      description?: DOMWrapper<Element>
-    } = {}
-    page.findAll('.v-input').forEach((inputWrapper) => {
-      const label = inputWrapper.text().trim()
-      const input = inputWrapper.find('.v-field__input')
-      if (label.includes('Title')) fields.title = input
-      else if (label.includes('Description')) fields.description = input
-    })
+    const titleField = page.findAll('.v-input')
+      .map(wrapper => ({ label: wrapper.text().trim(), input: wrapper.find('.v-field__input') }))
+      .find(field => field.label.includes('Title'))
 
-    await fields.title?.setValue('Bad Quest')
-    await fields.description?.setValue('Fails to save')
+    await titleField?.input.setValue('Bad Quest')
 
     await page.find('form').trigger('submit.prevent')
     await flushPromises()

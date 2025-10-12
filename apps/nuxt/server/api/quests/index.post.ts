@@ -8,11 +8,20 @@ const handler = defineEventHandler(async (event) => {
   const body = await readBody(event)
   const {
     title,
-    description,
     goal,
     context,
     constraints,
   } = body
+
+  if (typeof title !== 'string' || title.trim().length === 0) {
+    throw createError({ statusCode: 400, statusMessage: 'Title is required' })
+  }
+
+  const sanitizeOptionalField = (value: unknown) => {
+    if (typeof value !== 'string') return null
+    const trimmed = value.trim()
+    return trimmed.length > 0 ? trimmed : null
+  }
 
   // Access the queue from the event context
   // TODO: deretmine potentially better way to access this
@@ -20,22 +29,20 @@ const handler = defineEventHandler(async (event) => {
 
   const quest = await prisma.quest.create({
     data: {
-      title,
-      description,
-      goal,
-      context,
-      constraints,
+      title: title.trim(),
+      goal: sanitizeOptionalField(goal),
+      context: sanitizeOptionalField(context),
+      constraints: sanitizeOptionalField(constraints),
       ownerId: user.id,
     },
   })
 
   await questQueue.add('decompose', {
     questId: quest.id,
-    title,
-    description,
-    goal,
-    context,
-    constraints,
+    title: title.trim(),
+    goal: sanitizeOptionalField(goal),
+    context: sanitizeOptionalField(context),
+    constraints: sanitizeOptionalField(constraints),
   })
 
   return { success: true, quest }

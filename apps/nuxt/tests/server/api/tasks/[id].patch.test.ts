@@ -16,7 +16,7 @@ describe.skip('Tasks/[ID] PATCH API', () => {
     const questRes = await $fetch<{ quest: { id: string } }>(`/api/quests`, {
       method: 'POST',
       headers: { cookie },
-      body: { title: 'Quest Title', description: 'Testing PATCH' },
+      body: { title: 'Quest Title', goal: 'Testing PATCH' },
     })
 
     const questId = questRes.quest.id
