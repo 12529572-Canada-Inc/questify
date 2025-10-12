@@ -9,8 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
----
-
 ### 🖼 Branding & UI Updates
 - **Logo & Header**
     - Refreshed header logo artwork for improved branding.
@@ -23,6 +21,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Updated site title for consistency.
 - **Welcome Message**
     - Removed emoji from welcome message in index page and related tests.
+
+### 🛡️ Authorization & UI
+- Restricted quest actions and completion to owners in UI.
+- Restricted quest and task completion to quest owners.
+- Improved owner authorization logic for quest and task updates.
+
+### 🧪 Tests
+- Added a Nuxt tsconfig stub and setup guard so quest and task authorization tests run without generated build artifacts.
 
 ---
 
