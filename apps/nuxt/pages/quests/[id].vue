@@ -5,7 +5,7 @@ import { useQuest } from '~/composables/useQuest'
 const route = useRoute()
 const id = route.params.id as string
 
-const { data: quest, refresh, pending } = await useQuest(id)
+const { data: quest, refresh, pending, error } = await useQuest(id)
 const { user } = useUserSession()
 
 const isOwner = computed(() => {
@@ -28,6 +28,18 @@ const tasksLoading = computed(() => {
   const tasks = currentQuest.tasks ?? []
 
   return currentQuest.status === 'draft' && tasks.length === 0
+})
+
+// Error handling
+const errorType = computed(() => {
+  if (!error.value) return null
+  if (error.value.statusCode === 404) {
+    return 'not-found'
+  }
+  else if (error.value.statusCode === 403 || error.value.statusCode === 401) {
+    return 'unauthorized'
+  }
+  return 'unknown'
 })
 
 async function markTaskCompleted(taskId: string) {
@@ -140,18 +152,18 @@ onMounted(() => {
               No additional details provided for this quest yet.
             </p>
           </v-card-text>
-
           <v-divider class="my-4" />
 
           <!-- Owner Information -->
-          <v-card-text>
-            <h3 class="text-h6 mb-2">
-              Owner Information
-            </h3>
-            <p><strong>Name:</strong> {{ quest.owner.name || 'Unknown' }}</p>
-          </v-card-text>
-
-          <v-divider class="my-4" />
+          <div v-if="!isOwner">
+            <v-card-text>
+              <h3 class="text-h6 mb-2">
+                Owner Information
+              </h3>
+              <p><strong>Name:</strong> {{ quest.owner.name }}</p>
+            </v-card-text>
+            <v-divider class="my-4" />
+          </div>
 
           <!-- Tasks -->
           <v-card-text>
@@ -259,11 +271,25 @@ onMounted(() => {
         </v-card>
 
         <v-alert
-          v-else
+          v-else-if="errorType === 'not-found'"
           type="error"
           title="Quest Not Found"
         >
           This quest does not exist.
+        </v-alert>
+        <v-alert
+          v-else-if="errorType === 'unauthorized'"
+          type="error"
+          title="Unauthorized"
+        >
+          You are not authorized to view this quest.
+        </v-alert>
+        <v-alert
+          v-else
+          type="error"
+          title="Error"
+        >
+          An unexpected error occurred. Please try again later.
         </v-alert>
       </v-col>
     </v-row>
