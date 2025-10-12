@@ -144,11 +144,11 @@ onMounted(() => {
           <v-divider class="my-4" />
 
           <!-- Owner Information -->
-          <v-card-text>
+          <v-card-text v-if="!isOwner">
             <h3 class="text-h6 mb-2">
               Owner Information
             </h3>
-            <p><strong>Name:</strong> {{ quest.owner.name || 'Unknown' }}</p>
+            <p><strong>Name:</strong> {{ quest.owner.name }}</p>
           </v-card-text>
 
           <v-divider class="my-4" />
