@@ -26,6 +26,16 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const status = (body as { status?: string } | null | undefined)?.status
 
+  if (!status) {
+    throw createError({ statusCode: 400, statusMessage: 'Status is required' })
+  }
+
+  const allowedStatuses = ['draft', 'active', 'completed', 'failed'] as const
+
+  if (!allowedStatuses.includes(status as typeof allowedStatuses[number])) {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid quest status' })
+  }
+
   if (status === 'completed') {
     // Transaction: complete quest + all tasks
     const [updatedQuest] = await prisma.$transaction([
@@ -42,7 +52,22 @@ export default defineEventHandler(async (event) => {
     return updatedQuest
   }
 
-  // fallback if status is something else
+  if (status === 'draft' || status === 'active') {
+    const [updatedQuest] = await prisma.$transaction([
+      prisma.quest.update({
+        where: { id },
+        data: { status },
+      }),
+      prisma.task.updateMany({
+        where: { questId: id, status: 'completed' },
+        data: { status: 'todo' },
+      }),
+    ])
+
+    return updatedQuest
+  }
+
+  // fallback for statuses that don't impact task completion
   return prisma.quest.update({
     where: { id },
     data: { status },
