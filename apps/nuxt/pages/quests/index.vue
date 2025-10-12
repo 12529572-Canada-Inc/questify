@@ -2,6 +2,9 @@
 import { useQuests } from '~/composables/useQuest'
 
 const { data: quests } = await useQuests()
+
+// ✅ Make sure it's always an array in templates
+const questList = computed(() => Array.isArray(quests.value) ? quests.value : [])
 </script>
 
 <template>
@@ -27,7 +30,7 @@ const { data: quests } = await useQuests()
 
     <v-row>
       <v-col
-        v-for="quest in quests"
+        v-for="quest in questsList"
         :key="quest.id"
         cols="12"
         sm="6"
