@@ -1,43 +1,77 @@
-// TODO: Fix tests once upgrade to Nuxt 4 is complete
-import { loginAndGetCookie } from '../utils/auth'
-import { setupServer } from '../utils/server'
+import { beforeAll, beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
 
-describe.skip('Tasks/[ID] PATCH API', () => {
-  beforeAll(async () => {
-    await setupServer()
+const taskFindUniqueMock = vi.fn()
+const taskUpdateMock = vi.fn()
+
+vi.mock('@prisma/client', () => ({
+  PrismaClient: vi.fn().mockImplementation(() => ({
+    task: {
+      findUnique: taskFindUniqueMock,
+      update: taskUpdateMock,
+    },
+  })),
+}))
+
+const requireUserSessionMock = vi.fn()
+const getRouterParamMock = vi.fn()
+const readBodyMock = vi.fn()
+const createErrorMock = vi.fn()
+
+let taskPatchHandler: (event: unknown) => Promise<unknown>
+
+beforeAll(async () => {
+  vi.stubGlobal('defineEventHandler', (handler: any) => handler)
+  taskPatchHandler = (await import('~/server/api/tasks/[id].patch')).default
+})
+
+beforeEach(() => {
+  taskFindUniqueMock.mockReset()
+  taskUpdateMock.mockReset()
+
+  requireUserSessionMock.mockReset()
+  getRouterParamMock.mockReset()
+  readBodyMock.mockReset()
+  createErrorMock.mockReset()
+  createErrorMock.mockImplementation((error) =>
+    Object.assign(new Error(error.statusMessage), error),
+  )
+
+  ;(globalThis as any).requireUserSession = requireUserSessionMock
+  ;(globalThis as any).getRouterParam = getRouterParamMock
+  ;(globalThis as any).readBody = readBodyMock
+  ;(globalThis as any).createError = createErrorMock
+})
+
+afterEach(() => {
+  delete (globalThis as any).requireUserSession
+  delete (globalThis as any).getRouterParam
+  delete (globalThis as any).readBody
+  delete (globalThis as any).createError
+})
+
+describe('Task PATCH handler', () => {
+  it('allows the quest owner to update a task to an unfinished state', async () => {
+    requireUserSessionMock.mockResolvedValue({ user: { id: 'owner-1' } })
+    getRouterParamMock.mockReturnValue('task-123')
+    readBodyMock.mockResolvedValue({ status: 'todo' })
+    taskFindUniqueMock.mockResolvedValue({ quest: { ownerId: 'owner-1' } })
+    taskUpdateMock.mockResolvedValue({ id: 'task-123', status: 'todo' })
+
+    const result = await taskPatchHandler({} as unknown)
+
+    expect(taskUpdateMock).toHaveBeenCalledWith({
+      where: { id: 'task-123' },
+      data: { status: 'todo' },
+    })
+    expect(result).toEqual({ id: 'task-123', status: 'todo' })
   })
 
-  it('allows the quest owner to update their task', async () => {
-    const email = `owner-${Date.now()}@example.com`
-    const password = 'password123'
-    const cookie = await loginAndGetCookie(email, password)
-    console.log('🍪 Logged in with cookie:', cookie)
+  it('rejects invalid task statuses', async () => {
+    requireUserSessionMock.mockResolvedValue({ user: { id: 'owner-1' } })
+    getRouterParamMock.mockReturnValue('task-123')
+    readBodyMock.mockResolvedValue({ status: 'blocked' })
+    taskFindUniqueMock.mockResolvedValue({ quest: { ownerId: 'owner-1' } })
 
-    // Attach cookie to all $fetch requests
-    const questRes = await $fetch<{ quest: { id: string } }>(`/api/quests`, {
-      method: 'POST',
-      headers: { cookie },
-      body: { title: 'Quest Title', description: 'Testing PATCH' },
-    })
-
-    const questId = questRes.quest.id
-
-    const taskRes = await $fetch<{ task: { id: string } }>(`/api/tasks`, {
-      method: 'POST',
-      headers: { cookie },
-      body: { questId, title: 'Initial Task', status: 'draft' },
-    })
-
-    const taskId = taskRes.task.id
-
-    const updatedTask = await $fetch<{ task: { id: string, status: string } }>(`/api/tasks/${taskId}`,
-      {
-        method: 'PATCH',
-        headers: { cookie },
-        body: { status: 'completed' },
-      },
-    )
-
-    expect(updatedTask.task.status).toBe('completed')
+    await expect(taskPatchHandler({} as unknown)).rejects.toThrow('Invalid task status')
   })
 })
