@@ -6,28 +6,29 @@ const route = useRoute()
 const id = route.params.id as string
 
 const { data: quest, refresh, pending, error } = await useQuest(id)
+
 const { user } = useUserSession()
 
-const isOwner = computed(() => {
-  const currentQuest = quest.value
-  const currentUser = user.value
+// ✅ unwrap safely with null fallback
+const questData = computed(() => quest.value ?? null)
+const userData = computed(() => user.value ?? null)
 
-  if (!currentQuest || !currentUser) {
+const isOwner = computed(() => {
+  if (!questData.value || !userData.value) {
     return false
   }
 
-  return currentQuest.ownerId === currentUser.id
+  return questData.value.ownerId === userData.value.id
 })
 
 const tasksLoading = computed(() => {
-  const currentQuest = quest.value
-  if (!currentQuest) {
+  if (!questData.value) {
     return false
   }
 
-  const tasks = currentQuest.tasks ?? []
+  const tasks = questData.value.tasks ?? []
 
-  return currentQuest.status === 'draft' && tasks.length === 0
+  return questData.value.status === 'draft' && tasks.length === 0
 })
 
 // Error handling
@@ -95,7 +96,7 @@ onMounted(() => {
     refresh()
   }, 2000, { immediate: false })
 
-  watch(tasksLoading, (loading) => {
+  watch(tasksLoading, (loading: boolean) => {
     if (loading && !pending.value) resume()
     else pause()
   }, { immediate: true })
