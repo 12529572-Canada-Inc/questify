@@ -5,7 +5,19 @@ import { useQuest } from '~/composables/useQuest'
 const route = useRoute()
 const id = route.params.id as string
 
-const { data: quest, refresh, pending } = await useQuest(id)
+const { data: quest, refresh, pending, error } = await useQuest(id)
+const { user } = useUserSession()
+
+const isOwner = computed(() => {
+  const currentQuest = quest.value
+  const currentUser = user.value
+
+  if (!currentQuest || !currentUser) {
+    return false
+  }
+
+  return currentQuest.ownerId === currentUser.id
+})
 
 const tasksLoading = computed(() => {
   const currentQuest = quest.value
@@ -18,7 +30,23 @@ const tasksLoading = computed(() => {
   return currentQuest.status === 'draft' && tasks.length === 0
 })
 
+// Error handling
+const errorType = computed(() => {
+  if (!error.value) return null
+  if (error.value.statusCode === 404) {
+    return 'not-found'
+  }
+  else if (error.value.statusCode === 403 || error.value.statusCode === 401) {
+    return 'unauthorized'
+  }
+  return 'unknown'
+})
+
 async function markTaskCompleted(taskId: string) {
+  if (!isOwner.value) {
+    return
+  }
+
   await $fetch(`/api/tasks/${taskId}`, {
     method: 'PATCH',
     body: { status: 'completed' },
@@ -26,10 +54,38 @@ async function markTaskCompleted(taskId: string) {
   await refresh()
 }
 
+async function markTaskIncomplete(taskId: string) {
+  if (!isOwner.value) {
+    return
+  }
+
+  await $fetch(`/api/tasks/${taskId}`, {
+    method: 'PATCH',
+    body: { status: 'todo' },
+  })
+  await refresh()
+}
+
 async function completeQuest() {
+  if (!isOwner.value) {
+    return
+  }
+
   await $fetch(`/api/quests/${id}`, {
     method: 'PATCH',
     body: { status: 'completed' },
+  })
+  await refresh()
+}
+
+async function reopenQuest() {
+  if (!isOwner.value) {
+    return
+  }
+
+  await $fetch(`/api/quests/${id}`, {
+    method: 'PATCH',
+    body: { status: 'active' },
   })
   await refresh()
 }
@@ -56,18 +112,6 @@ onMounted(() => {
           </v-card-title>
           <v-card-subtitle>Status: <strong>{{ quest.status }}</strong></v-card-subtitle>
           <v-card-text class="d-flex flex-column gap-4">
-            <div>
-              <h3 class="text-subtitle-1 font-weight-medium mb-1">
-                Quest Description
-              </h3>
-              <TextWithLinks
-                class="mb-0"
-                tag="p"
-                :text="quest.description"
-                fallback="No description provided."
-              />
-            </div>
-
             <div v-if="quest.goal">
               <h3 class="text-subtitle-1 font-weight-medium mb-1">
                 Desired Outcome
@@ -100,19 +144,26 @@ onMounted(() => {
                 :text="quest.constraints"
               />
             </div>
-          </v-card-text>
 
+            <p
+              v-if="!quest.goal && !quest.context && !quest.constraints"
+              class="text-body-2 text-medium-emphasis mb-0"
+            >
+              No additional details provided for this quest yet.
+            </p>
+          </v-card-text>
           <v-divider class="my-4" />
 
           <!-- Owner Information -->
-          <v-card-text>
-            <h3 class="text-h6 mb-2">
-              Owner Information
-            </h3>
-            <p><strong>Name:</strong> {{ quest.owner.name || 'Unknown' }}</p>
-          </v-card-text>
-
-          <v-divider class="my-4" />
+          <div v-if="!isOwner">
+            <v-card-text>
+              <h3 class="text-h6 mb-2">
+                Owner Information
+              </h3>
+              <p><strong>Name:</strong> {{ quest.owner.name }}</p>
+            </v-card-text>
+            <v-divider class="my-4" />
+          </div>
 
           <!-- Tasks -->
           <v-card-text>
@@ -145,14 +196,24 @@ onMounted(() => {
                   />
                   <v-list-item-subtitle>Status: {{ task.status }}</v-list-item-subtitle>
                   <v-list-item-action>
-                    <v-btn
-                      v-if="task.status !== 'completed'"
-                      size="small"
-                      color="success"
-                      @click="markTaskCompleted(task.id)"
-                    >
-                      Complete
-                    </v-btn>
+                    <template v-if="isOwner">
+                      <v-btn
+                        v-if="task.status !== 'completed'"
+                        size="small"
+                        color="success"
+                        @click="markTaskCompleted(task.id)"
+                      >
+                        Complete
+                      </v-btn>
+                      <v-btn
+                        v-else
+                        size="small"
+                        color="warning"
+                        @click="markTaskIncomplete(task.id)"
+                      >
+                        Mark Incomplete
+                      </v-btn>
+                    </template>
                   </v-list-item-action>
                 </v-list-item>
               </v-list>
@@ -186,25 +247,49 @@ onMounted(() => {
                 cols="12"
                 sm="6"
               >
-                <v-btn
-                  v-if="quest.status !== 'completed'"
-                  block
-                  color="success"
-                  @click="completeQuest"
-                >
-                  Mark as Completed
-                </v-btn>
+                <template v-if="isOwner">
+                  <v-btn
+                    v-if="quest.status !== 'completed'"
+                    block
+                    color="success"
+                    @click="completeQuest"
+                  >
+                    Mark as Completed
+                  </v-btn>
+                  <v-btn
+                    v-else
+                    block
+                    color="warning"
+                    @click="reopenQuest"
+                  >
+                    Reopen Quest
+                  </v-btn>
+                </template>
               </v-col>
             </v-row>
           </v-card-actions>
         </v-card>
 
         <v-alert
-          v-else
+          v-else-if="errorType === 'not-found'"
           type="error"
           title="Quest Not Found"
         >
           This quest does not exist.
+        </v-alert>
+        <v-alert
+          v-else-if="errorType === 'unauthorized'"
+          type="error"
+          title="Unauthorized"
+        >
+          You are not authorized to view this quest.
+        </v-alert>
+        <v-alert
+          v-else
+          type="error"
+          title="Error"
+        >
+          An unexpected error occurred. Please try again later.
         </v-alert>
       </v-col>
     </v-row>

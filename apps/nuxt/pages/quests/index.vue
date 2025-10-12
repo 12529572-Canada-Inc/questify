@@ -37,13 +37,13 @@ const { data: quests } = await useQuests()
           <v-card-title>{{ quest.title }}</v-card-title>
           <v-card-text class="d-flex flex-column gap-2">
             <p class="mb-0">
-              {{ quest.description }}
+              {{ quest.goal || quest.context || quest.constraints || 'No additional details yet.' }}
             </p>
             <p
-              v-if="quest.goal"
+              v-if="quest.context"
               class="text-body-2 text-medium-emphasis mb-0"
             >
-              <strong>Goal:</strong> {{ quest.goal }}
+              <strong>Context:</strong> {{ quest.context }}
             </p>
           </v-card-text>
           <v-card-actions>

@@ -7,6 +7,18 @@ export default defineNuxtConfig({
   imports: {
     dirs: ['middleware'],
   },
+  app: {
+    head: {
+      title: 'Questify',
+      link: [
+        // SVG favicon
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+
+        // Fallback for browsers that don't support SVG favicons
+        { rel: 'icon', type: 'image/png', href: '/favicon.png' },
+      ],
+    },
+  },
   runtimeConfig: {
     redis: {
       host: process.env.REDIS_HOST || 'localhost',

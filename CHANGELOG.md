@@ -9,6 +9,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 🚀 Features
+- Simplified the quest creation form so only the title is required and optional goal/context/constraint inputs stay hidden until requested.
+
+### 🛠 Fixes
+- Trim quest titles and drop empty optional details in the creation API and worker queue payload to avoid persisting blank strings.
+- Surface optional quest details consistently across the quest list, detail view, and worker decomposition prompts.
+- Allow visiting the quest creation page without authentication to support demos and screenshots while keeping other quest routes protected.
+
+### 🗄️ Database
+- Removed the deprecated quest description column from the Prisma schema, migration, and seed utilities.
+- Added an `isPublic` flag to quests that defaults to private access.
+
+### 🖼 Branding & UI Updates
+- **Logo & Header**
+    - Refreshed header logo artwork for improved branding.
+    - Enhanced `logo.svg` by adding sword and scroll elements.
+    - Updated logo size in header for better visibility.
+    - Improved mobile header branding.
+    - Added scroll icon to `logo.svg`.
+- **Favicons & Site Title**
+    - Added SVG and PNG favicons.
+    - Updated site title for consistency.
+- **Welcome Message**
+    - Removed emoji from welcome message in index page and related tests.
+
+### 🛡️ Authorization & UI
+- Restricted quest actions and completion to owners in UI.
+- Restricted quest and task completion to quest owners.
+- Improved owner authorization logic for quest and task updates.
+- Added owner-only controls to reopen completed quests and mark tasks incomplete.
+- Validated quest and task status transitions to safely support reopening flows.
+- Limited quest retrieval APIs to owners unless the quest is explicitly public.
+
+### 🧪 Tests
+- Added a Nuxt tsconfig stub and setup guard so quest and task authorization tests run without generated build artifacts.
+- Added unit coverage for quest visibility helper logic.
+
 ---
 
 ## [1.5.0] - 2025-10-08

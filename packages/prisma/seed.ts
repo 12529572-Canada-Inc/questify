@@ -26,7 +26,9 @@ async function main() {
       data: {
         ownerId: user.id,
         title: quest.title,
-        description: quest.description,
+        goal: quest.goal ?? null,
+        context: quest.context ?? null,
+        constraints: quest.constraints ?? null,
         status: "active",
         tasks: {
           create: quest.tasks.map((task: { title: string; details: string; order: number }) => ({
