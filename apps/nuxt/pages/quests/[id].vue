@@ -32,10 +32,13 @@ const tasksLoading = computed(() => {
 
 // Error handling
 const errorType = computed(() => {
-  console.log('Error:', error.value) // Debugging line
   if (!error.value) return null
-  if (error.value.status === 404) return 'not-found'
-  if (error.value.status === 403 || error.value.status === 401) return 'unauthorized'
+  if (error.value.statusCode === 404) {
+    return 'not-found'
+  }
+  else if (error.value.statusCode === 403 || error.value.statusCode === 401) {
+    return 'unauthorized'
+  }
   return 'unknown'
 })
 
