@@ -21,7 +21,7 @@ pnpm up nuxt @nuxt/kit @nuxt/schema @nuxt/test-utils --filter nuxt
 # 5. Clear caches
 echo "🧹 Clearing caches..."
 pnpm store prune
-pnpm cache clean --all
+pnpm cache clean
 rm -rf ~/.cache/nuxi ~/.local/share/nuxi || true
 
 # 6. Prepare Nuxt
