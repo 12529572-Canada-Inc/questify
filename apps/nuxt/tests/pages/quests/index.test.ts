@@ -23,8 +23,8 @@ describe('Quests index page', () => {
         {
           id: 'quest-1',
           title: 'Quest One',
-          description: 'First quest description',
           goal: 'Finish the journey',
+          context: 'A multi-step adventure',
         },
       ]),
     })
@@ -36,8 +36,8 @@ describe('Quests index page', () => {
     expect(useQuestsMock).toHaveBeenCalled()
     const html = page.html()
     expect(html).toContain('Quest One')
-    expect(html).toContain('First quest description')
     expect(html).toContain('Finish the journey')
+    expect(html).toContain('A multi-step adventure')
   })
 
   it('always shows actions to create a quest', async () => {

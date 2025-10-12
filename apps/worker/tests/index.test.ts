@@ -121,7 +121,6 @@ describe('worker entrypoint', () => {
       data: {
         questId: 'quest-1',
         title: 'Quest Title',
-        description: 'Quest Description',
         goal: 'Quest Goal',
         context: 'Quest Context',
         constraints: 'Quest Constraints',

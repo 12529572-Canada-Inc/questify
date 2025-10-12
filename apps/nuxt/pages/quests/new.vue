@@ -33,10 +33,11 @@ async function submit() {
   error.value = null
 
   try {
+    const sanitizedTitle = title.value.trim()
     const res = await $fetch<CreateQuestResponse>('/api/quests', {
       method: 'POST',
       body: {
-        title: title.value,
+        title: sanitizedTitle,
         goal: goal.value,
         context: context.value,
         constraints: constraints.value,

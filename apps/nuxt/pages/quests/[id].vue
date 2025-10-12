@@ -100,18 +100,6 @@ onMounted(() => {
           </v-card-title>
           <v-card-subtitle>Status: <strong>{{ quest.status }}</strong></v-card-subtitle>
           <v-card-text class="d-flex flex-column gap-4">
-            <div>
-              <h3 class="text-subtitle-1 font-weight-medium mb-1">
-                Quest Description
-              </h3>
-              <TextWithLinks
-                class="mb-0"
-                tag="p"
-                :text="quest.description"
-                fallback="No description provided."
-              />
-            </div>
-
             <div v-if="quest.goal">
               <h3 class="text-subtitle-1 font-weight-medium mb-1">
                 Desired Outcome
@@ -144,6 +132,13 @@ onMounted(() => {
                 :text="quest.constraints"
               />
             </div>
+
+            <p
+              v-if="!quest.goal && !quest.context && !quest.constraints"
+              class="text-body-2 text-medium-emphasis mb-0"
+            >
+              No additional details provided for this quest yet.
+            </p>
           </v-card-text>
 
           <v-divider class="my-4" />

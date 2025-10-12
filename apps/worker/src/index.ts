@@ -13,11 +13,10 @@ new Worker(
   async (job) => {
     if (job.name === 'decompose') {
       console.log('Decomposing quest:', job.data);
-      const { questId, title, description, goal, context, constraints } = job.data;
+      const { questId, title, goal, context, constraints } = job.data;
 
       const promptSections = [
         `Quest Title: ${title}`,
-        description ? `Quest Description: ${description}` : null,
         goal ? `Desired Outcome: ${goal}` : null,
         context ? `Additional Context: ${context}` : null,
         constraints ? `Constraints or Preferences: ${constraints}` : null,

@@ -19,8 +19,8 @@ describe.skip('Quests/[ID] PATCH API', async () => {
       headers: { cookie },
       body: {
         title: 'Test Quest',
-        description: 'Initial quest description',
         goal: 'Finish',
+        context: 'Initial quest context',
       },
     })
     const questId = questRes.quest.id
@@ -47,8 +47,8 @@ describe.skip('Quests/[ID] PATCH API', async () => {
       headers: { cookie },
       body: {
         title: 'Owner Quest',
-        description: 'Owned quest description',
         goal: 'Win',
+        context: 'Owned quest context',
       },
     })
 

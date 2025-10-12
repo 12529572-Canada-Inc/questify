@@ -18,8 +18,8 @@ describe.skip('Quests/[ID] GET API', async () => {
       method: 'POST',
       body: {
         title: 'Test Quest',
-        description: 'Testing quest flow',
         goal: 'Complete it all',
+        context: 'Testing quest flow',
       },
     })
 
@@ -34,7 +34,7 @@ describe.skip('Quests/[ID] GET API', async () => {
     // Step 5: Assert the response
     expect(fetchedQuest).toHaveProperty('id', questId)
     expect(fetchedQuest).toHaveProperty('title', 'Test Quest')
-    expect(fetchedQuest).toHaveProperty('description', 'Testing quest flow')
     expect(fetchedQuest).toHaveProperty('goal', 'Complete it all')
+    expect(fetchedQuest).toHaveProperty('context', 'Testing quest flow')
   })
 })
