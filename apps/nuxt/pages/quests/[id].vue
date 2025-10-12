@@ -5,7 +5,7 @@ import { useQuest } from '~/composables/useQuest'
 const route = useRoute()
 const id = route.params.id as string
 
-const { data: quest, refresh, pending } = await useQuest(id)
+const { data: quest, refresh, pending, error } = await useQuest(id)
 const { user } = useUserSession()
 
 const isOwner = computed(() => {
@@ -28,6 +28,15 @@ const tasksLoading = computed(() => {
   const tasks = currentQuest.tasks ?? []
 
   return currentQuest.status === 'draft' && tasks.length === 0
+})
+
+// Error handling
+const errorType = computed(() => {
+  console.log('Error:', error.value) // Debugging line
+  if (!error.value) return null
+  if (error.value.status === 404) return 'not-found'
+  if (error.value.status === 403 || error.value.status === 401) return 'unauthorized'
+  return 'unknown'
 })
 
 async function markTaskCompleted(taskId: string) {
@@ -259,11 +268,25 @@ onMounted(() => {
         </v-card>
 
         <v-alert
-          v-else
+          v-else-if="errorType === 'not-found'"
           type="error"
           title="Quest Not Found"
         >
           This quest does not exist.
+        </v-alert>
+        <v-alert
+          v-else-if="errorType === 'unauthorized'"
+          type="error"
+          title="Unauthorized"
+        >
+          You are not authorized to view this quest.
+        </v-alert>
+        <v-alert
+          v-else
+          type="error"
+          title="Error"
+        >
+          An unexpected error occurred. Please try again later.
         </v-alert>
       </v-col>
     </v-row>
