@@ -3,6 +3,8 @@
 // This avoids tight coupling to internal Nitro / H3 types
 // and gives predictable IntelliSense during test authoring.
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 declare module '../utils/nitro' {
   /** A lightweight wrapper returned from `listhen()` */
   export interface TestListener {
@@ -25,3 +27,5 @@ declare module '../utils/nitro' {
   /** Sets up the built Nitro app and starts a listener */
   export function setupNitro(): Promise<NitroTestContext>
 }
+
+/* eslint-enable @typescript-eslint/no-explicit-any */
