@@ -22,7 +22,7 @@ pnpm store prune --force
 
 # 5. Remove & reinstall Nuxt + Nuxi
 echo "📦 Upgrading Nuxt packages..."
-pnpm up nuxt @nuxt/kit @nuxt/schema @nuxt/test-utils --filter nuxt
+pnpm up nuxt @nuxt/kit @nuxt/schema --filter nuxt
 pnpm remove nuxi --filter nuxt || true
 pnpm add -D nuxi@latest --filter nuxt
 

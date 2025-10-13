@@ -105,6 +105,9 @@ importers:
       listhen:
         specifier: ^1.9.0
         version: 1.9.0
+      nitropack:
+        specifier: ^2.12.7
+        version: 2.12.7(@vercel/blob@1.0.2)
       oxc-parser:
         specifier: 0.94.0
         version: 0.94.0
