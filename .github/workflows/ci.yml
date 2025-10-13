@@ -95,4 +95,6 @@ jobs:
                   pnpm --filter nuxt exec nuxi build
 
             - name: 🧪 Run tests
+              env:
+                  NUXT_TEST_UTILS_BUILD: true
               run: pnpm test
