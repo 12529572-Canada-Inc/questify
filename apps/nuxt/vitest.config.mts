@@ -31,8 +31,8 @@ export default defineVitestConfig({
     maxThreads: 1,
     minThreads: 1,
 
-    // Force Node environment for stability
-    environment: 'node',
+    // Set Nuxt environment for compatibility
+    environment: 'nuxt',
 
     alias: {
       '#app': path.resolve(__dirname, './.nuxt'),
