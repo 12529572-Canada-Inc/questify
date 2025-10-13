@@ -11,34 +11,36 @@ export async function setupNitro() {
   const rootDir = path.resolve(__dirname, '../..')
   const outputDir = path.join(rootDir, '.output', 'server')
 
-  // 🧱 ensure .output exists, build if missing
+  // 🧱 ensure build exists
   if (!fs.existsSync(outputDir)) {
     console.warn('⚙️  .output not found — running Nuxt build...')
     execSync('pnpm --filter nuxt build', { stdio: 'inherit' })
   }
 
-  // 🧩 locate the correct entry file dynamically
+  // 🔍 search for known Nitro entry points (covers all presets)
   const candidates = [
-    'index.mjs',
+    'server.mjs', // ✅ Vercel + Node presets (Nitro 2.12+)
+    'index.mjs', // fallback for older Nitro
     'app.mjs',
     'chunks/index.mjs',
   ].map(f => path.join(outputDir, f))
 
   const outputPath = candidates.find(f => fs.existsSync(f))
   if (!outputPath) {
-    throw new Error(`❌ Could not locate Nitro server entry in ${outputDir}`)
+    const files = fs.readdirSync(outputDir).join(', ')
+    throw new Error(`❌ Could not locate Nitro entry in ${outputDir}. Found: ${files}`)
   }
 
-  // 🧩 import Nitro handler
+  // 🧩 load Nitro handler
   const mod = await import(outputPath)
   const handler
     = mod.default?.handler || mod.handler || mod.default || mod.nitro || mod.app
 
   if (typeof handler !== 'function') {
-    throw new Error('❌ Invalid Nitro handler: expected function')
+    throw new Error('❌ Invalid Nitro handler: expected a function')
   }
 
-  // 🧩 start ephemeral listener
+  // 🧩 listen on ephemeral port
   const listener = await listen(handler, { port: 0 })
   const addr = listener.server?.address() as AddressInfo | null
   const url = listener.url || `http://localhost:${addr?.port}`
