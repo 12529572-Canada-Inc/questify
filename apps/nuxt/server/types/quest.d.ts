@@ -7,9 +7,12 @@ declare interface QuestBody {
 }
 
 declare interface CreateQuestResponse {
-  id: string
-  title: string
-  status: string
+  success: boolean
+  quest: {
+    id: string
+    title: string
+    status: string
+  }
 }
 
 declare interface QuestQueue {
