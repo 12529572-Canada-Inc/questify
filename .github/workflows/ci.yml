@@ -89,10 +89,10 @@ jobs:
             # - name: 🌱 Seed database
             #   run: pnpm --filter nuxt db:seed
 
-            - name: 🏗️ Build Nuxt test output
+            - name: 🏗️ Build Nuxt app for tests
               run: |
                   pnpm --filter nuxt dev:prepare
-                  pnpm --filter nuxt exec nuxi build --preset test
+                  pnpm --filter nuxt exec nuxi build
 
             - name: 🧪 Run tests
               run: pnpm test
