@@ -8,8 +8,6 @@ export default defineConfig({
     globals: true,
     setupFiles: [
       './vitest.setup.ts', // Prisma + dotenv bootstrap
-      './tests/setup.unit.ts', // Lightweight Nuxt runtime setup (mount, mocks)
-      './tests/setup.e2e.ts', // E2E server setup
     ],
 
     // Dependency optimizer
