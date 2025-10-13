@@ -1,4 +1,4 @@
-type QuestBody = {
+declare interface QuestBody {
   title?: string
   goal?: string | null
   context?: string | null

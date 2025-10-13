@@ -9,12 +9,12 @@ declare module 'nuxt-auth-utils' {
   }
 }
 
-type LoginBody = {
+declare interface LoginBody {
   email: string
   password: string
 }
 
-type SignupBody = {
+declare interface SignupBody {
   email: string
   password: string
   name?: string
