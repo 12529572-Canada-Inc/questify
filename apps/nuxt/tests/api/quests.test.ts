@@ -1,4 +1,3 @@
-// apps/nuxt/tests/api/quests.test.ts
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { setupNitro } from '../utils/nitro'
 
