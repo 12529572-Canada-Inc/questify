@@ -5,7 +5,7 @@ import { listen } from 'listhen'
 import type { NitroApp } from 'nitropack'
 
 // 🧱 Import the built Nitro entry (after running `pnpm build`)
-import nitroModule from '../../.output/server/index.mjs'
+import nitroModule from '../.output/server/index.mjs'
 
 let nitro: NitroApp
 let app: H3
