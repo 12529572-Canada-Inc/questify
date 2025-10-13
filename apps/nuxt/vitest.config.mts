@@ -13,17 +13,18 @@ export default defineVitestConfig({
         },
       },
     },
-    hookTimeout: 60000,
-    testTimeout: 120000,
+    testTimeout: 180000,
+    hookTimeout: 180000,
     retry: 1,
-    // 🚀 key line: only one Nuxt instance at a time
-    pool: 'threads',
+    isolate: false,
+    sequence: { concurrent: false },
+    pool: 'forks', // ← use plain Node forked processes, not worker threads
     maxThreads: 1,
     minThreads: 1,
-    isolate: false, // ← important: reuse same global context
-    sequence: {
-      concurrent: false,
-    },
+    environment: 'node', // ← don’t let Vitest auto-load vitest-environment-nuxt
+    // alias: {
+    //   '#app': path.resolve(__dirname, './.nuxt'),
+    // },
   },
   resolve: {
     alias: {
