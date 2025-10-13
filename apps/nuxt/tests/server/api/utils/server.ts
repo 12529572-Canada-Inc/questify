@@ -6,6 +6,7 @@ export async function setupServer() {
     build: true,
     server: true,
     dev: false,
-    // waitForPortTimeout: 60000,
+    // @ts-expect-error: waitForPortTimeout exists at runtime in Nuxt 4
+    waitForPortTimeout: 60000,
   })
 }
