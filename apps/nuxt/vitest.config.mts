@@ -1,26 +1,24 @@
 import { defineConfig } from 'vitest/config'
 import path from 'path'
 
+const r = (p: string) => path.resolve(__dirname, p)
+
 export default defineConfig({
   test: {
     globals: true,
-
-    // Bootstrap Prisma, dotenv, etc.
-    setupFiles: ['./vitest.setup.ts'],
-
-    // ✅ Use pure Node environment
     environment: 'node',
 
-    // Dependency optimizer: ensures shared package works with SSR
+    // 🧩 Centralized setup file (dotenv, mocks, globals, etc.)
+    setupFiles: [r('./vitest.setup.ts')],
+
+    // 🧠 Dependency optimizer ensures proper SSR behavior
     deps: {
       optimizer: {
-        ssr: {
-          include: ['shared'],
-        },
+        ssr: { include: ['shared'] },
       },
     },
 
-    // Optional: timeouts & concurrency
+    // 🕒 Timeouts & stability settings
     testTimeout: 180_000,
     hookTimeout: 180_000,
     // retry: 1,
@@ -28,26 +26,31 @@ export default defineConfig({
     // sequence: { concurrent: false },
     // pool: 'forks',
 
-    // Clean terminal output
+    // 🧹 Output clarity
     reporters: ['default'],
 
-    // Aliases for Nuxt conventions and shared package
+    // 🧭 Aliases for Nuxt conventions + shared packages
     alias: {
-      '~': path.resolve(__dirname, 'app'),
-      '@': path.resolve(__dirname, 'app'),
-      'shared': path.resolve(__dirname, '../../packages/shared/src'),
-      // 👇 Redirect Prisma imports to our mock during tests
-      '@prisma/client': path.resolve(__dirname, 'tests/mocks/prisma.ts'),
+      '~': r('app'),
+      '@': r('app'),
+      'shared': r('../../packages/shared/src'),
+
+      // 🧪 Conditionally mock Prisma (based on env)
+      ...(process.env.USE_MOCKS === 'true'
+        ? { '@prisma/client': r('tests/mocks/prisma.ts') }
+        : {}),
     },
   },
 
-  // Keep these for IDE and build tool consistency
+  // 🔄 Keep for IDE consistency
   resolve: {
     alias: {
-      '~': path.resolve(__dirname, 'app'),
-      '@': path.resolve(__dirname, 'app'),
-      'shared': path.resolve(__dirname, '../../packages/shared/src'),
-      '@prisma/client': path.resolve(__dirname, 'tests/mocks/prisma.ts'),
+      '~': r('app'),
+      '@': r('app'),
+      'shared': r('../../packages/shared/src'),
+      ...(process.env.USE_MOCKS === 'true'
+        ? { '@prisma/client': r('tests/mocks/prisma.ts') }
+        : {}),
     },
   },
 })
