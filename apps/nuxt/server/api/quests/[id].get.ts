@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import { canViewQuest } from '~/server/utils/quest-visibility'
+import { canViewQuest } from '../utils/quest-visibility'
 
 const prisma = new PrismaClient()
 
