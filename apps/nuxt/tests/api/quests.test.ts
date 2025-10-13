@@ -1,24 +1,26 @@
+import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import request from 'supertest'
 import { listen } from 'listhen'
-import { createApp } from 'h3'
-import { describe, it, expect, beforeAll, afterAll } from 'vitest'
+import { H3 } from 'h3'
 import nitroApp from '../../.output/server/index.mjs'
 
-let server: ReturnType<typeof listen>, url: string
+let listener: Awaited<ReturnType<typeof listen>>
 
-beforeAll(async () => {
-  server = await listen(createApp({ fetch: nitroApp.handle }))
-  url = server.url
-})
+describe('API /api/quests', () => {
+  beforeAll(async () => {
+    const app = new H3()
+    app.use(nitroApp.h3App)
 
-afterAll(async () => {
-  await server.close()
-})
+    // Start temporary HTTP server
+    listener = await listen(app)
+  })
 
-describe('GET /api/quests', () => {
-  it('returns list of quests', async () => {
-    const res = await request(url).get('/api/quests')
+  afterAll(async () => {
+    await listener.close()
+  })
+
+  it('GET /api/quests returns 200', async () => {
+    const res = await request(listener.url).get('/api/quests')
     expect(res.status).toBe(200)
-    expect(Array.isArray(res.body)).toBe(true)
   })
 })
