@@ -2,31 +2,28 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import request from 'supertest'
 import { H3 } from 'h3'
 import { listen } from 'listhen'
-import { createNitro } from 'nitropack'
+import { loadNitro, nitroApp } from 'nitropack/runtime'
 
-let nitro: Awaited<ReturnType<typeof createNitro>>
 let listener: Awaited<ReturnType<typeof listen>>
 
 describe('API /api/quests', () => {
   beforeAll(async () => {
-    // 🧱 1. Dynamically build the Nitro app in-memory
-    nitro = await createNitro({
+    // 🧱 Load Nitro runtime from your built output (no need for createNitro/buildNitro)
+    const nitro = await loadNitro({
       rootDir: process.cwd(),
       preset: 'node-server',
     })
-    await nitro.ready()
 
-    // 🧩 2. Create H3 app and attach Nitro handler
+    // 🧩 Create H3 app and attach Nitro’s built-in app
     const app = new H3()
-    app.use(nitro.handler)
+    app.use(nitroApp(nitro))
 
-    // 🚀 3. Start a temporary HTTP listener via listhen
-    listener = await listen(app.listener)
+    // 🚀 Start temporary HTTP listener
+    listener = await listen(app)
   })
 
   afterAll(async () => {
-    await listener.close()
-    await nitro.close()
+    if (listener) await listener.close()
   })
 
   it('GET /api/quests returns 200', async () => {
