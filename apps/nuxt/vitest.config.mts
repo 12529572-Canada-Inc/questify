@@ -36,6 +36,8 @@ export default defineConfig({
       '~': path.resolve(__dirname, 'app'),
       '@': path.resolve(__dirname, 'app'),
       'shared': path.resolve(__dirname, '../../packages/shared/src'),
+      // 👇 Redirect Prisma imports to our mock during tests
+      '@prisma/client': path.resolve(__dirname, 'tests/mocks/prisma.ts'),
     },
   },
 
@@ -45,6 +47,7 @@ export default defineConfig({
       '~': path.resolve(__dirname, 'app'),
       '@': path.resolve(__dirname, 'app'),
       'shared': path.resolve(__dirname, '../../packages/shared/src'),
+      '@prisma/client': path.resolve(__dirname, 'tests/mocks/prisma.ts'),
     },
   },
 })
