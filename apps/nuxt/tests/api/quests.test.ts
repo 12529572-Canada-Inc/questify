@@ -4,7 +4,7 @@ import { createApp } from 'h3'
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import nitroApp from '../../.output/server/index.mjs'
 
-let server: any, url: string
+let server: ReturnType<typeof listen>, url: string
 
 beforeAll(async () => {
   server = await listen(createApp({ fetch: nitroApp.handle }))
