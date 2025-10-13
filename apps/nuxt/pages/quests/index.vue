@@ -4,7 +4,7 @@ import { useQuests } from '~/composables/useQuest'
 const { data: quests } = await useQuests()
 
 // ✅ Make sure it's always an array in templates
-const questList = computed(() => Array.isArray(quests.value) ? quests.value : [])
+const questsList = computed(() => Array.isArray(quests.value) ? quests.value : [])
 </script>
 
 <template>
