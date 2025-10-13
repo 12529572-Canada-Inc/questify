@@ -21,8 +21,8 @@ export default defineConfig({
     },
 
     // Optional: timeouts & concurrency
-    // testTimeout: 180_000,
-    // hookTimeout: 180_000,
+    testTimeout: 180_000,
+    hookTimeout: 180_000,
     // retry: 1,
     // isolate: false,
     // sequence: { concurrent: false },
