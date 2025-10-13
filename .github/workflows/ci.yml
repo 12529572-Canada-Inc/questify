@@ -60,6 +60,8 @@ jobs:
               run: pnpm install --frozen-lockfile
 
             - name: 🧱 Generate Nuxt types
+              env:
+                  NITRO_PRESET: node
               run: pnpm --filter nuxt dev:prepare
 
             - name: 🧰 Build shared package
