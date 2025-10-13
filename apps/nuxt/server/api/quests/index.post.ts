@@ -5,7 +5,7 @@ const prisma = new PrismaClient()
 const handler = defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event) // 👈 forces login
 
-  const body = await readBody<QuestBody>(event)
+  const body = (await readBody<QuestBody>(event)) || {} as QuestBody
   const {
     title,
     goal,
@@ -25,7 +25,7 @@ const handler = defineEventHandler(async (event) => {
 
   // Access the queue from the event context
   // TODO: deretmine potentially better way to access this
-  const questQueue = event.context.questQueue
+  const questQueue = event.context.questQueue as QuestQueue
 
   const quest = await prisma.quest.create({
     data: {

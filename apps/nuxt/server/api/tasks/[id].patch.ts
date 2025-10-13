@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, statusText: 'You do not have permission to modify this task' })
   }
 
-  const body = await readBody<TaskBody>(event)
+  const body = (await readBody<TaskBody>(event)) || {} as TaskBody
   const status = body.status
 
   if (!status) {

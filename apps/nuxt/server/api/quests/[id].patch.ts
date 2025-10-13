@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 403, statusText: 'You do not have permission to modify this quest' })
   }
 
-  const body = await readBody<QuestBody>(event)
+  const body = (await readBody<QuestBody>(event)) || {} as QuestBody
   const status = body.status
 
   if (!status) {

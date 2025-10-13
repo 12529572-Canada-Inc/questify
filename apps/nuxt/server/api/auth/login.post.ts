@@ -4,7 +4,7 @@ import { verifyPassword } from 'shared'
 const prisma = new PrismaClient()
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody<LoginBody>(event)
+  const body = (await readBody<LoginBody>(event)) || {} as LoginBody
   const { email, password } = body
 
   const user = await prisma.user.findUnique({ where: { email } })
