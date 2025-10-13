@@ -20,6 +20,10 @@ export default defineVitestConfig({
     pool: 'threads',
     maxThreads: 1,
     minThreads: 1,
+    isolate: false, // ← important: reuse same global context
+    sequence: {
+      concurrent: false,
+    },
   },
   resolve: {
     alias: {
