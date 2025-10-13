@@ -9,6 +9,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### ⚙️ Core & Framework
+- **Nuxt 4 Upgrade**
+  - Upgraded the application from **Nuxt 3 → Nuxt 4.1.3** with **Nitro 2.12.7**, **Vite 7.1.x**, and **Vue 3.5.x**.
+  - Updated build and runtime configurations to remove deprecated APIs such as `createApp` and `toNodeListener`.
+  - Refactored internal server utilities and test helpers to align with the new **Nitro runtime API**.
+  - Verified compatibility across all packages and ensured production builds deploy successfully on **Vercel** and **Fly.io**.
+  - Cleaned up unused Nuxt 3 testing utilities (`@nuxt/test-utils`) and replaced them with a stable custom setup.
+
+---
+
+### 🧪 Tests & Infrastructure
+- **Nuxt 4 Test Harness**
+  - Added a **Vitest + Nuxt 4** test setup that runs server-route tests without relying on internal Nitro APIs.
+  - Introduced a unified `vitest.setup.ts` that:
+    - Loads `.env.test` automatically.
+    - Provides global mocks for Nitro/H3 helpers such as `defineEventHandler` and `getUserSession`.
+    - Safely initializes or skips Prisma migrate reset depending on the test mode.
+  - Refactored `vitest.config.mts` with a `USE_MOCKS` toggle to support two modes:
+    - **Mock Mode (`USE_MOCKS=true`)** → routes tested with mocked `PrismaClient` (no database).
+    - **Integration Mode (`USE_MOCKS=false`)** → runs against a real test database.
+  - Added script shortcuts `test:mock` and `test:integration` for quick switching between the two modes.
+  - Confirmed that API route tests (e.g., `/api/quests`) execute in a pure Node environment with fast, deterministic results.
+  - Established foundation for future extensions to automatically mock additional Nitro helpers (`getQuery`, `readBody`, etc.).
+
+---
+
+## [1.6.0] - 2025-10-12
+
 ### 🚀 Features
 - Simplified the quest creation form so only the title is required and optional goal/context/constraint inputs stay hidden until requested.
 
