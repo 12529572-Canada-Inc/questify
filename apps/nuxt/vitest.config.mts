@@ -15,6 +15,11 @@ export default defineVitestConfig({
     },
     hookTimeout: 60000,
     testTimeout: 120000,
+    retry: 1,
+    // 🚀 key line: only one Nuxt instance at a time
+    pool: 'threads',
+    maxThreads: 1,
+    minThreads: 1,
   },
   resolve: {
     alias: {
