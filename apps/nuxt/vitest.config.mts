@@ -1,15 +1,18 @@
-import { defineVitestConfig } from '@nuxt/test-utils/config'
+import { defineConfig } from 'vitest/config'
 import path from 'path'
 
-export default defineVitestConfig({
+// Nuxt 4 no longer needs @nuxt/test-utils.
+// We emulate minimal Nuxt env manually in vitest.setup.ts
+export default defineConfig({
   test: {
     globals: true,
     setupFiles: [
       './vitest.setup.ts', // Prisma + dotenv bootstrap
-      './tests/setup.unit.ts', // Lightweight Nuxt runtime setup
+      './tests/setup.unit.ts', // Lightweight Nuxt runtime setup (mount, mocks)
       './tests/setup.e2e.ts', // E2E server setup
     ],
 
+    // Dependency optimizer
     deps: {
       optimizer: {
         ssr: {
@@ -21,19 +24,19 @@ export default defineVitestConfig({
     testTimeout: 180_000,
     hookTimeout: 180_000,
     retry: 1,
-
-    // Prevent Nuxt from re-spawning per test
     isolate: false,
     sequence: { concurrent: false },
 
-    // Fix Vitest-Nuxt RPC issues
+    // Vitest concurrency controls
     pool: 'forks',
-    maxThreads: 1,
-    minThreads: 1,
 
-    // Set Nuxt environment for compatibility
-    environment: 'nuxt',
+    // Use "node" environment since Nuxt test-utils is gone
+    environment: 'node',
 
+    // Clean terminal output
+    reporters: ['default'],
+
+    // Aliases for Nuxt conventions and shared package
     alias: {
       '~': path.resolve(__dirname, 'app'),
       '@': path.resolve(__dirname, 'app'),
@@ -43,7 +46,9 @@ export default defineVitestConfig({
 
   resolve: {
     alias: {
-      shared: path.resolve(__dirname, '../../packages/shared/src'),
+      '~': path.resolve(__dirname, 'app'),
+      '@': path.resolve(__dirname, 'app'),
+      'shared': path.resolve(__dirname, '../../packages/shared/src'),
     },
   },
 })
