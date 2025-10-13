@@ -15,22 +15,22 @@ declare global {
   const useRouter: typeof import('vue-router')['useRouter']
 }
 
-// ✅ Nuxt-specific helpers
+// Nuxt Auth composables and H3 helpers
 declare global {
-  const useFetch: typeof import('#app')['useFetch']
-  const defineNuxtRouteMiddleware: typeof import('#app')['defineNuxtRouteMiddleware']
-  const navigateTo: typeof import('#app')['navigateTo']
-  const useUserSession: unknown
+  // --- User Session ---
+  const useUserSession: () => { user?: { id: string, email?: string, name?: string } | null }
+  const getUserSession: (event?: unknown) => Promise<{ user?: { id: string, email?: string, name?: string } | null }>
+  const setUserSession: (event?: unknown, data?: unknown) => Promise<void>
+  const clearUserSession: (event?: unknown) => Promise<void>
+  const requireUserSession: (event?: unknown) => Promise<{ user: { id: string, email?: string, name?: string } }>
+
+  // --- Nitro & H3 ---
   const defineNitroPlugin: typeof import('nitropack')['defineNitroPlugin']
   const useRuntimeConfig: typeof import('nitropack')['useRuntimeConfig']
   const defineEventHandler: typeof import('h3')['defineEventHandler']
-  const readBody: typeof import('h3')['readBody']
-  const getRouterParam: typeof import('h3')['getRouterParam']
+  const readBody: <T = unknown>(event: unknown) => Promise<T>
+  const getRouterParam: (event: unknown, name: string) => string | undefined
   const createError: typeof import('h3')['createError']
-  const getUserSession: unknown
-  const setUserSession: unknown
-  const clearUserSession: unknown
-  const requireUserSession: unknown
 }
 
 export {}
