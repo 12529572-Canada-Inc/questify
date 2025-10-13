@@ -35,8 +35,8 @@ export default defineVitestConfig({
     environment: 'nuxt',
 
     alias: {
-      '#app': path.resolve(__dirname, './.nuxt'),
-      '@': path.resolve(__dirname, './'),
+      '~': path.resolve(__dirname, 'app'),
+      '@': path.resolve(__dirname, 'app'),
       'shared': path.resolve(__dirname, '../../packages/shared/src'),
     },
   },

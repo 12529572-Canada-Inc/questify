@@ -1,10 +1,18 @@
 import { defineNuxtConfig } from 'nuxt/config'
 import type { NuxtConfig } from 'nuxt/schema'
+import path from 'path'
 
 // 🧠 Nuxt 4 Configuration — Questify (Vuetify + Auth + Redis)
 export default defineNuxtConfig({
   // ✅ Framework compatibility (locks in Nuxt 4 behavior)
   compatibilityDate: '2025-10-12',
+
+  // 🗂️ Source directory (where your app/ folder is located)
+  alias: {
+    // Point ~ and @ to new app/ directory
+    '~': path.resolve(__dirname, 'app'),
+    '@': path.resolve(__dirname, 'app'),
+  },
 
   // ⚙️ Modules
   modules: [
