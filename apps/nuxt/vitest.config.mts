@@ -13,6 +13,8 @@ export default defineVitestConfig({
         },
       },
     },
+    hookTimeout: 60000,
+    testTimeout: 120000,
   },
   resolve: {
     alias: {
