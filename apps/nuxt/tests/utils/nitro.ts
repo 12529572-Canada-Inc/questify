@@ -1,46 +1,37 @@
-import { execSync } from 'node:child_process'
-import { existsSync } from 'node:fs'
-import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import path from 'node:path'
+import { createServer } from 'node:http'
 import { listen } from 'listhen'
+import type { AddressInfo } from 'node:net'
 
-import type { NitroApp } from 'nitropack'
-
-/**
- * Bootstraps a real Nitro app for integration tests.
- * - Ensures Nuxt is built (so .output/server/index.mjs exists)
- * - Imports the built Nitro entry
- * - Returns both the Nitro instance and a live listener URL
- */
 export async function setupNitro() {
-  const rootDir = process.cwd()
-  const outputPath = join(rootDir, 'apps/nuxt/.output/server/index.mjs')
+  const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-  // 🏗 Ensure Nuxt is built
-  if (!existsSync(outputPath)) {
-    console.log('🛠  Building Nuxt before running tests...')
-    execSync('pnpm --filter nuxt build', { stdio: 'inherit' })
-  }
+  // ✅ Only one ../ up from /tests/utils
+  const outputPath = path.resolve(__dirname, '../.output/server/index.mjs')
 
-  // 🧩 Dynamically import the built Nitro module
+  // 🧩 Import built Nitro bundle
   const mod = await import(outputPath)
+  const nitro = mod.default || mod.nitro || mod.app || mod
 
-  // Support all export shapes seen across Nitro versions
-  const nitro: NitroApp
-    = (mod as any).nitro
-      || (mod as any).default?.nitro
-      || (mod as any).default
-      || (mod as any)
+  // 🧩 Use Nitro’s handler as request listener
+  const server = createServer(nitro)
 
-  // Normalize the handler reference (app vs handler)
-  const nodeHandler
-    = (nitro as any).app || (nitro as any).handler || (nitro as any).h3App?.handler
+  // ✅ Pass server's request handler to listhen
+  const listener = await listen(server.listeners('request')[0], { port: 0 })
 
-  if (!nodeHandler) {
-    throw new Error('❌ Could not find a valid Nitro handler')
+  // ✅ Derive URL safely
+  const address = listener.server?.address() as AddressInfo | null
+  const port = address?.port ?? new URL(listener.url).port
+  const url = listener.url || `http://localhost:${port}`
+
+  return {
+    nitro,
+    listener,
+    url,
+    async close() {
+      await listener.close?.()
+      server.close()
+    },
   }
-
-  // 🚀 Spin up a temporary HTTP server
-  const listener = await listen(nodeHandler, { showURL: false })
-
-  return { nitro, listener }
 }

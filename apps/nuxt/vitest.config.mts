@@ -1,16 +1,17 @@
 import { defineConfig } from 'vitest/config'
 import path from 'path'
 
-// Nuxt 4 no longer needs @nuxt/test-utils.
-// We emulate minimal Nuxt env manually in vitest.setup.ts
 export default defineConfig({
   test: {
     globals: true,
-    setupFiles: [
-      './vitest.setup.ts', // Prisma + dotenv bootstrap
-    ],
 
-    // Dependency optimizer
+    // Bootstrap Prisma, dotenv, etc.
+    setupFiles: ['./vitest.setup.ts'],
+
+    // ✅ Use pure Node environment
+    environment: 'node',
+
+    // Dependency optimizer: ensures shared package works with SSR
     deps: {
       optimizer: {
         ssr: {
@@ -19,18 +20,13 @@ export default defineConfig({
       },
     },
 
+    // Optional: timeouts & concurrency
     // testTimeout: 180_000,
     // hookTimeout: 180_000,
     // retry: 1,
     // isolate: false,
     // sequence: { concurrent: false },
-
-    // Vitest concurrency controls
     // pool: 'forks',
-
-    // Use "node" environment since Nuxt test-utils is gone
-    // environment: 'node',
-    environment: 'nuxt',
 
     // Clean terminal output
     reporters: ['default'],
@@ -43,6 +39,7 @@ export default defineConfig({
     },
   },
 
+  // Keep these for IDE and build tool consistency
   resolve: {
     alias: {
       '~': path.resolve(__dirname, 'app'),
