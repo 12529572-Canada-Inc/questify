@@ -3,8 +3,13 @@ import { setupNitro } from '../utils/nitro'
 
 let nitro: Awaited<ReturnType<typeof setupNitro>>
 
-beforeAll(async () => { nitro = await setupNitro() })
-afterAll(async () => { await nitro.close() })
+beforeAll(async () => {
+  nitro = await setupNitro()
+})
+
+afterAll(async () => {
+  await nitro.close()
+})
 
 describe('API /api/quests', () => {
   it('GET /api/quests returns 200', async () => {
