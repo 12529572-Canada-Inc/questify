@@ -9,38 +9,44 @@ import type { AddressInfo } from 'node:net'
 export async function setupNitro() {
   const __dirname = path.dirname(fileURLToPath(import.meta.url))
   const rootDir = path.resolve(__dirname, '../..')
+
+  const vercelDir = path.join(rootDir, '.vercel', 'output', 'functions', '__fallback.func')
   const outputDir = path.join(rootDir, '.output', 'server')
 
-  // 🧱 ensure build exists
-  if (!fs.existsSync(outputDir)) {
-    console.warn('⚙️  .output not found — running Nuxt build...')
+  // 🧱 Auto-build if neither folder exists
+  if (!fs.existsSync(vercelDir) && !fs.existsSync(outputDir)) {
+    console.warn('⚙️  No build output found — running Nuxt build...')
     execSync('pnpm --filter nuxt build', { stdio: 'inherit' })
   }
 
-  // 🔍 search for known Nitro entry points (covers all presets)
+  // 🧩 Discover the actual entry file
   const candidates = [
-    'server.mjs', // ✅ Vercel + Node presets (Nitro 2.12+)
-    'index.mjs', // fallback for older Nitro
-    'app.mjs',
-    'chunks/index.mjs',
-  ].map(f => path.join(outputDir, f))
+    path.join(outputDir, 'server.mjs'),
+    path.join(outputDir, 'index.mjs'),
+    path.join(outputDir, 'app.mjs'),
+    path.join(outputDir, 'chunks/index.mjs'),
+    path.join(vercelDir, 'index.mjs'), // ✅ vercel preset
+  ]
 
-  const outputPath = candidates.find(f => fs.existsSync(f))
-  if (!outputPath) {
-    const files = fs.readdirSync(outputDir).join(', ')
-    throw new Error(`❌ Could not locate Nitro entry in ${outputDir}. Found: ${files}`)
+  const entry = candidates.find(f => fs.existsSync(f))
+  if (!entry) {
+    throw new Error(
+      `❌ Could not find Nitro server entry. Checked:\n${candidates
+        .map(f => ' - ' + f)
+        .join('\n')}`,
+    )
   }
 
-  // 🧩 load Nitro handler
-  const mod = await import(outputPath)
+  // 🧩 Import Nitro handler
+  const mod = await import(entry)
   const handler
     = mod.default?.handler || mod.handler || mod.default || mod.nitro || mod.app
 
   if (typeof handler !== 'function') {
-    throw new Error('❌ Invalid Nitro handler: expected a function')
+    throw new Error('❌ Invalid Nitro handler — expected a function')
   }
 
-  // 🧩 listen on ephemeral port
+  // 🧩 Start listener
   const listener = await listen(handler, { port: 0 })
   const addr = listener.server?.address() as AddressInfo | null
   const url = listener.url || `http://localhost:${addr?.port}`
