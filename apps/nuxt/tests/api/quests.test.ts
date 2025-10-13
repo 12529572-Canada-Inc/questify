@@ -2,23 +2,28 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import request from 'supertest'
 import { H3 } from 'h3'
 import { listen } from 'listhen'
-import { loadNitro, nitroApp } from 'nitropack/runtime'
+import type { NitroApp } from 'nitropack'
 
+// 🧱 Import the built Nitro entry (after running `pnpm build`)
+import nitroModule from '../../.output/server/index.mjs'
+
+let nitro: NitroApp
+let app: H3
 let listener: Awaited<ReturnType<typeof listen>>
 
 describe('API /api/quests', () => {
   beforeAll(async () => {
-    // 🧱 Load Nitro runtime from your built output (no need for createNitro/buildNitro)
-    const nitro = await loadNitro({
-      rootDir: process.cwd(),
-      preset: 'node-server',
-    })
+    // 🧩 1. Extract the Nitro app instance from the built server
+    // Depending on how Nitro exports, it can be default or named
+    nitro = (nitroModule.default || nitroModule).nitro || nitroModule
 
-    // 🧩 Create H3 app and attach Nitro’s built-in app
-    const app = new H3()
-    app.use(nitroApp(nitro))
+    // 🧩 2. Create H3 instance and mount Nitro handler
+    app = new H3()
+    // New Nitro exports `.h3App` as the H3 application internally
+    // which contains a `.handler` property for use
+    app.use(nitro.h3App?.handler || nitro.handler)
 
-    // 🚀 Start temporary HTTP listener
+    // 🚀 3. Start an HTTP listener
     listener = await listen(app)
   })
 
