@@ -1,19 +1,20 @@
+// apps/nuxt/tests/api/quests.test.ts
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { setupNitro } from '../utils/nitro'
 
-let nitro: Awaited<ReturnType<typeof setupNitro>>
+let ctx: Awaited<ReturnType<typeof setupNitro>>
 
 beforeAll(async () => {
-  nitro = await setupNitro()
+  ctx = await setupNitro()
 })
 
 afterAll(async () => {
-  await nitro.close()
+  await ctx.close()
 })
 
 describe('API /api/quests', () => {
   it('GET /api/quests returns 200', async () => {
-    const res = await nitro.fetch('/api/quests')
+    const res = await ctx.fetch('/api/quests')
     expect(res.status).toBe(200)
   })
 })

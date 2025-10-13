@@ -5,66 +5,58 @@ import path from 'node:path'
 import fs from 'node:fs'
 
 /**
- * Creates or loads a Nitro instance for testing.
- *  - Prefers in-memory dev mode (fast)
- *  - Falls back to built bundle (.output/server/index.mjs) if present
+ * Unified Nuxt 4 / Nitro 2.12+ test harness.
+ * – Uses .output/server if built
+ * – Otherwise spins up dev-mode Nitro in-memory
  */
 export async function setupNitro() {
   const __dirname = path.dirname(fileURLToPath(import.meta.url))
   const rootDir = path.resolve(__dirname, '../..')
   const outputDir = path.resolve(rootDir, '.output/server')
-  const entryCandidates = ['index.mjs', 'server.mjs'].map(f =>
-    path.join(outputDir, f),
-  )
 
-  // ----------------------------
-  // 🧱 1. Try using the built Nitro bundle (for CI)
-  // ----------------------------
-  for (const entry of entryCandidates) {
-    if (fs.existsSync(entry)) {
-      const mod = await import(pathToFileURL(entry).href)
-      const handler = mod.default || mod.app || mod.handler || mod.nitro
-      if (!handler) throw new Error(`No default export in ${entry}`)
-      return {
-        nitro: { mode: 'production' },
-        fetch: async (url: string, init?: RequestInit) => {
-          const { request } = await import('undici')
-          const baseUrl = process.env.NUXT_PUBLIC_BASE_URL || 'http://localhost:3000'
-          return request(new URL(url, baseUrl).toString(), init)
-        },
-        async close() {
-          // no-op in built mode
-        },
-      }
+  // 1️⃣ Try using built Nitro bundle (for CI / prod smoke)
+  const builtEntry = ['index.mjs', 'server.mjs']
+    .map(f => path.join(outputDir, f))
+    .find(f => fs.existsSync(f))
+
+  if (builtEntry) {
+    const mod = await import(pathToFileURL(builtEntry).href)
+    const handler
+      = mod.default || mod.app || mod.handler || mod.nitro || mod.createApp
+    if (!handler) throw new Error(`❌ No handler export in ${builtEntry}`)
+
+    // Minimal fake fetch that proxies to running dev server if needed
+    return {
+      nitro: { mode: 'production' },
+      async fetch(url: string, init?: RequestInit) {
+        // The built bundle can’t self-serve, so use global fetch
+        const base = process.env.NUXT_TEST_BASE_URL ?? 'http://localhost:3000'
+        return fetch(new URL(url, base), init)
+      },
+      async close() {},
     }
   }
 
-  // ----------------------------
-  // ⚙️ 2. Fallback: create in-memory Nitro (fast dev test mode)
-  // ----------------------------
+  // 2️⃣ Fallback: create in-memory dev Nitro
   const nitro = await createNitro({
     rootDir,
     dev: true,
-    preset: 'node', // avoid vercel sandbox
+    preset: 'node',
   })
 
-  // prepare() replaces old .ready()
-  if (typeof (nitro as any).prepare === 'function') {
-    await (nitro as any).prepare()
+  // prepare() replaces old ready()
+  if (typeof nitro.prepare === 'function') {
+    await nitro.prepare()
   }
 
-  // Try the most stable fetch adapter available
-  let fetchFn: any
-  try {
-    const { toFetch } = await import('nitropack/runtime/internal/fetch')
-    fetchFn = toFetch(nitro.h3App)
-  }
-  catch {
-    // Fallback if API changes again
-    fetchFn = (await import('h3')).toWebRequest
-      ? (await import('h3')).toWebRequest(nitro.h3App)
-      : (url: string) => nitro.h3App.handler({ url } as any)
-  }
+  // localFetch exists in 2.12+
+  const fetchFn
+    = typeof nitro.localFetch === 'function'
+      ? nitro.localFetch.bind(nitro)
+      : (url: string, opts?: RequestInit) =>
+          Promise.reject(
+            new Error('nitro.localFetch not available on this version'),
+          )
 
   return {
     nitro,
