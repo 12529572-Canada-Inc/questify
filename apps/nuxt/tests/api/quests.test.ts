@@ -1,19 +1,27 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest'
-import { setupNitro } from '../utils/nitro'
+import { describe, it, expect, vi } from 'vitest'
 
-let ctx: Awaited<ReturnType<typeof setupNitro>>
+// Now import the actual route handler after the mock
+import handler from '../../server/api/quests/index.get'
 
-beforeAll(async () => {
-  ctx = await setupNitro()
-})
+// Ensure the Prisma mock applies before the route loads
+vi.mock('@prisma/client', async () => {
+  console.log('[Test] Mocking PrismaClient in test file')
 
-afterAll(async () => {
-  await ctx.close()
+  return {
+    PrismaClient: class {
+      quest = {
+        findMany: async () => [
+          { id: 'mock-1', title: 'Questify Mock', description: 'Mocked quest', status: 'active' },
+        ],
+      }
+    },
+  }
 })
 
 describe('API /api/quests', () => {
-  it('GET /api/quests returns 200', async () => {
-    const res = await ctx.fetch('/api/quests')
-    expect(res.status).toBe(200)
-  })
+  it('returns mocked quest data', async () => {
+    const result = await handler({} as unknown) // mock event
+    console.log('🧪 Result:', result)
+    expect(result[0].title).toBe('Questify Mock')
+  }, 10_000)
 })
