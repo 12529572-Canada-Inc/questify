@@ -19,17 +19,18 @@ export default defineConfig({
       },
     },
 
-    testTimeout: 180_000,
-    hookTimeout: 180_000,
-    retry: 1,
-    isolate: false,
-    sequence: { concurrent: false },
+    // testTimeout: 180_000,
+    // hookTimeout: 180_000,
+    // retry: 1,
+    // isolate: false,
+    // sequence: { concurrent: false },
 
     // Vitest concurrency controls
-    pool: 'forks',
+    // pool: 'forks',
 
     // Use "node" environment since Nuxt test-utils is gone
-    environment: 'node',
+    // environment: 'node',
+    environment: 'nuxt',
 
     // Clean terminal output
     reporters: ['default'],

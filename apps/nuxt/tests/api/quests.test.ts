@@ -1,27 +1,35 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import request from 'supertest'
 import { listen } from 'listhen'
+import { createNitro } from 'nitropack'
 import type { NitroApp } from 'nitropack'
-
-// 🧱 Import the built Nitro entry (after running `pnpm build`)
-import nitroModule from '../.output/server/index.mjs'
 
 let nitro: NitroApp
 let listener: Awaited<ReturnType<typeof listen>>
 
 describe('API /api/quests', () => {
   beforeAll(async () => {
-    // 🧩 1. Extract the Nitro app instance from the built server
-    // Depending on how Nitro exports, it can be default or named
-    // @ts-expect-error: Nitro module export types are not consistent between builds, so we handle both default and named exports here.
-    nitro = (nitroModule.default || nitroModule).nitro || nitroModule
+    // 🧩 Create the Nitro instance directly from your Nuxt app root
+    nitro = await createNitro({
+      rootDir: process.cwd() + '/apps/nuxt',
+      dev: true,
+      preset: 'node',
+    })
 
-    // 🚀 3. Start an HTTP listener
-    listener = await listen(nitro.handler) // Use port 0 for dynamic port assignment
+    // Ensure internal hooks & plugins are loaded
+    if (typeof (nitro as any).init === 'function') {
+      await (nitro as any).init()
+    }
+
+    // 🚀 Start a temporary server using Nitro’s internal h3App
+    listener = await listen((nitro as any).h3App)
   })
 
   afterAll(async () => {
     if (listener) await listener.close()
+    if (nitro && typeof (nitro as any).close === 'function') {
+      await (nitro as any).close()
+    }
   })
 
   it('GET /api/quests returns 200', async () => {
