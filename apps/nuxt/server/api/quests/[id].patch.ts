@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
 
   if (!id) {
-    throw createError({ status: 400, statusMessage: 'Quest id is required' })
+    throw createError({ status: 400, statusText: 'Quest id is required' })
   }
 
   const quest = await prisma.quest.findUnique({
@@ -16,24 +16,24 @@ export default defineEventHandler(async (event) => {
   })
 
   if (!quest) {
-    throw createError({ status: 404, statusMessage: 'Quest not found' })
+    throw createError({ status: 404, statusText: 'Quest not found' })
   }
 
   if (quest.ownerId !== user.id) {
-    throw createError({ status: 403, statusMessage: 'You do not have permission to modify this quest' })
+    throw createError({ status: 403, statusText: 'You do not have permission to modify this quest' })
   }
 
   const body = await readBody<QuestBody>(event)
   const status = body.status
 
   if (!status) {
-    throw createError({ status: 400, statusMessage: 'Status is required' })
+    throw createError({ status: 400, statusText: 'Status is required' })
   }
 
   const allowedStatuses = ['draft', 'active', 'completed', 'failed'] as const
 
   if (!allowedStatuses.includes(status as typeof allowedStatuses[number])) {
-    throw createError({ status: 400, statusMessage: 'Invalid quest status' })
+    throw createError({ status: 400, statusText: 'Invalid quest status' })
   }
 
   if (status === 'completed') {

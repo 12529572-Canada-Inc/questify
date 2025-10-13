@@ -9,12 +9,12 @@ export default defineEventHandler(async (event) => {
 
   const user = await prisma.user.findUnique({ where: { email } })
   if (!user) {
-    throw createError({ statusCode: 401, statusMessage: 'Invalid credentials' })
+    throw createError({ statusCode: 401, statusText: 'Invalid credentials' })
   }
 
   const ok = verifyPassword(password, user.password)
   if (!ok) {
-    throw createError({ statusCode: 401, statusMessage: 'Invalid credentials' })
+    throw createError({ statusCode: 401, statusText: 'Invalid credentials' })
   }
 
   // set session

@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
 
   const existing = await prisma.user.findUnique({ where: { email } })
   if (existing) {
-    throw createError({ statusCode: 409, statusMessage: 'User already exists' })
+    throw createError({ statusCode: 409, statusText: 'User already exists' })
   }
 
   const hashed = hashPassword(password)

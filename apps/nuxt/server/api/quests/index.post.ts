@@ -14,7 +14,7 @@ const handler = defineEventHandler(async (event) => {
   } = body
 
   if (typeof title !== 'string' || title.trim().length === 0) {
-    throw createError({ status: 400, statusMessage: 'Title is required' })
+    throw createError({ status: 400, statusText: 'Title is required' })
   }
 
   const sanitizeOptionalField = (value: unknown) => {
