@@ -27,6 +27,7 @@ jobs:
                     --health-interval=10s
                     --health-timeout=5s
                     --health-retries=5
+
             redis:
                 image: redis:7
                 ports:
@@ -44,52 +45,67 @@ jobs:
             NODE_ENV: test
 
         steps:
-            - name: Checkout repo
+            - name: 🧾 Checkout repo
               uses: actions/checkout@v4
 
-            - name: Setup Node.js
+            - name: 🧩 Setup Node.js
               uses: actions/setup-node@v4
               with:
                   node-version: 20
 
-            - name: Enable Corepack (for pnpm)
+            - name: ⚙️ Enable Corepack (for pnpm)
               run: corepack enable
 
-            - name: Install pnpm dependencies
+            - name: 📦 Install pnpm dependencies
               run: pnpm install --frozen-lockfile
 
-            - name: Generate Nuxt types
+            - name: 🧱 Generate Nuxt types
+              env:
+                  NITRO_PRESET: node
               run: pnpm --filter nuxt dev:prepare
 
-            - name: Build shared package
+            - name: 🧰 Build shared package
               run: pnpm --filter shared build
 
-            - name: Lint types
+            - name: 🧩 Lint types
               run: pnpm --filter nuxt lint:types
 
-            - name: Lint
+            - name: 🧹 Lint
               run: pnpm lint
 
-            - name: Wait for Postgres
+            - name: ⏳ Wait for Postgres
               run: |
                   until pg_isready -h localhost -p 5432 -U postgres; do
                     echo "Waiting for Postgres..."
                     sleep 2
                   done
 
-            - name: Generate Prisma Client
+            - name: 🧬 Generate Prisma Client
               run: pnpm prisma:generate
 
-            - name: Deploy Prisma Migrations
+            - name: 🧩 Deploy Prisma Migrations
               working-directory: packages/prisma
               run: pnpm run deploy
 
-            # - name: Seed database (optional, if you need test fixtures)
+            # Optional: seed data for tests
+            # - name: 🌱 Seed database
             #   run: pnpm --filter nuxt db:seed
 
-            - name: Build apps
-              if: github.ref == 'refs/heads/develop'
-              run: pnpm build
+            - name: 🏗️ Build Nuxt app for tests
+              run: |
+                  pnpm --filter nuxt dev:prepare
+                  pnpm --filter nuxt exec nuxi build
 
-            - name: Test
+            - name: 🧪 Run tests
+              env:
+                  NUXT_TEST_UTILS_BUILD: true
               run: pnpm test
+
+            - name: 💾 Cache Nuxt build
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      apps/nuxt/.nuxt
+                  key: ${{ runner.os }}-nuxt-${{ hashFiles('apps/nuxt/package.json', 'pnpm-lock.yaml') }}
+                  restore-keys: |
+                      ${{ runner.os }}-nuxt-

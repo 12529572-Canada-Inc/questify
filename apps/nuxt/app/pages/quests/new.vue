@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { CreateQuestResponse } from '~/server/api/quests/index.post'
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
