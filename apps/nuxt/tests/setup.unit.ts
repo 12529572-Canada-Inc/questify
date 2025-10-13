@@ -1,6 +1,6 @@
-import { setupTest } from '@nuxt/test-utils/runtime'
+import { setup } from '@nuxt/test-utils'
 
 // Creates a Nuxt app context for mountSuspended(), composables, etc.
-setupTest({
+setup({
   server: false,
 })

@@ -1,11 +1,11 @@
-import { setup } from '@nuxt/test-utils/e2e'
+import { setup } from '@nuxt/test-utils'
 
-// One shared Nuxt build/server for all API + page tests
+// Shared Nuxt build/server for all E2E + API tests
 await setup({
   rootDir: process.cwd(),
   build: true,
   server: true,
-  testDir: '.nuxt/test', // fixed test output dir (avoids index.mjs errors)
-  waitForPortTimeout: 120_000, // prevent GetPortError timeouts
-  browser: false, // run headless, not in browser
+  browser: false,
+  testDir: '.nuxt/test', // stable output dir to avoid missing index.mjs
+  setupTimeout: 120_000, // replaces waitForPortTimeout
 })
