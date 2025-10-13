@@ -1,17 +1,15 @@
-// apps/nuxt/vitest.setup.ts
-import { vi } from 'vitest'
+import { beforeAll } from 'vitest'
 import { config } from 'dotenv'
+import { execSync } from 'node:child_process'
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 
 // ------------------------------------------------------
-// 1️⃣ Load .env.test (but avoid real DB calls later)
+// 1️⃣ Load environment for tests
 // ------------------------------------------------------
 config({ path: '.env.test' })
 
-// ------------------------------------------------------
-// 2️⃣ Create dummy .nuxt/tsconfig.json if missing
-// ------------------------------------------------------
+// Ensure Nuxt’s generated .nuxt/tsconfig exists
 const nuxtTsconfigPath = resolve(process.cwd(), '.nuxt/tsconfig.json')
 if (!existsSync(nuxtTsconfigPath)) {
   mkdirSync(dirname(nuxtTsconfigPath), { recursive: true })
@@ -22,48 +20,36 @@ if (!existsSync(nuxtTsconfigPath)) {
 }
 
 // ------------------------------------------------------
-// 3️⃣ Mock Prisma globally (critical for Nitro server)
+// 2️⃣ Mock Nitro globals so API handlers run directly
 // ------------------------------------------------------
-vi.mock('@prisma/client', async () => {
-  console.log('[Vitest] 🔄 Mocking @prisma/client (no DB connection)')
+if (!globalThis.defineEventHandler) {
+  globalThis.defineEventHandler = (fn: unknown) => fn
+}
 
-  // Return a fake PrismaClient that resolves immediately
-  return {
-    PrismaClient: class {
-      quest = {
-        findMany: async () => [
-          {
-            id: 'mock-quest-1',
-            title: 'Mock Quest',
-            description: 'Mocked quest data from vitest.setup.ts',
-            status: 'active',
-            createdAt: new Date().toISOString(),
-          },
-        ],
-      }
-
-      // Optional for handlers that call disconnect()
-      async $disconnect() {
-        console.log('[Vitest] Prisma mock disconnected')
-      }
-    },
-  }
-})
+if (!globalThis.getUserSession) {
+  globalThis.getUserSession = async () => ({
+    user: { id: 'mock-user-1', name: 'Mock Tester' },
+  })
+}
 
 // ------------------------------------------------------
-// 4️⃣ Skip actual DB reset (optional safety)
+// 3️⃣ Reset database (only in integration mode)
 // ------------------------------------------------------
-// You can leave this commented out to prevent resetting real DB
-/*
 beforeAll(() => {
+  if (process.env.USE_MOCKS === 'true') {
+    console.log('[vitest.setup] Running in MOCK mode (no DB reset)')
+    return
+  }
+
   try {
+    console.log('[vitest.setup] Resetting Prisma test database...')
     execSync('pnpm --filter nuxt prisma migrate reset --force --skip-generate', {
       stdio: 'ignore',
       env: { ...process.env },
       timeout: 5_000,
     })
-  } catch (error) {
-    console.warn('[vitest.setup] Skipping Prisma migrate reset:', (error as Error).message)
+  }
+  catch (error) {
+    console.warn('[vitest.setup] Skipping Prisma reset:', (error as Error).message)
   }
 })
-*/
