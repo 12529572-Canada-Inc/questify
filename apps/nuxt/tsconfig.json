@@ -25,6 +25,8 @@
     "server",
     "tests",
     "nuxt.config.ts",
+    ".nuxt",
+    "vite.config.ts",
   ],
   "exclude": ["node_modules", "dist", ".output"]
 }

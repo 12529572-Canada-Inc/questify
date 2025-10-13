@@ -5,3 +5,9 @@ declare interface QuestBody {
   constraints?: string | null
   status?: 'draft' | 'active' | 'completed' | 'failed'
 }
+
+declare interface CreateQuestResponse {
+  id: string
+  title: string
+  status: string
+}

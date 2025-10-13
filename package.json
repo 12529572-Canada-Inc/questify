@@ -11,6 +11,7 @@
     "lint": "pnpm lint:nuxt && pnpm lint:worker",
     "lint:nuxt": "pnpm --filter nuxt lint",
     "lint:worker": "pnpm --filter worker lint",
+    "nuxt:clean": "pnpm --filter nuxt clean",
     "nuxt:info": "pnpm --filter nuxt dlx nuxi info",
     "nuxt:prepare": "pnpm --filter nuxt exec nuxi prepare",
     "nuxt:upgrade": "bash ./scripts/upgrade-nuxt.sh",
