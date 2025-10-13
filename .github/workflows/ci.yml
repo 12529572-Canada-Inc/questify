@@ -98,3 +98,12 @@ jobs:
               env:
                   NUXT_TEST_UTILS_BUILD: true
               run: pnpm test
+
+            - name: 💾 Cache Nuxt build
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      apps/nuxt/.nuxt
+                  key: ${{ runner.os }}-nuxt-${{ hashFiles('apps/nuxt/package.json', 'pnpm-lock.yaml') }}
+                  restore-keys: |
+                      ${{ runner.os }}-nuxt-
