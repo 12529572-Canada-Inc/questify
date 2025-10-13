@@ -14,7 +14,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Upgraded the application from **Nuxt 3 → Nuxt 4.1.3** with **Nitro 2.12.7**, **Vite 7.1.x**, and **Vue 3.5.x**.
   - Updated build and runtime configurations to remove deprecated APIs such as `createApp` and `toNodeListener`.
   - Refactored internal server utilities and test helpers to align with the new **Nitro runtime API**.
-  - Verified compatibility across all packages and ensured production builds deploy successfully on **Vercel** and **Fly.io**.
   - Cleaned up unused Nuxt 3 testing utilities (`@nuxt/test-utils`) and replaced them with a stable custom setup.
 
 ---
