@@ -28,7 +28,7 @@ declare global {
 // ----------------------------------------------------
 declare global {
   interface UserSession {
-    user: { id: string, email?: string, name?: string } | null
+    user: Ref<{ id: string, email?: string, name?: string } | null>
     loggedIn: Ref<boolean>
     fetch: () => Promise<{ user?: { id: string, email?: string, name?: string } }>
     clear: () => Promise<void>
