@@ -3,9 +3,13 @@ import path from 'path'
 
 export default defineVitestConfig({
   test: {
-    environment: 'nuxt',
     globals: true,
-    setupFiles: ['./vitest.setup.ts'],
+    setupFiles: [
+      './vitest.setup.ts', // Prisma + dotenv bootstrap
+      './tests/setup.unit.ts', // Lightweight Nuxt runtime setup
+      './tests/setup.e2e.ts', // E2E server setup
+    ],
+
     deps: {
       optimizer: {
         ssr: {
@@ -13,19 +17,30 @@ export default defineVitestConfig({
         },
       },
     },
-    testTimeout: 180000,
-    hookTimeout: 180000,
+
+    testTimeout: 180_000,
+    hookTimeout: 180_000,
     retry: 1,
+
+    // Prevent Nuxt from re-spawning per test
     isolate: false,
     sequence: { concurrent: false },
-    pool: 'forks', // ← use plain Node forked processes, not worker threads
+
+    // Fix Vitest-Nuxt RPC issues
+    pool: 'forks',
     maxThreads: 1,
     minThreads: 1,
-    environment: 'node', // ← don’t let Vitest auto-load vitest-environment-nuxt
-    // alias: {
-    //   '#app': path.resolve(__dirname, './.nuxt'),
-    // },
+
+    // Force Node environment for stability
+    environment: 'node',
+
+    alias: {
+      '#app': path.resolve(__dirname, './.nuxt'),
+      '@': path.resolve(__dirname, './'),
+      'shared': path.resolve(__dirname, '../../packages/shared/src'),
+    },
   },
+
   resolve: {
     alias: {
       shared: path.resolve(__dirname, '../../packages/shared/src'),
