@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
 
   if (!id) {
-    throw createError({ statusCode: 400, statusMessage: 'Quest id is required' })
+    throw createError({ status: 400, statusMessage: 'Quest id is required' })
   }
 
   const session = await getUserSession(event)

@@ -8,3 +8,14 @@ declare module 'nuxt-auth-utils' {
     user: User
   }
 }
+
+type LoginBody = {
+  email: string
+  password: string
+}
+
+type SignupBody = {
+  email: string
+  password: string
+  name?: string
+}

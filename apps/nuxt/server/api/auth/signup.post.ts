@@ -4,7 +4,7 @@ import { hashPassword } from 'shared'
 const prisma = new PrismaClient()
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event)
+  const body = await readBody<SignupBody>(event)
   const { email, password, name } = body
 
   const existing = await prisma.user.findUnique({ where: { email } })

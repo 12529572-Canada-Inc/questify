@@ -5,7 +5,7 @@ const prisma = new PrismaClient()
 const handler = defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event) // 👈 forces login
 
-  const body = await readBody(event)
+  const body = await readBody<QuestBody>(event)
   const {
     title,
     goal,
@@ -14,7 +14,7 @@ const handler = defineEventHandler(async (event) => {
   } = body
 
   if (typeof title !== 'string' || title.trim().length === 0) {
-    throw createError({ statusCode: 400, statusMessage: 'Title is required' })
+    throw createError({ status: 400, statusMessage: 'Title is required' })
   }
 
   const sanitizeOptionalField = (value: unknown) => {
