@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const router = useRouter()
+
 const name = ref('')
 const email = ref('')
 const password = ref('')
@@ -28,72 +30,50 @@ async function submit() {
       method: 'POST',
       body: { email: email.value, password: password.value, name: name.value },
     })
-    // Redirect to quest list after successful signup
-    await useRouter().push('/quests')
+    await router.push('/quests')
   }
   catch (e) {
     error.value = e instanceof Error ? e.message : 'Signup failed'
+  }
+  finally {
+    loading.value = false
   }
 }
 </script>
 
 <template>
-  <v-container class="d-flex justify-center">
-    <v-card
-      class="pa-6"
-      max-width="400"
-    >
-      <v-card-title>Sign Up</v-card-title>
-      <v-form
-        v-model="valid"
-        @submit.prevent="submit"
-      >
-        <v-text-field
-          v-model="name"
-          label="Name"
-          required
-          class="mb-2"
-          :rules="rules.name"
-        />
-        <v-text-field
-          v-model="email"
-          label="Email"
-          required
-          class="mb-2"
-          :rules="rules.email"
-        />
-        <v-text-field
-          v-model="password"
-          type="password"
-          label="Password"
-          required
-          class="mb-2"
-          :rules="rules.password"
-        />
-        <v-btn
-          type="submit"
-          color="success"
-          block
-          class="mt-4 mb-2"
-          :loading="loading"
-          :disabled="!valid || loading"
-        >
-          Create Account
-        </v-btn>
-        <v-btn
-          variant="text"
-          to="/auth/login"
-        >
-          Already have an account? Log in
-        </v-btn>
-        <v-alert
-          v-if="error"
-          type="error"
-          class="mt-2"
-        >
-          {{ error }}
-        </v-alert>
-      </v-form>
-    </v-card>
-  </v-container>
+  <AuthFormCard
+    v-model:valid="valid"
+    title="Sign Up"
+    submit-label="Create Account"
+    submit-color="success"
+    :loading="loading"
+    :error="error"
+    switch-label="Already have an account? Log in"
+    switch-to="/auth/login"
+    @submit="submit"
+  >
+    <v-text-field
+      v-model="name"
+      label="Name"
+      required
+      class="mb-2"
+      :rules="rules.name"
+    />
+    <v-text-field
+      v-model="email"
+      label="Email"
+      required
+      class="mb-2"
+      :rules="rules.email"
+    />
+    <v-text-field
+      v-model="password"
+      type="password"
+      label="Password"
+      required
+      class="mb-2"
+      :rules="rules.password"
+    />
+  </AuthFormCard>
 </template>

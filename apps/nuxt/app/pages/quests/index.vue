@@ -39,42 +39,7 @@ const questsList = computed(() => Array.isArray(quests.value) ? quests.value : [
         <v-card>
           <v-card-title>{{ quest.title }}</v-card-title>
           <v-card-text class="d-flex flex-column gap-2">
-            <TextWithLinks
-              v-if="!quest.goal && !quest.context && !quest.constraints"
-              class="mb-0"
-              tag="p"
-              text="No additional details provided."
-            />
-            <p
-              v-if="quest.goal"
-              class="text-body-2 text-medium-emphasis mb-0"
-            >
-              <strong>Goal:</strong>
-              <TextWithLinks
-                tag="span"
-                :text="quest.goal"
-              />
-            </p>
-            <p
-              v-if="quest.context"
-              class="text-body-2 text-medium-emphasis mb-0"
-            >
-              <strong>Context:</strong>
-              <TextWithLinks
-                tag="span"
-                :text="quest.context"
-              />
-            </p>
-            <p
-              v-if="quest.constraints"
-              class="text-body-2 text-medium-emphasis mb-0"
-            >
-              <strong>Constraints:</strong>
-              <TextWithLinks
-                tag="span"
-                :text="quest.constraints"
-              />
-            </p>
+            <QuestDetailsSummary :quest="quest" />
           </v-card-text>
           <v-card-actions>
             <v-btn :to="`/quests/${quest.id}`">
