@@ -2,11 +2,8 @@ import { defineNuxtConfig } from 'nuxt/config'
 import type { NuxtConfig } from 'nuxt/schema'
 import path from 'path'
 
-// 🧠 Nuxt 4 Configuration — Questify (Vuetify + Auth + Redis)
+// 🧠 Nuxt 4 Configuration — Questify
 export default defineNuxtConfig({
-  // 👇 Force the Nuxt root to be this app
-//   srcDir: 'app/',
-//   rootDir: __dirname,
   // ✅ Framework compatibility (locks in Nuxt 4 behavior)
   compatibilityDate: '2025-10-12',
 
@@ -24,12 +21,6 @@ export default defineNuxtConfig({
     'nuxt-auth-utils',
   ],
 
-  // 🔍 Auto-imports
-  //   imports: {
-  //     autoImport: true,
-  //     dirs: ['composables', 'middleware', 'utils'],
-  //   },
-
   // 🌐 App metadata and head configuration
   app: {
     head: {
@@ -39,16 +30,6 @@ export default defineNuxtConfig({
         { rel: 'icon', type: 'image/png', href: '/favicon.png' },
       ],
     },
-  },
-
-  // 🧱 Auto-register components from the components/ directory
-  components: {
-    dirs: [
-      {
-        path: '~/app/components',
-        pathPrefix: false, // allows <QuestList> instead of <AppComponentsQuestList>
-      },
-    ],
   },
 
   // 🧩 Runtime configuration
