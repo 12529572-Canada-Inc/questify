@@ -193,79 +193,126 @@ onMounted(() => {
             </div>
             <template v-else>
               <template v-if="hasTasks">
-                <v-list>
-                  <template v-if="todoTasks.length">
-                    <v-list-subheader class="text-uppercase text-body-2 text-medium-emphasis">
+                <div class="d-flex flex-column gap-4">
+                  <v-card
+                    v-if="todoTasks.length"
+                    variant="tonal"
+                    color="primary"
+                    class="elevation-0"
+                  >
+                    <v-card-title class="text-subtitle-1 font-weight-medium">
                       To Do
-                    </v-list-subheader>
-                    <v-list-item
-                      v-for="task in todoTasks"
-                      :key="task.id"
+                    </v-card-title>
+                    <v-divider />
+                    <v-list
+                      lines="three"
+                      density="comfortable"
+                      class="py-0"
                     >
-                      <v-list-item-title>{{ task.title }}</v-list-item-title>
-                      <TextWithLinks
-                        v-if="task.details"
-                        class="text-body-2"
-                        tag="div"
-                        :text="task.details"
-                      />
-                      <v-list-item-subtitle>Status: {{ task.status }}</v-list-item-subtitle>
-                      <v-list-item-action>
-                        <template v-if="isOwner">
+                      <v-list-item
+                        v-for="task in todoTasks"
+                        :key="task.id"
+                        class="py-3"
+                      >
+                        <template #title>
+                          <span class="text-body-1 font-weight-medium">
+                            {{ task.title }}
+                          </span>
+                        </template>
+                        <template #subtitle>
+                          <div
+                            class="d-flex flex-column"
+                            style="gap: 4px;"
+                          >
+                            <TextWithLinks
+                              v-if="task.details"
+                              class="text-body-2"
+                              tag="div"
+                              :text="task.details"
+                            />
+                            <span class="text-body-2 text-medium-emphasis">
+                              Status: {{ task.status }}
+                            </span>
+                          </div>
+                        </template>
+                        <template #append>
                           <v-btn
+                            v-if="isOwner"
                             size="small"
                             color="success"
+                            variant="text"
                             @click="markTaskCompleted(task.id)"
                           >
                             Complete
                           </v-btn>
                         </template>
-                      </v-list-item-action>
-                    </v-list-item>
-                  </template>
+                      </v-list-item>
+                    </v-list>
+                  </v-card>
 
-                  <template v-if="completedTasks.length">
-                    <v-divider class="my-3" />
-                    <v-list-subheader class="text-uppercase text-body-2 text-medium-emphasis">
+                  <v-card
+                    v-if="completedTasks.length"
+                    variant="tonal"
+                    color="success"
+                    class="elevation-0"
+                  >
+                    <v-card-title class="text-subtitle-1 font-weight-medium">
                       Completed
-                    </v-list-subheader>
-                    <v-list-item
-                      v-for="task in completedTasks"
-                      :key="task.id"
+                    </v-card-title>
+                    <v-divider />
+                    <v-list
+                      lines="three"
+                      density="comfortable"
+                      class="py-0"
                     >
-                      <v-list-item-title
-                        class="text-medium-emphasis"
-                        style="text-decoration: line-through;"
+                      <v-list-item
+                        v-for="task in completedTasks"
+                        :key="task.id"
+                        class="py-3"
                       >
-                        {{ task.title }}
-                      </v-list-item-title>
-                      <TextWithLinks
-                        v-if="task.details"
-                        class="text-body-2 text-medium-emphasis"
-                        style="text-decoration: line-through;"
-                        tag="div"
-                        :text="task.details"
-                      />
-                      <v-list-item-subtitle
-                        class="text-medium-emphasis"
-                        style="text-decoration: line-through;"
-                      >
-                        Status: {{ task.status }}
-                      </v-list-item-subtitle>
-                      <v-list-item-action>
-                        <template v-if="isOwner">
+                        <template #title>
+                          <span
+                            class="text-body-1 font-weight-medium text-medium-emphasis"
+                            style="text-decoration: line-through;"
+                          >
+                            {{ task.title }}
+                          </span>
+                        </template>
+                        <template #subtitle>
+                          <div
+                            class="d-flex flex-column"
+                            style="gap: 4px;"
+                          >
+                            <TextWithLinks
+                              v-if="task.details"
+                              class="text-body-2 text-medium-emphasis"
+                              style="text-decoration: line-through;"
+                              tag="div"
+                              :text="task.details"
+                            />
+                            <span
+                              class="text-body-2 text-medium-emphasis"
+                              style="text-decoration: line-through;"
+                            >
+                              Status: {{ task.status }}
+                            </span>
+                          </div>
+                        </template>
+                        <template #append>
                           <v-btn
+                            v-if="isOwner"
                             size="small"
                             color="warning"
+                            variant="text"
                             @click="markTaskIncomplete(task.id)"
                           >
                             Mark Incomplete
                           </v-btn>
                         </template>
-                      </v-list-item-action>
-                    </v-list-item>
-                  </template>
-                </v-list>
+                      </v-list-item>
+                    </v-list>
+                  </v-card>
+                </div>
               </template>
               <p
                 v-else
