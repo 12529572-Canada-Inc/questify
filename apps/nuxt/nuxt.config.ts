@@ -4,6 +4,9 @@ import path from 'path'
 
 // 🧠 Nuxt 4 Configuration — Questify (Vuetify + Auth + Redis)
 export default defineNuxtConfig({
+  // 👇 Force the Nuxt root to be this app
+//   srcDir: 'app/',
+//   rootDir: __dirname,
   // ✅ Framework compatibility (locks in Nuxt 4 behavior)
   compatibilityDate: '2025-10-12',
 
@@ -21,10 +24,11 @@ export default defineNuxtConfig({
     'nuxt-auth-utils',
   ],
 
-  // 🔍 Auto-imports (middleware, composables, utils, etc.)
-  imports: {
-    dirs: ['middleware'],
-  },
+  // 🔍 Auto-imports
+  //   imports: {
+  //     autoImport: true,
+  //     dirs: ['composables', 'middleware', 'utils'],
+  //   },
 
   // 🌐 App metadata and head configuration
   app: {

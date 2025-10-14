@@ -26,8 +26,15 @@
     "server",
     "tests",
     "nuxt.config.ts",
-    ".nuxt",
     "vite.config.ts",
+    // 👇 Explicitly pull in Nuxt’s generated declarations
+    ".nuxt",
+    ".nuxt/imports.d.ts",
+    ".nuxt/nuxt.d.ts"
   ],
-  "exclude": ["node_modules", "dist", ".output"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    ".output"
+  ]
 }

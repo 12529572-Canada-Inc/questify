@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { useQuestDetails } from '~/composables/useQuestDetails'
-
 const props = defineProps<{
   quest: Partial<Record<'goal' | 'context' | 'constraints', string | null>> | null
   fallbackMessage?: string
