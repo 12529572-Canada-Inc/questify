@@ -16,6 +16,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Refactored internal server utilities and test helpers to align with the new **Nitro runtime API**.
   - Cleaned up unused Nuxt 3 testing utilities (`@nuxt/test-utils`) and replaced them with a stable custom setup.
 
+### 🛠 Fixes & Improvements
+- **Quest Details Display**
+    - Improved quest details view with clearer messaging and layout.
+- **Quest List Rendering**
+    - Quest lists now support link parsing for embedded URLs. 
+- **URL Parsing**
+    - Enhanced URL parsing to handle balanced closing punctuation and strip trailing punctuation from text links.
+
 ---
 
 ### 🧪 Tests & Infrastructure
