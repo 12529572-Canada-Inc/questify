@@ -33,7 +33,7 @@ export function useQuestDetails(
     }
 
     return (['goal', 'context', 'constraints'] as QuestDetailKey[])
-      .map(key => {
+      .map((key) => {
         const text = value[key]?.trim() ?? ''
         return {
           key,
