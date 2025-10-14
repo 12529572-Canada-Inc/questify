@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useIntervalFn } from '@vueuse/core'
+import type { Task } from '@prisma/client'
 import { useQuest } from '~/composables/useQuest'
 
 const route = useRoute()
@@ -31,7 +32,7 @@ const tasksLoading = computed(() => {
   return questData.value.status === 'draft' && tasks.length === 0
 })
 
-const allTasks = computed(() => questData.value?.tasks ?? [])
+const allTasks = computed<Task[]>(() => questData.value?.tasks ?? [])
 const todoTasks = computed(() =>
   allTasks.value.filter(task => task.status !== 'completed'),
 )
@@ -109,6 +110,35 @@ async function reopenQuest() {
   })
   await refresh()
 }
+
+const taskSections = computed(() => [
+  {
+    value: 'todo' as const,
+    title: 'To Do',
+    color: 'primary',
+    emptyMessage: 'All tasks are completed!',
+    tasks: todoTasks.value,
+    completed: false,
+    action: {
+      label: 'Complete',
+      color: 'success',
+      handler: markTaskCompleted,
+    },
+  },
+  {
+    value: 'completed' as const,
+    title: 'Completed',
+    color: 'success',
+    emptyMessage: 'No tasks have been completed yet.',
+    tasks: completedTasks.value,
+    completed: true,
+    action: {
+      label: 'Mark Incomplete',
+      color: 'warning',
+      handler: markTaskIncomplete,
+    },
+  },
+])
 
 onMounted(() => {
   const { pause, resume } = useIntervalFn(() => {
@@ -208,111 +238,49 @@ onMounted(() => {
                   density="comfortable"
                   color="primary"
                 >
-                  <v-tab value="todo">
-                    To Do ({{ todoTasks.length }})
-                  </v-tab>
-                  <v-tab value="completed">
-                    Completed ({{ completedTasks.length }})
+                  <v-tab
+                    v-for="section in taskSections"
+                    :key="section.value"
+                    :value="section.value"
+                  >
+                    {{ section.title }} ({{ section.tasks.length }})
                   </v-tab>
                 </v-tabs>
 
-                <v-window
+                <v-tabs-window
                   v-model="taskTab"
                   class="mt-4"
                 >
-                  <v-window-item value="todo">
+                  <v-tabs-window-item
+                    v-for="section in taskSections"
+                    :key="section.value"
+                    :value="section.value"
+                  >
                     <v-card
                       variant="tonal"
-                      color="primary"
+                      :color="section.color"
                       class="elevation-0"
                     >
                       <v-card-title class="text-subtitle-1 font-weight-medium">
-                        To Do
+                        {{ section.title }}
                       </v-card-title>
                       <v-divider />
                       <div class="pa-4 pt-0">
-                        <template v-if="todoTasks.length">
+                        <template v-if="section.tasks.length">
                           <v-list
                             lines="three"
                             density="comfortable"
                             class="py-0"
                           >
                             <v-list-item
-                              v-for="task in todoTasks"
-                              :key="task.id"
-                              class="py-3"
-                            >
-                              <template #title>
-                                <span class="text-body-1 font-weight-medium">
-                                  {{ task.title }}
-                                </span>
-                              </template>
-                              <template #subtitle>
-                                <div
-                                  class="d-flex flex-column"
-                                  style="gap: 4px;"
-                                >
-                                  <TextWithLinks
-                                    v-if="task.details"
-                                    class="text-body-2"
-                                    tag="div"
-                                    :text="task.details"
-                                  />
-                                  <span class="text-body-2 text-medium-emphasis">
-                                    Status: {{ task.status }}
-                                  </span>
-                                </div>
-                              </template>
-                              <template #append>
-                                <v-btn
-                                  v-if="isOwner"
-                                  size="small"
-                                  color="success"
-                                  variant="text"
-                                  @click="markTaskCompleted(task.id)"
-                                >
-                                  Complete
-                                </v-btn>
-                              </template>
-                            </v-list-item>
-                          </v-list>
-                        </template>
-                        <p
-                          v-else
-                          class="text-body-2 text-medium-emphasis mb-0"
-                        >
-                          All tasks are completed!
-                        </p>
-                      </div>
-                    </v-card>
-                  </v-window-item>
-
-                  <v-window-item value="completed">
-                    <v-card
-                      variant="tonal"
-                      color="success"
-                      class="elevation-0"
-                    >
-                      <v-card-title class="text-subtitle-1 font-weight-medium">
-                        Completed
-                      </v-card-title>
-                      <v-divider />
-                      <div class="pa-4 pt-0">
-                        <template v-if="completedTasks.length">
-                          <v-list
-                            lines="three"
-                            density="comfortable"
-                            class="py-0"
-                          >
-                            <v-list-item
-                              v-for="task in completedTasks"
+                              v-for="task in section.tasks"
                               :key="task.id"
                               class="py-3"
                             >
                               <template #title>
                                 <span
-                                  class="text-body-1 font-weight-medium text-medium-emphasis"
-                                  style="text-decoration: line-through;"
+                                  class="text-body-1 font-weight-medium"
+                                  :class="section.completed ? ['text-medium-emphasis', 'task--completed'] : []"
                                 >
                                   {{ task.title }}
                                 </span>
@@ -324,14 +292,13 @@ onMounted(() => {
                                 >
                                   <TextWithLinks
                                     v-if="task.details"
-                                    class="text-body-2 text-medium-emphasis"
-                                    style="text-decoration: line-through;"
+                                    :class="section.completed ? 'text-body-2 text-medium-emphasis task--completed' : 'text-body-2'"
                                     tag="div"
                                     :text="task.details"
                                   />
                                   <span
-                                    class="text-body-2 text-medium-emphasis"
-                                    style="text-decoration: line-through;"
+                                    class="text-body-2"
+                                    :class="section.completed ? ['text-medium-emphasis', 'task--completed'] : 'text-medium-emphasis'"
                                   >
                                     Status: {{ task.status }}
                                   </span>
@@ -341,11 +308,11 @@ onMounted(() => {
                                 <v-btn
                                   v-if="isOwner"
                                   size="small"
-                                  color="warning"
+                                  :color="section.action.color"
                                   variant="text"
-                                  @click="markTaskIncomplete(task.id)"
+                                  @click="section.action.handler(task.id)"
                                 >
-                                  Mark Incomplete
+                                  {{ section.action.label }}
                                 </v-btn>
                               </template>
                             </v-list-item>
@@ -355,12 +322,12 @@ onMounted(() => {
                           v-else
                           class="text-body-2 text-medium-emphasis mb-0"
                         >
-                          No tasks have been completed yet.
+                          {{ section.emptyMessage }}
                         </p>
                       </div>
                     </v-card>
-                  </v-window-item>
-                </v-window>
+                  </v-tabs-window-item>
+                </v-tabs-window>
               </template>
               <p
                 v-else
@@ -440,3 +407,9 @@ onMounted(() => {
     </v-row>
   </v-container>
 </template>
+
+<style scoped>
+.task--completed {
+  text-decoration: line-through;
+}
+</style>
