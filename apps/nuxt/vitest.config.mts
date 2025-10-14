@@ -7,6 +7,10 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
+    // Exclude E2E tests from unit test runs
+    exclude: ['**/e2e/**', '**/mocks/**', '**/fixtures/**'],
+    // Include TypeScript files
+    include: ['**/*.test.ts', '**/*.spec.ts'],
 
     // 🧩 Centralized setup file (dotenv, mocks, globals, etc.)
     setupFiles: [r('./vitest.setup.ts')],
