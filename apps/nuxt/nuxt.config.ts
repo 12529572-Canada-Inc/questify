@@ -12,6 +12,9 @@ export default defineNuxtConfig({
     // Point ~ and @ to new app/ directory
     '~': path.resolve(__dirname, 'app'),
     '@': path.resolve(__dirname, 'app'),
+    ...(process.env.USE_MOCKS === 'true'
+      ? { '@prisma/client': path.resolve(__dirname, 'tests/mocks/prisma.ts') }
+      : {}),
   },
 
   // ⚙️ Modules

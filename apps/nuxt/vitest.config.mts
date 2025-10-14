@@ -34,6 +34,8 @@ export default defineConfig({
       '~': r('app'),
       '@': r('app'),
       'shared': r('../../packages/shared/src'),
+      'nuxt': r('node_modules/nuxt/dist/index.mjs'),
+      'nuxt/config': r('node_modules/nuxt/config.js'),
 
       // 🧪 Conditionally mock Prisma (based on env)
       ...(process.env.USE_MOCKS === 'true'
@@ -48,6 +50,8 @@ export default defineConfig({
       '~': r('app'),
       '@': r('app'),
       'shared': r('../../packages/shared/src'),
+      'nuxt': r('node_modules/nuxt/dist/index.mjs'),
+      'nuxt/config': r('node_modules/nuxt/config.js'),
       ...(process.env.USE_MOCKS === 'true'
         ? { '@prisma/client': r('tests/mocks/prisma.ts') }
         : {}),

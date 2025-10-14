@@ -2,7 +2,10 @@ import { Queue } from 'bullmq'
 import { parseRedisUrl } from 'shared'
 
 export default defineNitroPlugin((nitroApp) => {
-  if (process.env.NODE_ENV === 'test') {
+  const shouldSkip =
+    process.env.NODE_ENV === 'test' || process.env.NUXT_DISABLE_QUEUE === 'true'
+
+  if (shouldSkip) {
     console.log('Skipping quest queue setup in test environment')
     return
   }
