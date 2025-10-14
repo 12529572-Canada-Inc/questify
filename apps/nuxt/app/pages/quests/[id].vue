@@ -39,6 +39,16 @@ const completedTasks = computed(() =>
   allTasks.value.filter(task => task.status === 'completed'),
 )
 const hasTasks = computed(() => allTasks.value.length > 0)
+const taskTab = ref<'todo' | 'completed'>('todo')
+
+watch([todoTasks, completedTasks], ([todo, completed]) => {
+  if (taskTab.value === 'todo' && !todo.length && completed.length) {
+    taskTab.value = 'completed'
+  }
+  else if (taskTab.value === 'completed' && !completed.length && todo.length) {
+    taskTab.value = 'todo'
+  }
+}, { immediate: true })
 
 // Error handling
 const errorType = computed(() => {
@@ -193,126 +203,164 @@ onMounted(() => {
             </div>
             <template v-else>
               <template v-if="hasTasks">
-                <div class="d-flex flex-column gap-4">
-                  <v-card
-                    v-if="todoTasks.length"
-                    variant="tonal"
-                    color="primary"
-                    class="elevation-0"
-                  >
-                    <v-card-title class="text-subtitle-1 font-weight-medium">
-                      To Do
-                    </v-card-title>
-                    <v-divider />
-                    <v-list
-                      lines="three"
-                      density="comfortable"
-                      class="py-0"
-                    >
-                      <v-list-item
-                        v-for="task in todoTasks"
-                        :key="task.id"
-                        class="py-3"
-                      >
-                        <template #title>
-                          <span class="text-body-1 font-weight-medium">
-                            {{ task.title }}
-                          </span>
-                        </template>
-                        <template #subtitle>
-                          <div
-                            class="d-flex flex-column"
-                            style="gap: 4px;"
-                          >
-                            <TextWithLinks
-                              v-if="task.details"
-                              class="text-body-2"
-                              tag="div"
-                              :text="task.details"
-                            />
-                            <span class="text-body-2 text-medium-emphasis">
-                              Status: {{ task.status }}
-                            </span>
-                          </div>
-                        </template>
-                        <template #append>
-                          <v-btn
-                            v-if="isOwner"
-                            size="small"
-                            color="success"
-                            variant="text"
-                            @click="markTaskCompleted(task.id)"
-                          >
-                            Complete
-                          </v-btn>
-                        </template>
-                      </v-list-item>
-                    </v-list>
-                  </v-card>
+                <v-tabs
+                  v-model="taskTab"
+                  density="comfortable"
+                  color="primary"
+                >
+                  <v-tab value="todo">
+                    To Do ({{ todoTasks.length }})
+                  </v-tab>
+                  <v-tab value="completed">
+                    Completed ({{ completedTasks.length }})
+                  </v-tab>
+                </v-tabs>
 
-                  <v-card
-                    v-if="completedTasks.length"
-                    variant="tonal"
-                    color="success"
-                    class="elevation-0"
-                  >
-                    <v-card-title class="text-subtitle-1 font-weight-medium">
-                      Completed
-                    </v-card-title>
-                    <v-divider />
-                    <v-list
-                      lines="three"
-                      density="comfortable"
-                      class="py-0"
+                <v-window
+                  v-model="taskTab"
+                  class="mt-4"
+                >
+                  <v-window-item value="todo">
+                    <v-card
+                      variant="tonal"
+                      color="primary"
+                      class="elevation-0"
                     >
-                      <v-list-item
-                        v-for="task in completedTasks"
-                        :key="task.id"
-                        class="py-3"
-                      >
-                        <template #title>
-                          <span
-                            class="text-body-1 font-weight-medium text-medium-emphasis"
-                            style="text-decoration: line-through;"
+                      <v-card-title class="text-subtitle-1 font-weight-medium">
+                        To Do
+                      </v-card-title>
+                      <v-divider />
+                      <div class="pa-4 pt-0">
+                        <template v-if="todoTasks.length">
+                          <v-list
+                            lines="three"
+                            density="comfortable"
+                            class="py-0"
                           >
-                            {{ task.title }}
-                          </span>
-                        </template>
-                        <template #subtitle>
-                          <div
-                            class="d-flex flex-column"
-                            style="gap: 4px;"
-                          >
-                            <TextWithLinks
-                              v-if="task.details"
-                              class="text-body-2 text-medium-emphasis"
-                              style="text-decoration: line-through;"
-                              tag="div"
-                              :text="task.details"
-                            />
-                            <span
-                              class="text-body-2 text-medium-emphasis"
-                              style="text-decoration: line-through;"
+                            <v-list-item
+                              v-for="task in todoTasks"
+                              :key="task.id"
+                              class="py-3"
                             >
-                              Status: {{ task.status }}
-                            </span>
-                          </div>
+                              <template #title>
+                                <span class="text-body-1 font-weight-medium">
+                                  {{ task.title }}
+                                </span>
+                              </template>
+                              <template #subtitle>
+                                <div
+                                  class="d-flex flex-column"
+                                  style="gap: 4px;"
+                                >
+                                  <TextWithLinks
+                                    v-if="task.details"
+                                    class="text-body-2"
+                                    tag="div"
+                                    :text="task.details"
+                                  />
+                                  <span class="text-body-2 text-medium-emphasis">
+                                    Status: {{ task.status }}
+                                  </span>
+                                </div>
+                              </template>
+                              <template #append>
+                                <v-btn
+                                  v-if="isOwner"
+                                  size="small"
+                                  color="success"
+                                  variant="text"
+                                  @click="markTaskCompleted(task.id)"
+                                >
+                                  Complete
+                                </v-btn>
+                              </template>
+                            </v-list-item>
+                          </v-list>
                         </template>
-                        <template #append>
-                          <v-btn
-                            v-if="isOwner"
-                            size="small"
-                            color="warning"
-                            variant="text"
-                            @click="markTaskIncomplete(task.id)"
+                        <p
+                          v-else
+                          class="text-body-2 text-medium-emphasis mb-0"
+                        >
+                          All tasks are completed!
+                        </p>
+                      </div>
+                    </v-card>
+                  </v-window-item>
+
+                  <v-window-item value="completed">
+                    <v-card
+                      variant="tonal"
+                      color="success"
+                      class="elevation-0"
+                    >
+                      <v-card-title class="text-subtitle-1 font-weight-medium">
+                        Completed
+                      </v-card-title>
+                      <v-divider />
+                      <div class="pa-4 pt-0">
+                        <template v-if="completedTasks.length">
+                          <v-list
+                            lines="three"
+                            density="comfortable"
+                            class="py-0"
                           >
-                            Mark Incomplete
-                          </v-btn>
+                            <v-list-item
+                              v-for="task in completedTasks"
+                              :key="task.id"
+                              class="py-3"
+                            >
+                              <template #title>
+                                <span
+                                  class="text-body-1 font-weight-medium text-medium-emphasis"
+                                  style="text-decoration: line-through;"
+                                >
+                                  {{ task.title }}
+                                </span>
+                              </template>
+                              <template #subtitle>
+                                <div
+                                  class="d-flex flex-column"
+                                  style="gap: 4px;"
+                                >
+                                  <TextWithLinks
+                                    v-if="task.details"
+                                    class="text-body-2 text-medium-emphasis"
+                                    style="text-decoration: line-through;"
+                                    tag="div"
+                                    :text="task.details"
+                                  />
+                                  <span
+                                    class="text-body-2 text-medium-emphasis"
+                                    style="text-decoration: line-through;"
+                                  >
+                                    Status: {{ task.status }}
+                                  </span>
+                                </div>
+                              </template>
+                              <template #append>
+                                <v-btn
+                                  v-if="isOwner"
+                                  size="small"
+                                  color="warning"
+                                  variant="text"
+                                  @click="markTaskIncomplete(task.id)"
+                                >
+                                  Mark Incomplete
+                                </v-btn>
+                              </template>
+                            </v-list-item>
+                          </v-list>
                         </template>
-                      </v-list-item>
-                    </v-list>
-                  </v-card>
-                </div>
+                        <p
+                          v-else
+                          class="text-body-2 text-medium-emphasis mb-0"
+                        >
+                          No tasks have been completed yet.
+                        </p>
+                      </div>
+                    </v-card>
+                  </v-window-item>
+                </v-window>
               </template>
               <p
                 v-else
