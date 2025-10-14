@@ -16,6 +16,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Refactored internal server utilities and test helpers to align with the new **Nitro runtime API**.
   - Cleaned up unused Nuxt 3 testing utilities (`@nuxt/test-utils`) and replaced them with a stable custom setup.
 
+### 🧱 Refactors
+- **Quest View Modularization**
+  - Refactored quest-related pages into smaller, reusable components and composables.
+  - Introduced dedicated components for `QuestList`, `QuestCard`, and `QuestTasksTabs`.
+  - Improved separation of concerns between data fetching (`useQuest`, `useQuests`) and rendering logic.
+- **QuestTasksTabs Enhancements**
+  - Removed redundant status display for completed tasks.
+  - Updated the `pending` prop to correctly use a **reactive value** and provide a **default of `false`**.
+  - Eliminated unnecessary reactivity edge cases and type warnings in TypeScript templates.
+- **Nuxt Configuration Cleanup**
+  - Consolidated Nuxt configuration into clearly defined sections for **auto-imports**, **runtime**, and **framework settings**.
+  - Removed legacy and commented code for clarity and maintainability.
+
 ### 🛠 Fixes & Improvements
 - **Quest Details Display**
     - Improved quest details view with clearer messaging and layout.
@@ -25,8 +38,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Enhanced URL parsing to handle balanced closing punctuation and strip trailing punctuation from text links.
 - **Quest Task Navigation**
     - Swapped the quest task sections to Vuetify tabs with contextual empty states and owner controls scoped to each status.
-
----
 
 ### 🧪 Tests & Infrastructure
 - **Nuxt 4 Test Harness**
