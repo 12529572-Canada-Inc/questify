@@ -1,16 +1,6 @@
 <script setup lang="ts">
-interface TextSegment {
-  type: 'text'
-  value: string
-}
-
-interface LinkSegment {
-  type: 'link'
-  value: string
-  display: string
-}
-
-type Segment = TextSegment | LinkSegment
+import type { Segment } from '~/utils/text-with-links'
+import { splitTextIntoSegments } from '~/utils/text-with-links'
 
 const props = withDefaults(
   defineProps<{
@@ -26,42 +16,7 @@ const props = withDefaults(
 
 const attrs = useAttrs()
 
-const urlPattern = /https?:\/\/[^\s]+/g
-
-function summarizeUrl(url: string) {
-  try {
-    const { hostname } = new URL(url)
-    return hostname.replace(/^www\./, '')
-  }
-  catch {
-    return url
-  }
-}
-
-const segments = computed<Segment[]>(() => {
-  if (!props.text)
-    return []
-
-  const result: Segment[] = []
-  const { text } = props
-  let lastIndex = 0
-
-  for (const match of text.matchAll(urlPattern)) {
-    const url = match[0]
-    const index = match.index ?? 0
-
-    if (index > lastIndex)
-      result.push({ type: 'text', value: text.slice(lastIndex, index) })
-
-    result.push({ type: 'link', value: url, display: summarizeUrl(url) })
-    lastIndex = index + url.length
-  }
-
-  if (lastIndex < text.length)
-    result.push({ type: 'text', value: text.slice(lastIndex) })
-
-  return result
-})
+const segments = computed<Segment[]>(() => splitTextIntoSegments(props.text))
 
 const hasContent = computed(() => segments.value.length > 0)
 </script>
