@@ -1,24 +1,20 @@
 /// <reference types="vitest" />
-import { defineVitestConfig, defineVitestProject } from 'vitest/config'
+import { defineConfig, defineProject } from 'vitest/config'
 import { resolve } from 'path'
 
 const r = (p: string) => resolve(__dirname, p)
 
-export default defineVitestConfig({
+export default defineConfig({
   test: {
-    // 🧩 Use multiple projects to separate environments
     projects: [
-      // 🧪 1️⃣ Unit / Integration tests (Node environment)
-      {
+      // 🧪 1️⃣ Unit / Integration tests
+      defineProject({
         test: {
           name: 'unit',
           globals: true,
           environment: 'node',
 
-          include: [
-            'tests/{unit,api,utils}/**/*.{test,spec}.ts',
-          ],
-
+          include: ['tests/{unit,api,utils}/**/*.{test,spec}.ts'],
           exclude: [
             '**/node_modules/**',
             '**/.nuxt/**',
@@ -31,13 +27,7 @@ export default defineVitestConfig({
           ],
 
           setupFiles: [r('./vitest.setup.ts')],
-
-          deps: {
-            optimizer: {
-              ssr: { include: ['shared'] },
-            },
-          },
-
+          deps: { optimizer: { ssr: { include: ['shared'] } } },
           testTimeout: 180_000,
           hookTimeout: 180_000,
           reporters: ['default'],
@@ -54,10 +44,10 @@ export default defineVitestConfig({
               : {}),
           },
         },
-      },
+      }),
 
-      // 🌐 2️⃣ Nuxt-aware component/runtime tests (Nuxt environment)
-      await defineVitestProject({
+      // 🌐 2️⃣ Nuxt-aware component/runtime tests
+      defineProject({
         test: {
           name: 'nuxt',
           environment: 'nuxt',
@@ -67,7 +57,6 @@ export default defineVitestConfig({
             'tests/nuxt/**/*.{test,spec}.ts',
             'tests/components/**/*.{test,spec}.ts',
           ],
-
           exclude: [
             '**/node_modules/**',
             '**/.output/**',
@@ -76,7 +65,6 @@ export default defineVitestConfig({
           ],
 
           setupFiles: [r('./vitest.setup.ts')],
-
           testTimeout: 180_000,
           hookTimeout: 180_000,
           reporters: ['default'],
