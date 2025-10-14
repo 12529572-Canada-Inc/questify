@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import { useQuestDetails } from '~/composables/useQuestDetails'
+
 const props = defineProps<{
   quest: Partial<Record<'goal' | 'context' | 'constraints', string | null>>
   emptyMessage?: string
 }>()
 
-const { sections, hasDetails } = useQuestDetails(() => props.quest)
+const { sections, hasDetails } = useQuestDetails(props.quest)
 </script>
 
 <template>
