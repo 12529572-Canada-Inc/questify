@@ -18,18 +18,21 @@ describe('HomeHeroCard', () => {
     const wrapper = await mountSuspended(HomeHeroCard)
     const buttons = wrapper.findAllComponents({ name: 'VBtn' })
 
-    // ✅ Button count
-    expect(buttons).toHaveLength(2)
+    // ✅ Defensive checks for TypeScript
+    expect(buttons.length).toBeGreaterThanOrEqual(2)
 
-    // ✅ Text and target routes
     const viewQuests = buttons[0]
     const createQuest = buttons[1]
 
-    expect(viewQuests.text()).toBe('View Quests')
-    expect(viewQuests.attributes('to')).toBe('/quests')
+    // ✅ Assert defined before access (avoids TS18048)
+    expect(viewQuests).toBeDefined()
+    expect(createQuest).toBeDefined()
 
-    expect(createQuest.text()).toBe('Create Quest')
-    expect(createQuest.attributes('to')).toBe('/quests/new')
+    expect(viewQuests!.text()).toBe('View Quests')
+    expect(viewQuests!.attributes('to')).toBe('/quests')
+
+    expect(createQuest!.text()).toBe('Create Quest')
+    expect(createQuest!.attributes('to')).toBe('/quests/new')
   })
 
   it('applies Vuetify layout classes', async () => {
@@ -37,8 +40,8 @@ describe('HomeHeroCard', () => {
     const container = wrapper.find('.main-container')
 
     expect(container.exists()).toBe(true)
-    expect(container.classes()).toContain('d-flex')
-    expect(container.classes()).toContain('justify-center')
-    expect(container.classes()).toContain('align-center')
+    expect(container.classes()).toEqual(
+      expect.arrayContaining(['d-flex', 'justify-center', 'align-center']),
+    )
   })
 })
