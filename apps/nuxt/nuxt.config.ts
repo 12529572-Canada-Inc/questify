@@ -41,6 +41,16 @@ export default defineNuxtConfig({
     },
   },
 
+  // 🧱 Auto-register components from the components/ directory
+  components: {
+    dirs: [
+      {
+        path: '~/app/components',
+        pathPrefix: false, // allows <QuestList> instead of <AppComponentsQuestList>
+      },
+    ],
+  },
+
   // 🧩 Runtime configuration
   runtimeConfig: {
     // 🔒 Server-only (not exposed to client)
