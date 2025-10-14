@@ -7,33 +7,34 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
-    // Exclude E2E tests from unit test runs
-    exclude: ['**/e2e/**', '**/mocks/**', '**/fixtures/**'],
-    // Include TypeScript files
+
+    // ✅ Exclude irrelevant folders (including node_modules)
+    exclude: [
+      '**/node_modules/**',
+      '**/.nuxt/**',
+      '**/.output/**',
+      '**/e2e/**',
+      '**/mocks/**',
+      '**/fixtures/**',
+      '**/dist/**',
+      '**/coverage/**',
+    ],
+
+    // ✅ Include only your tests
     include: ['**/*.test.ts', '**/*.spec.ts'],
 
-    // 🧩 Centralized setup file (dotenv, mocks, globals, etc.)
     setupFiles: [r('./vitest.setup.ts')],
 
-    // 🧠 Dependency optimizer ensures proper SSR behavior
     deps: {
       optimizer: {
         ssr: { include: ['shared'] },
       },
     },
 
-    // 🕒 Timeouts & stability settings
     testTimeout: 180_000,
     hookTimeout: 180_000,
-    // retry: 1,
-    // isolate: false,
-    // sequence: { concurrent: false },
-    // pool: 'forks',
-
-    // 🧹 Output clarity
     reporters: ['default'],
 
-    // 🧭 Aliases for Nuxt conventions + shared packages
     alias: {
       '~': r('app'),
       '@': r('app'),
@@ -41,7 +42,6 @@ export default defineConfig({
       'nuxt': r('node_modules/nuxt/dist/index.mjs'),
       'nuxt/config': r('node_modules/nuxt/config.js'),
 
-      // 🧪 Conditionally mock Prisma (based on env)
       ...(process.env.USE_MOCKS === 'true'
         ? { '@prisma/client': r('tests/mocks/prisma.ts') }
         : {}),
