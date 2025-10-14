@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import QuestForm from '~/components/quests/QuestForm.vue'
-</script>
-
 <template>
   <v-container class="fill-height d-flex justify-center align-center">
     <v-row

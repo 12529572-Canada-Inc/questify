@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useVModel } from '@vueuse/core'
 import type { Task } from '@prisma/client'
-import TextWithLinks from '~/components/TextWithLinks.vue'
 
 type TaskTab = 'todo' | 'completed'
 

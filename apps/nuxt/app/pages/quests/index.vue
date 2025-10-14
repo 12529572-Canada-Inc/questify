@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useQuests } from '~/composables/useQuest'
-import QuestList from '~/components/quests/QuestList.vue'
 
 const { data: quests } = await useQuests()
 

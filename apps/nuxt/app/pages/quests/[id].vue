@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { useIntervalFn } from '@vueuse/core'
 import { computed, onMounted, watch } from 'vue'
-import QuestDetailsSections from '~/components/quests/QuestDetailsSections.vue'
-import QuestOwnerInfo from '~/components/quests/QuestOwnerInfo.vue'
-import QuestTasksTabs from '~/components/quests/QuestTasksTabs.vue'
 import { useQuest } from '~/composables/useQuest'
 import { useQuestActions } from '~/composables/useQuestActions'
 import { useQuestTaskTabs, useQuestTasks } from '~/composables/useQuestTasks'
