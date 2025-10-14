@@ -3,7 +3,6 @@ import { useQuests } from '~/composables/useQuest'
 
 const { data: quests } = await useQuests()
 
-// ✅ Make sure it's always an array in templates
 const questsList = computed(() => Array.isArray(quests.value) ? quests.value : [])
 </script>
 
@@ -20,37 +19,14 @@ const questsList = computed(() => Array.isArray(quests.value) ? quests.value : [
         </h2>
       </v-col>
       <v-col cols="auto">
-        <v-btn
-          :to="`/quests/new`"
-        >
+        <v-btn :to="`/quests/new`">
           Create Quest
         </v-btn>
       </v-col>
     </v-row>
 
-    <v-row>
-      <v-col
-        v-for="quest in questsList"
-        :key="quest.id"
-        cols="12"
-        sm="6"
-        md="4"
-      >
-        <v-card>
-          <v-card-title>{{ quest.title }}</v-card-title>
-          <v-card-text class="d-flex flex-column gap-2">
-            <QuestDetailsSummary :quest="quest" />
-          </v-card-text>
-          <v-card-actions>
-            <v-btn :to="`/quests/${quest.id}`">
-              View Details
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-col>
-    </v-row>
+    <QuestList :quests="questsList" />
 
-    <!-- Floating Action Button (FAB) for mobile -->
     <v-btn
       color="primary"
       class="fab"
@@ -61,7 +37,6 @@ const questsList = computed(() => Array.isArray(quests.value) ? quests.value : [
 </template>
 
 <style scoped>
-/* Floating Action Button positioning */
 .fab {
   position: fixed;
   bottom: 16px;
