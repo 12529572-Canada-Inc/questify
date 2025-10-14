@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Quest } from '@prisma/client'
+import QuestCard from '~/components/quests/QuestCard.vue'
 
 defineProps<{
   quests: Quest[]

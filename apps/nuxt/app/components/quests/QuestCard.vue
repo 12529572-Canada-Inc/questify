@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Quest } from '@prisma/client'
+import QuestDetailsSummary from '~/components/quests/QuestDetailsSummary.vue'
 
 defineProps<{
   quest: Quest

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import QuestForm from '~/components/quests/QuestForm.vue'
 </script>
 
 <template>
