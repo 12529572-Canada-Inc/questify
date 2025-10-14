@@ -119,12 +119,6 @@ const taskTab = useVModel(props, 'modelValue', emit)
                             tag="div"
                             :text="task.details"
                           />
-                          <span
-                            class="text-body-2"
-                            :class="section.completed ? ['text-medium-emphasis', 'task--completed'] : 'text-medium-emphasis'"
-                          >
-                            Status: {{ task.status }}
-                          </span>
                         </div>
                       </template>
                       <template #append>
