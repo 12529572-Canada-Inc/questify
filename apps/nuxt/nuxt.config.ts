@@ -32,6 +32,20 @@ export default defineNuxtConfig({
     },
   },
 
+  // 🧱 Auto-imported components
+  components: {
+    dirs: [
+      { path: '~/components', pathPrefix: false },
+    ],
+  },
+
+  // Hooks for debugging
+  //   hooks: {
+  //     'components:dirs'(dirs) {
+  //       console.log('Component scan dirs:', dirs)
+  //     },
+  //   },
+
   // 🧩 Runtime configuration
   runtimeConfig: {
     // 🔒 Server-only (not exposed to client)
