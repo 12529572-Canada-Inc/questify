@@ -3,7 +3,8 @@ import { ref } from 'vue'
 import { useQuestActions } from '~/composables/useQuestActions'
 
 describe('useQuestActions', () => {
-  const refresh = vi.fn<[], Promise<void>>().mockResolvedValue()
+  // Updated typing: Vitest 1.x no longer accepts two generic args on vi.fn()
+  const refresh = vi.fn().mockResolvedValue(undefined)
   const fetchMock = vi.fn().mockResolvedValue(undefined)
 
   beforeEach(() => {
@@ -40,14 +41,20 @@ describe('useQuestActions', () => {
     await actions.markTaskIncomplete('task-9')
     await actions.reopenQuest()
 
-    expect(fetchMock).toHaveBeenCalledWith('/api/tasks/task-9', expect.objectContaining({
-      method: 'PATCH',
-      body: { status: 'todo' },
-    }))
-    expect(fetchMock).toHaveBeenCalledWith('/api/quests/quest-7', expect.objectContaining({
-      method: 'PATCH',
-      body: { status: 'active' },
-    }))
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/tasks/task-9',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: { status: 'todo' },
+      }),
+    )
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/quests/quest-7',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: { status: 'active' },
+      }),
+    )
     expect(refresh).toHaveBeenCalledTimes(2)
   })
 })

@@ -1,8 +1,9 @@
 import { fileURLToPath } from 'node:url'
 import { test, expect } from '@playwright/test'
-import { setupTest, url } from '@nuxt/test-utils/e2e'
+import { setup, url } from '@nuxt/test-utils/e2e'
 
-await setupTest({
+// Initialize Nuxt test environment
+await setup({
   rootDir: fileURLToPath(new URL('../..', import.meta.url)),
   browser: true,
 })
