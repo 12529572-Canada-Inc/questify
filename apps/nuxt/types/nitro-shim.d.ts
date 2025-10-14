@@ -28,4 +28,16 @@ declare module '../utils/nitro' {
   export function setupNitro(): Promise<NitroTestContext>
 }
 
+// -----------------------------------------------------
+// 🧩 Additional global stubs to avoid pulling real H3/Nitro internals
+// -----------------------------------------------------
+
+// Explicitly clear any existing H3 declarations
+declare global {
+  // Replace all internal H3 types with loose test-safe ones
+  type H3Event<_T = unknown> = unknown
+  type EventHandlerRequest = unknown
+  type EventHandlerResponse = unknown
+}
+
 /* eslint-enable @typescript-eslint/no-explicit-any */

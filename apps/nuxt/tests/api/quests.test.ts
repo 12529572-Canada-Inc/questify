@@ -1,6 +1,4 @@
 import { describe, it, expect, vi } from 'vitest'
-
-// Now import the actual route handler after the mock
 import handler from '../../server/api/quests/index.get'
 
 // Ensure the Prisma mock applies before the route loads
@@ -20,8 +18,11 @@ vi.mock('@prisma/client', async () => {
 
 describe('API /api/quests', () => {
   it('returns mocked quest data', async () => {
-    const result = await handler({} as unknown) // mock event
+    // Ignore TypeScript errors for the mock event
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const mockEvent = {} as any
+    const result = await handler(mockEvent)
     console.log('🧪 Result:', result)
-    expect(result[0].title).toBe('Questify Mock')
+    expect(result[0]?.title).toBe('Questify Mock')
   }, 10_000)
 })

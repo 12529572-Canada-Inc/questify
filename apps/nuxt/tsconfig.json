@@ -9,6 +9,7 @@
       "shared/*": ["../../packages/shared/src/*"]
     },
     "types": [
+      "./types/nitro-shim",
       "./types/nuxt-shim",
       "@nuxt/types",
       "@nuxt/schema",
