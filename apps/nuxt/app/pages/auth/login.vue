@@ -26,58 +26,38 @@ async function submit() {
   catch (e) {
     error.value = e instanceof Error ? e.message : 'Login failed'
   }
+  finally {
+    loading.value = false
+  }
 }
 </script>
 
 <template>
-  <v-container class="d-flex justify-center">
-    <v-card
-      class="pa-6"
-      max-width="400"
-    >
-      <v-card-title>Login</v-card-title>
-      <v-form
-        v-model="valid"
-        @submit.prevent="submit"
-      >
-        <v-text-field
-          v-model="email"
-          label="Email"
-          required
-          class="mb-2"
-          :rules="rules.email"
-        />
-        <v-text-field
-          v-model="password"
-          type="password"
-          label="Password"
-          required
-          class="mb-2"
-          :rules="rules.password"
-        />
-        <v-btn
-          type="submit"
-          color="primary"
-          block
-          class="mt-4 mb-2"
-          :loading="loading"
-          :disabled="!valid || loading"
-        >
-          Login
-        </v-btn>
-        <v-btn
-          variant="text"
-          to="/auth/signup"
-        >
-          Don't have an account? Sign up
-        </v-btn>
-        <v-alert
-          v-if="error"
-          type="error"
-        >
-          {{ error }}
-        </v-alert>
-      </v-form>
-    </v-card>
-  </v-container>
+  <AuthFormCard
+    v-model:valid="valid"
+    title="Login"
+    submit-label="Login"
+    submit-color="primary"
+    :loading="loading"
+    :error="error"
+    switch-label="Don't have an account? Sign up"
+    switch-to="/auth/signup"
+    @submit="submit"
+  >
+    <v-text-field
+      v-model="email"
+      label="Email"
+      required
+      class="mb-2"
+      :rules="rules.email"
+    />
+    <v-text-field
+      v-model="password"
+      type="password"
+      label="Password"
+      required
+      class="mb-2"
+      :rules="rules.password"
+    />
+  </AuthFormCard>
 </template>

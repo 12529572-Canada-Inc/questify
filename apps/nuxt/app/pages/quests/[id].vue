@@ -162,45 +162,7 @@ onMounted(() => {
           </v-card-title>
           <v-card-subtitle>Status: <strong>{{ questData.status }}</strong></v-card-subtitle>
           <v-card-text class="d-flex flex-column gap-4">
-            <div v-if="questData.goal">
-              <h3 class="text-subtitle-1 font-weight-medium mb-1">
-                Desired Outcome
-              </h3>
-              <TextWithLinks
-                class="mb-0"
-                tag="p"
-                :text="questData.goal"
-              />
-            </div>
-
-            <div v-if="questData.context">
-              <h3 class="text-subtitle-1 font-weight-medium mb-1">
-                Context
-              </h3>
-              <TextWithLinks
-                class="mb-0"
-                tag="p"
-                :text="questData.context"
-              />
-            </div>
-
-            <div v-if="questData.constraints">
-              <h3 class="text-subtitle-1 font-weight-medium mb-1">
-                Constraints & Preferences
-              </h3>
-              <TextWithLinks
-                class="mb-0"
-                tag="p"
-                :text="questData.constraints"
-              />
-            </div>
-
-            <p
-              v-if="!questData.goal && !questData.context && !questData.constraints"
-              class="text-body-2 text-medium-emphasis mb-0"
-            >
-              No additional details provided for this quest yet.
-            </p>
+            <QuestDetailsSections :quest="questData" />
           </v-card-text>
           <v-divider class="my-4" />
 

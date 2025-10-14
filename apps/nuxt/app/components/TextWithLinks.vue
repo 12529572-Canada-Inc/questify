@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import type { Segment } from '~/utils/text-with-links'
-import { splitTextIntoSegments } from '~/utils/text-with-links'
-
 const props = withDefaults(
   defineProps<{
     text?: string | null
