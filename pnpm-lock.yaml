@@ -13,7 +13,7 @@ importers:
     devDependencies:
       '@nuxt/test-utils':
         specifier: github:12529572-Canada-Inc/test-utils#main
-        version: '@qwestify/test-utils@https://codeload.github.com/12529572-Canada-Inc/test-utils/tar.gz/ad6ed0e059b2ddf35940474f6dce7912091e3f58(@playwright/test@1.56.0)(@vue/test-utils@2.4.6)(happy-dom@18.0.1)(magicast@0.3.5)(typescript@5.9.3)(vitest@3.2.4)'
+        version: '@qwestify/test-utils@https://codeload.github.com/12529572-Canada-Inc/test-utils/tar.gz/0fc717d36b64071763f6f1b65d65e8513bc67867(@playwright/test@1.56.0)(@vue/test-utils@2.4.6)(happy-dom@18.0.1)(magicast@0.3.5)(typescript@5.9.3)(vitest@3.2.4)'
       '@oxc-minify/binding-darwin-arm64':
         specifier: 0.94.0
         version: 0.94.0
@@ -28,7 +28,7 @@ importers:
         version: 0.94.0
       '@qwestify/test-utils':
         specifier: github:12529572-Canada-Inc/test-utils
-        version: https://codeload.github.com/12529572-Canada-Inc/test-utils/tar.gz/ad6ed0e059b2ddf35940474f6dce7912091e3f58(@playwright/test@1.56.0)(@vue/test-utils@2.4.6)(happy-dom@18.0.1)(magicast@0.3.5)(typescript@5.9.3)(vitest@3.2.4)
+        version: https://codeload.github.com/12529572-Canada-Inc/test-utils/tar.gz/0fc717d36b64071763f6f1b65d65e8513bc67867(@playwright/test@1.56.0)(@vue/test-utils@2.4.6)(happy-dom@18.0.1)(magicast@0.3.5)(typescript@5.9.3)(vitest@3.2.4)
       '@types/node':
         specifier: 20.19.17
         version: 20.19.17
@@ -95,7 +95,7 @@ importers:
         version: 4.1.3
       '@nuxt/test-utils':
         specifier: github:12529572-Canada-Inc/test-utils#main
-        version: '@qwestify/test-utils@https://codeload.github.com/12529572-Canada-Inc/test-utils/tar.gz/ad6ed0e059b2ddf35940474f6dce7912091e3f58(@playwright/test@1.56.0)(@vue/test-utils@2.4.6)(happy-dom@18.0.1)(magicast@0.3.5)(typescript@5.9.3)(vitest@3.2.4)'
+        version: '@qwestify/test-utils@https://codeload.github.com/12529572-Canada-Inc/test-utils/tar.gz/0fc717d36b64071763f6f1b65d65e8513bc67867(@playwright/test@1.56.0)(@vue/test-utils@2.4.6)(happy-dom@18.0.1)(magicast@0.3.5)(typescript@5.9.3)(vitest@3.2.4)'
       '@nuxt/types':
         specifier: ^2.18.1
         version: 2.18.1
@@ -1470,8 +1470,8 @@ packages:
   '@prisma/get-platform@5.22.0':
     resolution: {integrity: sha512-pHhpQdr1UPFpt+zFfnPazhulaZYCUqeIcPpJViYoq9R+D/yw4fjE+CtnsnKzPYm0ddUbeXUzjGVGIRVgPDCk4Q==}
 
-  '@qwestify/test-utils@https://codeload.github.com/12529572-Canada-Inc/test-utils/tar.gz/ad6ed0e059b2ddf35940474f6dce7912091e3f58':
-    resolution: {tarball: https://codeload.github.com/12529572-Canada-Inc/test-utils/tar.gz/ad6ed0e059b2ddf35940474f6dce7912091e3f58}
+  '@qwestify/test-utils@https://codeload.github.com/12529572-Canada-Inc/test-utils/tar.gz/0fc717d36b64071763f6f1b65d65e8513bc67867':
+    resolution: {tarball: https://codeload.github.com/12529572-Canada-Inc/test-utils/tar.gz/0fc717d36b64071763f6f1b65d65e8513bc67867}
     version: 3.19.2-patch.1
     engines: {node: ^20 || ^22 || >=24}
     peerDependencies:
@@ -7594,7 +7594,7 @@ snapshots:
     dependencies:
       '@prisma/debug': 5.22.0
 
-  '@qwestify/test-utils@https://codeload.github.com/12529572-Canada-Inc/test-utils/tar.gz/ad6ed0e059b2ddf35940474f6dce7912091e3f58(@playwright/test@1.56.0)(@vue/test-utils@2.4.6)(happy-dom@18.0.1)(magicast@0.3.5)(typescript@5.9.3)(vitest@3.2.4)':
+  '@qwestify/test-utils@https://codeload.github.com/12529572-Canada-Inc/test-utils/tar.gz/0fc717d36b64071763f6f1b65d65e8513bc67867(@playwright/test@1.56.0)(@vue/test-utils@2.4.6)(happy-dom@18.0.1)(magicast@0.3.5)(typescript@5.9.3)(vitest@3.2.4)':
     dependencies:
       '@nuxt/kit': 4.1.3(magicast@0.3.5)
       c12: 3.3.0(magicast@0.3.5)
@@ -8450,7 +8450,7 @@ snapshots:
       std-env: 3.10.0
       test-exclude: 7.0.1
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@edge-runtime/vm@3.2.0)(@types/node@20.19.17)(@vitest/ui@3.2.4)(happy-dom@18.0.1)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+      vitest: 3.2.4(@edge-runtime/vm@3.2.0)(@types/node@24.7.2)(@vitest/ui@3.2.4)(happy-dom@18.0.1)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -8469,6 +8469,14 @@ snapshots:
       magic-string: 0.30.19
     optionalDependencies:
       vite: 7.1.10(@types/node@20.19.17)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+
+  '@vitest/mocker@3.2.4(vite@7.1.10(@types/node@24.7.2)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))':
+    dependencies:
+      '@vitest/spy': 3.2.4
+      estree-walker: 3.0.3
+      magic-string: 0.30.19
+    optionalDependencies:
+      vite: 7.1.10(@types/node@24.7.2)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
 
   '@vitest/pretty-format@3.2.4':
     dependencies:
@@ -8499,7 +8507,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@edge-runtime/vm@3.2.0)(@types/node@20.19.17)(@vitest/ui@3.2.4)(happy-dom@18.0.1)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+      vitest: 3.2.4(@edge-runtime/vm@3.2.0)(@types/node@24.7.2)(@vitest/ui@3.2.4)(happy-dom@18.0.1)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
 
   '@vitest/utils@3.2.4':
     dependencies:
@@ -12898,7 +12906,7 @@ snapshots:
 
   vitest-environment-nuxt@1.0.1(@playwright/test@1.56.0)(@vue/test-utils@2.4.6)(happy-dom@18.0.1)(magicast@0.3.5)(typescript@5.9.3)(vitest@3.2.4):
     dependencies:
-      '@nuxt/test-utils': '@qwestify/test-utils@https://codeload.github.com/12529572-Canada-Inc/test-utils/tar.gz/ad6ed0e059b2ddf35940474f6dce7912091e3f58(@playwright/test@1.56.0)(@vue/test-utils@2.4.6)(happy-dom@18.0.1)(magicast@0.3.5)(typescript@5.9.3)(vitest@3.2.4)'
+      '@nuxt/test-utils': '@qwestify/test-utils@https://codeload.github.com/12529572-Canada-Inc/test-utils/tar.gz/0fc717d36b64071763f6f1b65d65e8513bc67867(@playwright/test@1.56.0)(@vue/test-utils@2.4.6)(happy-dom@18.0.1)(magicast@0.3.5)(typescript@5.9.3)(vitest@3.2.4)'
     transitivePeerDependencies:
       - '@playwright/test'
       - '@testing-library/vue'
@@ -12957,7 +12965,7 @@ snapshots:
     dependencies:
       '@types/chai': 5.2.2
       '@vitest/expect': 3.2.4
-      '@vitest/mocker': 3.2.4(vite@7.1.10(@types/node@20.19.17)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))
+      '@vitest/mocker': 3.2.4(vite@7.1.10(@types/node@24.7.2)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))
       '@vitest/pretty-format': 3.2.4
       '@vitest/runner': 3.2.4
       '@vitest/snapshot': 3.2.4
