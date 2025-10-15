@@ -2,7 +2,7 @@ diff --git a/node_modules/@nuxt/test-utils/dist/vitest-environment.mjs b/node_mo
 index 1111111..2222222 100644
 --- a/node_modules/@nuxt/test-utils/dist/vitest-environment.mjs
 +++ b/node_modules/@nuxt/test-utils/dist/vitest-environment.mjs
-@@
+@@ -170,9 +170,17 @@ export class NuxtEnvironment {
    async setup(global) {
 -    const { ctx } = this
 -    const url = ctx.url
@@ -16,6 +16,5 @@ index 1111111..2222222 100644
 +    }
 +
 +    const nuxt = useTestContext(ctx)
-@@
      await nuxt.setup(global)
    }
