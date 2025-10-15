@@ -23,6 +23,9 @@ importers:
       '@oxc-transform/binding-darwin-arm64':
         specifier: 0.94.0
         version: 0.94.0
+      '@types/node':
+        specifier: 20.19.17
+        version: 20.19.17
       '@vuetify/loader-shared':
         specifier: ^2.1.1
         version: 2.1.1(vue@3.5.22(typescript@5.9.2))(vuetify@3.10.5)
@@ -40,7 +43,7 @@ importers:
         version: 48.1.6(rollup@4.52.4)
       vite:
         specifier: ^7.1.10
-        version: 7.1.10(@types/node@16.18.11)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+        version: 7.1.10(@types/node@20.19.17)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
       vuetify:
         specifier: ^3.10.5
         version: 3.10.5(typescript@5.9.2)(vite-plugin-vuetify@2.1.2)(vue@3.5.22(typescript@5.9.2))
@@ -8296,7 +8299,7 @@ snapshots:
 
   '@types/node-fetch@2.6.13':
     dependencies:
-      '@types/node': 24.5.1
+      '@types/node': 24.6.2
       form-data: 4.0.4
 
   '@types/node@16.18.11': {}
@@ -8822,14 +8825,6 @@ snapshots:
       chai: 5.3.3
       tinyrainbow: 2.0.0
 
-  '@vitest/mocker@3.2.4(vite@7.1.10(@types/node@16.18.11)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))':
-    dependencies:
-      '@vitest/spy': 3.2.4
-      estree-walker: 3.0.3
-      magic-string: 0.30.19
-    optionalDependencies:
-      vite: 7.1.10(@types/node@16.18.11)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
-
   '@vitest/mocker@3.2.4(vite@7.1.10(@types/node@20.19.17)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))':
     dependencies:
       '@vitest/spy': 3.2.4
@@ -8837,6 +8832,14 @@ snapshots:
       magic-string: 0.30.19
     optionalDependencies:
       vite: 7.1.10(@types/node@20.19.17)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+
+  '@vitest/mocker@3.2.4(vite@7.1.10(@types/node@24.6.2)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))':
+    dependencies:
+      '@vitest/spy': 3.2.4
+      estree-walker: 3.0.3
+      magic-string: 0.30.19
+    optionalDependencies:
+      vite: 7.1.10(@types/node@24.6.2)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
 
   '@vitest/pretty-format@3.2.4':
     dependencies:
@@ -13378,18 +13381,6 @@ snapshots:
       vite: 7.1.10(@types/node@20.19.17)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
       vue: 3.5.22(typescript@5.9.2)
 
-  vite-plugin-vuetify@2.1.2(vite@7.1.10(@types/node@16.18.11)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))(vue@3.5.22(typescript@5.9.2))(vuetify@3.10.5):
-    dependencies:
-      '@vuetify/loader-shared': 2.1.1(vue@3.5.22(typescript@5.9.2))(vuetify@3.10.5)
-      debug: 4.4.3
-      upath: 2.0.1
-      vite: 7.1.10(@types/node@16.18.11)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
-      vue: 3.5.22(typescript@5.9.2)
-      vuetify: 3.10.5(typescript@5.9.2)(vite-plugin-vuetify@2.1.2)(vue@3.5.22(typescript@5.9.2))
-    transitivePeerDependencies:
-      - supports-color
-    optional: true
-
   vite-plugin-vuetify@2.1.2(vite@7.1.10(@types/node@20.19.17)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))(vue@3.5.21(typescript@5.9.2))(vuetify@3.10.3):
     dependencies:
       '@vuetify/loader-shared': 2.1.1(vue@3.5.21(typescript@5.9.2))(vuetify@3.10.3)
@@ -13401,21 +13392,17 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  vite@7.1.10(@types/node@16.18.11)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1):
+  vite-plugin-vuetify@2.1.2(vite@7.1.10(@types/node@20.19.17)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))(vue@3.5.22(typescript@5.9.2))(vuetify@3.10.5):
     dependencies:
-      esbuild: 0.25.10
-      fdir: 6.5.0(picomatch@4.0.3)
-      picomatch: 4.0.3
-      postcss: 8.5.6
-      rollup: 4.52.4
-      tinyglobby: 0.2.15
-    optionalDependencies:
-      '@types/node': 16.18.11
-      fsevents: 2.3.3
-      jiti: 2.6.1
-      terser: 5.44.0
-      tsx: 4.20.6
-      yaml: 2.8.1
+      '@vuetify/loader-shared': 2.1.1(vue@3.5.22(typescript@5.9.2))(vuetify@3.10.5)
+      debug: 4.4.3
+      upath: 2.0.1
+      vite: 7.1.10(@types/node@20.19.17)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+      vue: 3.5.22(typescript@5.9.2)
+      vuetify: 3.10.5(typescript@5.9.2)(vite-plugin-vuetify@2.1.2)(vue@3.5.22(typescript@5.9.2))
+    transitivePeerDependencies:
+      - supports-color
+    optional: true
 
   vite@7.1.10(@types/node@20.19.17)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1):
     dependencies:
@@ -13530,7 +13517,7 @@ snapshots:
     dependencies:
       '@types/chai': 5.2.2
       '@vitest/expect': 3.2.4
-      '@vitest/mocker': 3.2.4(vite@7.1.10(@types/node@16.18.11)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))
+      '@vitest/mocker': 3.2.4(vite@7.1.10(@types/node@20.19.17)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))
       '@vitest/pretty-format': 3.2.4
       '@vitest/runner': 3.2.4
       '@vitest/snapshot': 3.2.4
@@ -13574,7 +13561,7 @@ snapshots:
     dependencies:
       '@types/chai': 5.2.2
       '@vitest/expect': 3.2.4
-      '@vitest/mocker': 3.2.4(vite@7.1.10(@types/node@16.18.11)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))
+      '@vitest/mocker': 3.2.4(vite@7.1.10(@types/node@24.6.2)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))
       '@vitest/pretty-format': 3.2.4
       '@vitest/runner': 3.2.4
       '@vitest/snapshot': 3.2.4
@@ -13705,7 +13692,7 @@ snapshots:
       vue: 3.5.22(typescript@5.9.2)
     optionalDependencies:
       typescript: 5.9.2
-      vite-plugin-vuetify: 2.1.2(vite@7.1.10(@types/node@16.18.11)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))(vue@3.5.22(typescript@5.9.2))(vuetify@3.10.5)
+      vite-plugin-vuetify: 2.1.2(vite@7.1.10(@types/node@20.19.17)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))(vue@3.5.22(typescript@5.9.2))(vuetify@3.10.5)
 
   web-streams-polyfill@4.0.0-beta.3: {}
 
