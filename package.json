@@ -15,7 +15,7 @@
     "nuxt:info": "pnpm --filter nuxt dlx nuxi info",
     "nuxt:prepare": "pnpm --filter nuxt exec nuxi prepare",
     "nuxt:upgrade": "bash ./scripts/upgrade-nuxt.sh",
-    "prepare": "bash ./scripts/prepare-safe.sh",
+    "prepare": "sh ./scripts/prepare-safe.sh",
     "prisma:generate": "pnpm --filter prisma generate",
     "prisma:migrate": "pnpm --filter prisma migrate",
     "prisma:deploy": "pnpm --filter prisma run deploy",
