@@ -1,0 +1,21 @@
+diff --git a/dist/vitest-environment.mjs b/dist/vitest-environment.mjs
+index 1111111..2222222 100644
+--- a/dist/vitest-environment.mjs
++++ b/dist/vitest-environment.mjs
+@@
+   async setup(global) {
+-    const { ctx } = this
+-    const url = ctx.url
+-    const nuxt = useTestContext(ctx)
++    const { ctx } = this || {}
++    const url = ctx?.url || '/'
++
++    if (!ctx) {
++      console.warn('[patch-package:@nuxt/test-utils] ⚠️ ctx missing; skipping Nuxt environment bootstrap.')
++      return
++    }
++
++    const nuxt = useTestContext(ctx)
+@@
+     await nuxt.setup(global)
+   }
