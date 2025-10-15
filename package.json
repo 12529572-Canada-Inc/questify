@@ -48,7 +48,19 @@
   "pnpm": {
     "overrides": {
       "@nuxt/test-utils": "github:12529572-Canada-Inc/test-utils#main"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "@prisma/client",
+      "@prisma/engines",
+      "@qwestify/test-utils",
+      "bcrypt",
+      "esbuild",
+      "msgpackr-extract",
+      "postinstall-postinstall",
+      "prisma",
+      "unrs-resolver"
+    ]
   },
   "resolutions": {
     "@nuxt/test-utils": "github:12529572-Canada-Inc/test-utils#main"
