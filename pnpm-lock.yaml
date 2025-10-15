@@ -23,6 +23,9 @@ importers:
       '@oxc-transform/binding-darwin-arm64':
         specifier: 0.94.0
         version: 0.94.0
+      '@qwestify/test-utils':
+        specifier: github:12529572-Canada-Inc/test-utils
+        version: https://codeload.github.com/12529572-Canada-Inc/test-utils/tar.gz/ad6ed0e059b2ddf35940474f6dce7912091e3f58(@playwright/test@1.56.0)(@vitest/ui@3.2.4)(@vue/test-utils@2.4.6)(happy-dom@18.0.1)(magicast@0.3.5)(playwright-core@1.56.0)(typescript@5.9.2)(vitest@3.2.4)
       '@types/node':
         specifier: 20.19.17
         version: 20.19.17
@@ -1496,6 +1499,31 @@ packages:
 
   '@prisma/get-platform@5.22.0':
     resolution: {integrity: sha512-pHhpQdr1UPFpt+zFfnPazhulaZYCUqeIcPpJViYoq9R+D/yw4fjE+CtnsnKzPYm0ddUbeXUzjGVGIRVgPDCk4Q==}
+
+  '@qwestify/test-utils@https://codeload.github.com/12529572-Canada-Inc/test-utils/tar.gz/ad6ed0e059b2ddf35940474f6dce7912091e3f58':
+    resolution: {tarball: https://codeload.github.com/12529572-Canada-Inc/test-utils/tar.gz/ad6ed0e059b2ddf35940474f6dce7912091e3f58}
+    version: 3.19.2-patch.1
+    engines: {node: ^20 || ^22 || >=24}
+    peerDependencies:
+      '@playwright/test': ^1.43.1
+      '@testing-library/vue': ^8.0.1
+      '@vue/test-utils': ^2.4.6
+      happy-dom: ^19.0.0
+      jsdom: ^27.0.0
+      vitest: ^3.2.0
+    peerDependenciesMeta:
+      '@playwright/test':
+        optional: true
+      '@testing-library/vue':
+        optional: true
+      '@vue/test-utils':
+        optional: true
+      happy-dom:
+        optional: true
+      jsdom:
+        optional: true
+      vitest:
+        optional: true
 
   '@rolldown/binding-android-arm64@1.0.0-beta.35':
     resolution: {integrity: sha512-zVTg0544Ib1ldJSWwjy8URWYHlLFJ98rLnj+2FIj5fRs4KqGKP4VgH/pVUbXNGxeLFjItie6NSK1Un7nJixneQ==}
@@ -7755,6 +7783,45 @@ snapshots:
   '@prisma/get-platform@5.22.0':
     dependencies:
       '@prisma/debug': 5.22.0
+
+  '@qwestify/test-utils@https://codeload.github.com/12529572-Canada-Inc/test-utils/tar.gz/ad6ed0e059b2ddf35940474f6dce7912091e3f58(@playwright/test@1.56.0)(@vitest/ui@3.2.4)(@vue/test-utils@2.4.6)(happy-dom@18.0.1)(magicast@0.3.5)(playwright-core@1.56.0)(typescript@5.9.2)(vitest@3.2.4)':
+    dependencies:
+      '@nuxt/kit': 4.1.3(magicast@0.3.5)
+      c12: 3.3.0(magicast@0.3.5)
+      consola: 3.4.2
+      defu: 6.1.4
+      destr: 2.0.5
+      estree-walker: 3.0.3
+      fake-indexeddb: 6.2.3
+      get-port-please: 3.2.0
+      h3: 1.15.4
+      local-pkg: 1.1.2
+      magic-string: 0.30.19
+      node-fetch-native: 1.6.7
+      node-mock-http: 1.0.3
+      ofetch: 1.4.1
+      pathe: 2.0.3
+      perfect-debounce: 2.0.0
+      radix3: 1.1.2
+      scule: 1.3.0
+      std-env: 3.9.0
+      tinyexec: 1.0.1
+      ufo: 1.6.1
+      unplugin: 2.3.10
+      vitest-environment-nuxt: 1.0.1(@playwright/test@1.56.0)(@vitest/ui@3.2.4)(@vue/test-utils@2.4.6)(happy-dom@18.0.1)(magicast@0.3.5)(playwright-core@1.56.0)(typescript@5.9.2)(vitest@3.2.4)
+      vue: 3.5.22(typescript@5.9.2)
+    optionalDependencies:
+      '@playwright/test': 1.56.0
+      '@vue/test-utils': 2.4.6
+      happy-dom: 18.0.1
+      vitest: 3.2.4(@edge-runtime/vm@3.2.0)(@types/node@20.19.17)(@vitest/ui@3.2.4)(happy-dom@18.0.1)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+    transitivePeerDependencies:
+      - '@cucumber/cucumber'
+      - '@jest/globals'
+      - '@vitest/ui'
+      - magicast
+      - playwright-core
+      - typescript
 
   '@rolldown/binding-android-arm64@1.0.0-beta.35':
     optional: true

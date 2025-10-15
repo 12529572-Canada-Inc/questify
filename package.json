@@ -35,6 +35,7 @@
     "@oxc-minify/binding-linux-x64-gnu": "0.94.0",
     "@oxc-parser/binding-darwin-arm64": "0.94.0",
     "@oxc-transform/binding-darwin-arm64": "0.94.0",
+    "@qwestify/test-utils": "github:12529572-Canada-Inc/test-utils",
     "@types/node": "20.19.17",
     "@vuetify/loader-shared": "^2.1.1",
     "patch-package": "^8.0.1",
