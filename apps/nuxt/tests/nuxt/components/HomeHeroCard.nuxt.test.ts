@@ -3,8 +3,7 @@ import { describe, it, expect } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import HomeHeroCard from '~/components/home/HomeHeroCard.vue'
 
-// TODO: Enable this test once we have a stable testing environment for Vitest + Nuxt Test Utils
-describe.skip('HomeHeroCard', () => {
+describe('HomeHeroCard', () => {
   it('renders the hero title and tagline', async () => {
     const wrapper = await mountSuspended(HomeHeroCard)
 
