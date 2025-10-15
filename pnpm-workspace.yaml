@@ -1,3 +1,14 @@
 packages:
-- "apps/*"
-- "packages/*"
+  - apps/*
+  - packages/*
+
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - '@prisma/client'
+  - '@prisma/engines'
+  - bcrypt
+  - esbuild
+  - msgpackr-extract
+  - postinstall-postinstall
+  - prisma
+  - unrs-resolver
