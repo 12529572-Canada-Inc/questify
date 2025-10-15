@@ -26,7 +26,8 @@
     "test": "pnpm test:nuxt && pnpm test:worker && pnpm test:shared",
     "test:nuxt": "pnpm --filter nuxt test",
     "test:worker": "pnpm --filter worker test",
-    "test:shared": "pnpm --filter shared test"
+    "test:shared": "pnpm --filter shared test",
+    "postinstall": "patch-package"
   },
   "devDependencies": {
     "@oxc-minify/binding-darwin-arm64": "0.94.0",
