@@ -21,15 +21,29 @@ export function hashPassword(password: string): string {
  */
 export function verifyPassword(password: string, stored: string): boolean {
   try {
-    // Example structure:
-    // $scrypt$n=16384,r=8,p=1$<salt>$<key>
+    // Expected format: $scrypt$n=16384,r=8,p=1$<salt>$<key>
     const match = /^\$scrypt\$n=(\d+),r=(\d+),p=(\d+)\$([^$]+)\$([^$]+)$/.exec(stored);
-    if (!match) return false;
 
-    const [_, nStr, rStr, pStr, saltB64, keyB64] = match;
+    if (!match) {
+      console.error("Invalid scrypt hash format");
+      return false;
+    }
+
+    // Explicitly assert to satisfy TypeScript (no undefineds)
+    const nStr = match[1]!;
+    const rStr = match[2]!;
+    const pStr = match[3]!;
+    const saltB64 = match[4]!;
+    const keyB64 = match[5]!;
+
     const N = parseInt(nStr, 10);
     const r = parseInt(rStr, 10);
     const p = parseInt(pStr, 10);
+
+    if ([N, r, p].some((val) => isNaN(val))) {
+      console.error("Invalid scrypt parameters");
+      return false;
+    }
 
     const salt = Buffer.from(saltB64, "base64");
     const expectedKey = Buffer.from(keyB64, "base64");

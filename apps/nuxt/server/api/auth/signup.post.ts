@@ -4,12 +4,12 @@ import { hashPassword } from 'shared'
 const prisma = new PrismaClient()
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event)
+  const body = (await readBody<SignupBody>(event)) || {} as SignupBody
   const { email, password, name } = body
 
   const existing = await prisma.user.findUnique({ where: { email } })
   if (existing) {
-    throw createError({ statusCode: 409, statusMessage: 'User already exists' })
+    throw createError({ statusCode: 409, statusText: 'User already exists' })
   }
 
   const hashed = hashPassword(password)

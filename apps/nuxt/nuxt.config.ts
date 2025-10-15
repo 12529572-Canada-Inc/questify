@@ -1,25 +1,54 @@
+import { defineNuxtConfig } from 'nuxt/config'
+import type { NuxtConfig } from 'nuxt/schema'
+import path from 'path'
+
+// 🧠 Nuxt 4 Configuration — Questify
 export default defineNuxtConfig({
+  // ✅ Framework compatibility (locks in Nuxt 4 behavior)
+  compatibilityDate: '2025-10-12',
+
+  // 🗂️ Source directory (where your app/ folder is located)
+  alias: {
+    // Point ~ and @ to new app/ directory
+    '~': path.resolve(__dirname, 'app'),
+    '@': path.resolve(__dirname, 'app'),
+  },
+
+  // ⚙️ Modules
   modules: [
     '@nuxt/eslint',
     'vuetify-nuxt-module',
     'nuxt-auth-utils',
   ],
-  imports: {
-    dirs: ['middleware'],
-  },
+
+  // 🌐 App metadata and head configuration
   app: {
     head: {
       title: 'Questify',
       link: [
-        // SVG favicon
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
-
-        // Fallback for browsers that don't support SVG favicons
         { rel: 'icon', type: 'image/png', href: '/favicon.png' },
       ],
     },
   },
+
+  // 🧱 Auto-imported components
+  components: {
+    dirs: [
+      { path: '~/components', pathPrefix: false },
+    ],
+  },
+
+  // Hooks for debugging
+  //   hooks: {
+  //     'components:dirs'(dirs) {
+  //       console.log('Component scan dirs:', dirs)
+  //     },
+  //   },
+
+  // 🧩 Runtime configuration
   runtimeConfig: {
+    // 🔒 Server-only (not exposed to client)
     redis: {
       host: process.env.REDIS_HOST || 'localhost',
       port: process.env.REDIS_PORT || '6379',
@@ -27,9 +56,34 @@ export default defineNuxtConfig({
       url: process.env.REDIS_URL || '',
       tls: process.env.REDIS_TLS === 'true',
     },
+
+    // 🌍 Client-exposed
+    public: {
+      appEnv: process.env.NODE_ENV,
+      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || '/api',
+      questifyVersion: '4.1.3',
+    },
   },
-  compatibilityDate: '2025-09-25',
+
+  // 🧰 TypeScript configuration
+  typescript: {
+    strict: true,
+    typeCheck: true,
+    tsConfig: {
+      compilerOptions: {
+        moduleResolution: 'bundler',
+        esModuleInterop: true,
+        allowJs: false,
+        target: 'ES2022',
+      },
+    },
+  },
+
+  // ⚡ Vite configuration
   vite: {
+    define: {
+      'process.env.DEBUG': false,
+    },
     server: {
       watch: {
         ignored: [
@@ -42,16 +96,27 @@ export default defineNuxtConfig({
       },
     },
   },
-  typescript: {
-    strict: true,
-    typeCheck: true,
+
+  // 🧱 Build options
+  build: {
+    transpile: ['vuetify'],
   },
-  vuetify: {
-    moduleOptions: {
-      // Optional module-specific flags
-    },
-    vuetifyOptions: {
-      // Custom Vuetify options (themes, icons, etc.)
-    },
+
+  // 🚀 Nitro (server engine) config
+  nitro: {
+    preset: process.env.NITRO_PRESET || 'vercel', // or 'fly' for worker deployments
+    serveStatic: true,
+    compressPublicAssets: true,
   },
-})
+
+  // 🧪 Experimental features for performance
+  experimental: {
+    asyncContext: true,
+  },
+
+  // 💡 Vuetify customization (optional)
+  // vuetify: {
+  //   moduleOptions: {},
+  //   vuetifyOptions: {},
+  // },
+} satisfies NuxtConfig)

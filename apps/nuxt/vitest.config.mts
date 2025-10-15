@@ -1,22 +1,56 @@
-import { defineVitestConfig } from '@nuxt/test-utils/config'
+import { defineConfig } from 'vitest/config'
 import path from 'path'
 
-export default defineVitestConfig({
+const r = (p: string) => path.resolve(__dirname, p)
+
+export default defineConfig({
   test: {
-    environment: 'nuxt',
     globals: true,
-    setupFiles: ['./vitest.setup.ts'],
+    environment: 'node',
+
+    // 🧩 Centralized setup file (dotenv, mocks, globals, etc.)
+    setupFiles: [r('./vitest.setup.ts')],
+
+    // 🧠 Dependency optimizer ensures proper SSR behavior
     deps: {
       optimizer: {
-        ssr: {
-          include: ['shared'],
-        },
+        ssr: { include: ['shared'] },
       },
     },
+
+    // 🕒 Timeouts & stability settings
+    testTimeout: 180_000,
+    hookTimeout: 180_000,
+    // retry: 1,
+    // isolate: false,
+    // sequence: { concurrent: false },
+    // pool: 'forks',
+
+    // 🧹 Output clarity
+    reporters: ['default'],
+
+    // 🧭 Aliases for Nuxt conventions + shared packages
+    alias: {
+      '~': r('app'),
+      '@': r('app'),
+      'shared': r('../../packages/shared/src'),
+
+      // 🧪 Conditionally mock Prisma (based on env)
+      ...(process.env.USE_MOCKS === 'true'
+        ? { '@prisma/client': r('tests/mocks/prisma.ts') }
+        : {}),
+    },
   },
+
+  // 🔄 Keep for IDE consistency
   resolve: {
     alias: {
-      shared: path.resolve(__dirname, '../../packages/shared/src'),
+      '~': r('app'),
+      '@': r('app'),
+      'shared': r('../../packages/shared/src'),
+      ...(process.env.USE_MOCKS === 'true'
+        ? { '@prisma/client': r('tests/mocks/prisma.ts') }
+        : {}),
     },
   },
 })

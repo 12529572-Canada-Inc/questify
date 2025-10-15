@@ -3,12 +3,16 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./*"],
-      "@/*": ["./*"],
+      "~/*": ["./app/*"],
+      "@/*": ["./app/*"],
       "shared": ["../../packages/shared/src"],
       "shared/*": ["../../packages/shared/src/*"]
     },
     "types": [
+      "./types/nitro-shim",
+      "./types/nuxt-shim",
+      "@nuxt/types",
+      "@nuxt/schema",
       "@types/node",
       "nuxt-auth-utils",
       "vue-router",
@@ -19,15 +23,19 @@
     "noImplicitAny": false
   },
   "include": [
+    "app",
+    "server",
+    "tests",
     "nuxt.config.ts",
-    "app.vue",
-    "pages/**/*.vue",
-    "components/**/*.vue",
-    "composables/**/*.ts",
-    "plugins/**/*.ts",
-    "tests/**/*.ts",
-    ".nuxt/**/*.ts",
-    "env.d.ts"
+    "vite.config.ts",
+    // 👇 Explicitly pull in Nuxt’s generated declarations
+    ".nuxt",
+    ".nuxt/imports.d.ts",
+    ".nuxt/nuxt.d.ts"
   ],
-  "exclude": ["node_modules", "dist"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    ".output"
+  ]
 }

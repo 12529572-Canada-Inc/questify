@@ -4,17 +4,17 @@ import { verifyPassword } from 'shared'
 const prisma = new PrismaClient()
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event)
+  const body = (await readBody<LoginBody>(event)) || {} as LoginBody
   const { email, password } = body
 
   const user = await prisma.user.findUnique({ where: { email } })
   if (!user) {
-    throw createError({ statusCode: 401, statusMessage: 'Invalid credentials' })
+    throw createError({ statusCode: 401, statusText: 'Invalid credentials' })
   }
 
   const ok = verifyPassword(password, user.password)
   if (!ok) {
-    throw createError({ statusCode: 401, statusMessage: 'Invalid credentials' })
+    throw createError({ statusCode: 401, statusText: 'Invalid credentials' })
   }
 
   // set session

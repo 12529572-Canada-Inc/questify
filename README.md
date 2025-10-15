@@ -4,7 +4,7 @@
 
 Questify transforms goals into epic quests.
 
-This monorepo uses **Nuxt 3** for the frontend + API layer, **Prisma** for the database, and a **Worker** for AI-driven quest decomposition.
+This monorepo uses **Nuxt** for the frontend + API layer, **Prisma** for the database, and a **Worker** for AI-driven quest decomposition.
 
 ## Structure
 
