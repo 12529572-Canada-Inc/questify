@@ -11,15 +11,10 @@
     "lint": "eslint .",
     "lint:types": "npx nuxi typecheck",
     "format": "eslint . --fix",
-    "test": "pnpm dev:prepare && vitest run",
-    "test:unit": "pnpm dev:prepare && vitest run tests/unit tests/utils",
-    "test:nuxt": "pnpm dev:prepare && vitest run tests/nuxt",
-    "test:e2e": "pnpm dev:prepare && playwright test",
-    "test:silent": "pnpm dev:prepare && vitest run --silent",
-    "test:ui": "pnpm dev:prepare && vitest --ui",
-    "test:mock": "USE_MOCKS=true pnpm --filter nuxt test",
-    "test:integration": "USE_MOCKS=false pnpm --filter nuxt test",
-    "test:coverage": "pnpm dev:prepare && vitest run --coverage"
+    "test:unit": "pnpm dev:prepare && vitest --project unit run",
+    "test:runtime": "pnpm dev:prepare && vitest --project nuxt run",
+    "test:nuxt": "pnpm run test:nuxt:unit && pnpm run test:nuxt:runtime",
+    "test:e2e": "pnpm dev:prepare && playwright test"
   },
   "dependencies": {
     "@prisma/client": "5.22.0",
