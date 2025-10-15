@@ -1,7 +1,7 @@
-diff --git a/node_modules/.pnpm/@nuxt+test-utils@3.19.2_@playwright+test@1.56.0_@vitest+ui@3.2.4_@vue+test-utils@2.4.6__0110f7183063a930613c3d5827ced593/node_modules/@nuxt/test-utils/dist/vitest-environment.mjs b/node_modules/.pnpm/@nuxt+test-utils@3.19.2_@playwright+test@1.56.0_@vitest+ui@3.2.4_@vue+test-utils@2.4.6__0110f7183063a930613c3d5827ced593/node_modules/@nuxt/test-utils/dist/vitest-environment.mjs
+diff --git a/node_modules/@nuxt/test-utils/dist/vitest-environment.mjs b/node_modules/@nuxt/test-utils/dist/vitest-environment.mjs
 index 1111111..2222222 100644
---- a/node_modules/.pnpm/@nuxt+test-utils@3.19.2_@playwright+test@1.56.0_@vitest+ui@3.2.4_@vue+test-utils@2.4.6__0110f7183063a930613c3d5827ced593/node_modules/@nuxt/test-utils/dist/vitest-environment.mjs
-+++ b/node_modules/.pnpm/@nuxt+test-utils@3.19.2_@playwright+test@1.56.0_@vitest+ui@3.2.4_@vue+test-utils@2.4.6__0110f7183063a930613c3d5827ced593/node_modules/@nuxt/test-utils/dist/vitest-environment.mjs
+--- a/node_modules/@nuxt/test-utils/dist/vitest-environment.mjs
++++ b/node_modules/@nuxt/test-utils/dist/vitest-environment.mjs
 @@
    async setup(global) {
 -    const { ctx } = this
