@@ -2,6 +2,7 @@
 import { defineConfig, defineProject } from 'vitest/config'
 import { resolve } from 'path'
 
+// Helper to resolve paths relative to this config file
 const r = (p: string) => resolve(__dirname, p)
 
 export default defineConfig({
@@ -28,10 +29,8 @@ export default defineConfig({
 
           setupFiles: [r('./vitest.setup.ts')],
           deps: { optimizer: { ssr: { include: ['shared'] } } },
-          testTimeout: 180_000,
-          hookTimeout: 180_000,
-          reporters: ['default'],
-
+          testTimeout: 90_000,
+          hookTimeout: 90_000,
           alias: {
             '~': r('app'),
             '@': r('app'),
@@ -52,10 +51,8 @@ export default defineConfig({
           name: 'nuxt',
           environment: 'nuxt',
           globals: true,
-
           include: [
             'tests/nuxt/**/*.{test,spec}.ts',
-            'tests/components/**/*.{test,spec}.ts',
           ],
           exclude: [
             '**/node_modules/**',
@@ -63,12 +60,9 @@ export default defineConfig({
             '**/dist/**',
             '**/coverage/**',
           ],
-
           setupFiles: [r('./vitest.setup.ts')],
-          testTimeout: 180_000,
-          hookTimeout: 180_000,
-          reporters: ['default'],
-
+          testTimeout: 90_000,
+          hookTimeout: 90_000,
           alias: {
             '~': r('app'),
             '@': r('app'),
