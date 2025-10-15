@@ -1,6 +1,11 @@
 {
   "name": "questify",
   "private": true,
+  "pnpm": {
+    "patchedDependencies": {
+      "@nuxt/test-utils@3.19.2": "patches/@nuxt+test-utils@3.19.2.patch"
+    }
+  },
   "scripts": {
     "build": "pnpm --recursive build",
     "dev:nuxt": "pnpm --filter nuxt dev",
