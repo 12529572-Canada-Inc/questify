@@ -13,7 +13,7 @@
     "format": "eslint . --fix",
     "test:unit": "pnpm dev:prepare && vitest --project unit run",
     "test:runtime": "pnpm dev:prepare && vitest --project nuxt run",
-    "test:nuxt": "pnpm run test:nuxt:unit && pnpm run test:nuxt:runtime",
+    "test:nuxt": "pnpm run test:unit && pnpm run test:runtime",
     "test:e2e": "pnpm dev:prepare && playwright test",
     "test": "pnpm run test:unit && pnpm run test:runtime && pnpm run test:nuxt && pnpm run test:e2e"
   },
