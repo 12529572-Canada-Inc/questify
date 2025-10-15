@@ -1,4 +1,3 @@
-#!/bin/sh
 set -e
 
 # Always run from repository root
