@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.7.1] - 2025-10-15
+
+### 🛠 Fixes
+- Updated Dockerfile to run bash script so that the `prepare-safe.sh` script executes correctly in container environments.
+
 ## [1.7.0] - 2025-10-15
 
 ### ⚙️ Core & Framework
