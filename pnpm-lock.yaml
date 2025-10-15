@@ -22,7 +22,7 @@ importers:
         version: 0.94.0
       '@vuetify/loader-shared':
         specifier: ^2.1.1
-        version: 2.1.1(vue@3.5.22(typescript@5.9.2))(vuetify@3.10.3)
+        version: 2.1.1(vue@3.5.22(typescript@5.9.2))(vuetify@3.10.5)
       patch-package:
         specifier: ^8.0.1
         version: 8.0.1
@@ -38,6 +38,9 @@ importers:
       vite:
         specifier: ^7.1.10
         version: 7.1.10(@types/node@16.18.11)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+      vuetify:
+        specifier: ^3.10.5
+        version: 3.10.5(typescript@5.9.2)(vite-plugin-vuetify@2.1.2)(vue@3.5.22(typescript@5.9.2))
 
   apps/nuxt:
     dependencies:
@@ -6418,6 +6421,21 @@ packages:
       webpack-plugin-vuetify:
         optional: true
 
+  vuetify@3.10.5:
+    resolution: {integrity: sha512-3h1onfjcj04B+LJ0cXvGrOOe6C3652JAlyUAuGKgQXwhP9Oe1hAfdM6+svXR5Dt1xC39lQEGqJdacZtwisUEoQ==}
+    peerDependencies:
+      typescript: '>=4.7'
+      vite-plugin-vuetify: '>=2.1.0'
+      vue: ^3.5.0
+      webpack-plugin-vuetify: '>=3.1.0'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+      vite-plugin-vuetify:
+        optional: true
+      webpack-plugin-vuetify:
+        optional: true
+
   web-streams-polyfill@4.0.0-beta.3:
     resolution: {integrity: sha512-QW95TCTaHmsYfHDybGMwO5IJIM93I/6vTRk+daHTWFPhwh+C8Cg7j7XyKrwrj8Ib6vYXe0ocYNrmzY4xAAN6ug==}
     engines: {node: '>= 14'}
@@ -9078,11 +9096,11 @@ snapshots:
       vue: 3.5.21(typescript@5.9.2)
       vuetify: 3.10.3(typescript@5.9.2)(vite-plugin-vuetify@2.1.2)(vue@3.5.21(typescript@5.9.2))
 
-  '@vuetify/loader-shared@2.1.1(vue@3.5.22(typescript@5.9.2))(vuetify@3.10.3)':
+  '@vuetify/loader-shared@2.1.1(vue@3.5.22(typescript@5.9.2))(vuetify@3.10.5)':
     dependencies:
       upath: 2.0.1
       vue: 3.5.22(typescript@5.9.2)
-      vuetify: 3.10.3(typescript@5.9.2)(vite-plugin-vuetify@2.1.2)(vue@3.5.22(typescript@5.9.2))
+      vuetify: 3.10.5(typescript@5.9.2)(vite-plugin-vuetify@2.1.2)(vue@3.5.22(typescript@5.9.2))
 
   '@vueuse/core@13.9.0(vue@3.5.21(typescript@5.9.2))':
     dependencies:
@@ -13365,14 +13383,14 @@ snapshots:
       vite: 7.1.10(@types/node@20.19.17)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
       vue: 3.5.22(typescript@5.9.2)
 
-  vite-plugin-vuetify@2.1.2(vite@7.1.10(@types/node@16.18.11)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))(vue@3.5.22(typescript@5.9.2))(vuetify@3.10.3):
+  vite-plugin-vuetify@2.1.2(vite@7.1.10(@types/node@16.18.11)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))(vue@3.5.22(typescript@5.9.2))(vuetify@3.10.5):
     dependencies:
-      '@vuetify/loader-shared': 2.1.1(vue@3.5.22(typescript@5.9.2))(vuetify@3.10.3)
+      '@vuetify/loader-shared': 2.1.1(vue@3.5.22(typescript@5.9.2))(vuetify@3.10.5)
       debug: 4.4.3
       upath: 2.0.1
       vite: 7.1.10(@types/node@16.18.11)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
       vue: 3.5.22(typescript@5.9.2)
-      vuetify: 3.10.3(typescript@5.9.2)(vite-plugin-vuetify@2.1.2)(vue@3.5.22(typescript@5.9.2))
+      vuetify: 3.10.5(typescript@5.9.2)(vite-plugin-vuetify@2.1.2)(vue@3.5.22(typescript@5.9.2))
     transitivePeerDependencies:
       - supports-color
     optional: true
@@ -13687,12 +13705,12 @@ snapshots:
       typescript: 5.9.2
       vite-plugin-vuetify: 2.1.2(vite@7.1.10(@types/node@20.19.17)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))(vue@3.5.21(typescript@5.9.2))(vuetify@3.10.3)
 
-  vuetify@3.10.3(typescript@5.9.2)(vite-plugin-vuetify@2.1.2)(vue@3.5.22(typescript@5.9.2)):
+  vuetify@3.10.5(typescript@5.9.2)(vite-plugin-vuetify@2.1.2)(vue@3.5.22(typescript@5.9.2)):
     dependencies:
       vue: 3.5.22(typescript@5.9.2)
     optionalDependencies:
       typescript: 5.9.2
-      vite-plugin-vuetify: 2.1.2(vite@7.1.10(@types/node@16.18.11)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))(vue@3.5.22(typescript@5.9.2))(vuetify@3.10.3)
+      vite-plugin-vuetify: 2.1.2(vite@7.1.10(@types/node@16.18.11)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))(vue@3.5.22(typescript@5.9.2))(vuetify@3.10.5)
 
   web-streams-polyfill@4.0.0-beta.3: {}
 
