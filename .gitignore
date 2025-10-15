@@ -34,6 +34,9 @@ prisma/dev.db-journal
 # Generated
 *.tsbuildinfo
 
+# Test
+test-results/
+
 # Coverage
 coverage/
 *.lcov
