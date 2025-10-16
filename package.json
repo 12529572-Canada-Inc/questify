@@ -25,9 +25,6 @@
     "prisma:reset": "pnpm --filter prisma reset",
     "test": "pnpm test:nuxt && pnpm test:worker && pnpm test:shared",
     "test:nuxt": "pnpm --filter nuxt test",
-    "test:nuxt:e2e": "pnpm --filter nuxt test:e2e",
-    "test:nuxt:mock": "USE_MOCKS=true pnpm --filter nuxt test",
-    "test:nuxt:integration": "USE_MOCKS=false pnpm --filter nuxt test",
     "test:worker": "pnpm --filter worker test",
     "test:shared": "pnpm --filter shared test"
   },

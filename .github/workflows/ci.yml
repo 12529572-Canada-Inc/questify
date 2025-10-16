@@ -96,6 +96,9 @@ jobs:
                   pnpm --filter nuxt dev:prepare
                   pnpm --filter nuxt exec nuxi build
 
+            - name: 🌐 Install Playwright browsers
+              run: pnpm exec playwright install --with-deps
+
             - name: 🧪 Run tests
               env:
                   NUXT_TEST_UTILS_BUILD: true
