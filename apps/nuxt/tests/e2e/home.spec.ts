@@ -1,6 +1,7 @@
 import { expect, test } from '@nuxt/test-utils/playwright'
 
-test('homepage hero is visible', async ({ page }) => {
+test('homepage hero is visible', async ({ page, nuxt }) => {
+  console.log('🚀 Nuxt started at', nuxt?.host)
   await page.goto('/')
 
   await expect(page.getByText('Welcome to Questify')).toBeVisible()

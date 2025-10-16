@@ -18,6 +18,8 @@ export default defineConfig({
       },
     },
 
+    exclude: ['node_modules', '.nuxt', 'dist', 'tests/e2e'],
+
     // 🕒 Timeouts & stability settings
     testTimeout: 180_000,
     hookTimeout: 180_000,
