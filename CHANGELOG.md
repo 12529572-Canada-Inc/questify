@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 🚀 Features
+- Allow quest owners to edit task titles, details, and attach extra content directly from the quest view.
+- Surface owner-provided task extra content in the task list so collaborators can reference progress notes or resources.
+
+### 🗄️ Database
+- Added `extraContent` column to tasks to persist owner-authored follow-up content alongside generated task details.
+
+### 🛠 Fixes & Improvements
+- Expanded the task PATCH API to validate and accept combined updates for status, title, details, and extra content.
+
 ---
 
 ## [1.7.1] - 2025-10-15

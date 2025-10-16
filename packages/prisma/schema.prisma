@@ -37,6 +37,7 @@ model Task {
   questId   String
   title     String
   details   String?
+  extraContent String?
   order     Int
   status    String @default("todo") // todo, in-progress, done
   createdAt DateTime @default(now())
