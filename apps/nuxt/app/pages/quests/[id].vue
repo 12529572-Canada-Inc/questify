@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Task } from '@prisma/client'
 import { useIntervalFn } from '@vueuse/core'
 import { useQuest } from '~/composables/useQuest'
 import { useQuestActions } from '~/composables/useQuestActions'
@@ -24,11 +25,95 @@ const isOwner = computed(() => {
 const { tasksLoading, todoTasks, completedTasks, hasTasks } = useQuestTasks(questData)
 const { taskTab } = useQuestTaskTabs(todoTasks, completedTasks)
 
-const { markTaskCompleted, markTaskIncomplete, completeQuest, reopenQuest } = useQuestActions({
+const { markTaskCompleted, markTaskIncomplete, updateTask, completeQuest, reopenQuest } = useQuestActions({
   questId: id,
   refresh,
   isOwner,
 })
+
+const taskEditDialogOpen = ref(false)
+const taskEditSaving = ref(false)
+const taskEditError = ref<string | null>(null)
+const taskBeingEdited = ref<Task | null>(null)
+const taskEditForm = ref({
+  title: '',
+  details: '',
+  extraContent: '',
+})
+
+function normalizeOptionalContent(value: string) {
+  const trimmed = value.trim()
+  return trimmed.length > 0 ? trimmed : null
+}
+
+function pickString(source: Record<string, unknown> | undefined, key: string) {
+  const value = source?.[key]
+  return typeof value === 'string' ? value : undefined
+}
+
+function resolveTaskUpdateError(err: unknown) {
+  if (err && typeof err === 'object') {
+    const maybeError = err as Record<string, unknown>
+    const data = maybeError['data'] as Record<string, unknown> | undefined
+
+    return (
+      pickString(data, 'statusMessage')
+      ?? pickString(data, 'statusText')
+      ?? pickString(data, 'message')
+      ?? pickString(maybeError, 'statusMessage')
+      ?? pickString(maybeError, 'message')
+      ?? 'Unable to update the task. Please try again.'
+    )
+  }
+
+  return 'Unable to update the task. Please try again.'
+}
+
+function openTaskEditDialog(task: Task) {
+  taskBeingEdited.value = task
+  taskEditForm.value = {
+    title: task.title,
+    details: task.details ?? '',
+    extraContent: task.extraContent ?? '',
+  }
+  taskEditError.value = null
+  taskEditDialogOpen.value = true
+}
+
+function closeTaskEditDialog() {
+  taskEditDialogOpen.value = false
+}
+
+async function saveTaskEdits() {
+  if (!taskBeingEdited.value) {
+    return
+  }
+
+  const title = taskEditForm.value.title.trim()
+
+  if (!title) {
+    taskEditError.value = 'Task title is required.'
+    return
+  }
+
+  taskEditSaving.value = true
+  taskEditError.value = null
+
+  try {
+    await updateTask(taskBeingEdited.value.id, {
+      title,
+      details: normalizeOptionalContent(taskEditForm.value.details),
+      extraContent: normalizeOptionalContent(taskEditForm.value.extraContent),
+    })
+    taskEditDialogOpen.value = false
+  }
+  catch (err) {
+    taskEditError.value = resolveTaskUpdateError(err)
+  }
+  finally {
+    taskEditSaving.value = false
+  }
+}
 
 const questStatusMeta = computed(() => {
   const status = questData.value?.status ?? 'draft'
@@ -114,6 +199,18 @@ onMounted(() => {
     else pause()
   }, { immediate: true })
 })
+
+watch(taskEditDialogOpen, (isOpen) => {
+  if (!isOpen) {
+    taskBeingEdited.value = null
+    taskEditForm.value = {
+      title: '',
+      details: '',
+      extraContent: '',
+    }
+    taskEditError.value = null
+  }
+})
 </script>
 
 <template>
@@ -122,7 +219,7 @@ onMounted(() => {
       <v-col cols="12">
         <v-card v-if="questData">
           <v-card-title class="py-4">
-            <div class="quest-header d-flex align-center gap-3 flex-wrap">
+            <div class="quest-header d-flex align-center flex-wrap">
               <v-tooltip
                 location="bottom"
                 :text="questStatusMeta.label"
@@ -130,23 +227,16 @@ onMounted(() => {
                 <template #activator="{ props: tooltipProps }">
                   <v-avatar
                     v-bind="tooltipProps"
-                    size="48"
-                    variant="flat"
-                    :color="questStatusMeta.color"
+                    size="56"
                     class="quest-status-avatar elevation-2"
-                  >
-                    <v-icon
-                      :icon="questStatusMeta.icon"
-                      color="white"
-                      size="28"
-                    />
-                  </v-avatar>
+                    :image="'/quest.png'"
+                  />
                 </template>
               </v-tooltip>
 
               <div class="d-flex flex-column gap-2">
-                <div class="d-flex align-center gap-3 flex-wrap">
-                  <span class="text-h5 font-weight-medium text-truncate">
+                <div class="quest-title-row d-flex align-center flex-wrap">
+                  <span class="quest-title text-h5 font-weight-medium text-truncate">
                     {{ questData.title }}
                   </span>
                   <v-chip
@@ -182,7 +272,72 @@ onMounted(() => {
               :tasks-loading="tasksLoading"
               :is-owner="isOwner"
               :has-tasks="hasTasks"
+              @edit-task="openTaskEditDialog"
             />
+            <v-dialog
+              v-model="taskEditDialogOpen"
+              max-width="640"
+            >
+              <v-card>
+                <v-card-title class="text-h6">
+                  Edit Task
+                </v-card-title>
+                <v-card-text>
+                  <p class="text-body-2 text-medium-emphasis mb-4">
+                    Update the task details or add extra content that helps track progress or results.
+                  </p>
+                  <v-text-field
+                    v-model="taskEditForm.title"
+                    label="Title"
+                    :disabled="taskEditSaving"
+                    autofocus
+                    required
+                  />
+                  <v-textarea
+                    v-model="taskEditForm.details"
+                    label="Details"
+                    :disabled="taskEditSaving"
+                    auto-grow
+                    rows="3"
+                    hint="Optional. Provide additional guidance or notes for this task."
+                    persistent-hint
+                  />
+                  <v-textarea
+                    v-model="taskEditForm.extraContent"
+                    label="Extra Content"
+                    :disabled="taskEditSaving"
+                    auto-grow
+                    rows="4"
+                    hint="Optional. Capture lists, findings, or resources generated while completing this task."
+                    persistent-hint
+                  />
+                  <v-alert
+                    v-if="taskEditError"
+                    type="error"
+                    variant="tonal"
+                    class="mt-4"
+                    :text="taskEditError"
+                  />
+                </v-card-text>
+                <v-card-actions>
+                  <v-spacer />
+                  <v-btn
+                    variant="text"
+                    :disabled="taskEditSaving"
+                    @click="closeTaskEditDialog"
+                  >
+                    Cancel
+                  </v-btn>
+                  <v-btn
+                    color="primary"
+                    :loading="taskEditSaving"
+                    @click="saveTaskEdits"
+                  >
+                    Save Changes
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
           </v-card-text>
 
           <v-card-actions>
@@ -258,13 +413,22 @@ onMounted(() => {
 <style scoped>
 .quest-header {
   min-width: 0;
+  gap: 16px;
 }
 
 .quest-status-avatar {
-  border-radius: 12px;
+  border-radius: 16px;
 }
 
 .quest-status-chip {
   letter-spacing: 0.05em;
+}
+
+.quest-title-row {
+  gap: 12px;
+}
+
+.quest-title {
+  min-width: 0;
 }
 </style>

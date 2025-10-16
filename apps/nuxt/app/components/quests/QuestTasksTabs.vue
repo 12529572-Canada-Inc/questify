@@ -31,6 +31,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: TaskTab): void
+  (e: 'edit-task', task: Task): void
 }>()
 
 const taskTab = useVModel(props, 'modelValue', emit)
@@ -119,18 +120,46 @@ const taskTab = useVModel(props, 'modelValue', emit)
                             tag="div"
                             :text="task.details"
                           />
+                          <div
+                            v-if="task.extraContent"
+                            class="task-extra-content"
+                          >
+                            <span class="text-caption text-medium-emphasis d-block">Extra content</span>
+                            <TextWithLinks
+                              :text="task.extraContent"
+                              tag="div"
+                              :class="[
+                                'text-body-2',
+                                'task-extra-content__text',
+                                section.completed ? 'text-medium-emphasis task--completed' : '',
+                              ]"
+                            />
+                          </div>
                         </div>
                       </template>
                       <template #append>
-                        <v-btn
-                          v-if="isOwner && section.action"
-                          size="small"
-                          :color="section.action.color"
-                          variant="text"
-                          @click="section.action.handler(task.id)"
+                        <div
+                          v-if="isOwner"
+                          class="d-flex align-center"
+                          style="gap: 6px;"
                         >
-                          {{ section.action.label }}
-                        </v-btn>
+                          <v-btn
+                            icon="mdi-pencil"
+                            variant="text"
+                            density="comfortable"
+                            size="small"
+                            @click="emit('edit-task', task)"
+                          />
+                          <v-btn
+                            v-if="section.action"
+                            size="small"
+                            :color="section.action.color"
+                            variant="text"
+                            @click="section.action.handler(task.id)"
+                          >
+                            {{ section.action.label }}
+                          </v-btn>
+                        </div>
                       </template>
                     </v-list-item>
                   </v-list>
@@ -159,5 +188,14 @@ const taskTab = useVModel(props, 'modelValue', emit)
 <style scoped>
 .task--completed {
   text-decoration: line-through;
+}
+
+.task-extra-content {
+  margin-top: 8px;
+}
+
+.task-extra-content__text {
+  display: block;
+  white-space: pre-line;
 }
 </style>
