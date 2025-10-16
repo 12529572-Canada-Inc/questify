@@ -2,6 +2,7 @@
   "name": "nuxt",
   "version": "1.7.1",   
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "nuxt dev",
     "dev:prepare": "nuxt prepare",
