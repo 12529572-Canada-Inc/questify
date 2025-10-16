@@ -104,9 +104,7 @@ export default defineNuxtConfig({
 
   // 🚀 Nitro (server engine) config
   nitro: {
-    preset: process.env.NITRO_PRESET || 'vercel', // or 'fly' for worker deployments
-    serveStatic: true,
-    compressPublicAssets: true,
+    preset: process.env.NODE_ENV === 'test' ? 'node' : undefined,
   },
 
   // 🧪 Experimental features for performance
