@@ -12,7 +12,9 @@
     "lint": "eslint .",
     "lint:types": "npx nuxi typecheck",
     "format": "eslint . --fix",
-    "test": "pnpm dev:prepare && vitest run && pnpm exec playwright test",
+    "test:unit": "vitest run",
+    "test:e2e": "nuxt test --runner=playwright",
+    "test": "pnpm dev:prepare && pnpm test:unit && pnpm test:e2e",
     "test:coverage": "pnpm dev:prepare && vitest run --coverage"
   },
   "dependencies": {
