@@ -116,10 +116,11 @@ export default defineNuxtConfig({
 
   // 🔗 Hooks
   hooks: {
-    'vite:extendConfig'(viteConfig, { isClient: _isClient, isServer: _isServer }) {
-      if (process.env.NODE_ENV === 'test' || process.env.VITEST) {
-        viteConfig.plugins = (viteConfig.plugins || []).filter(
-          p => !(p as { name?: string })?.name?.includes?.('vite:checker'),
+    'vite:extendConfig'(config) {
+      // Disable vite-plugin-checker in test or CI contexts
+      if (process.env.NODE_ENV === 'test' || process.env.VITEST || process.env.CI) {
+        config.plugins = (config.plugins || []).filter(
+          plugin => !(plugin && typeof plugin === 'object' && 'name' in plugin && String(plugin.name).includes('vite:checker')),
         )
       }
     },
