@@ -6,9 +6,16 @@ interface QuestActionsOptions {
   isOwner: MaybeRef<boolean>
 }
 
-async function updateTaskStatus(
+type TaskMutationPayload = {
+  status?: 'todo' | 'pending' | 'in-progress' | 'completed' | 'draft'
+  title?: string
+  details?: string | null
+  extraContent?: string | null
+}
+
+async function mutateTask(
   taskId: string,
-  status: 'todo' | 'completed',
+  body: TaskMutationPayload,
   canMutate: () => boolean,
   refresh: () => Promise<void>,
 ) {
@@ -18,7 +25,7 @@ async function updateTaskStatus(
 
   await $fetch(`/api/tasks/${taskId}`, {
     method: 'PATCH',
-    body: { status },
+    body,
   })
 
   await refresh()
@@ -46,11 +53,15 @@ export function useQuestActions(options: QuestActionsOptions) {
   const canMutate = () => unref(options.isOwner)
 
   async function markTaskCompleted(taskId: string) {
-    await updateTaskStatus(taskId, 'completed', canMutate, options.refresh)
+    await mutateTask(taskId, { status: 'completed' }, canMutate, options.refresh)
   }
 
   async function markTaskIncomplete(taskId: string) {
-    await updateTaskStatus(taskId, 'todo', canMutate, options.refresh)
+    await mutateTask(taskId, { status: 'todo' }, canMutate, options.refresh)
+  }
+
+  async function updateTask(taskId: string, payload: TaskMutationPayload) {
+    await mutateTask(taskId, payload, canMutate, options.refresh)
   }
 
   async function completeQuest() {
@@ -64,6 +75,7 @@ export function useQuestActions(options: QuestActionsOptions) {
   return {
     markTaskCompleted,
     markTaskIncomplete,
+    updateTask,
     completeQuest,
     reopenQuest,
   }
