@@ -14,8 +14,6 @@
     "test": "pnpm dev:prepare && vitest run",
     "test:silent": "pnpm dev:prepare && vitest run --silent",
     "test:ui": "pnpm dev:prepare && vitest --ui",
-    "test:mock": "USE_MOCKS=true pnpm --filter nuxt test",
-    "test:integration": "USE_MOCKS=false pnpm --filter nuxt test",
     "test:coverage": "pnpm dev:prepare && vitest run --coverage",
     "test:e2e": "pnpm dev:prepare && pnpm exec playwright test"
   },
