@@ -9,7 +9,19 @@ type QuestWithTasks = {
 export function useQuestTasks(quest: MaybeRef<QuestWithTasks>) {
   const questValue = computed(() => unref(quest) ?? null)
 
-  const allTasks = computed<Task[]>(() => questValue.value?.tasks ?? [])
+  const allTasks = computed<Task[]>(() => {
+    const tasks = questValue.value?.tasks ?? []
+    return [...tasks].sort((a, b) => {
+      const aOrder = typeof a.order === 'number' ? a.order : Number.MAX_SAFE_INTEGER
+      const bOrder = typeof b.order === 'number' ? b.order : Number.MAX_SAFE_INTEGER
+
+      if (aOrder === bOrder) {
+        return a.id.localeCompare(b.id)
+      }
+
+      return aOrder - bOrder
+    })
+  })
 
   const tasksLoading = computed(() => {
     if (!questValue.value) {

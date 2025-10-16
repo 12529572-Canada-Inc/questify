@@ -205,7 +205,7 @@ watch(taskEditDialogOpen, (isOpen) => {
             <QuestTasksTabs
               v-model="taskTab"
               :sections="taskSections"
-              :pending="pending.value"
+              :pending="pending.value || false"
               :tasks-loading="tasksLoading"
               :is-owner="isOwner"
               :has-tasks="hasTasks"

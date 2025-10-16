@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🛠 Fixes & Improvements
 - Expanded the task PATCH API to validate and accept combined updates for status, title, details, and extra content.
+- Keep task ordering stable in the quest view after editing task details.
 
 ---
 
