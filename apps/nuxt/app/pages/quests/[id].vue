@@ -108,7 +108,7 @@ onMounted(() => {
             <QuestTasksTabs
               v-model="taskTab"
               :sections="taskSections"
-              :pending="pending"
+              :pending="pending.value"
               :tasks-loading="tasksLoading"
               :is-owner="isOwner"
               :has-tasks="hasTasks"
