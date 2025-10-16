@@ -115,6 +115,36 @@ async function saveTaskEdits() {
   }
 }
 
+const questStatusMeta = computed(() => {
+  const status = questData.value?.status ?? 'draft'
+  const base = {
+    label: 'Draft',
+    icon: 'mdi-pencil-circle',
+    color: 'secondary',
+  }
+
+  const map: Record<string, typeof base> = {
+    draft: base,
+    active: {
+      label: 'Active',
+      icon: 'mdi-timer-sand',
+      color: 'primary',
+    },
+    completed: {
+      label: 'Completed',
+      icon: 'mdi-check-circle',
+      color: 'success',
+    },
+    failed: {
+      label: 'Failed',
+      icon: 'mdi-alert-octagon',
+      color: 'error',
+    },
+  }
+
+  return map[status] ?? base
+})
+
 const taskSections = computed(() => [
   {
     value: 'todo' as const,
@@ -188,18 +218,44 @@ watch(taskEditDialogOpen, (isOpen) => {
     <v-row>
       <v-col cols="12">
         <v-card v-if="questData">
-          <v-card-title class="text-h5">
-            {{ questData.title }}
+          <v-card-title class="py-4">
+            <div class="quest-header d-flex align-center flex-wrap">
+              <v-avatar
+                size="56"
+                class="quest-status-avatar elevation-2"
+                :image="'/quest.png'"
+              />
+              <div class="d-flex flex-column gap-2">
+                <div class="quest-title-row d-flex align-center flex-wrap">
+                  <span class="quest-title text-h5 font-weight-medium text-truncate">
+                    {{ questData.title }}
+                  </span>
+                  <v-chip
+                    size="small"
+                    :color="questStatusMeta.color"
+                    variant="tonal"
+                    :prepend-icon="questStatusMeta.icon"
+                    class="quest-status-chip text-uppercase font-weight-medium"
+                  >
+                    {{ questStatusMeta.label }}
+                  </v-chip>
+                </div>
+                <template v-if="!isOwner">
+                  <div class="d-flex align-center gap-2 text-medium-emphasis text-body-2 flex-wrap">
+                    <v-icon
+                      icon="mdi-account"
+                      size="18"
+                    />
+                    <span>{{ questData.owner?.name ?? 'Unknown owner' }}</span>
+                  </div>
+                </template>
+              </div>
+            </div>
           </v-card-title>
-          <v-card-subtitle>Status: <strong>{{ questData.status }}</strong></v-card-subtitle>
           <v-card-text class="d-flex flex-column gap-4">
             <QuestDetailsSections :quest="questData" />
           </v-card-text>
           <v-divider class="my-4" />
-
-          <template v-if="!isOwner">
-            <QuestOwnerInfo :owner="questData.owner" />
-          </template>
 
           <v-card-text>
             <QuestTasksTabs
@@ -346,3 +402,26 @@ watch(taskEditDialogOpen, (isOpen) => {
     </v-row>
   </v-container>
 </template>
+
+<style scoped>
+.quest-header {
+  min-width: 0;
+  gap: 16px;
+}
+
+.quest-status-avatar {
+  border-radius: 16px;
+}
+
+.quest-status-chip {
+  letter-spacing: 0.05em;
+}
+
+.quest-title-row {
+  gap: 12px;
+}
+
+.quest-title {
+  min-width: 0;
+}
+</style>

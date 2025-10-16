@@ -20,6 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Expanded the task PATCH API to validate and accept combined updates for status, title, details, and extra content.
 - Keep task ordering stable in the quest view after editing task details.
 
+### 🎨 UI
+- Refined the quest detail header to display status with Vuetify avatars/chips and inline owner context instead of a plain status label.
+- Reworked quest detail sections into a tonal Vuetify list with contextual icons and a friendly alert fallback when no details are provided.
+
 ---
 
 ## [1.7.1] - 2025-10-15
