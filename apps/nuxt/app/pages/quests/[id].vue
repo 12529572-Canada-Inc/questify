@@ -220,20 +220,11 @@ watch(taskEditDialogOpen, (isOpen) => {
         <v-card v-if="questData">
           <v-card-title class="py-4">
             <div class="quest-header d-flex align-center flex-wrap">
-              <v-tooltip
-                location="bottom"
-                :text="questStatusMeta.label"
-              >
-                <template #activator="{ props: tooltipProps }">
-                  <v-avatar
-                    v-bind="tooltipProps"
-                    size="56"
-                    class="quest-status-avatar elevation-2"
-                    :image="'/quest.png'"
-                  />
-                </template>
-              </v-tooltip>
-
+              <v-avatar
+                size="56"
+                class="quest-status-avatar elevation-2"
+                :image="'/quest.png'"
+              />
               <div class="d-flex flex-column gap-2">
                 <div class="quest-title-row d-flex align-center flex-wrap">
                   <span class="quest-title text-h5 font-weight-medium text-truncate">
@@ -249,13 +240,15 @@ watch(taskEditDialogOpen, (isOpen) => {
                     {{ questStatusMeta.label }}
                   </v-chip>
                 </div>
-                <div class="d-flex align-center gap-2 text-medium-emphasis text-body-2 flex-wrap">
-                  <v-icon
-                    icon="mdi-account"
-                    size="18"
-                  />
-                  <span>{{ questData.owner?.name ?? 'Unknown owner' }}</span>
-                </div>
+                <template v-if="!isOwner">
+                  <div class="d-flex align-center gap-2 text-medium-emphasis text-body-2 flex-wrap">
+                    <v-icon
+                      icon="mdi-account"
+                      size="18"
+                    />
+                    <span>{{ questData.owner?.name ?? 'Unknown owner' }}</span>
+                  </div>
+                </template>
               </div>
             </div>
           </v-card-title>
