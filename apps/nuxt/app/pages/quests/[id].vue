@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useIntervalFn } from '@vueuse/core'
-import { computed, onMounted, watch } from 'vue'
 import { useQuest } from '~/composables/useQuest'
 import { useQuestActions } from '~/composables/useQuestActions'
 import { useQuestTaskTabs, useQuestTasks } from '~/composables/useQuestTasks'
@@ -109,7 +108,7 @@ onMounted(() => {
             <QuestTasksTabs
               v-model="taskTab"
               :sections="taskSections"
-              :pending="pending.value ?? false"
+              :pending="pending.value"
               :tasks-loading="tasksLoading"
               :is-owner="isOwner"
               :has-tasks="hasTasks"
