@@ -81,6 +81,8 @@ export default defineNuxtConfig({
 
   // ⚡ Vite configuration
   vite: {
+    optimizeDeps: { exclude: ['@vite-plugin-checker-runtime'] },
+    plugins: [],
     define: {
       'process.env.DEBUG': false,
     },
@@ -110,6 +112,17 @@ export default defineNuxtConfig({
   // 🧪 Experimental features for performance
   experimental: {
     asyncContext: true,
+  },
+
+  // 🔗 Hooks
+  hooks: {
+    'vite:extendConfig'(viteConfig, { isClient, isServer }) {
+      if (process.env.NODE_ENV === 'test' || process.env.VITEST) {
+        viteConfig.plugins = (viteConfig.plugins || []).filter(
+          p => !p?.name?.includes?.('vite:checker'),
+        )
+      }
+    },
   },
 
   // 💡 Vuetify customization (optional)
