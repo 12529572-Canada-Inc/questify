@@ -38,6 +38,11 @@ prisma/dev.db-journal
 coverage/
 *.lcov
 
+# Playwright
+playwright-report/
+test-results/
+blob-report/
+
 # Docker
 docker-data/
 .vercel

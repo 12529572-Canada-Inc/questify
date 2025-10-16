@@ -25,6 +25,7 @@
     "prisma:reset": "pnpm --filter prisma reset",
     "test": "pnpm test:nuxt && pnpm test:worker && pnpm test:shared",
     "test:nuxt": "pnpm --filter nuxt test",
+    "test:e2e": "pnpm --filter nuxt test:e2e",
     "test:worker": "pnpm --filter worker test",
     "test:shared": "pnpm --filter shared test"
   },
