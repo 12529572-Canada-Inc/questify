@@ -1,8 +1,7 @@
-import { expect, test } from '@nuxt/test-utils/playwright'
+import { expect, test } from '@playwright/test'
 
-test('homepage hero is visible', async ({ page, nuxt }) => {
-  console.log('🚀 Nuxt started at', nuxt?.host)
-  await page.goto('/')
+test('homepage hero is visible', async ({ page }) => {
+  await page.goto('/', { waitUntil: 'networkidle' })
 
   await expect(page.getByText('Welcome to Questify')).toBeVisible()
   await expect(page.getByRole('button', { name: 'View Quests' })).toBeVisible()

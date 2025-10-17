@@ -1,22 +1,26 @@
 import { defineConfig, devices } from '@playwright/test'
-import type { ConfigOptions } from '@nuxt/test-utils/playwright'
 import { fileURLToPath } from 'node:url'
 
 const testDir = fileURLToPath(new URL('./tests/e2e', import.meta.url))
-const nuxtRoot = fileURLToPath(new URL('.', import.meta.url))
 
-export default defineConfig<ConfigOptions>({
+export default defineConfig({
   testDir,
-  timeout: 60000, // ⏱️ allow up to 60 s per test
-  expect: { timeout: 10000 },
+  timeout: 60_000,
+  expect: { timeout: 10_000 },
+  retries: process.env.CI ? 1 : 0,
   use: {
-    trace: 'on-first-retry',
-    nuxt: {
-      rootDir: nuxtRoot,
-      dev: false, // ⛔ don’t use dev mode
-      build: true, // ✅ force a build before start
-      startTimeout: 30000, // ⏳ wait 30 s for server start
-    },
+    baseURL: process.env.PLAYWRIGHT_BASE_URL ?? 'http://127.0.0.1:3000',
+    trace: 'retain-on-failure',
+    video: 'retain-on-failure',
+  },
+  webServer: {
+    command: process.env.PLAYWRIGHT_WEB_SERVER_COMMAND
+      ?? 'pnpm --filter nuxt preview -- --hostname 127.0.0.1 --port 3000',
+    url: 'http://127.0.0.1:3000',
+    reuseExistingServer: !process.env.CI,
+    timeout: 120_000,
+    stdout: 'pipe',
+    stderr: 'pipe',
   },
   projects: [
     {

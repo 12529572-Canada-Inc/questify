@@ -17,7 +17,7 @@
     "format": "eslint . --fix",
     "test:unit": "vitest run",
     "test:coverage": "pnpm dev:prepare && vitest run --coverage",
-    "test:e2e": "NODE_ENV=test nuxt test --runner=playwright --config ./playwright.config.ts",
+    "test:e2e": "NUXT_TEST_UTILS_BUILD=1 NODE_ENV=test npx nuxi build && NUXT_TEST_UTILS_BUILD=1 NODE_ENV=test playwright test --config ./playwright.config.ts",
     "test": "pnpm dev:prepare && pnpm test:unit"
   },
   "dependencies": {
