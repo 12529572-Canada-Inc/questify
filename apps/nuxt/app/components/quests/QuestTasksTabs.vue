@@ -1,8 +1,17 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useVModel } from '@vueuse/core'
-import type { Task } from '@prisma/client'
+import type { Task, TaskInvestigation, User } from '@prisma/client'
 
 type TaskTab = 'todo' | 'completed'
+
+type TaskInvestigationWithUser = TaskInvestigation & {
+  initiatedBy: Pick<User, 'id' | 'name' | 'email'> | null
+}
+
+type TaskWithInvestigations = Task & {
+  investigations: TaskInvestigationWithUser[]
+}
 
 type QuestTaskSectionAction = {
   label: string
@@ -14,7 +23,7 @@ type QuestTaskSection = {
   value: TaskTab
   title: string
   color: string
-  tasks: Task[]
+  tasks: TaskWithInvestigations[]
   completed: boolean
   emptyMessage: string
   action?: QuestTaskSectionAction | null
@@ -27,14 +36,52 @@ const props = defineProps<{
   tasksLoading: boolean
   isOwner: boolean
   hasTasks: boolean
+  investigatingTaskIds?: string[]
 }>()
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: TaskTab): void
-  (e: 'edit-task', task: Task): void
+  (e: 'edit-task' | 'investigate-task', task: TaskWithInvestigations): void
 }>()
 
 const taskTab = useVModel(props, 'modelValue', emit)
+const investigatingIds = computed(() => new Set(props.investigatingTaskIds ?? []))
+
+const investigationStatusMeta = {
+  pending: {
+    label: 'Pending',
+    color: 'warning',
+    icon: 'mdi-progress-clock',
+  },
+  completed: {
+    label: 'Completed',
+    color: 'success',
+    icon: 'mdi-check-circle',
+  },
+  failed: {
+    label: 'Failed',
+    color: 'error',
+    icon: 'mdi-alert-circle',
+  },
+} as const
+
+const dateFormatter = new Intl.DateTimeFormat(undefined, {
+  dateStyle: 'medium',
+  timeStyle: 'short',
+})
+
+function formatInvestigationDate(value: string | Date) {
+  const date = typeof value === 'string' ? new Date(value) : value
+  if (Number.isNaN(date.getTime())) {
+    return ''
+  }
+  return dateFormatter.format(date)
+}
+
+function hasPendingInvestigation(task: TaskWithInvestigations) {
+  return task.investigations.some(inv => inv.status === 'pending')
+    || investigatingIds.value.has(task.id)
+}
 </script>
 
 <template>
@@ -135,6 +182,74 @@ const taskTab = useVModel(props, 'modelValue', emit)
                               ]"
                             />
                           </div>
+                          <div
+                            v-if="task.investigations.length"
+                            class="task-investigations"
+                          >
+                            <span class="text-caption text-medium-emphasis d-block">Investigations</span>
+                            <div class="d-flex flex-column task-investigation-list">
+                              <v-sheet
+                                v-for="investigation in task.investigations"
+                                :key="investigation.id"
+                                class="task-investigation-sheet"
+                                :color="investigationStatusMeta[investigation.status as keyof typeof investigationStatusMeta]?.color ?? 'surface'"
+                                variant="tonal"
+                              >
+                                <div class="d-flex justify-space-between align-start gap-4">
+                                  <div class="d-flex flex-column task-investigation-meta">
+                                    <div class="d-flex align-center gap-2">
+                                      <v-icon
+                                        :icon="investigationStatusMeta[investigation.status as keyof typeof investigationStatusMeta]?.icon ?? 'mdi-help-circle-outline'"
+                                        size="18"
+                                      />
+                                      <span class="text-body-2 font-weight-medium">
+                                        {{ investigationStatusMeta[investigation.status as keyof typeof investigationStatusMeta]?.label ?? investigation.status }}
+                                      </span>
+                                    </div>
+                                    <span class="text-caption text-medium-emphasis">
+                                      {{ formatInvestigationDate(investigation.createdAt) }}
+                                      <template v-if="investigation.initiatedBy?.name">
+                                        • {{ investigation.initiatedBy.name }}
+                                      </template>
+                                    </span>
+                                  </div>
+                                  <v-chip
+                                    v-if="investigation.status === 'pending'"
+                                    variant="outlined"
+                                    size="small"
+                                    color="warning"
+                                  >
+                                    <v-progress-circular
+                                      indeterminate
+                                      color="warning"
+                                      size="14"
+                                      width="2"
+                                      class="mr-1"
+                                    />
+                                    In progress
+                                  </v-chip>
+                                </div>
+                                <p
+                                  v-if="investigation.summary"
+                                  class="text-body-2 mt-3 mb-1"
+                                >
+                                  {{ investigation.summary }}
+                                </p>
+                                <TextWithLinks
+                                  v-if="investigation.details"
+                                  class="text-body-2 text-medium-emphasis task-investigation-details"
+                                  tag="div"
+                                  :text="investigation.details"
+                                />
+                                <p
+                                  v-if="investigation.status === 'failed' && investigation.error"
+                                  class="text-body-2 text-error mt-3 mb-0"
+                                >
+                                  {{ investigation.error }}
+                                </p>
+                              </v-sheet>
+                            </div>
+                          </div>
                         </div>
                       </template>
                       <template #append>
@@ -143,6 +258,25 @@ const taskTab = useVModel(props, 'modelValue', emit)
                           class="d-flex align-center"
                           style="gap: 6px;"
                         >
+                          <v-btn
+                            variant="text"
+                            density="comfortable"
+                            size="small"
+                            :disabled="hasPendingInvestigation(task) || pending"
+                            :aria-label="`Investigate ${task.title}`"
+                            @click="emit('investigate-task', task)"
+                          >
+                            <v-icon
+                              icon="mdi-flask-outline"
+                              size="18"
+                            />
+                            <v-tooltip
+                              activator="parent"
+                              location="bottom"
+                            >
+                              Investigate task
+                            </v-tooltip>
+                          </v-btn>
                           <v-btn
                             icon="mdi-pencil"
                             variant="text"
@@ -197,5 +331,26 @@ const taskTab = useVModel(props, 'modelValue', emit)
 .task-extra-content__text {
   display: block;
   white-space: pre-line;
+}
+
+.task-investigations {
+  margin-top: 12px;
+}
+
+.task-investigation-sheet {
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.task-investigation-details {
+  white-space: pre-line;
+}
+
+.task-investigation-list {
+  gap: 8px;
+}
+
+.task-investigation-meta {
+  gap: 4px;
 }
 </style>

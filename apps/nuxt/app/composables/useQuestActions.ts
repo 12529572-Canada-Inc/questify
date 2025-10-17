@@ -64,6 +64,18 @@ export function useQuestActions(options: QuestActionsOptions) {
     await mutateTask(taskId, payload, canMutate, options.refresh)
   }
 
+  async function investigateTask(taskId: string) {
+    if (!canMutate()) {
+      return
+    }
+
+    await $fetch(`/api/tasks/${taskId}/investigations`, {
+      method: 'POST',
+    })
+
+    await options.refresh()
+  }
+
   async function completeQuest() {
     await updateQuestStatus(options.questId, 'completed', canMutate, options.refresh)
   }
@@ -76,6 +88,7 @@ export function useQuestActions(options: QuestActionsOptions) {
     markTaskCompleted,
     markTaskIncomplete,
     updateTask,
+    investigateTask,
     completeQuest,
     reopenQuest,
   }

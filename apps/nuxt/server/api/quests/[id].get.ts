@@ -15,21 +15,40 @@ export default defineEventHandler(async (event) => {
 
   const quest = await prisma.quest.findUnique({
     where: { id },
-    include: { tasks: true, owner: {
-      select: {
-        id: true,
-        name: true,
-        email: true,
+    include: {
+      tasks: {
+        orderBy: { order: 'asc' },
+        include: {
+          investigations: {
+            orderBy: { createdAt: 'desc' },
+            include: {
+              initiatedBy: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                },
+              },
+            },
+          },
+        },
       },
-    } },
+      owner: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
   })
 
   if (!quest) {
-    throw createError({ statusCode: 404, statusText: 'Quest not found' })
+    throw createError({ status: 404, statusText: 'Quest not found' })
   }
 
   if (!canViewQuest(quest, userId)) {
-    throw createError({ statusCode: 403, statusText: 'You do not have permission to view this quest' })
+    throw createError({ status: 403, statusText: 'You do not have permission to view this quest' })
   }
 
   return quest

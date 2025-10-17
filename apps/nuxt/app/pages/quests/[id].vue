@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import type { Task } from '@prisma/client'
 import { useIntervalFn } from '@vueuse/core'
 import { useQuest } from '~/composables/useQuest'
 import { useQuestActions } from '~/composables/useQuestActions'
-import { useQuestTaskTabs, useQuestTasks } from '~/composables/useQuestTasks'
+import { useQuestTaskTabs, useQuestTasks, type TaskWithInvestigations } from '~/composables/useQuestTasks'
 
 const route = useRoute()
 const id = route.params.id as string
@@ -25,7 +24,7 @@ const isOwner = computed(() => {
 const { tasksLoading, todoTasks, completedTasks, hasTasks } = useQuestTasks(questData)
 const { taskTab } = useQuestTaskTabs(todoTasks, completedTasks)
 
-const { markTaskCompleted, markTaskIncomplete, updateTask, completeQuest, reopenQuest } = useQuestActions({
+const { markTaskCompleted, markTaskIncomplete, updateTask, investigateTask, completeQuest, reopenQuest } = useQuestActions({
   questId: id,
   refresh,
   isOwner,
@@ -34,12 +33,15 @@ const { markTaskCompleted, markTaskIncomplete, updateTask, completeQuest, reopen
 const taskEditDialogOpen = ref(false)
 const taskEditSaving = ref(false)
 const taskEditError = ref<string | null>(null)
-const taskBeingEdited = ref<Task | null>(null)
+const taskBeingEdited = ref<TaskWithInvestigations | null>(null)
 const taskEditForm = ref({
   title: '',
   details: '',
   extraContent: '',
 })
+const investigationError = ref<string | null>(null)
+const investigatingTaskIds = ref<Set<string>>(new Set())
+const investigatingTaskIdsList = computed(() => Array.from(investigatingTaskIds.value))
 
 function normalizeOptionalContent(value: string) {
   const trimmed = value.trim()
@@ -69,7 +71,7 @@ function resolveTaskUpdateError(err: unknown) {
   return 'Unable to update the task. Please try again.'
 }
 
-function openTaskEditDialog(task: Task) {
+function openTaskEditDialog(task: TaskWithInvestigations) {
   taskBeingEdited.value = task
   taskEditForm.value = {
     title: task.title,
@@ -112,6 +114,25 @@ async function saveTaskEdits() {
   }
   finally {
     taskEditSaving.value = false
+  }
+}
+
+async function startInvestigation(task: TaskWithInvestigations) {
+  if (investigatingTaskIds.value.has(task.id)) {
+    return
+  }
+
+  investigationError.value = null
+  investigatingTaskIds.value.add(task.id)
+
+  try {
+    await investigateTask(task.id)
+  }
+  catch (err) {
+    investigationError.value = resolveTaskUpdateError(err)
+  }
+  finally {
+    investigatingTaskIds.value.delete(task.id)
   }
 }
 
@@ -258,6 +279,16 @@ watch(taskEditDialogOpen, (isOpen) => {
           <v-divider class="my-4" />
 
           <v-card-text>
+            <v-alert
+              v-if="investigationError"
+              type="error"
+              variant="tonal"
+              closable
+              class="mb-4"
+              @click:close="investigationError = null"
+            >
+              {{ investigationError }}
+            </v-alert>
             <QuestTasksTabs
               v-model="taskTab"
               :sections="taskSections"
@@ -265,7 +296,9 @@ watch(taskEditDialogOpen, (isOpen) => {
               :tasks-loading="tasksLoading"
               :is-owner="isOwner"
               :has-tasks="hasTasks"
+              :investigating-task-ids="investigatingTaskIdsList"
               @edit-task="openTaskEditDialog"
+              @investigate-task="startInvestigation"
             />
             <v-dialog
               v-model="taskEditDialogOpen"
