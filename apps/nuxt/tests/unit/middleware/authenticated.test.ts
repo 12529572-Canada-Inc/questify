@@ -3,6 +3,11 @@ import { ref } from 'vue'
 import authenticatedMiddleware from '~/middleware/authenticated.global'
 
 describe('authenticated middleware', () => {
+  type MiddlewareArgs = Parameters<typeof authenticatedMiddleware>
+
+  const createTo = (path: string) => ({ path } as MiddlewareArgs[0])
+  const createFrom = () => ({} as MiddlewareArgs[1])
+
   afterEach(() => {
     vi.unstubAllGlobals()
   })
@@ -17,7 +22,7 @@ describe('authenticated middleware', () => {
     }))
     vi.stubGlobal('navigateTo', navigateTo)
 
-    await authenticatedMiddleware({ path: '/quests/new' } as any, {} as any)
+    await authenticatedMiddleware(createTo('/quests/new'), createFrom())
 
     expect(fetch).toHaveBeenCalledTimes(1)
     expect(navigateTo).not.toHaveBeenCalled()
@@ -33,7 +38,7 @@ describe('authenticated middleware', () => {
     }))
     vi.stubGlobal('navigateTo', navigateTo)
 
-    await authenticatedMiddleware({ path: '/quests/alpha' } as any, {} as any)
+    await authenticatedMiddleware(createTo('/quests/alpha'), createFrom())
 
     expect(fetch).toHaveBeenCalledTimes(1)
     expect(navigateTo).toHaveBeenCalledWith('/auth/login')
@@ -49,7 +54,7 @@ describe('authenticated middleware', () => {
     }))
     vi.stubGlobal('navigateTo', navigateTo)
 
-    await authenticatedMiddleware({ path: '/quests/beta' } as any, {} as any)
+    await authenticatedMiddleware(createTo('/quests/beta'), createFrom())
 
     expect(fetch).toHaveBeenCalledTimes(1)
     expect(navigateTo).not.toHaveBeenCalled()

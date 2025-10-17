@@ -4,15 +4,16 @@ import vue from '@vitejs/plugin-vue'
 
 const r = (p: string) => resolve(__dirname, p)
 
-const sharedAliases = {
+const sharedAliases: Record<string, string> = {
   '~': r('app'),
   '@': r('app'),
-  shared: r('../../packages/shared/src'),
-  '#imports': r('.nuxt/imports.mjs'),
+  'shared': r('../../packages/shared/src'),
   ...(process.env.USE_MOCKS === 'true'
     ? { '@prisma/client': r('tests/mocks/prisma.ts') }
     : {}),
 }
+
+sharedAliases['#imports'] = r('.nuxt/imports.mjs')
 
 export default defineConfig({
   test: {
@@ -44,7 +45,7 @@ export default defineConfig({
           reporters: ['default'],
           alias: {
             ...sharedAliases,
-            nuxt: r('node_modules/nuxt/dist/index.mjs'),
+            'nuxt': r('node_modules/nuxt/dist/index.mjs'),
             'nuxt/config': r('node_modules/nuxt/config.js'),
           },
         },
