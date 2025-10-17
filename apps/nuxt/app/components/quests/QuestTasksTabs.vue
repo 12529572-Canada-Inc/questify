@@ -189,111 +189,134 @@ function toggleInvestigationExpansion(investigationId: string) {
                               ]"
                             />
                           </div>
-                          <div
+                          <v-card
                             v-if="task.investigations.length"
                             class="task-investigations"
+                            variant="outlined"
                           >
-                            <span class="text-caption text-medium-emphasis d-block">Investigations</span>
-                            <div class="d-flex flex-column task-investigation-list">
-                              <v-sheet
-                                v-for="investigation in task.investigations"
-                                :key="investigation.id"
-                                class="task-investigation-sheet"
-                                variant="tonal"
+                            <v-card-title class="text-caption text-medium-emphasis">
+                              Investigations
+                            </v-card-title>
+                            <v-divider />
+                            <v-card-text>
+                              <v-list
+                                class="task-investigation-list"
+                                density="compact"
                               >
-                                <div class="d-flex justify-space-between align-start gap-4">
-                                  <div class="d-flex flex-column task-investigation-meta">
-                                    <v-chip
-                                      :color="investigationStatusMeta[investigation.status as keyof typeof investigationStatusMeta]?.color ?? 'default'"
-                                      variant="tonal"
-                                      size="small"
-                                      class="font-weight-medium"
-                                      :prepend-icon="investigationStatusMeta[investigation.status as keyof typeof investigationStatusMeta]?.icon ?? 'mdi-help-circle-outline'"
-                                    >
-                                      {{ investigationStatusMeta[investigation.status as keyof typeof investigationStatusMeta]?.label ?? investigation.status }}
-                                    </v-chip>
-                                    <span class="text-caption text-medium-emphasis">
-                                      {{ formatInvestigationDate(investigation.createdAt) }}
-                                      <template v-if="investigation.initiatedBy?.name">
-                                        • {{ investigation.initiatedBy.name }}
-                                      </template>
-                                    </span>
-                                  </div>
-                                  <v-chip
-                                    v-if="investigation.status === 'pending'"
-                                    variant="outlined"
-                                    size="small"
-                                    color="warning"
-                                  >
-                                    <v-progress-circular
-                                      indeterminate
-                                      color="warning"
-                                      size="14"
-                                      width="2"
-                                      class="mr-1"
-                                    />
-                                    In progress
-                                  </v-chip>
-                                </div>
-
-                                <div
-                                  class="task-investigation-content"
-                                  :class="{
-                                    'task-investigation-content--collapsed': expandedInvestigationId !== investigation.id,
-                                  }"
+                                <v-list-item
+                                  v-for="investigation in task.investigations"
+                                  :key="investigation.id"
+                                  class="pa-0"
                                 >
-                                  <div
-                                    v-if="investigation.prompt"
-                                    class="task-investigation-section"
+                                  <v-card
+                                    class="task-investigation-sheet"
+                                    variant="tonal"
                                   >
-                                    <span class="task-investigation-section__title">Context</span>
-                                    <MarkdownBlock
-                                      class="task-investigation-section__body"
-                                      :content="investigation.prompt"
-                                    />
-                                  </div>
-                                  <div
-                                    v-if="investigation.summary"
-                                    class="task-investigation-section"
-                                  >
-                                    <span class="task-investigation-section__title">Summary</span>
-                                    <MarkdownBlock
-                                      class="task-investigation-section__body"
-                                      :content="investigation.summary"
-                                    />
-                                  </div>
-                                  <div
-                                    v-if="investigation.details"
-                                    class="task-investigation-section"
-                                  >
-                                    <span class="task-investigation-section__title">Details</span>
-                                    <MarkdownBlock
-                                      class="task-investigation-section__body"
-                                      :content="investigation.details"
-                                    />
-                                  </div>
-                                </div>
-
-                                <p
-                                  v-if="investigation.status === 'failed' && investigation.error"
-                                  class="text-body-2 text-error mt-3 mb-0"
-                                >
-                                  {{ investigation.error }}
-                                </p>
-
-                                <v-btn
-                                  v-if="investigation.summary || investigation.details"
-                                  variant="text"
-                                  size="small"
-                                  class="task-investigation-toggle mt-3"
-                                  :append-icon="expandedInvestigationId === investigation.id ? 'mdi-chevron-up' : 'mdi-chevron-down'"
-                                  @click="toggleInvestigationExpansion(investigation.id)"
-                                >
-                                  {{ expandedInvestigationId === investigation.id ? 'Show less' : 'View full investigation' }}
-                                </v-btn>
-                              </v-sheet>
-                            </div>
-                          </div>
+                                    <v-card-item>
+                                      <div class="d-flex justify-space-between align-start gap-4">
+                                        <div class="d-flex flex-column task-investigation-meta">
+                                          <v-chip
+                                            :color="investigationStatusMeta[investigation.status as keyof typeof investigationStatusMeta]?.color ?? 'default'"
+                                            variant="tonal"
+                                            size="small"
+                                            class="font-weight-medium"
+                                            :prepend-icon="investigationStatusMeta[investigation.status as keyof typeof investigationStatusMeta]?.icon ?? 'mdi-help-circle-outline'"
+                                          >
+                                            {{ investigationStatusMeta[investigation.status as keyof typeof investigationStatusMeta]?.label ?? investigation.status }}
+                                          </v-chip>
+                                          <span class="text-caption text-medium-emphasis">
+                                            {{ formatInvestigationDate(investigation.createdAt) }}
+                                            <template v-if="investigation.initiatedBy?.name">
+                                              • {{ investigation.initiatedBy.name }}
+                                            </template>
+                                          </span>
+                                        </div>
+                                        <v-chip
+                                          v-if="investigation.status === 'pending'"
+                                          variant="outlined"
+                                          size="small"
+                                          color="warning"
+                                        >
+                                          <v-progress-circular
+                                            indeterminate
+                                            color="warning"
+                                            size="14"
+                                            width="2"
+                                            class="mr-1"
+                                          />
+                                          In progress
+                                        </v-chip>
+                                      </div>
+                                    </v-card-item>
+                                    <v-card-text>
+                                      <div
+                                        class="task-investigation-content"
+                                        :class="{
+                                          'task-investigation-content--collapsed': expandedInvestigationId !== investigation.id,
+                                        }"
+                                      >
+                                        <v-card
+                                          v-if="investigation.prompt"
+                                          class="mb-2"
+                                          variant="text"
+                                        >
+                                          <v-card-title class="task-investigation-section__title">
+                                            Context
+                                          </v-card-title>
+                                          <v-card-text class="task-investigation-section__body">
+                                            <MarkdownBlock :content="investigation.prompt" />
+                                          </v-card-text>
+                                        </v-card>
+                                        <v-card
+                                          v-if="investigation.summary"
+                                          class="mb-2"
+                                          variant="text"
+                                        >
+                                          <v-card-title class="task-investigation-section__title">
+                                            Summary
+                                          </v-card-title>
+                                          <v-card-text class="task-investigation-section__body">
+                                            <MarkdownBlock :content="investigation.summary" />
+                                          </v-card-text>
+                                        </v-card>
+                                        <v-card
+                                          v-if="investigation.details"
+                                          class="mb-2"
+                                          variant="text"
+                                        >
+                                          <v-card-title class="task-investigation-section__title">
+                                            Details
+                                          </v-card-title>
+                                          <v-card-text class="task-investigation-section__body">
+                                            <MarkdownBlock :content="investigation.details" />
+                                          </v-card-text>
+                                        </v-card>
+                                      </div>
+                                      <v-alert
+                                        v-if="investigation.status === 'failed' && investigation.error"
+                                        type="error"
+                                        class="mt-3 mb-0"
+                                        density="compact"
+                                        border="start"
+                                      >
+                                        {{ investigation.error }}
+                                      </v-alert>
+                                      <v-btn
+                                        v-if="investigation.summary || investigation.details"
+                                        variant="text"
+                                        size="small"
+                                        class="task-investigation-toggle mt-3"
+                                        :append-icon="expandedInvestigationId === investigation.id ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+                                        @click="toggleInvestigationExpansion(investigation.id)"
+                                      >
+                                        {{ expandedInvestigationId === investigation.id ? 'Show less' : 'View full investigation' }}
+                                      </v-btn>
+                                    </v-card-text>
+                                  </v-card>
+                                </v-list-item>
+                              </v-list>
+                            </v-card-text>
+                          </v-card>
                         </div>
                       </template>
                       <template #append>
