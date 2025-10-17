@@ -17,7 +17,7 @@ describe('authenticated middleware', () => {
     }))
     vi.stubGlobal('navigateTo', navigateTo)
 
-    await authenticatedMiddleware({ path: '/quests/new' } as any)
+    await authenticatedMiddleware({ path: '/quests/new' } as any, {} as any)
 
     expect(fetch).toHaveBeenCalledTimes(1)
     expect(navigateTo).not.toHaveBeenCalled()
@@ -33,7 +33,7 @@ describe('authenticated middleware', () => {
     }))
     vi.stubGlobal('navigateTo', navigateTo)
 
-    await authenticatedMiddleware({ path: '/quests/alpha' } as any)
+    await authenticatedMiddleware({ path: '/quests/alpha' } as any, {} as any)
 
     expect(fetch).toHaveBeenCalledTimes(1)
     expect(navigateTo).toHaveBeenCalledWith('/auth/login')
@@ -49,7 +49,7 @@ describe('authenticated middleware', () => {
     }))
     vi.stubGlobal('navigateTo', navigateTo)
 
-    await authenticatedMiddleware({ path: '/quests/beta' } as any)
+    await authenticatedMiddleware({ path: '/quests/beta' } as any, {} as any)
 
     expect(fetch).toHaveBeenCalledTimes(1)
     expect(navigateTo).not.toHaveBeenCalled()

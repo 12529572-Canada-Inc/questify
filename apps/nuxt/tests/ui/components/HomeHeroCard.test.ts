@@ -33,10 +33,12 @@ describe('HomeHeroCard', () => {
 
     expect(buttons).toHaveLength(2)
 
-    expect(buttons[0].text()).toBe('View Quests')
-    expect(buttons[0].attributes('data-to')).toBe('/quests')
+    const [viewQuests, createQuest] = buttons
 
-    expect(buttons[1].text()).toBe('Create Quest')
-    expect(buttons[1].attributes('data-to')).toBe('/quests/new')
+    expect(viewQuests?.text()).toBe('View Quests')
+    expect(viewQuests?.attributes('data-to')).toBe('/quests')
+
+    expect(createQuest?.text()).toBe('Create Quest')
+    expect(createQuest?.attributes('data-to')).toBe('/quests/new')
   })
 })
