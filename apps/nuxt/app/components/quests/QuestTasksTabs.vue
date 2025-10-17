@@ -350,14 +350,14 @@ function toggleInvestigationExpansion(investigationId: string) {
                             @click="emit('investigate-task', task)"
                           >
                             <v-icon
-                              icon="mdi-flask-outline"
+                              icon="mdi-magnify"
                               size="18"
                             />
                             <v-tooltip
                               activator="parent"
                               location="bottom"
                             >
-                              Investigate task
+                              Investigate
                             </v-tooltip>
                           </v-btn>
                           <v-btn
