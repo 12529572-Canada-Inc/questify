@@ -203,15 +203,15 @@ function toggleInvestigationExpansion(investigationId: string) {
                               >
                                 <div class="d-flex justify-space-between align-start gap-4">
                                   <div class="d-flex flex-column task-investigation-meta">
-                                    <div class="d-flex align-center gap-2">
-                                      <v-icon
-                                        :icon="investigationStatusMeta[investigation.status as keyof typeof investigationStatusMeta]?.icon ?? 'mdi-help-circle-outline'"
-                                        size="18"
-                                      />
-                                      <span class="text-body-2 font-weight-medium">
-                                        {{ investigationStatusMeta[investigation.status as keyof typeof investigationStatusMeta]?.label ?? investigation.status }}
-                                      </span>
-                                    </div>
+                                    <v-chip
+                                      :color="investigationStatusMeta[investigation.status as keyof typeof investigationStatusMeta]?.color ?? 'default'"
+                                      variant="tonal"
+                                      size="small"
+                                      class="font-weight-medium"
+                                      :prepend-icon="investigationStatusMeta[investigation.status as keyof typeof investigationStatusMeta]?.icon ?? 'mdi-help-circle-outline'"
+                                    >
+                                      {{ investigationStatusMeta[investigation.status as keyof typeof investigationStatusMeta]?.label ?? investigation.status }}
+                                    </v-chip>
                                     <span class="text-caption text-medium-emphasis">
                                       {{ formatInvestigationDate(investigation.createdAt) }}
                                       <template v-if="investigation.initiatedBy?.name">
