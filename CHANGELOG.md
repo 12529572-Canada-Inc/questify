@@ -12,17 +12,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 🚀 Features
 - Allow quest owners to edit task titles, details, and attach extra content directly from the quest view.
 - Surface owner-provided task extra content in the task list so collaborators can reference progress notes or resources.
+- Add an AI-powered "Investigate" action on tasks that spins up an agent to research next steps and capture findings per task.
+- Prompt owners for optional investigation context and track those instructions alongside every run.
 
 ### 🗄️ Database
 - Added `extraContent` column to tasks to persist owner-authored follow-up content alongside generated task details.
+- Introduced a `TaskInvestigation` table to store historical investigation runs, including status, summaries, and initiators.
+- Added a `prompt` column to persist the instructions used to launch each investigation.
 
 ### 🛠 Fixes & Improvements
 - Expanded the task PATCH API to validate and accept combined updates for status, title, details, and extra content.
 - Keep task ordering stable in the quest view after editing task details.
+- Added task investigation API endpoint, queue wiring, and worker processing so investigations are enqueued and resolved asynchronously.
 
 ### 🎨 UI
 - Refined the quest detail header to display status with Vuetify avatars/chips and inline owner context instead of a plain status label.
 - Reworked quest detail sections into a tonal Vuetify list with contextual icons and a friendly alert fallback when no details are provided.
+- Surfaced investigation history beneath each task with status badges, timestamps, summaries, and error messaging.
 
 ---
 

@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
   }
 
   if (taskRecord.quest.ownerId !== user.id) {
-    throw createError({ statusCode: 403, statusText: 'You do not have permission to modify this task' })
+    throw createError({ status: 403, statusText: 'You do not have permission to modify this task' })
   }
 
   const body = (await readBody<TaskBody>(event)) || {} as TaskBody

@@ -1,17 +1,29 @@
 import { computed, ref, unref, watch, type MaybeRef } from 'vue'
-import type { Task } from '@prisma/client'
+import type { Task, TaskInvestigation, User } from '@prisma/client'
+
+type TaskInvestigationWithUser = TaskInvestigation & {
+  initiatedBy: Pick<User, 'id' | 'name' | 'email'> | null
+}
+
+export type TaskWithInvestigations = Task & {
+  investigations: TaskInvestigationWithUser[]
+}
 
 type QuestWithTasks = {
   status?: string | null
-  tasks?: Task[] | null
+  tasks?: TaskWithInvestigations[] | null
 } | null | undefined
 
 export function useQuestTasks(quest: MaybeRef<QuestWithTasks>) {
   const questValue = computed(() => unref(quest) ?? null)
 
-  const allTasks = computed<Task[]>(() => {
-    const tasks = questValue.value?.tasks ?? []
-    return [...tasks].sort((a, b) => {
+  const allTasks = computed<TaskWithInvestigations[]>(() => {
+    const tasks = (questValue.value?.tasks ?? []).map(task => ({
+      ...task,
+      investigations: Array.isArray(task.investigations) ? task.investigations : [],
+    }))
+
+    return tasks.sort((a, b) => {
       const aOrder = typeof a.order === 'number' ? a.order : Number.MAX_SAFE_INTEGER
       const bOrder = typeof b.order === 'number' ? b.order : Number.MAX_SAFE_INTEGER
 

@@ -6,9 +6,15 @@ const WorkerMock = vi.fn(() => workerInstance);
 const parseJsonFromModelMock = vi.fn();
 const taskCreateMock = vi.fn();
 const questUpdateMock = vi.fn();
+const taskInvestigationFindUniqueMock = vi.fn();
+const taskInvestigationUpdateMock = vi.fn();
 const PrismaClientMock = vi.fn(() => ({
   task: { create: taskCreateMock },
   quest: { update: questUpdateMock },
+  taskInvestigation: {
+    findUnique: taskInvestigationFindUniqueMock,
+    update: taskInvestigationUpdateMock,
+  },
 }));
 const openAiCreateMock = vi.fn();
 const OpenAIMock = vi.fn(() => ({
@@ -51,6 +57,8 @@ describe('worker entrypoint', () => {
     parseJsonFromModelMock.mockReset();
     taskCreateMock.mockReset();
     questUpdateMock.mockReset();
+    taskInvestigationFindUniqueMock.mockReset();
+    taskInvestigationUpdateMock.mockReset();
     PrismaClientMock.mockClear();
     openAiCreateMock.mockReset();
     OpenAIMock.mockClear();
@@ -70,10 +78,10 @@ describe('worker entrypoint', () => {
 
     await importWorker();
 
-    expect(WorkerMock).toHaveBeenCalledTimes(1);
-    const workerArgs = WorkerMock.mock.calls[0];
-    expect(workerArgs[0]).toBe('quests');
-    expect(workerArgs[2]).toEqual({
+    expect(WorkerMock).toHaveBeenCalledTimes(2);
+    const [questWorkerArgs, taskWorkerArgs] = WorkerMock.mock.calls;
+    expect(questWorkerArgs[0]).toBe('quests');
+    expect(questWorkerArgs[2]).toEqual({
       connection: {
         host: 'fallback-host',
         port: 6380,
@@ -81,6 +89,8 @@ describe('worker entrypoint', () => {
         tls: {},
       },
     });
+    expect(taskWorkerArgs[0]).toBe('tasks');
+    expect(taskWorkerArgs[2]).toEqual(questWorkerArgs[2]);
   });
 
   it('prefers the parsed redis configuration when available', async () => {
@@ -88,7 +98,7 @@ describe('worker entrypoint', () => {
 
     await importWorker();
 
-    expect(WorkerMock).toHaveBeenCalledTimes(1);
+    expect(WorkerMock).toHaveBeenCalledTimes(2);
     const workerArgs = WorkerMock.mock.calls[0];
     expect(workerArgs[2]).toEqual({
       connection: shared.parseRedisUrl('redis://url-host:1234'),
@@ -114,8 +124,7 @@ describe('worker entrypoint', () => {
 
     await importWorker();
 
-    const workerArgs = WorkerMock.mock.calls[0];
-    const processor = workerArgs[1];
+    const processor = WorkerMock.mock.calls[0][1];
     const job = {
       name: 'decompose',
       data: {
@@ -168,8 +177,7 @@ describe('worker entrypoint', () => {
 
     await importWorker();
 
-    const workerArgs = WorkerMock.mock.calls[0];
-    const processor = workerArgs[1];
+    const processor = WorkerMock.mock.calls[0][1];
     const errorSpy = vi
       .spyOn(console, 'error')
       .mockImplementation(() => {});
@@ -186,6 +194,122 @@ describe('worker entrypoint', () => {
     });
     expect(errorSpy).toHaveBeenCalledWith(
       'Error during quest decomposition:',
+      expect.any(Error),
+    );
+
+    errorSpy.mockRestore();
+  });
+
+  it('processes investigate-task jobs and stores investigation results', async () => {
+    configMock.redisUrl = 'redis://redis-host:6379';
+    parseJsonFromModelMock.mockReturnValue({
+      summary: 'Key findings',
+      details: 'Detailed analysis',
+    });
+    openAiCreateMock.mockResolvedValue({
+      choices: [
+        {
+          message: {
+            content: 'investigation-content',
+          },
+        },
+      ],
+    });
+    taskInvestigationFindUniqueMock.mockResolvedValue({
+      id: 'inv-1',
+      task: {
+        title: 'Task Title',
+        details: 'Task details',
+        extraContent: 'Owner notes',
+        quest: {
+          title: 'Quest Title',
+          goal: 'Quest Goal',
+          context: 'Quest Context',
+          constraints: 'Quest Constraints',
+        },
+      },
+    });
+
+    await importWorker();
+
+    const processor = WorkerMock.mock.calls[1][1];
+    await processor({
+      name: 'investigate-task',
+      data: { investigationId: 'inv-1' },
+    });
+
+    expect(taskInvestigationFindUniqueMock).toHaveBeenCalledWith({
+      where: { id: 'inv-1' },
+      include: {
+        task: {
+          select: {
+            id: true,
+            title: true,
+            details: true,
+            extraContent: true,
+            quest: {
+              select: {
+                title: true,
+                goal: true,
+                context: true,
+                constraints: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    expect(parseJsonFromModelMock).toHaveBeenCalledWith('investigation-content');
+    expect(taskInvestigationUpdateMock).toHaveBeenCalledWith({
+      where: { id: 'inv-1' },
+      data: {
+        status: 'completed',
+        summary: 'Key findings',
+        details: 'Detailed analysis',
+        error: null,
+      },
+    });
+  });
+
+  it('marks investigations as failed when OpenAI throws', async () => {
+    configMock.redisUrl = 'redis://redis-host:6379';
+    openAiCreateMock.mockRejectedValue(new Error('investigation failure'));
+    taskInvestigationFindUniqueMock.mockResolvedValue({
+      id: 'inv-1',
+      task: {
+        title: 'Task Title',
+        details: null,
+        extraContent: null,
+        quest: {
+          title: 'Quest Title',
+          goal: null,
+          context: null,
+          constraints: null,
+        },
+      },
+    });
+
+    await importWorker();
+
+    const processor = WorkerMock.mock.calls[1][1];
+    const errorSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
+    await processor({
+      name: 'investigate-task',
+      data: { investigationId: 'inv-1' },
+    });
+
+    expect(taskInvestigationUpdateMock).toHaveBeenCalledWith({
+      where: { id: 'inv-1' },
+      data: {
+        status: 'failed',
+        error: 'investigation failure',
+      },
+    });
+    expect(errorSpy).toHaveBeenCalledWith(
+      'Error during task investigation:',
       expect.any(Error),
     );
 

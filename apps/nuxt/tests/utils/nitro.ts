@@ -4,6 +4,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import path from 'node:path'
 import fs from 'node:fs'
 import type { Nitro } from 'nitropack'
+import type { RequestListener } from 'node:http'
 
 export async function setupNitro() {
   const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -39,7 +40,12 @@ export async function setupNitro() {
     preset: 'node',
   })
 
-  const listener = await listen(nitro.h3App, { port: 0 })
+  if (!nitro.h3App) {
+    throw new Error('Nitro instance did not expose an h3App handler')
+  }
+
+  const requestListener = nitro.h3App as unknown as RequestListener
+  const listener = await listen(requestListener, { port: 0 })
   console.log(`⚙️  Using in-memory Nitro → ${listener.url}`)
 
   return {
