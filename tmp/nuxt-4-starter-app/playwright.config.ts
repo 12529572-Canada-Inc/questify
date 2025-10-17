@@ -2,7 +2,7 @@
     import { defineConfig } from '@playwright/test';
 
     export default defineConfig({
-      testDir: './e2e', // Or wherever your E2E tests are located
+      testDir: './tests/e2e', // Or wherever your E2E tests are located
       webServer: {
         command: 'npm run dev', // Command to start your Nuxt development server
         port: 3000, // Port your Nuxt app runs on
