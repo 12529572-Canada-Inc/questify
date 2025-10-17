@@ -255,42 +255,58 @@ function toggleInvestigationExpansion(investigationId: string) {
                                           'task-investigation-content--collapsed': expandedInvestigationId !== investigation.id,
                                         }"
                                       >
-                                        <v-card
-                                          v-if="investigation.prompt"
-                                          class="mb-2"
-                                          variant="text"
-                                        >
-                                          <v-card-title class="task-investigation-section__title">
-                                            Context
-                                          </v-card-title>
-                                          <v-card-text class="task-investigation-section__body">
-                                            <MarkdownBlock :content="investigation.prompt" />
-                                          </v-card-text>
-                                        </v-card>
-                                        <v-card
-                                          v-if="investigation.summary"
-                                          class="mb-2"
-                                          variant="text"
-                                        >
-                                          <v-card-title class="task-investigation-section__title">
-                                            Summary
-                                          </v-card-title>
-                                          <v-card-text class="task-investigation-section__body">
-                                            <MarkdownBlock :content="investigation.summary" />
-                                          </v-card-text>
-                                        </v-card>
-                                        <v-card
-                                          v-if="investigation.details"
-                                          class="mb-2"
-                                          variant="text"
-                                        >
-                                          <v-card-title class="task-investigation-section__title">
-                                            Details
-                                          </v-card-title>
-                                          <v-card-text class="task-investigation-section__body">
-                                            <MarkdownBlock :content="investigation.details" />
-                                          </v-card-text>
-                                        </v-card>
+                                        <template v-if="expandedInvestigationId === investigation.id">
+                                          <v-card
+                                            v-if="investigation.prompt"
+                                            class="mb-2"
+                                            variant="text"
+                                          >
+                                            <v-card-title class="task-investigation-section__title">
+                                              Context
+                                            </v-card-title>
+                                            <v-card-text class="task-investigation-section__body">
+                                              <MarkdownBlock :content="investigation.prompt" />
+                                            </v-card-text>
+                                          </v-card>
+                                          <v-card
+                                            v-if="investigation.summary"
+                                            class="mb-2"
+                                            variant="text"
+                                          >
+                                            <v-card-title class="task-investigation-section__title">
+                                              Summary
+                                            </v-card-title>
+                                            <v-card-text class="task-investigation-section__body">
+                                              <MarkdownBlock :content="investigation.summary" />
+                                            </v-card-text>
+                                          </v-card>
+                                          <v-card
+                                            v-if="investigation.details"
+                                            class="mb-2"
+                                            variant="text"
+                                          >
+                                            <v-card-title class="task-investigation-section__title">
+                                              Details
+                                            </v-card-title>
+                                            <v-card-text class="task-investigation-section__body">
+                                              <MarkdownBlock :content="investigation.details" />
+                                            </v-card-text>
+                                          </v-card>
+                                        </template>
+                                        <template v-else>
+                                          <v-card
+                                            v-if="investigation.summary"
+                                            class="mb-2"
+                                            variant="text"
+                                          >
+                                            <v-card-title class="task-investigation-section__title">
+                                              Summary
+                                            </v-card-title>
+                                            <v-card-text class="task-investigation-section__body">
+                                              <MarkdownBlock :content="investigation.summary" />
+                                            </v-card-text>
+                                          </v-card>
+                                        </template>
                                       </div>
                                       <v-alert
                                         v-if="investigation.status === 'failed' && investigation.error"

@@ -4,7 +4,11 @@ import handler from '../../server/api/tasks/[id]/investigations.post'
 type RequireUserSessionMock = (event?: unknown) => Promise<{ user: { id: string } }>
 type GetRouterParamMock = (event: unknown, name: string) => string
 type ReadBodyMock = (event: unknown) => Promise<unknown>
-type CreateErrorMock = (input: { status?: number; statusCode?: number; statusText?: string }) => Error
+type CreateErrorMock = (input: {
+  status?: number
+  statusCode?: number
+  statusText?: string
+}) => Error
 
 const globalWithMocks = globalThis as typeof globalThis & {
   requireUserSession?: RequireUserSessionMock
