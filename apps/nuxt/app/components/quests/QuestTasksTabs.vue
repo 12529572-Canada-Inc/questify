@@ -411,7 +411,7 @@ function toggleInvestigationExpansion(investigationId: string) {
 
 .task-investigation-list {
   gap: 8px;
-  max-height: 320px;
+  max-height: 420px;
   overflow-y: auto;
   padding-right: 4px;
   scroll-behavior: smooth;
