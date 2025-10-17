@@ -162,6 +162,11 @@ async function submitInvestigation() {
   const taskId = investigationTargetTask.value.id
   const prompt = investigationPrompt.value.trim()
 
+  if (prompt.length === 0) {
+    investigationDialogError.value = 'Please provide some context for the investigation.'
+    return
+  }
+
   if (prompt.length > 1000) {
     investigationDialogError.value = 'Please keep investigation context under 1000 characters.'
     return
@@ -455,7 +460,7 @@ watch(taskEditDialogOpen, (isOpen) => {
                 <v-card-text class="d-flex flex-column gap-4">
                   <div>
                     <p class="text-body-2 mb-2">
-                      Provide additional context or questions for the AI agent to research. This will be saved with the investigation history.
+                      Provide additional context or questions for the Quest Agent to research.
                     </p>
                     <v-textarea
                       v-model="investigationPrompt"
@@ -465,7 +470,7 @@ watch(taskEditDialogOpen, (isOpen) => {
                       rows="4"
                       maxlength="1000"
                       counter
-                      hint="Optional. Describe what you want the agent to look into."
+                      hint="This will help generate insights or suggestions related to the task."
                       persistent-hint
                     />
                   </div>
