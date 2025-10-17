@@ -1,58 +1,79 @@
-import { defineConfig } from 'vitest/config'
-import path from 'path'
+import { defineConfig, defineProject } from 'vitest/config'
+import { resolve } from 'path'
+import vue from '@vitejs/plugin-vue'
 
-const r = (p: string) => path.resolve(__dirname, p)
+const r = (p: string) => resolve(__dirname, p)
+
+const sharedAliases = {
+  '~': r('app'),
+  '@': r('app'),
+  shared: r('../../packages/shared/src'),
+  '#imports': r('.nuxt/imports.mjs'),
+  ...(process.env.USE_MOCKS === 'true'
+    ? { '@prisma/client': r('tests/mocks/prisma.ts') }
+    : {}),
+}
 
 export default defineConfig({
   test: {
-    globals: true,
-    environment: 'node',
-
-    // 🧩 Centralized setup file (dotenv, mocks, globals, etc.)
-    setupFiles: [r('./vitest.setup.ts')],
-
-    // 🧠 Dependency optimizer ensures proper SSR behavior
-    deps: {
-      optimizer: {
-        ssr: { include: ['shared'] },
-      },
-    },
-
-    exclude: ['node_modules', '.nuxt', 'dist', 'tests/e2e'],
-
-    // 🕒 Timeouts & stability settings
-    testTimeout: 180_000,
-    hookTimeout: 180_000,
-    // retry: 1,
-    // isolate: false,
-    // sequence: { concurrent: false },
-    // pool: 'forks',
-
-    // 🧹 Output clarity
-    reporters: ['default'],
-
-    // 🧭 Aliases for Nuxt conventions + shared packages
-    alias: {
-      '~': r('app'),
-      '@': r('app'),
-      'shared': r('../../packages/shared/src'),
-
-      // 🧪 Conditionally mock Prisma (based on env)
-      ...(process.env.USE_MOCKS === 'true'
-        ? { '@prisma/client': r('tests/mocks/prisma.ts') }
-        : {}),
-    },
+    projects: [
+      defineProject({
+        test: {
+          name: 'unit',
+          globals: true,
+          environment: 'node',
+          include: ['tests/{api,unit,utils}/**/*.{test,spec}.ts'],
+          exclude: [
+            '**/node_modules/**',
+            '**/.nuxt/**',
+            '**/.output/**',
+            '**/e2e/**',
+            '**/mocks/**',
+            '**/fixtures/**',
+            '**/dist/**',
+            '**/coverage/**',
+          ],
+          setupFiles: [r('./vitest.setup.ts')],
+          deps: {
+            optimizer: {
+              ssr: { include: ['shared'] },
+            },
+          },
+          testTimeout: 90_000,
+          hookTimeout: 90_000,
+          reporters: ['default'],
+          alias: {
+            ...sharedAliases,
+            nuxt: r('node_modules/nuxt/dist/index.mjs'),
+            'nuxt/config': r('node_modules/nuxt/config.js'),
+          },
+        },
+      }),
+      defineProject({
+        test: {
+          name: 'ui',
+          globals: true,
+          environment: 'happy-dom',
+          include: ['tests/ui/**/*.{test,spec}.ts'],
+          exclude: [
+            '**/node_modules/**',
+            '**/.output/**',
+            '**/dist/**',
+            '**/coverage/**',
+          ],
+          setupFiles: [r('./vitest.setup.ts')],
+          testTimeout: 90_000,
+          hookTimeout: 90_000,
+          reporters: ['default'],
+          alias: {
+            ...sharedAliases,
+          },
+        },
+        plugins: [vue()],
+      }),
+    ],
   },
-
-  // 🔄 Keep for IDE consistency
   resolve: {
-    alias: {
-      '~': r('app'),
-      '@': r('app'),
-      'shared': r('../../packages/shared/src'),
-      ...(process.env.USE_MOCKS === 'true'
-        ? { '@prisma/client': r('tests/mocks/prisma.ts') }
-        : {}),
-    },
+    alias: sharedAliases,
   },
 })

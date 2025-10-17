@@ -3,6 +3,7 @@ import { config } from 'dotenv'
 import { execSync } from 'node:child_process'
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
+import { computed } from 'vue'
 
 // ------------------------------------------------------
 // 1️⃣ Load environment for tests
@@ -30,6 +31,23 @@ if (!globalThis.getUserSession) {
   globalThis.getUserSession = async () => ({
     user: { id: 'mock-user-1', name: 'Mock Tester' },
   })
+}
+
+if (!globalThis.__nuxt_app__) {
+  const vueApp = {
+    config: { globalProperties: {} },
+    _context: { directives: {}, components: {} },
+    provide: () => {},
+  }
+  globalThis.__nuxt_app__ = { vueApp }
+}
+
+if (!globalThis.computed) {
+  globalThis.computed = computed
+}
+
+if (!globalThis.defineNuxtRouteMiddleware) {
+  globalThis.defineNuxtRouteMiddleware = (handler: unknown) => handler
 }
 
 // ------------------------------------------------------

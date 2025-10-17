@@ -83,7 +83,7 @@ pnpm prisma:seed
 
 ## 5. Nuxt Development
 
-Start the Nuxt 3 frontend + API:
+Start the Nuxt 4 frontend + API:
 
 ```bash
 pnpm dev:nuxt
@@ -94,7 +94,60 @@ Available at:
 
 ---
 
-## 6. Redis Queue Plugin (BullMQ)
+## 6. Testing
+
+Questify uses [Vitest](https://vitest.dev/) for unit, integration, and UI/component tests, plus [Playwright](https://playwright.dev/) for end-to-end coverage.
+
+### 6.1 Run All Tests
+
+```bash
+pnpm --filter nuxt test
+```
+
+This prepares Nuxt, runs the Vitest project matrix (unit + UI suites), and reuses Prisma mocks when `USE_MOCKS=true`.
+
+### 6.2 Run Specific Suites
+
+```bash
+# Unit/API/utils (node environment)
+pnpm --filter nuxt exec vitest run --project unit
+
+# UI/component/layout/page tests (happy-dom)
+pnpm --filter nuxt exec vitest run --project ui
+
+# Playwright end-to-end tests
+pnpm --filter nuxt test:e2e
+```
+
+To run a single file, pass its path:
+
+```bash
+pnpm --filter nuxt exec vitest run tests/unit/composables/useQuestActions.test.ts
+```
+
+### 6.3 Folder Mapping
+
+| Folder | Environment | Description |
+| --- | --- | --- |
+| `tests/unit/**` | 🧪 Node | Composables, stores, and other logic (e.g. `useQuestActions`) |
+| `tests/api/**` | 🧪 Node | API route handlers with mocked Nitro contexts |
+| `tests/utils/**` | 🧪 Node | Pure utility helpers like `text-with-links` |
+| `tests/ui/components/**` | 🖥️ happy-dom | Vue components rendered with lightweight Vuetify stubs |
+| `tests/ui/layouts/**` | 🖥️ happy-dom | Layout rendering & interactions (logout flow, nav links) |
+| `tests/ui/pages/**` | 🖥️ happy-dom | Page-level behaviour and data loading with mocked composables |
+| `tests/e2e/**` | 🚀 Playwright | Full-stack browser tests launched via `nuxt test --runner=playwright` |
+
+### 6.4 Coverage
+
+```bash
+pnpm --filter nuxt exec vitest run --project unit --coverage
+```
+
+Coverage reports are saved to `apps/nuxt/coverage/`.
+
+---
+
+## 7. Redis Queue Plugin (BullMQ)
 
 Questify uses [BullMQ](https://docs.bullmq.io/) for background job processing.
 
@@ -124,7 +177,7 @@ await $questQueue.add("decompose", { questId, title, description });
 
 ---
 
-## 7. TypeScript Support
+## 8. TypeScript Support
 
 Custom types for Nuxt app injections are declared in:
 `apps/nuxt/plugins/types.d.ts`
@@ -137,7 +190,7 @@ This ensures `$questQueue` is strongly typed across the app.
 
 Questify follows **Git Flow** conventions.
 
-## 8. Creating a Release
+## 9. Creating a Release
 
 ```bash
 # Make sure you're on develop
@@ -165,7 +218,7 @@ git push origin --tags
 
 ---
 
-## 9. Creating a Hotfix
+## 10. Creating a Hotfix
 
 Hotfixes fix urgent production issues.
 
