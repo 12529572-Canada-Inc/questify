@@ -20,10 +20,17 @@ describe('quests index page', () => {
     ])
 
     const questModule = await import('~/composables/useQuest')
-    type UseQuestsReturn = Awaited<ReturnType<typeof questModule.useQuests>>
-    vi.spyOn(questModule, 'useQuests').mockResolvedValue({
+    const asyncDataMock = {
       data: quests,
-    } as UseQuestsReturn)
+      pending: ref(false),
+      refresh: vi.fn(),
+      execute: vi.fn(),
+      clear: vi.fn(),
+      status: ref<'success'>('success'),
+      error: ref(null),
+    } as unknown as Awaited<ReturnType<typeof questModule.useQuests>>
+
+    vi.spyOn(questModule, 'useQuests').mockResolvedValue(asyncDataMock)
 
     const wrapper = mount({
       render() {
