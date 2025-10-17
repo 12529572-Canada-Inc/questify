@@ -129,13 +129,11 @@ pnpm --filter nuxt exec vitest run tests/unit/composables/useQuestActions.test.t
 
 | Folder | Environment | Description |
 | --- | --- | --- |
-| `tests/unit/**` | 🧪 Node | Composables, stores, and other logic (e.g. `useQuestActions`) |
 | `tests/api/**` | 🧪 Node | API route handlers with mocked Nitro contexts |
-| `tests/utils/**` | 🧪 Node | Pure utility helpers like `text-with-links` |
-| `tests/ui/components/**` | 🖥️ happy-dom | Vue components rendered with lightweight Vuetify stubs |
-| `tests/ui/layouts/**` | 🖥️ happy-dom | Layout rendering & interactions (logout flow, nav links) |
-| `tests/ui/pages/**` | 🖥️ happy-dom | Page-level behaviour and data loading with mocked composables |
-| `tests/e2e/**` | 🚀 Playwright | Full-stack browser tests launched via `nuxt test --runner=playwright` |
+| `tests/e2e/**` | 🚀 Playwright | Full-stack browser tests |
+| `tests/mocks/**` | 🧪 Node | 3rd-party service mocks (eg. Prisma) |
+| `tests/nuxt/**` | 🟩 Nuxt | Nuxt-specific features (components, composables, layouts, middleware, pages) |
+| `tests/unit/**` | 🧪 Node | Pure utility helpers like `text-with-links` |
 
 ### 6.4 Coverage
 
