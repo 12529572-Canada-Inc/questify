@@ -341,42 +341,44 @@ function toggleInvestigationExpansion(investigationId: string) {
                           class="d-flex align-center"
                           style="gap: 6px;"
                         >
-                          <v-btn
-                            variant="text"
-                            density="comfortable"
-                            size="small"
-                            :disabled="hasPendingInvestigation(task) || pending"
-                            :aria-label="`Investigate ${task.title}`"
-                            @click="emit('investigate-task', task)"
-                          >
-                            <v-icon
-                              icon="mdi-magnify"
-                              size="18"
-                            />
-                            <v-tooltip
-                              activator="parent"
-                              location="bottom"
+                          <template v-if="task.status !== 'completed'">
+                            <v-btn
+                              variant="text"
+                              density="comfortable"
+                              size="small"
+                              :disabled="hasPendingInvestigation(task) || pending"
+                              :aria-label="`Investigate ${task.title}`"
+                              @click="emit('investigate-task', task)"
                             >
-                              Investigate task
-                            </v-tooltip>
-                          </v-btn>
-                          <v-btn
-                            variant="text"
-                            density="comfortable"
-                            size="small"
-                            @click="emit('edit-task', task)"
-                          >
-                            <v-icon
-                              icon="mdi-pencil-outline"
-                              size="18"
-                            />
-                            <v-tooltip
-                              activator="parent"
-                              location="bottom"
+                              <v-icon
+                                icon="mdi-magnify"
+                                size="18"
+                              />
+                              <v-tooltip
+                                activator="parent"
+                                location="bottom"
+                              >
+                                Investigate task
+                              </v-tooltip>
+                            </v-btn>
+                            <v-btn
+                              variant="text"
+                              density="comfortable"
+                              size="small"
+                              @click="emit('edit-task', task)"
                             >
-                              Edit task
-                            </v-tooltip>
-                          </v-btn>
+                              <v-icon
+                                icon="mdi-pencil-outline"
+                                size="18"
+                              />
+                              <v-tooltip
+                                activator="parent"
+                                location="bottom"
+                              >
+                                Edit task
+                              </v-tooltip>
+                            </v-btn>
+                          </template>
                           <v-btn
                             v-if="section.action"
                             size="small"

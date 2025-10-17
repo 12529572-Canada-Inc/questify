@@ -39,6 +39,22 @@ const taskEditForm = ref({
   details: '',
   extraContent: '',
 })
+const taskEditBaseline = ref({
+  title: '',
+  details: '',
+  extraContent: '',
+})
+const isTaskEditDirty = computed(() => {
+  if (!taskBeingEdited.value) {
+    return false
+  }
+
+  return (
+    taskEditForm.value.title !== taskEditBaseline.value.title
+    || taskEditForm.value.details !== taskEditBaseline.value.details
+    || taskEditForm.value.extraContent !== taskEditBaseline.value.extraContent
+  )
+})
 const investigationError = ref<string | null>(null)
 const investigatingTaskIds = ref<Set<string>>(new Set())
 const investigatingTaskIdsList = computed(() => Array.from(investigatingTaskIds.value))
@@ -90,6 +106,7 @@ function openTaskEditDialog(task: TaskWithInvestigations) {
     details: task.details ?? '',
     extraContent: task.extraContent ?? '',
   }
+  taskEditBaseline.value = { ...taskEditForm.value }
   taskEditError.value = null
   taskEditDialogOpen.value = true
 }
@@ -120,6 +137,7 @@ async function saveTaskEdits() {
       extraContent: normalizeOptionalContent(taskEditForm.value.extraContent),
     })
     taskEditDialogOpen.value = false
+    taskEditBaseline.value = { ...taskEditForm.value }
   }
   catch (err) {
     taskEditError.value = resolveTaskUpdateError(err)
@@ -442,6 +460,7 @@ watch(taskEditDialogOpen, (isOpen) => {
                   <v-btn
                     color="primary"
                     :loading="taskEditSaving"
+                    :disabled="taskEditSaving || !isTaskEditDirty"
                     @click="saveTaskEdits"
                   >
                     Save Changes
@@ -466,6 +485,7 @@ watch(taskEditDialogOpen, (isOpen) => {
                       v-model="investigationPrompt"
                       label="Investigation context"
                       :disabled="investigationDialogSubmitting"
+                      :error="investigationDialogError !== null"
                       auto-grow
                       rows="4"
                       maxlength="1000"
@@ -493,6 +513,7 @@ watch(taskEditDialogOpen, (isOpen) => {
                   <v-btn
                     color="primary"
                     :loading="investigationDialogSubmitting"
+                    :disabled="investigationDialogError !== null || investigationPrompt.trim().length === 0"
                     @click="submitInvestigation"
                   >
                     Investigate
