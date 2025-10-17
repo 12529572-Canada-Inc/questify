@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🧪 Tests & Infrastructure
 - Split Nuxt Vitest suites into `unit` and `ui` projects with happy-dom component coverage, Nuxt-aware bootstrap helpers, and updated documentation on how to run each suite.
+- CI now installs Playwright, runs Nuxt coverage and End-to-End suites, and uploads coverage plus Playwright artifacts for analysis.
 
 ---
 

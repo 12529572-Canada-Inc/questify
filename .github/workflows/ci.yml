@@ -95,14 +95,33 @@ jobs:
                   pnpm --filter nuxt dev:prepare
                   pnpm --filter nuxt exec nuxi build
 
-            # TODO: re-enable Playwright tests when CI issues are resolved
-            # - name: 🌐 Install Playwright browsers
-            #   run: pnpm exec playwright install --with-deps
-
             - name: 🧪 Run tests
               env:
                   NUXT_TEST_UTILS_BUILD: true
               run: pnpm test
+
+            - name: 🌐 Install Playwright browsers
+              run: pnpm --filter nuxt exec playwright install --with-deps
+
+            - name: 📈 Nuxt coverage
+              run: pnpm --filter nuxt test:coverage
+
+            - name: 🌍 Nuxt E2E tests
+              run: pnpm --filter nuxt test:e2e
+
+            - name: 📊 Upload coverage report
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: nuxt-coverage
+                  path: apps/nuxt/coverage
+
+            - name: 🗃️ Upload Playwright traces
+              if: failure()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: playwright-results
+                  path: apps/nuxt/test-results
 
             - name: 💾 Cache Nuxt build
               uses: actions/cache@v4
