@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useVModel } from '@vueuse/core'
 import type { Task, TaskInvestigation, User } from '@prisma/client'
 
@@ -46,6 +46,7 @@ const emit = defineEmits<{
 
 const taskTab = useVModel(props, 'modelValue', emit)
 const investigatingIds = computed(() => new Set(props.investigatingTaskIds ?? []))
+const expandedInvestigationId = ref<string | null>(null)
 
 const investigationStatusMeta = {
   pending: {
@@ -65,7 +66,7 @@ const investigationStatusMeta = {
   },
 } as const
 
-const dateFormatter = new Intl.DateTimeFormat(undefined, {
+const dateFormatter = new Intl.DateTimeFormat('en-US', {
   dateStyle: 'medium',
   timeStyle: 'short',
 })
@@ -81,6 +82,12 @@ function formatInvestigationDate(value: string | Date) {
 function hasPendingInvestigation(task: TaskWithInvestigations) {
   return task.investigations.some(inv => inv.status === 'pending')
     || investigatingIds.value.has(task.id)
+}
+
+function toggleInvestigationExpansion(investigationId: string) {
+  expandedInvestigationId.value = expandedInvestigationId.value === investigationId
+    ? null
+    : investigationId
 }
 </script>
 
@@ -229,24 +236,62 @@ function hasPendingInvestigation(task: TaskWithInvestigations) {
                                     In progress
                                   </v-chip>
                                 </div>
-                                <p
-                                  v-if="investigation.summary"
-                                  class="text-body-2 mt-3 mb-1"
+
+                                <div
+                                  class="task-investigation-content"
+                                  :class="{
+                                    'task-investigation-content--collapsed': expandedInvestigationId !== investigation.id,
+                                  }"
                                 >
-                                  {{ investigation.summary }}
-                                </p>
-                                <TextWithLinks
-                                  v-if="investigation.details"
-                                  class="text-body-2 text-medium-emphasis task-investigation-details"
-                                  tag="div"
-                                  :text="investigation.details"
-                                />
+                                  <div
+                                    v-if="investigation.prompt"
+                                    class="task-investigation-section"
+                                  >
+                                    <span class="task-investigation-section__title">Context</span>
+                                    <MarkdownBlock
+                                      class="task-investigation-section__body"
+                                      :content="investigation.prompt"
+                                    />
+                                  </div>
+                                  <div
+                                    v-if="investigation.summary"
+                                    class="task-investigation-section"
+                                  >
+                                    <span class="task-investigation-section__title">Summary</span>
+                                    <MarkdownBlock
+                                      class="task-investigation-section__body"
+                                      :content="investigation.summary"
+                                    />
+                                  </div>
+                                  <div
+                                    v-if="investigation.details"
+                                    class="task-investigation-section"
+                                  >
+                                    <span class="task-investigation-section__title">Details</span>
+                                    <MarkdownBlock
+                                      class="task-investigation-section__body"
+                                      :content="investigation.details"
+                                    />
+                                  </div>
+                                </div>
+
                                 <p
                                   v-if="investigation.status === 'failed' && investigation.error"
                                   class="text-body-2 text-error mt-3 mb-0"
                                 >
                                   {{ investigation.error }}
                                 </p>
+
+                                <v-btn
+                                  v-if="investigation.summary || investigation.details"
+                                  variant="text"
+                                  size="small"
+                                  class="task-investigation-toggle mt-3"
+                                  :append-icon="expandedInvestigationId === investigation.id ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+                                  @click="toggleInvestigationExpansion(investigation.id)"
+                                >
+                                  {{ expandedInvestigationId === investigation.id ? 'Show less' : 'View full investigation' }}
+                                </v-btn>
                               </v-sheet>
                             </div>
                           </div>
@@ -342,15 +387,75 @@ function hasPendingInvestigation(task: TaskWithInvestigations) {
   border-radius: 12px;
 }
 
-.task-investigation-details {
-  white-space: pre-line;
-}
-
 .task-investigation-list {
   gap: 8px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 4px;
+  scroll-behavior: smooth;
 }
 
 .task-investigation-meta {
   gap: 4px;
+}
+
+.task-investigation-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.task-investigation-list::-webkit-scrollbar-thumb {
+  background: rgba(var(--v-theme-on-surface), 0.2);
+  border-radius: 999px;
+}
+
+.task-investigation-content {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+}
+
+.task-investigation-section__title {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(var(--v-theme-on-surface), 0.6);
+  margin-bottom: 4px;
+}
+
+.task-investigation-section__body {
+  padding: 0.5rem 0;
+  border-radius: 8px;
+  background-color: rgba(var(--v-theme-surface-variant), 0.2);
+}
+
+.task-investigation-content--collapsed {
+  max-height: 220px;
+  overflow: hidden;
+}
+
+.task-investigation-content--collapsed::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 48px;
+  background: linear-gradient(
+    180deg,
+    rgba(var(--v-theme-surface), 0) 0%,
+    rgba(var(--v-theme-surface), 1) 100%
+  );
+  pointer-events: none;
+}
+
+.task-investigation-toggle {
+  align-self: flex-start;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding: 0 0.25rem;
 }
 </style>

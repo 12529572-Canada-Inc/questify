@@ -42,6 +42,18 @@ const taskEditForm = ref({
 const investigationError = ref<string | null>(null)
 const investigatingTaskIds = ref<Set<string>>(new Set())
 const investigatingTaskIdsList = computed(() => Array.from(investigatingTaskIds.value))
+const expandedInvestigationId = ref<string | null>(null)
+const investigationDialogOpen = ref(false)
+const investigationDialogSubmitting = ref(false)
+const investigationDialogError = ref<string | null>(null)
+const investigationPrompt = ref('')
+const investigationTargetTask = ref<TaskWithInvestigations | null>(null)
+const hasPendingInvestigations = computed(() => {
+  const allTasks = [...todoTasks.value, ...completedTasks.value]
+  return allTasks.some(task =>
+    task.investigations.some(investigation => investigation.status === 'pending'),
+  )
+})
 
 function normalizeOptionalContent(value: string) {
   const trimmed = value.trim()
@@ -117,22 +129,63 @@ async function saveTaskEdits() {
   }
 }
 
-async function startInvestigation(task: TaskWithInvestigations) {
-  if (investigatingTaskIds.value.has(task.id)) {
+function openInvestigationDialog(task: TaskWithInvestigations) {
+  investigationTargetTask.value = task
+  investigationPrompt.value = ''
+  investigationDialogError.value = null
+  investigationDialogOpen.value = true
+}
+
+function closeInvestigationDialog() {
+  if (investigationDialogSubmitting.value) return
+  investigationDialogOpen.value = false
+  investigationTargetTask.value = null
+  investigationPrompt.value = ''
+}
+
+function addInvestigatingTask(taskId: string) {
+  investigatingTaskIds.value = new Set([...investigatingTaskIds.value, taskId])
+}
+
+function removeInvestigatingTask(taskId: string) {
+  if (!investigatingTaskIds.value.has(taskId)) return
+  const next = new Set(investigatingTaskIds.value)
+  next.delete(taskId)
+  investigatingTaskIds.value = next
+}
+
+async function submitInvestigation() {
+  if (!investigationTargetTask.value) {
     return
   }
 
+  const taskId = investigationTargetTask.value.id
+  const prompt = investigationPrompt.value.trim()
+
+  if (prompt.length > 1000) {
+    investigationDialogError.value = 'Please keep investigation context under 1000 characters.'
+    return
+  }
+
+  investigationDialogSubmitting.value = true
+  investigationDialogError.value = null
   investigationError.value = null
-  investigatingTaskIds.value.add(task.id)
+
+  addInvestigatingTask(taskId)
 
   try {
-    await investigateTask(task.id)
+    await investigateTask(taskId, prompt)
+    investigationDialogOpen.value = false
+    investigationTargetTask.value = null
+    investigationPrompt.value = ''
   }
   catch (err) {
     investigationError.value = resolveTaskUpdateError(err)
+    investigationDialogError.value = resolveTaskUpdateError(err)
   }
   finally {
-    investigatingTaskIds.value.delete(task.id)
+    removeInvestigatingTask(taskId)
+    investigationDialogSubmitting.value = false
   }
 }
 
@@ -210,15 +263,42 @@ const errorType = computed(() => {
   return 'unknown'
 })
 
-onMounted(() => {
-  const { pause, resume } = useIntervalFn(() => {
-    refresh()
-  }, 2000, { immediate: false })
+const { pause: pauseRefresh, resume: resumeRefresh } = useIntervalFn(() => {
+  refresh()
+}, 2000, { immediate: false })
 
-  watch(tasksLoading, (loading: boolean) => {
-    if (loading && !pending.value) resume()
-    else pause()
-  }, { immediate: true })
+watch(
+  () => [tasksLoading.value, hasPendingInvestigations.value, investigatingTaskIdsList.value.length] as const,
+  ([loading, pendingInvestigations, activeInvestigations]) => {
+    const shouldPoll = loading || pendingInvestigations || activeInvestigations > 0
+    if (shouldPoll) resumeRefresh()
+    else pauseRefresh()
+  },
+  { immediate: true },
+)
+
+watch(
+  () => expandedInvestigationId.value,
+  () => {
+    // keep expanded id only if it still exists in the refreshed data
+    if (!expandedInvestigationId.value) {
+      return
+    }
+
+    const exists = [...todoTasks.value, ...completedTasks.value].some(task =>
+      task.investigations.some(investigation => investigation.id === expandedInvestigationId.value),
+    )
+
+    if (!exists) {
+      expandedInvestigationId.value = null
+    }
+  },
+)
+
+watch(investigationDialogOpen, (open) => {
+  if (!open) {
+    investigationDialogError.value = null
+  }
 })
 
 watch(taskEditDialogOpen, (isOpen) => {
@@ -298,7 +378,7 @@ watch(taskEditDialogOpen, (isOpen) => {
               :has-tasks="hasTasks"
               :investigating-task-ids="investigatingTaskIdsList"
               @edit-task="openTaskEditDialog"
-              @investigate-task="startInvestigation"
+              @investigate-task="openInvestigationDialog"
             />
             <v-dialog
               v-model="taskEditDialogOpen"
@@ -360,6 +440,57 @@ watch(taskEditDialogOpen, (isOpen) => {
                     @click="saveTaskEdits"
                   >
                     Save Changes
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+            <v-dialog
+              v-model="investigationDialogOpen"
+              max-width="560"
+            >
+              <v-card>
+                <v-card-title class="text-h6">
+                  Investigate Task
+                </v-card-title>
+                <v-card-text class="d-flex flex-column gap-4">
+                  <div>
+                    <p class="text-body-2 mb-2">
+                      Provide additional context or questions for the AI agent to research. This will be saved with the investigation history.
+                    </p>
+                    <v-textarea
+                      v-model="investigationPrompt"
+                      label="Investigation context"
+                      :disabled="investigationDialogSubmitting"
+                      auto-grow
+                      rows="4"
+                      maxlength="1000"
+                      counter
+                      hint="Optional. Describe what you want the agent to look into."
+                      persistent-hint
+                    />
+                  </div>
+                  <v-alert
+                    v-if="investigationDialogError"
+                    type="error"
+                    variant="tonal"
+                    :text="investigationDialogError"
+                  />
+                </v-card-text>
+                <v-card-actions>
+                  <v-spacer />
+                  <v-btn
+                    variant="text"
+                    :disabled="investigationDialogSubmitting"
+                    @click="closeInvestigationDialog"
+                  >
+                    Cancel
+                  </v-btn>
+                  <v-btn
+                    color="primary"
+                    :loading="investigationDialogSubmitting"
+                    @click="submitInvestigation"
+                  >
+                    Investigate
                   </v-btn>
                 </v-card-actions>
               </v-card>

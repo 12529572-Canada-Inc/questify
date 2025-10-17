@@ -59,16 +59,29 @@ Return the plan as a JSON array where each item has the shape {"title": string, 
     const content = response.choices[0].message?.content || '';
     console.log('OpenAI content:', content);
 
-    const tasks = parseJsonFromModel(content);
+    type GeneratedTask = {
+      title?: string
+      details?: string
+    }
+
+    const tasks = parseJsonFromModel<GeneratedTask[]>(content);
 
     console.log('Parsed tasks:', tasks);
 
     for (let i = 0; i < tasks.length; i++) {
+      const taskDefinition = tasks[i] ?? {};
+      const title = typeof taskDefinition.title === 'string'
+        ? taskDefinition.title.trim()
+        : '';
+      const details = typeof taskDefinition.details === 'string'
+        ? taskDefinition.details.trim()
+        : '';
+
       await prisma.task.create({
         data: {
           questId,
-          title: tasks[i].title,
-          details: tasks[i].details,
+          title: title || `Task ${i + 1}`,
+          details: details || null,
           order: i,
         },
       });
@@ -90,6 +103,7 @@ Return the plan as a JSON array where each item has the shape {"title": string, 
 type InvestigateJobData = {
   investigationId: string
   taskId: string
+  prompt?: string | null
 }
 
 async function processTaskInvestigation(job: Job<InvestigateJobData>) {
@@ -138,6 +152,8 @@ async function processTaskInvestigation(job: Job<InvestigateJobData>) {
     task.quest?.goal ? `Quest Goal: ${task.quest.goal}` : null,
     task.quest?.context ? `Quest Context: ${task.quest.context}` : null,
     task.quest?.constraints ? `Quest Constraints: ${task.quest.constraints}` : null,
+    investigation.prompt ? `Investigation Context: ${investigation.prompt}` : null,
+    job.data.prompt ? `Ad-hoc Context: ${job.data.prompt}` : null,
   ].filter((section): section is string => Boolean(section));
 
   const prompt = `You are a research assistant helping a user make progress on a task inside a personal quest planning app.
@@ -157,7 +173,7 @@ ${promptSections.join('\n')}`;
     const content = response.choices[0].message?.content || '';
     console.log('Investigation content:', content);
 
-    const result = parseJsonFromModel(content) as { summary?: string; details?: string };
+    const result = parseJsonFromModel<{ summary?: string; details?: string }>(content);
 
     await prisma.taskInvestigation.update({
       where: { id: investigationId },

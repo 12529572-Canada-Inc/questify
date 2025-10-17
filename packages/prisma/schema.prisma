@@ -53,6 +53,7 @@ model TaskInvestigation {
   summary       String?
   details       String?
   error         String?
+  prompt        String?
   initiatedById String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

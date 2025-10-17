@@ -64,13 +64,14 @@ export function useQuestActions(options: QuestActionsOptions) {
     await mutateTask(taskId, payload, canMutate, options.refresh)
   }
 
-  async function investigateTask(taskId: string) {
+  async function investigateTask(taskId: string, prompt?: string | null) {
     if (!canMutate()) {
       return
     }
 
     await $fetch(`/api/tasks/${taskId}/investigations`, {
       method: 'POST',
+      body: prompt && prompt.trim().length > 0 ? { prompt: prompt.trim() } : undefined,
     })
 
     await options.refresh()

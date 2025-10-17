@@ -10,6 +10,13 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 400, statusText: 'Task id is required' })
   }
 
+  const body = (await readBody<TaskInvestigationBody>(event)) || {} as TaskInvestigationBody
+  const prompt = typeof body.prompt === 'string' ? body.prompt.trim() : null
+
+  if (prompt && prompt.length > 1000) {
+    throw createError({ status: 400, statusText: 'Investigation context is too long' })
+  }
+
   const task = await prisma.task.findUnique({
     where: { id },
     select: {
@@ -34,6 +41,7 @@ export default defineEventHandler(async (event) => {
     data: {
       taskId: id,
       initiatedById: user.id,
+      prompt,
       status: 'pending',
     },
   })
@@ -44,6 +52,7 @@ export default defineEventHandler(async (event) => {
     await taskQueue.add('investigate-task', {
       investigationId: investigation.id,
       taskId: id,
+      prompt,
     })
   }
   else {
