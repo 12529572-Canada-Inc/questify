@@ -15,9 +15,10 @@
     "lint": "eslint .",
     "lint:types": "npx nuxi typecheck",
     "format": "eslint . --fix",
-    "test:unit": "vitest run",
-    "test:coverage": "pnpm dev:prepare && vitest run --coverage",
-    "test:e2e": "npx playwright test",
+    "test:nuxt": "vitest --project nuxt",
+    "test:unit": "vitest --project unit",
+    "test:coverage": "pnpm dev:prepare && vitest --coverage",
+    "test:e2e": "playwright test",
     "test": "pnpm dev:prepare && pnpm test:unit && pnpm test:e2e"
   },
   "dependencies": {
