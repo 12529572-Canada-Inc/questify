@@ -199,7 +199,6 @@ function toggleInvestigationExpansion(investigationId: string) {
                                 v-for="investigation in task.investigations"
                                 :key="investigation.id"
                                 class="task-investigation-sheet"
-                                :color="investigationStatusMeta[investigation.status as keyof typeof investigationStatusMeta]?.color ?? 'surface'"
                                 variant="tonal"
                               >
                                 <div class="d-flex justify-space-between align-start gap-4">
