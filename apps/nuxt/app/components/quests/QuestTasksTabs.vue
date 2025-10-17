@@ -357,16 +357,26 @@ function toggleInvestigationExpansion(investigationId: string) {
                               activator="parent"
                               location="bottom"
                             >
-                              Investigate
+                              Investigate task
                             </v-tooltip>
                           </v-btn>
                           <v-btn
-                            icon="mdi-pencil"
                             variant="text"
                             density="comfortable"
                             size="small"
                             @click="emit('edit-task', task)"
-                          />
+                          >
+                            <v-icon
+                              icon="mdi-pencil-outline"
+                              size="18"
+                            />
+                            <v-tooltip
+                              activator="parent"
+                              location="bottom"
+                            >
+                              Edit task
+                            </v-tooltip>
+                          </v-btn>
                           <v-btn
                             v-if="section.action"
                             size="small"
