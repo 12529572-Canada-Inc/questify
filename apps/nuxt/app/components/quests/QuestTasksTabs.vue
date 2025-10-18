@@ -667,4 +667,32 @@ function toggleInvestigationExpansion(investigationId: string) {
 .task-actions-mobile__group {
   width: auto;
 }
+
+@media (max-width: 600px) {
+  .task-investigations {
+    margin-top: 8px;
+    border-radius: 10px;
+  }
+
+  .task-investigation-sheet {
+    padding: 8px;
+  }
+
+  .task-investigations :deep(.v-card-text) {
+    padding: 12px;
+  }
+
+  .task-investigation-content {
+    gap: 12px;
+  }
+
+  .task-investigation-section__body {
+    padding: 0.4rem 0;
+    border-radius: 6px;
+  }
+
+  .task-investigation-toggle {
+    margin-top: 8px;
+  }
+}
 </style>
