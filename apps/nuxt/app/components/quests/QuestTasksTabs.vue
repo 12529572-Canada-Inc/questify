@@ -154,7 +154,7 @@ function toggleInvestigationExpansion(investigationId: string) {
                 {{ section.title }}
               </v-card-title>
               <v-divider />
-              <div class="pa-4 pt-0">
+              <div class="task-tab-content">
                 <template v-if="section.tasks.length">
                   <v-list
                     lines="three"
@@ -509,6 +509,10 @@ function toggleInvestigationExpansion(investigationId: string) {
 .task-extra-content__text {
   display: block;
   white-space: pre-line;
+}
+
+.task-tab-content {
+    padding: 0px;
 }
 
 .task-subtitle {
