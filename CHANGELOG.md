@@ -30,6 +30,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reworked quest detail sections into a tonal Vuetify list with contextual icons and a friendly alert fallback when no details are provided.
 - Surfaced investigation history beneath each task with status badges, timestamps, summaries, and error messaging.
 
+### 🧪 Tests & Infrastructure
+- Split Nuxt Vitest suites into `unit` and `ui` projects with happy-dom component coverage, Nuxt-aware bootstrap helpers, and updated documentation on how to run each suite.
+- CI now installs Playwright, runs Nuxt coverage and End-to-End suites, and uploads coverage plus Playwright artifacts for analysis.
+
 ---
 
 ## [1.7.1] - 2025-10-15

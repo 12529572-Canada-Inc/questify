@@ -59,6 +59,15 @@ jobs:
             - name: 📦 Install pnpm dependencies
               run: pnpm install --frozen-lockfile
 
+            # - name: 🌐 Install Playwright browsers
+            #   run: pnpm exec playwright install --with-deps
+
+            # - name: 💾 Cache Playwright binaries
+            #   uses: actions/cache@v4
+            #   with:
+            #       path: ~/.cache/ms-playwright
+            #       key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
+
             - name: 🧱 Generate Nuxt types
               env:
                   NITRO_PRESET: node
@@ -87,28 +96,44 @@ jobs:
               working-directory: packages/prisma
               run: pnpm run deploy
 
-            # Optional: seed data for tests
-            # - name: 🌱 Seed database
+            # - name: 🌱 Seed database (optional)
             #   run: pnpm --filter nuxt db:seed
+
             - name: 🏗️ Build Nuxt app for tests
               run: |
                   pnpm --filter nuxt dev:prepare
                   pnpm --filter nuxt exec nuxi build
 
-            # TODO: re-enable Playwright tests when CI issues are resolved
-            # - name: 🌐 Install Playwright browsers
-            #   run: pnpm exec playwright install --with-deps
-
+            # ✅ Run your full test suite
             - name: 🧪 Run tests
               env:
                   NUXT_TEST_UTILS_BUILD: true
               run: pnpm test
 
+            - name: 📈 Nuxt coverage
+              run: pnpm --filter nuxt test:coverage
+
+            # - name: 🌍 Nuxt E2E tests
+            #   run: pnpm --filter nuxt test:e2e
+
+            - name: 📊 Upload coverage report
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: nuxt-coverage
+                  path: apps/nuxt/coverage
+
+            # - name: 🗃️ Upload Playwright traces
+            #   if: failure()
+            #   uses: actions/upload-artifact@v4
+            #   with:
+            #       name: playwright-results
+            #       path: apps/nuxt/test-results
+
             - name: 💾 Cache Nuxt build
               uses: actions/cache@v4
               with:
-                  path: |
-                      apps/nuxt/.nuxt
+                  path: apps/nuxt/.nuxt
                   key: ${{ runner.os }}-nuxt-${{ hashFiles('apps/nuxt/package.json', 'pnpm-lock.yaml') }}
                   restore-keys: |
                       ${{ runner.os }}-nuxt-
