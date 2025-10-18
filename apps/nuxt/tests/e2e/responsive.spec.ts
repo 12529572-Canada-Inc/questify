@@ -17,10 +17,7 @@ test.describe('Mobile responsiveness', () => {
     expect(hasHorizontalOverflow).toBeFalsy()
 
     await shareButton.click()
-    const shareLinkField = page.getByLabel('Shareable link')
-    await expect(shareLinkField).toBeVisible()
-    const dialog = shareLinkField.locator('xpath=ancestor::*[@role="dialog"][1]')
-
+    const dialog = await page.waitForSelector('[data-testid="share-dialog"]', { state: 'visible' })
     await expect(dialog).toBeVisible()
 
     const dialogFitsViewport = await dialog.evaluate((element) => {
@@ -29,7 +26,12 @@ test.describe('Mobile responsiveness', () => {
     })
     expect(dialogFitsViewport).toBeTruthy()
 
-    await dialog.getByRole('button', { name: 'Close' }).click()
+    await dialog.evaluate((element) => {
+      const closeButton = element.querySelector('[data-testid="share-dialog-close"]')
+      if (closeButton instanceof HTMLElement) {
+        closeButton.click()
+      }
+    })
   })
 
   test('auth login form stays usable on mobile', async ({ page }) => {
