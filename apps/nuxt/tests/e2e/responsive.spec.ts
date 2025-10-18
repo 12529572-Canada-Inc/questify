@@ -17,7 +17,10 @@ test.describe('Mobile responsiveness', () => {
     expect(hasHorizontalOverflow).toBeFalsy()
 
     await shareButton.click()
-    const dialog = page.getByRole('dialog', { name: 'Share Questify' })
+    const shareLinkField = page.getByLabel('Shareable link')
+    await expect(shareLinkField).toBeVisible()
+    const dialog = shareLinkField.locator('xpath=ancestor::*[@role="dialog"][1]')
+
     await expect(dialog).toBeVisible()
 
     const dialogFitsViewport = await dialog.evaluate((element) => {
