@@ -18,7 +18,7 @@ test.describe('Mobile responsiveness', () => {
 
     await shareButton.click()
     const dialog = await page.waitForSelector('[data-testid="share-dialog"]', { state: 'visible' })
-    await expect(dialog).toBeVisible()
+    expect(await dialog.isVisible()).toBe(true)
 
     const dialogFitsViewport = await dialog.evaluate((element) => {
       const rect = element.getBoundingClientRect()
