@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { breakpointsVuetify, useBreakpoints, useVModel, useWindowSize } from '@vueuse/core'
+import { breakpointsVuetifyV3, useBreakpoints, useVModel, useWindowSize } from '@vueuse/core'
 import type { Task, TaskInvestigation, User } from '@prisma/client'
 
 type TaskTab = 'todo' | 'completed'
@@ -49,7 +49,7 @@ const taskTab = useVModel(props, 'modelValue', emit)
 const investigatingIds = computed(() => new Set(props.investigatingTaskIds ?? []))
 const expandedInvestigationId = ref<string | null>(null)
 const highlightedTaskId = computed(() => props.highlightedTaskId ?? null)
-const breakpoints = useBreakpoints(breakpointsVuetify)
+const breakpoints = useBreakpoints(breakpointsVuetifyV3)
 const compactActions = breakpoints.smallerOrEqual('md')
 const { width: windowWidth } = useWindowSize()
 const hideOwnerActions = computed(() => windowWidth.value < 500)
