@@ -670,29 +670,45 @@ function toggleInvestigationExpansion(investigationId: string) {
 
 @media (max-width: 600px) {
   .task-investigations {
-    margin-top: 8px;
-    border-radius: 10px;
+    width: calc(100% - 8px);
+    margin: 4px auto 0;
+    border-radius: 6px;
+    padding: 4px;
   }
 
   .task-investigation-sheet {
-    padding: 8px;
+    padding: 4px;
+    border-radius: 8px;
+    width: 100%;
+  }
+
+  .task-investigations :deep(.v-card-title) {
+    padding: 4px 6px;
   }
 
   .task-investigations :deep(.v-card-text) {
-    padding: 12px;
+    padding: 6px;
   }
 
   .task-investigation-content {
-    gap: 12px;
+    gap: 6px;
   }
 
   .task-investigation-section__body {
-    padding: 0.4rem 0;
-    border-radius: 6px;
+    padding: 0.25rem 0;
+    border-radius: 4px;
   }
 
   .task-investigation-toggle {
-    margin-top: 8px;
+    margin-top: 4px;
+  }
+
+  .task-investigation-sheet :deep(.v-card-item) {
+    padding: 6px;
+  }
+
+  .task-investigation-list {
+    padding: 0;
   }
 }
 </style>
