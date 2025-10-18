@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 🚀 Features
+- Added share controls with QR codes so teammates can access the app login, quests, and individual tasks via generated links.
+
 ---
 
 ## [1.8.0] - 2025-10-17
