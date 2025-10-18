@@ -80,9 +80,10 @@ onBeforeUnmount(() => {
     v-model="dialogOpen"
     max-width="520"
     :aria-label="title"
-    data-testid="share-dialog"
   >
-    <v-card>
+    <v-card
+      data-testid="share-dialog-card"
+    >
       <v-card-title class="text-h6 font-weight-medium">
         {{ title }}
       </v-card-title>
