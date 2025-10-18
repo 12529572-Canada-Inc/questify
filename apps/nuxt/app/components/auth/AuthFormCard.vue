@@ -31,12 +31,17 @@ function handleSubmit() {
 </script>
 
 <template>
-  <v-container class="d-flex justify-center">
+  <v-container class="auth-card">
     <v-card
-      class="pa-6"
+      class="auth-card__content pa-6"
       max-width="400"
     >
-      <v-card-title>{{ title }}</v-card-title>
+      <v-card-title
+        class="auth-card__title"
+        tag="h1"
+      >
+        {{ title }}
+      </v-card-title>
       <v-form
         v-model="valid"
         @submit.prevent="handleSubmit"
@@ -71,3 +76,30 @@ function handleSubmit() {
     </v-card>
   </v-container>
 </template>
+
+<style scoped>
+.auth-card {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(16px, 5vw, 32px) 16px;
+}
+
+.auth-card__content {
+  width: 100%;
+}
+
+.auth-card__title {
+  text-align: center;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 480px) {
+  .auth-card__content {
+    padding: 24px 18px;
+  }
+}
+</style>

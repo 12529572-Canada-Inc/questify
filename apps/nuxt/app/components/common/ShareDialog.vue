@@ -79,8 +79,11 @@ onBeforeUnmount(() => {
   <v-dialog
     v-model="dialogOpen"
     max-width="520"
+    :aria-label="title"
   >
-    <v-card>
+    <v-card
+      data-testid="share-dialog-card"
+    >
       <v-card-title class="text-h6 font-weight-medium">
         {{ title }}
       </v-card-title>
@@ -155,6 +158,7 @@ onBeforeUnmount(() => {
         <v-spacer />
         <v-btn
           variant="text"
+          data-testid="share-dialog-close"
           @click="dialogOpen = false"
         >
           Close
