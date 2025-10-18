@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useVModel } from '@vueuse/core'
+import { breakpointsVuetify, useBreakpoints, useVModel, useWindowSize } from '@vueuse/core'
 import type { Task, TaskInvestigation, User } from '@prisma/client'
-import { useDisplay } from 'vuetify'
 
 type TaskTab = 'todo' | 'completed'
 
@@ -50,8 +49,10 @@ const taskTab = useVModel(props, 'modelValue', emit)
 const investigatingIds = computed(() => new Set(props.investigatingTaskIds ?? []))
 const expandedInvestigationId = ref<string | null>(null)
 const highlightedTaskId = computed(() => props.highlightedTaskId ?? null)
-const { mdAndDown } = useDisplay()
-const compactActions = computed(() => mdAndDown.value)
+const breakpoints = useBreakpoints(breakpointsVuetify)
+const compactActions = breakpoints.smallerOrEqual('md')
+const { width: windowWidth } = useWindowSize()
+const hideOwnerActions = computed(() => windowWidth.value < 500)
 
 const investigationStatusMeta = {
   pending: {
@@ -410,7 +411,7 @@ function toggleInvestigationExpansion(investigationId: string) {
                                 </v-tooltip>
                               </v-btn>
 
-                              <template v-if="isOwner">
+                              <template v-if="!hideOwnerActions && isOwner">
                                 <template v-if="task.status !== 'completed'">
                                   <v-btn
                                     class="task-action-btn"
@@ -454,7 +455,7 @@ function toggleInvestigationExpansion(investigationId: string) {
                               </template>
 
                               <v-btn
-                                v-if="section.action"
+                                v-if="section.action && !hideOwnerActions"
                                 class="task-action-btn task-action-btn--primary"
                                 size="small"
                                 :color="section.action.color"
