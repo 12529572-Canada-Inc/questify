@@ -18,6 +18,7 @@ test.describe('Mobile responsiveness', () => {
 
     await shareButton.click()
     const closeButton = page.getByTestId('share-dialog-close')
+    await closeButton.waitFor({ state: 'visible' })
     await expect(closeButton).toBeVisible()
     const dialog = closeButton.locator('xpath=ancestor::*[@role="dialog"][1]')
     await expect(dialog).toBeVisible()
