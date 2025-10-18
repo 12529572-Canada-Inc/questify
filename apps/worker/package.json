@@ -1,6 +1,6 @@
 {
   "name": "worker",
-  "version": "1.7.1",   
+  "version": "1.8.0",   
   "private": true,
   "type": "module",
   "scripts": {
@@ -17,7 +17,8 @@
     "bullmq": "^4.0.0",
     "dotenv": "^17.2.2",
     "openai": "^4.0.0",
-    "shared": "workspace:*"
+    "shared": "workspace:*",
+    "jsonrepair": "^3.6.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",

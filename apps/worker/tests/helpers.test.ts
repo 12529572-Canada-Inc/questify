@@ -22,6 +22,19 @@ describe('parseJsonFromModel', () => {
     ]);
   });
 
+  it('repairs JSON blobs that contain unescaped newlines', () => {
+    const malformed = `{
+  "summary": "Line one",
+  "details": "Line one
+Line two"
+}`;
+
+    expect(parseJsonFromModel(malformed)).toEqual({
+      summary: 'Line one',
+      details: 'Line one\nLine two',
+    });
+  });
+
   it('logs the cleaned payload before rethrowing invalid JSON', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 

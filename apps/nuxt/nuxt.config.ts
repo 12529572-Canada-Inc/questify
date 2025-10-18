@@ -39,6 +39,10 @@ export default defineNuxtConfig({
     ],
   },
 
+  css: [
+    '@mdi/font/css/materialdesignicons.css',
+  ],
+
   // Hooks for debugging
   //   hooks: {
   //     'components:dirs'(dirs) {
@@ -81,6 +85,8 @@ export default defineNuxtConfig({
 
   // ⚡ Vite configuration
   vite: {
+    optimizeDeps: { exclude: ['@vite-plugin-checker-runtime'] },
+    plugins: [],
     define: {
       'process.env.DEBUG': false,
     },
@@ -104,14 +110,24 @@ export default defineNuxtConfig({
 
   // 🚀 Nitro (server engine) config
   nitro: {
-    preset: process.env.NITRO_PRESET || 'vercel', // or 'fly' for worker deployments
-    serveStatic: true,
-    compressPublicAssets: true,
+    preset: process.env.NODE_ENV === 'test' ? 'node' : undefined,
   },
 
   // 🧪 Experimental features for performance
   experimental: {
     asyncContext: true,
+  },
+
+  // 🔗 Hooks
+  hooks: {
+    'vite:extendConfig'(config) {
+      // Disable vite-plugin-checker in test or CI contexts
+      if (process.env.NODE_ENV === 'test' || process.env.VITEST || process.env.CI) {
+        config.plugins = (config.plugins || []).filter(
+          plugin => !(plugin && typeof plugin === 'object' && 'name' in plugin && String(plugin.name).includes('vite:checker')),
+        )
+      }
+    },
   },
 
   // 💡 Vuetify customization (optional)

@@ -1,0 +1,132 @@
+import { describe, beforeEach, afterEach, expect, it, vi } from 'vitest'
+import handler from '../../server/api/tasks/[id]/investigations.post'
+
+type RequireUserSessionMock = (event?: unknown) => Promise<{ user: { id: string } }>
+type GetRouterParamMock = (event: unknown, name: string) => string
+type ReadBodyMock = (event: unknown) => Promise<unknown>
+type CreateErrorMock = (input: {
+  status?: number
+  statusCode?: number
+  statusText?: string
+}) => Error
+
+type GlobalWithMocks = typeof globalThis & {
+  requireUserSession?: RequireUserSessionMock
+  getRouterParam?: GetRouterParamMock
+  readBody?: ReadBodyMock
+  createError?: CreateErrorMock
+}
+
+const prismaMocks = vi.hoisted(() => ({
+  taskFindUniqueMock: vi.fn(),
+  taskInvestigationCreateMock: vi.fn(),
+}))
+
+vi.mock('@prisma/client', () => ({
+  PrismaClient: class {
+    task = {
+      findUnique: prismaMocks.taskFindUniqueMock,
+    }
+
+    taskInvestigation = {
+      create: prismaMocks.taskInvestigationCreateMock,
+    }
+  },
+}))
+
+const addMock = vi.fn()
+const originalRequireUserSession = (globalThis as GlobalWithMocks).requireUserSession
+const originalGetRouterParam = (globalThis as GlobalWithMocks).getRouterParam
+const originalReadBody = (globalThis as GlobalWithMocks).readBody
+const originalCreateError = (globalThis as GlobalWithMocks).createError
+
+beforeEach(() => {
+  prismaMocks.taskFindUniqueMock.mockReset()
+  prismaMocks.taskInvestigationCreateMock.mockReset()
+  addMock.mockReset()
+
+  Reflect.set(globalThis as GlobalWithMocks, 'requireUserSession', vi.fn(async () => ({
+    user: { id: 'user-1' },
+  })))
+
+  Reflect.set(globalThis as GlobalWithMocks, 'getRouterParam', vi.fn(() => 'task-1'))
+  Reflect.set(globalThis as GlobalWithMocks, 'readBody', vi.fn(async () => ({ prompt: '  Explore risks and opportunities  ' })))
+  Reflect.set(globalThis as GlobalWithMocks, 'createError', ({ status, statusCode, statusText }) => {
+    const error = new Error(statusText ?? 'Error') as Error & { statusCode?: number }
+    error.statusCode = status ?? statusCode ?? 500
+    return error
+  })
+
+  prismaMocks.taskFindUniqueMock.mockResolvedValue({ id: 'task-1', quest: { ownerId: 'user-1' } })
+  prismaMocks.taskInvestigationCreateMock.mockResolvedValue({
+    id: 'inv-1',
+    status: 'pending',
+    prompt: 'Explore risks and opportunities',
+  })
+})
+
+afterEach(() => {
+  if (originalRequireUserSession) Reflect.set(globalThis as GlobalWithMocks, 'requireUserSession', originalRequireUserSession)
+  else Reflect.deleteProperty(globalThis as GlobalWithMocks, 'requireUserSession')
+
+  if (originalGetRouterParam) Reflect.set(globalThis as GlobalWithMocks, 'getRouterParam', originalGetRouterParam)
+  else Reflect.deleteProperty(globalThis as GlobalWithMocks, 'getRouterParam')
+
+  if (originalReadBody) Reflect.set(globalThis as GlobalWithMocks, 'readBody', originalReadBody)
+  else Reflect.deleteProperty(globalThis as GlobalWithMocks, 'readBody')
+
+  if (originalCreateError) Reflect.set(globalThis as GlobalWithMocks, 'createError', originalCreateError)
+  else Reflect.deleteProperty(globalThis as GlobalWithMocks, 'createError')
+})
+
+describe('API /api/tasks/[id]/investigations.post', () => {
+  it('creates an investigation record and enqueues a job', async () => {
+    const mockEvent = {
+      context: {
+        taskQueue: {
+          add: addMock,
+        },
+      },
+    } as unknown as Parameters<typeof handler>[0]
+
+    const response = await handler(mockEvent)
+
+    expect(prismaMocks.taskFindUniqueMock).toHaveBeenCalledWith({
+      where: { id: 'task-1' },
+      select: {
+        id: true,
+        quest: {
+          select: {
+            ownerId: true,
+          },
+        },
+      },
+    })
+    expect(prismaMocks.taskInvestigationCreateMock).toHaveBeenCalledWith({
+      data: {
+        taskId: 'task-1',
+        initiatedById: 'user-1',
+        prompt: 'Explore risks and opportunities',
+        status: 'pending',
+      },
+    })
+    expect(addMock).toHaveBeenCalledWith('investigate-task', {
+      investigationId: 'inv-1',
+      taskId: 'task-1',
+      prompt: 'Explore risks and opportunities',
+    })
+    expect(response.investigation).toEqual({
+      id: 'inv-1',
+      status: 'pending',
+      prompt: 'Explore risks and opportunities',
+    })
+  })
+
+  it('rejects investigation context that exceeds the limit', async () => {
+    (globalThis as GlobalWithMocks).readBody = vi.fn(async () => ({ prompt: 'a'.repeat(1200) }))
+
+    await expect(async () => handler({} as Parameters<typeof handler>[0])).rejects.toMatchObject({ statusCode: 400 })
+    expect(prismaMocks.taskInvestigationCreateMock).not.toHaveBeenCalled()
+    expect(addMock).not.toHaveBeenCalled()
+  })
+})

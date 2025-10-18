@@ -1,5 +1,10 @@
 declare interface TaskBody {
   title?: string
-  description?: string | null
+  details?: string | null
+  extraContent?: string | null
   status?: 'todo' | 'pending' | 'in-progress' | 'completed' | 'draft'
+}
+
+declare interface TaskInvestigationBody {
+  prompt?: string | null
 }

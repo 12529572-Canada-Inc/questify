@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import type { H3Event } from 'h3'
 import { hashPassword } from 'shared'
 
 const prisma = new PrismaClient()
@@ -9,7 +10,7 @@ export default defineEventHandler(async (event) => {
 
   const existing = await prisma.user.findUnique({ where: { email } })
   if (existing) {
-    throw createError({ statusCode: 409, statusText: 'User already exists' })
+    throw createError({ status: 409, statusText: 'User already exists' })
   }
 
   const hashed = hashPassword(password)
@@ -22,7 +23,7 @@ export default defineEventHandler(async (event) => {
   })
 
   // set the session
-  await setUserSession(event, {
+  await setUserSession(event as unknown as H3Event, {
     user: {
       id: user.id,
       email: user.email,

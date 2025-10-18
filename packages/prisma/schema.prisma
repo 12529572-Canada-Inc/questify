@@ -13,6 +13,7 @@ model User {
   password  String
   name      String?
   quests    Quest[]
+  investigations TaskInvestigation[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -37,8 +38,28 @@ model Task {
   questId   String
   title     String
   details   String?
+  extraContent String?
   order     Int
   status    String @default("todo") // todo, in-progress, done
   createdAt DateTime @default(now())
   quest     Quest  @relation(fields: [questId], references: [id])
+  investigations TaskInvestigation[]
+}
+
+model TaskInvestigation {
+  id            String   @id @default(cuid())
+  taskId        String
+  status        String   @default("pending")
+  summary       String?
+  details       String?
+  error         String?
+  prompt        String?
+  initiatedById String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  task          Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  initiatedBy   User?    @relation(fields: [initiatedById], references: [id])
+
+  @@index([taskId])
+  @@index([createdAt])
 }
