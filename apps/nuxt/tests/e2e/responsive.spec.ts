@@ -4,7 +4,7 @@ test.describe('Mobile responsiveness', () => {
   test.use({ viewport: { width: 360, height: 780 } })
 
   test('header and home layout adapt on small screens', async ({ page }) => {
-    await page.goto('/', { waitUntil: 'networkidle' })
+    await page.goto('/')
 
     const shareButton = page.getByRole('button', { name: 'Share Questify' })
     await expect(shareButton).toBeVisible()
@@ -30,7 +30,7 @@ test.describe('Mobile responsiveness', () => {
   })
 
   test('auth login form stays usable on mobile', async ({ page }) => {
-    await page.goto('/auth/login', { waitUntil: 'networkidle' })
+    await page.goto('/auth/login')
 
     await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible()
 
