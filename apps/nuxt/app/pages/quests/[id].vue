@@ -25,6 +25,9 @@ const isOwner = computed(() => {
 const { tasksLoading, todoTasks, completedTasks, hasTasks } = useQuestTasks(questData)
 const { taskTab } = useQuestTaskTabs(todoTasks, completedTasks)
 
+const todoTaskIds = computed(() => todoTasks.value.map(task => task.id))
+const completedTaskIds = computed(() => completedTasks.value.map(task => task.id))
+
 const { markTaskCompleted, markTaskIncomplete, updateTask, investigateTask, completeQuest, reopenQuest } = useQuestActions({
   questId: id,
   refresh,
@@ -58,23 +61,22 @@ const highlightedTaskId = computed(() => {
   return typeof value === 'string' && value.trim().length > 0 ? value : null
 })
 
-watchEffect(() => {
-  const taskId = highlightedTaskId.value
-  if (!taskId) {
-    return
-  }
+watch(
+  [highlightedTaskId, () => tasksLoading.value, todoTaskIds, completedTaskIds],
+  ([taskId, loading, todoIds, completedIds]) => {
+    if (!taskId || loading) {
+      return
+    }
 
-  if (todoTasks.value.some(task => task.id === taskId)) {
-    if (taskTab.value !== 'todo') {
+    if (todoIds.includes(taskId)) {
       taskTab.value = 'todo'
     }
-  }
-  else if (completedTasks.value.some(task => task.id === taskId)) {
-    if (taskTab.value !== 'completed') {
+    else if (completedIds.includes(taskId)) {
       taskTab.value = 'completed'
     }
-  }
-})
+  },
+  { immediate: true },
+)
 
 const taskEditDialogOpen = ref(false)
 const taskEditSaving = ref(false)
