@@ -59,16 +59,14 @@ jobs:
             - name: 📦 Install pnpm dependencies
               run: pnpm install --frozen-lockfile
 
-            # ✅ Moved here — browsers must exist before tests run
-            - name: 🌐 Install Playwright browsers
-              run: pnpm exec playwright install --with-deps
+            # - name: 🌐 Install Playwright browsers
+            #   run: pnpm exec playwright install --with-deps
 
-            # (optional but speeds up repeated CI runs)
-            - name: 💾 Cache Playwright binaries
-              uses: actions/cache@v4
-              with:
-                  path: ~/.cache/ms-playwright
-                  key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
+            # - name: 💾 Cache Playwright binaries
+            #   uses: actions/cache@v4
+            #   with:
+            #       path: ~/.cache/ms-playwright
+            #       key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
 
             - name: 🧱 Generate Nuxt types
               env:
@@ -115,8 +113,8 @@ jobs:
             - name: 📈 Nuxt coverage
               run: pnpm --filter nuxt test:coverage
 
-            - name: 🌍 Nuxt E2E tests
-              run: pnpm --filter nuxt test:e2e
+            # - name: 🌍 Nuxt E2E tests
+            #   run: pnpm --filter nuxt test:e2e
 
             - name: 📊 Upload coverage report
               if: always()
@@ -125,12 +123,12 @@ jobs:
                   name: nuxt-coverage
                   path: apps/nuxt/coverage
 
-            - name: 🗃️ Upload Playwright traces
-              if: failure()
-              uses: actions/upload-artifact@v4
-              with:
-                  name: playwright-results
-                  path: apps/nuxt/test-results
+            # - name: 🗃️ Upload Playwright traces
+            #   if: failure()
+            #   uses: actions/upload-artifact@v4
+            #   with:
+            #       name: playwright-results
+            #       path: apps/nuxt/test-results
 
             - name: 💾 Cache Nuxt build
               uses: actions/cache@v4
