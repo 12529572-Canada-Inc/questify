@@ -15,12 +15,10 @@
     "lint": "eslint .",
     "lint:types": "npx nuxi typecheck",
     "format": "eslint . --fix",
-    "test:api": "vitest run --project api",
-    "test:nuxt": "vitest run --project nuxt",
-    "test:unit": "vitest run --project unit",
-    "test:coverage": "pnpm dev:prepare && vitest run --coverage",
+    "test:unit": "vitest run --config vitest.unit.config.ts",
+    "test:coverage": "pnpm dev:prepare && vitest run --config vitest.unit.config.ts --coverage",
     "test:e2e": "playwright test",
-    "test": "pnpm dev:prepare && pnpm test:api && pnpm test:nuxt && pnpm test:unit && pnpm test:e2e"
+    "test": "pnpm dev:prepare && pnpm test:unit && pnpm test:e2e"
   },
   "dependencies": {
     "@prisma/client": "5.22.0",
