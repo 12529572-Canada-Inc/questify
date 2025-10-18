@@ -17,16 +17,18 @@ test.describe('Mobile responsiveness', () => {
     expect(hasHorizontalOverflow).toBeFalsy()
 
     await shareButton.click()
-    const dialogCard = page.getByTestId('share-dialog-card')
-    await expect(dialogCard).toBeVisible()
+    const closeButton = page.getByTestId('share-dialog-close')
+    await expect(closeButton).toBeVisible()
+    const dialog = closeButton.locator('xpath=ancestor::*[@role="dialog"][1]')
+    await expect(dialog).toBeVisible()
 
-    const dialogFitsViewport = await dialogCard.evaluate((element) => {
+    const dialogFitsViewport = await dialog.evaluate((element) => {
       const rect = element.getBoundingClientRect()
       return rect.width <= window.innerWidth + 1 && rect.height <= window.innerHeight + 1
     })
     expect(dialogFitsViewport).toBeTruthy()
 
-    await dialogCard.getByTestId('share-dialog-close').click()
+    await closeButton.click()
   })
 
   test('auth login form stays usable on mobile', async ({ page }) => {
