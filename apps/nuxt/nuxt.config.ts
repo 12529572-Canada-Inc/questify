@@ -111,6 +111,9 @@ export default defineNuxtConfig({
   // 🚀 Nitro (server engine) config
   nitro: {
     preset: process.env.NODE_ENV === 'test' ? 'node' : undefined,
+    externals: {
+      inline: ['vue', '@vue/server-renderer'],
+    },
   },
 
   // 🧪 Experimental features for performance

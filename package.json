@@ -29,6 +29,7 @@
     "test:shared": "pnpm --filter shared test"
   },
   "devDependencies": {
+    "@playwright/test": "^1.43.1",
     "@oxc-minify/binding-darwin-arm64": "0.94.0",
     "@oxc-minify/binding-linux-x64-gnu": "0.94.0",
     "@oxc-parser/binding-darwin-arm64": "0.94.0",
