@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { breakpointsVuetifyV3, useBreakpoints, useVModel, useWindowSize } from '@vueuse/core'
 import type { Task, TaskInvestigation, User } from '@prisma/client'
 
@@ -50,9 +50,14 @@ const investigatingIds = computed(() => new Set(props.investigatingTaskIds ?? []
 const expandedInvestigationId = ref<string | null>(null)
 const highlightedTaskId = computed(() => props.highlightedTaskId ?? null)
 const breakpoints = useBreakpoints(breakpointsVuetifyV3)
-const compactActions = breakpoints.smallerOrEqual('md')
+const isMounted = ref(false)
+onMounted(() => {
+  isMounted.value = true
+})
+const smOrEqualMd = breakpoints.smallerOrEqual('md')
+const compactActions = computed(() => (isMounted.value ? smOrEqualMd.value : false))
 const { width: windowWidth } = useWindowSize()
-const hideOwnerActions = computed(() => windowWidth.value < 500)
+const hideOwnerActions = computed(() => (isMounted.value ? windowWidth.value < 500 : false))
 
 const investigationStatusMeta = {
   pending: {
