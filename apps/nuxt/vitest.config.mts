@@ -7,26 +7,6 @@ const r = (p: string) => resolve(__dirname, p)
 export default defineConfig({
   test: {
     projects: [
-      {
-        // API route tests
-        test: {
-          name: 'api',
-          include: ['tests/api/**/*.test.ts', 'tests/api/**/*.spec.ts'], // Adjust path as needed
-          environment: 'node',
-        },
-      },
-      {
-        // Unit tests
-        test: {
-          name: 'unit',
-          include: ['tests/unit/**/*.test.ts', 'tests/unit/**/*.spec.ts'], // Adjust path as needed
-          environment: 'node',
-          alias: {
-            '~': r('app'),
-            '@': r('app'),
-          },
-        },
-      },
       // Nuxt-specific tests
       await defineVitestProject({
         test: {
