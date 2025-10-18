@@ -2,7 +2,8 @@
 import { useIntervalFn } from '@vueuse/core'
 import { useQuest } from '~/composables/useQuest'
 import { useQuestActions } from '~/composables/useQuestActions'
-import { useQuestTaskTabs, useQuestTasks, type TaskWithInvestigations } from '~/composables/useQuestTasks'
+import { useQuestTaskTabs, useQuestTasks } from '~/composables/useQuestTasks'
+import type { TaskWithInvestigations } from '~/types/quest-tasks'
 
 const route = useRoute()
 const id = route.params.id as string

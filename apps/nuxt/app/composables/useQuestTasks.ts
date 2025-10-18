@@ -1,13 +1,5 @@
 import { computed, ref, unref, watch, type MaybeRef } from 'vue'
-import type { Task, TaskInvestigation, User } from '@prisma/client'
-
-type TaskInvestigationWithUser = TaskInvestigation & {
-  initiatedBy: Pick<User, 'id' | 'name' | 'email'> | null
-}
-
-export type TaskWithInvestigations = Task & {
-  investigations: TaskInvestigationWithUser[]
-}
+import type { QuestTaskTab, TaskWithInvestigations } from '~/types/quest-tasks'
 
 type QuestWithTasks = {
   status?: string | null
@@ -67,10 +59,10 @@ export function useQuestTasks(quest: MaybeRef<QuestWithTasks>) {
 type TaskTab = 'todo' | 'completed'
 
 export function useQuestTaskTabs(
-  todoTasks: MaybeRef<Task[]>,
-  completedTasks: MaybeRef<Task[]>,
+  todoTasks: MaybeRef<TaskWithInvestigations[]>,
+  completedTasks: MaybeRef<TaskWithInvestigations[]>,
 ) {
-  const taskTab = ref<TaskTab>('todo')
+  const taskTab = ref<QuestTaskTab>('todo')
 
   watch([
     () => unref(todoTasks).length,
@@ -84,7 +76,5 @@ export function useQuestTaskTabs(
     }
   }, { immediate: true })
 
-  return {
-    taskTab,
-  }
+  return { taskTab }
 }

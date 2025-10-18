@@ -1,17 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { breakpointsVuetifyV3, useBreakpoints, useVModel, useWindowSize } from '@vueuse/core'
-import type { Task, TaskInvestigation, User } from '@prisma/client'
-
-type TaskTab = 'todo' | 'completed'
-
-type TaskInvestigationWithUser = TaskInvestigation & {
-  initiatedBy: Pick<User, 'id' | 'name' | 'email'> | null
-}
-
-type TaskWithInvestigations = Task & {
-  investigations: TaskInvestigationWithUser[]
-}
+import type { QuestTaskTab, TaskWithInvestigations } from '~/types/quest-tasks'
 
 type QuestTaskSectionAction = {
   label: string
@@ -20,7 +10,7 @@ type QuestTaskSectionAction = {
 }
 
 type QuestTaskSection = {
-  value: TaskTab
+  value: QuestTaskTab
   title: string
   color: string
   tasks: TaskWithInvestigations[]
@@ -30,7 +20,7 @@ type QuestTaskSection = {
 }
 
 const props = defineProps<{
-  modelValue: TaskTab
+  modelValue: QuestTaskTab
   sections: QuestTaskSection[]
   pending: boolean
   tasksLoading: boolean
@@ -41,7 +31,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: TaskTab): void
+  (e: 'update:modelValue', value: QuestTaskTab): void
   (e: 'edit-task' | 'investigate-task' | 'share-task', task: TaskWithInvestigations): void
 }>()
 

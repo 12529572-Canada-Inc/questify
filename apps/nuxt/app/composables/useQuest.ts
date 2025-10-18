@@ -1,12 +1,5 @@
-import type { Quest, TaskInvestigation, Task, User } from '@prisma/client'
-
-type TaskInvestigationWithUser = TaskInvestigation & {
-  initiatedBy: Pick<User, 'id' | 'name' | 'email'> | null
-}
-
-type TaskWithInvestigations = Task & {
-  investigations: TaskInvestigationWithUser[]
-}
+import type { Quest, User } from '@prisma/client'
+import type { TaskWithInvestigations } from '~/types/quest-tasks'
 
 export function useQuest(id: string) {
   return useFetch<Quest & { tasks: TaskWithInvestigations[], owner: User }>(`/api/quests/${id}`, {
