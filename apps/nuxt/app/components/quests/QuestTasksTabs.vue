@@ -37,16 +37,18 @@ const props = defineProps<{
   isOwner: boolean
   hasTasks: boolean
   investigatingTaskIds?: string[]
+  highlightedTaskId?: string | null
 }>()
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: TaskTab): void
-  (e: 'edit-task' | 'investigate-task', task: TaskWithInvestigations): void
+  (e: 'edit-task' | 'investigate-task' | 'share-task', task: TaskWithInvestigations): void
 }>()
 
 const taskTab = useVModel(props, 'modelValue', emit)
 const investigatingIds = computed(() => new Set(props.investigatingTaskIds ?? []))
 const expandedInvestigationId = ref<string | null>(null)
+const highlightedTaskId = computed(() => props.highlightedTaskId ?? null)
 
 const investigationStatusMeta = {
   pending: {
@@ -153,7 +155,11 @@ function toggleInvestigationExpansion(investigationId: string) {
                     <v-list-item
                       v-for="task in section.tasks"
                       :key="task.id"
+                      :data-task-id="task.id"
                       class="py-3"
+                      :class="{
+                        'task-list-item--highlighted': highlightedTaskId === task.id,
+                      }"
                     >
                       <template #title>
                         <span
@@ -337,48 +343,69 @@ function toggleInvestigationExpansion(investigationId: string) {
                       </template>
                       <template #append>
                         <div
-                          v-if="isOwner"
-                          class="d-flex align-center"
+                          class="d-flex align-center task-actions"
                           style="gap: 6px;"
                         >
-                          <template v-if="task.status !== 'completed'">
-                            <v-btn
-                              variant="text"
-                              density="comfortable"
-                              size="small"
-                              :disabled="hasPendingInvestigation(task) || pending"
-                              :aria-label="`Investigate ${task.title}`"
-                              @click="emit('investigate-task', task)"
+                          <v-btn
+                            variant="text"
+                            density="comfortable"
+                            size="small"
+                            :aria-label="`Share ${task.title}`"
+                            @click="emit('share-task', task)"
+                          >
+                            <v-icon
+                              icon="mdi-share-variant"
+                              size="18"
+                            />
+                            <v-tooltip
+                              activator="parent"
+                              location="bottom"
                             >
-                              <v-icon
-                                icon="mdi-magnify"
-                                size="18"
-                              />
-                              <v-tooltip
-                                activator="parent"
-                                location="bottom"
+                              Share task
+                            </v-tooltip>
+                          </v-btn>
+
+                          <template v-if="isOwner">
+                            <template v-if="task.status !== 'completed'">
+                              <v-btn
+                                variant="text"
+                                density="comfortable"
+                                size="small"
+                                :disabled="hasPendingInvestigation(task) || pending"
+                                :aria-label="`Investigate ${task.title}`"
+                                @click="emit('investigate-task', task)"
                               >
-                                Investigate task
-                              </v-tooltip>
-                            </v-btn>
-                            <v-btn
-                              variant="text"
-                              density="comfortable"
-                              size="small"
-                              @click="emit('edit-task', task)"
-                            >
-                              <v-icon
-                                icon="mdi-pencil-outline"
-                                size="18"
-                              />
-                              <v-tooltip
-                                activator="parent"
-                                location="bottom"
+                                <v-icon
+                                  icon="mdi-magnify"
+                                  size="18"
+                                />
+                                <v-tooltip
+                                  activator="parent"
+                                  location="bottom"
+                                >
+                                  Investigate task
+                                </v-tooltip>
+                              </v-btn>
+                              <v-btn
+                                variant="text"
+                                density="comfortable"
+                                size="small"
+                                @click="emit('edit-task', task)"
                               >
-                                Edit task
-                              </v-tooltip>
-                            </v-btn>
+                                <v-icon
+                                  icon="mdi-pencil-outline"
+                                  size="18"
+                                />
+                                <v-tooltip
+                                  activator="parent"
+                                  location="bottom"
+                                >
+                                  Edit task
+                                </v-tooltip>
+                              </v-btn>
+                            </template>
                           </template>
+
                           <v-btn
                             v-if="section.action"
                             size="small"
@@ -507,5 +534,15 @@ function toggleInvestigationExpansion(investigationId: string) {
   font-weight: 500;
   letter-spacing: 0.02em;
   padding: 0 0.25rem;
+}
+
+.task-actions {
+  min-width: 0;
+}
+
+.task-list-item--highlighted {
+  background-color: rgba(var(--v-theme-primary), 0.08);
+  border-left: 3px solid rgba(var(--v-theme-primary), 0.65);
+  border-radius: 12px;
 }
 </style>

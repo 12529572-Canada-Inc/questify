@@ -1,6 +1,10 @@
 <script setup lang="ts">
 const { clear, loggedIn } = useUserSession()
 const router = useRouter()
+const requestUrl = useRequestURL()
+
+const shareDialogOpen = ref(false)
+const loginShareUrl = computed(() => new URL('/auth/login', requestUrl.origin).toString())
 
 async function logout() {
   try {
@@ -45,6 +49,14 @@ async function logout() {
       </v-app-bar-title>
       <v-spacer />
 
+      <v-btn
+        variant="text"
+        prepend-icon="mdi-share-variant"
+        @click="shareDialogOpen = true"
+      >
+        Share App
+      </v-btn>
+
       <template v-if="loggedIn">
         <v-btn
           text
@@ -69,6 +81,12 @@ async function logout() {
       </template>
     </v-app-bar>
     <slot />
+    <ShareDialog
+      v-model="shareDialogOpen"
+      title="Share Questify"
+      :share-url="loginShareUrl"
+      description="Invite someone to Questify. The link opens the login page where they can sign in or create an account."
+    />
   </v-main>
 </template>
 

@@ -6,6 +6,7 @@ import { useQuestTaskTabs, useQuestTasks, type TaskWithInvestigations } from '~/
 
 const route = useRoute()
 const id = route.params.id as string
+const requestUrl = useRequestURL()
 
 const { data: quest, refresh, pending, error } = await useQuest(id)
 const { user } = useUserSession()
@@ -28,6 +29,51 @@ const { markTaskCompleted, markTaskIncomplete, updateTask, investigateTask, comp
   questId: id,
   refresh,
   isOwner,
+})
+
+type ShareDialogContent = {
+  title: string
+  description: string
+  url: string
+}
+
+const shareDialogState = ref<ShareDialogContent | null>(null)
+const shareDialogVisible = computed({
+  get: () => shareDialogState.value !== null,
+  set: (value: boolean) => {
+    if (!value) {
+      shareDialogState.value = null
+    }
+  },
+})
+
+const questShareUrl = computed(() => new URL(`/quests/${id}`, requestUrl.origin).toString())
+
+function buildTaskShareUrl(taskId: string) {
+  return new URL(`/quests/${id}?task=${taskId}`, requestUrl.origin).toString()
+}
+
+const highlightedTaskId = computed(() => {
+  const value = route.query.task
+  return typeof value === 'string' && value.trim().length > 0 ? value : null
+})
+
+watchEffect(() => {
+  const taskId = highlightedTaskId.value
+  if (!taskId) {
+    return
+  }
+
+  if (todoTasks.value.some(task => task.id === taskId)) {
+    if (taskTab.value !== 'todo') {
+      taskTab.value = 'todo'
+    }
+  }
+  else if (completedTasks.value.some(task => task.id === taskId)) {
+    if (taskTab.value !== 'completed') {
+      taskTab.value = 'completed'
+    }
+  }
 })
 
 const taskEditDialogOpen = ref(false)
@@ -170,6 +216,26 @@ function removeInvestigatingTask(taskId: string) {
   const next = new Set(investigatingTaskIds.value)
   next.delete(taskId)
   investigatingTaskIds.value = next
+}
+
+function openQuestShare() {
+  if (!questData.value) {
+    return
+  }
+
+  shareDialogState.value = {
+    title: 'Share quest',
+    description: `Share "${questData.value.title}" with teammates. They will need to sign in to view this quest.`,
+    url: questShareUrl.value,
+  }
+}
+
+function openTaskShare(task: TaskWithInvestigations) {
+  shareDialogState.value = {
+    title: 'Share task',
+    description: `Share the task "${task.title}" from "${questData.value?.title ?? 'this quest'}". Recipients land on the quest page with the task highlighted.`,
+    url: buildTaskShareUrl(task.id),
+  }
 }
 
 async function submitInvestigation() {
@@ -341,231 +407,255 @@ watch(taskEditDialogOpen, (isOpen) => {
   <v-container class="py-6">
     <v-row>
       <v-col cols="12">
-        <v-card v-if="questData">
-          <v-card-title class="py-4">
-            <div class="quest-header d-flex align-center flex-wrap">
-              <v-avatar
-                size="56"
-                class="quest-status-avatar elevation-2"
-                :image="'/quest.png'"
-              />
-              <div class="d-flex flex-column gap-2">
-                <div class="quest-title-row d-flex align-center flex-wrap">
-                  <span class="quest-title text-h5 font-weight-medium text-truncate">
-                    {{ questData.title }}
-                  </span>
-                  <v-chip
-                    size="small"
-                    :color="questStatusMeta.color"
-                    variant="tonal"
-                    :prepend-icon="questStatusMeta.icon"
-                    class="quest-status-chip text-uppercase font-weight-medium"
-                  >
-                    {{ questStatusMeta.label }}
-                  </v-chip>
-                </div>
-                <template v-if="!isOwner">
-                  <div class="d-flex align-center gap-2 text-medium-emphasis text-body-2 flex-wrap">
-                    <v-icon
-                      icon="mdi-account"
-                      size="18"
-                    />
-                    <span>{{ questData.owner?.name ?? 'Unknown owner' }}</span>
+        <template v-if="questData">
+          <v-card>
+            <v-card-title class="py-4">
+              <div class="quest-header d-flex align-center flex-wrap justify-space-between">
+                <div class="quest-header__info d-flex align-center flex-wrap">
+                  <v-avatar
+                    size="56"
+                    class="quest-status-avatar elevation-2"
+                    :image="'/quest.png'"
+                  />
+                  <div class="d-flex flex-column gap-2">
+                    <div class="quest-title-row d-flex align-center flex-wrap">
+                      <span class="quest-title text-h5 font-weight-medium text-truncate">
+                        {{ questData.title }}
+                      </span>
+                      <v-chip
+                        size="small"
+                        :color="questStatusMeta.color"
+                        variant="tonal"
+                        :prepend-icon="questStatusMeta.icon"
+                        class="quest-status-chip text-uppercase font-weight-medium"
+                      >
+                        {{ questStatusMeta.label }}
+                      </v-chip>
+                    </div>
+                    <template v-if="!isOwner">
+                      <div class="d-flex align-center gap-2 text-medium-emphasis text-body-2 flex-wrap">
+                        <v-icon
+                          icon="mdi-account"
+                          size="18"
+                        />
+                        <span>{{ questData.owner?.name ?? 'Unknown owner' }}</span>
+                      </div>
+                    </template>
                   </div>
-                </template>
-              </div>
-            </div>
-          </v-card-title>
-          <v-card-text class="d-flex flex-column gap-4">
-            <QuestDetailsSections :quest="questData" />
-          </v-card-text>
-          <v-divider class="my-4" />
-
-          <v-card-text>
-            <v-alert
-              v-if="investigationError"
-              type="error"
-              variant="tonal"
-              closable
-              class="mb-4"
-              @click:close="investigationError = null"
-            >
-              {{ investigationError }}
-            </v-alert>
-            <QuestTasksTabs
-              v-model="taskTab"
-              :sections="taskSections"
-              :pending="pending.value || false"
-              :tasks-loading="tasksLoading"
-              :is-owner="isOwner"
-              :has-tasks="hasTasks"
-              :investigating-task-ids="investigatingTaskIdsList"
-              @edit-task="openTaskEditDialog"
-              @investigate-task="openInvestigationDialog"
-            />
-            <v-dialog
-              v-model="taskEditDialogOpen"
-              max-width="640"
-            >
-              <v-card>
-                <v-card-title class="text-h6">
-                  Edit Task
-                </v-card-title>
-                <v-card-text>
-                  <p class="text-body-2 text-medium-emphasis mb-4">
-                    Update the task details or add extra content that helps track progress or results.
-                  </p>
-                  <v-text-field
-                    v-model="taskEditForm.title"
-                    label="Title"
-                    :disabled="taskEditSaving"
-                    autofocus
-                    required
-                  />
-                  <v-textarea
-                    v-model="taskEditForm.details"
-                    label="Details"
-                    :disabled="taskEditSaving"
-                    auto-grow
-                    rows="3"
-                    hint="Optional. Provide additional guidance or notes for this task."
-                    persistent-hint
-                  />
-                  <v-textarea
-                    v-model="taskEditForm.extraContent"
-                    label="Extra Content"
-                    :disabled="taskEditSaving"
-                    auto-grow
-                    rows="4"
-                    hint="Optional. Capture lists, findings, or resources generated while completing this task."
-                    persistent-hint
-                  />
-                  <v-alert
-                    v-if="taskEditError"
-                    type="error"
-                    variant="tonal"
-                    class="mt-4"
-                    :text="taskEditError"
-                  />
-                </v-card-text>
-                <v-card-actions>
-                  <v-spacer />
+                </div>
+                <div class="quest-header__actions d-flex align-center gap-2">
                   <v-btn
                     variant="text"
-                    :disabled="taskEditSaving"
-                    @click="closeTaskEditDialog"
-                  >
-                    Cancel
-                  </v-btn>
-                  <v-btn
                     color="primary"
-                    :loading="taskEditSaving"
-                    :disabled="taskEditSaving || !isTaskEditDirty"
-                    @click="saveTaskEdits"
+                    prepend-icon="mdi-share-variant"
+                    @click="openQuestShare"
                   >
-                    Save Changes
+                    Share quest
                   </v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-            <v-dialog
-              v-model="investigationDialogOpen"
-              max-width="560"
-            >
-              <v-card>
-                <v-card-title class="text-h6">
-                  Investigate Task
-                </v-card-title>
-                <v-card-text class="d-flex flex-column gap-4">
-                  <div>
-                    <p class="text-body-2 mb-2">
-                      Provide additional context or questions for the Quest Agent to research.
+                </div>
+              </div>
+            </v-card-title>
+            <v-card-text class="d-flex flex-column gap-4">
+              <QuestDetailsSections :quest="questData" />
+            </v-card-text>
+            <v-divider class="my-4" />
+
+            <v-card-text>
+              <v-alert
+                v-if="investigationError"
+                type="error"
+                variant="tonal"
+                closable
+                class="mb-4"
+                @click:close="investigationError = null"
+              >
+                {{ investigationError }}
+              </v-alert>
+              <QuestTasksTabs
+                v-model="taskTab"
+                :sections="taskSections"
+                :pending="pending.value || false"
+                :tasks-loading="tasksLoading"
+                :is-owner="isOwner"
+                :has-tasks="hasTasks"
+                :investigating-task-ids="investigatingTaskIdsList"
+                :highlighted-task-id="highlightedTaskId"
+                @edit-task="openTaskEditDialog"
+                @investigate-task="openInvestigationDialog"
+                @share-task="openTaskShare"
+              />
+              <v-dialog
+                v-model="taskEditDialogOpen"
+                max-width="640"
+              >
+                <v-card>
+                  <v-card-title class="text-h6">
+                    Edit Task
+                  </v-card-title>
+                  <v-card-text>
+                    <p class="text-body-2 text-medium-emphasis mb-4">
+                      Update the task details or add extra content that helps track progress or results.
                     </p>
+                    <v-text-field
+                      v-model="taskEditForm.title"
+                      label="Title"
+                      :disabled="taskEditSaving"
+                      autofocus
+                      required
+                    />
                     <v-textarea
-                      v-model="investigationPrompt"
-                      label="Investigation context"
-                      :disabled="investigationDialogSubmitting"
-                      :error="investigationDialogError !== null"
+                      v-model="taskEditForm.details"
+                      label="Details"
+                      :disabled="taskEditSaving"
                       auto-grow
-                      rows="4"
-                      maxlength="1000"
-                      counter
-                      hint="This will help generate insights or suggestions related to the task."
+                      rows="3"
+                      hint="Optional. Provide additional guidance or notes for this task."
                       persistent-hint
                     />
-                  </div>
-                  <v-alert
-                    v-if="investigationDialogError"
-                    type="error"
-                    variant="tonal"
-                    :text="investigationDialogError"
-                  />
-                </v-card-text>
-                <v-card-actions>
-                  <v-spacer />
-                  <v-btn
-                    variant="text"
-                    :disabled="investigationDialogSubmitting"
-                    @click="closeInvestigationDialog"
-                  >
-                    Cancel
-                  </v-btn>
-                  <v-btn
-                    color="primary"
-                    :loading="investigationDialogSubmitting"
-                    :disabled="investigationDialogError !== null || investigationPrompt.trim().length === 0"
-                    @click="submitInvestigation"
-                  >
-                    Investigate
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-          </v-card-text>
+                    <v-textarea
+                      v-model="taskEditForm.extraContent"
+                      label="Extra Content"
+                      :disabled="taskEditSaving"
+                      auto-grow
+                      rows="4"
+                      hint="Optional. Capture lists, findings, or resources generated while completing this task."
+                      persistent-hint
+                    />
+                    <v-alert
+                      v-if="taskEditError"
+                      type="error"
+                      variant="tonal"
+                      class="mt-4"
+                      :text="taskEditError"
+                    />
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-spacer />
+                    <v-btn
+                      variant="text"
+                      :disabled="taskEditSaving"
+                      @click="closeTaskEditDialog"
+                    >
+                      Cancel
+                    </v-btn>
+                    <v-btn
+                      color="primary"
+                      :loading="taskEditSaving"
+                      :disabled="taskEditSaving || !isTaskEditDirty"
+                      @click="saveTaskEdits"
+                    >
+                      Save Changes
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+              <v-dialog
+                v-model="investigationDialogOpen"
+                max-width="560"
+              >
+                <v-card>
+                  <v-card-title class="text-h6">
+                    Investigate Task
+                  </v-card-title>
+                  <v-card-text class="d-flex flex-column gap-4">
+                    <div>
+                      <p class="text-body-2 mb-2">
+                        Provide additional context or questions for the Quest Agent to research.
+                      </p>
+                      <v-textarea
+                        v-model="investigationPrompt"
+                        label="Investigation context"
+                        :disabled="investigationDialogSubmitting"
+                        :error="investigationDialogError !== null"
+                        auto-grow
+                        rows="4"
+                        maxlength="1000"
+                        counter
+                        hint="This will help generate insights or suggestions related to the task."
+                        persistent-hint
+                      />
+                    </div>
+                    <v-alert
+                      v-if="investigationDialogError"
+                      type="error"
+                      variant="tonal"
+                      :text="investigationDialogError"
+                    />
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-spacer />
+                    <v-btn
+                      variant="text"
+                      :disabled="investigationDialogSubmitting"
+                      @click="closeInvestigationDialog"
+                    >
+                      Cancel
+                    </v-btn>
+                    <v-btn
+                      color="primary"
+                      :loading="investigationDialogSubmitting"
+                      :disabled="investigationDialogError !== null || investigationPrompt.trim().length === 0"
+                      @click="submitInvestigation"
+                    >
+                      Investigate
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+            </v-card-text>
 
-          <v-card-actions>
-            <v-row
-              class="w-100"
-              dense
-            >
-              <v-col
-                cols="12"
-                sm="6"
+            <v-card-actions>
+              <v-row
+                class="w-100"
+                dense
               >
-                <v-btn
-                  block
-                  color="primary"
-                  :to="`/quests`"
+                <v-col
+                  cols="12"
+                  sm="6"
                 >
-                  Back to Quests
-                </v-btn>
-              </v-col>
-              <v-col
-                cols="12"
-                sm="6"
-              >
-                <template v-if="isOwner">
                   <v-btn
-                    v-if="questData.status !== 'completed'"
                     block
-                    color="success"
-                    @click="completeQuest"
+                    color="primary"
+                    :to="`/quests`"
                   >
-                    Mark as Completed
+                    Back to Quests
                   </v-btn>
-                  <v-btn
-                    v-else
-                    block
-                    color="warning"
-                    @click="reopenQuest"
-                  >
-                    Reopen Quest
-                  </v-btn>
-                </template>
-              </v-col>
-            </v-row>
-          </v-card-actions>
-        </v-card>
+                </v-col>
+                <v-col
+                  cols="12"
+                  sm="6"
+                >
+                  <template v-if="isOwner">
+                    <v-btn
+                      v-if="questData.status !== 'completed'"
+                      block
+                      color="success"
+                      @click="completeQuest"
+                    >
+                      Mark as Completed
+                    </v-btn>
+                    <v-btn
+                      v-else
+                      block
+                      color="warning"
+                      @click="reopenQuest"
+                    >
+                      Reopen Quest
+                    </v-btn>
+                  </template>
+                </v-col>
+              </v-row>
+            </v-card-actions>
+          </v-card>
+
+          <ShareDialog
+            v-if="shareDialogState"
+            v-model="shareDialogVisible"
+            :title="shareDialogState.title"
+            :description="shareDialogState.description"
+            :share-url="shareDialogState.url"
+          />
+        </template>
 
         <v-alert
           v-else-if="errorType === 'not-found'"
@@ -596,7 +686,16 @@ watch(taskEditDialogOpen, (isOpen) => {
 <style scoped>
 .quest-header {
   min-width: 0;
+  width: 100%;
   gap: 16px;
+}
+
+.quest-header__info {
+  gap: 16px;
+}
+
+.quest-header__actions {
+  flex: 0 0 auto;
 }
 
 .quest-status-avatar {
@@ -613,5 +712,25 @@ watch(taskEditDialogOpen, (isOpen) => {
 
 .quest-title {
   min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .quest-header {
+    gap: 12px;
+  }
+
+  .quest-header__info {
+    gap: 12px;
+  }
+
+  .quest-header__actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .quest-header__actions :deep(.v-btn) {
+    width: 100%;
+    justify-content: center;
+  }
 }
 </style>
