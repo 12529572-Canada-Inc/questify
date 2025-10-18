@@ -79,6 +79,7 @@ onBeforeUnmount(() => {
   <v-dialog
     v-model="dialogOpen"
     max-width="520"
+    :aria-label="title"
   >
     <v-card>
       <v-card-title class="text-h6 font-weight-medium">
