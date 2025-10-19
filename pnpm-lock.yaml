@@ -8,9 +8,6 @@ importers:
 
   .:
     devDependencies:
-      '@playwright/test':
-        specifier: ^1.43.1
-        version: 1.56.0
       '@oxc-minify/binding-darwin-arm64':
         specifier: 0.94.0
         version: 0.94.0
@@ -23,6 +20,9 @@ importers:
       '@oxc-transform/binding-darwin-arm64':
         specifier: 0.94.0
         version: 0.94.0
+      '@playwright/test':
+        specifier: ^1.43.1
+        version: 1.56.0
       typescript:
         specifier: ^5.6.3
         version: 5.9.2
@@ -243,6 +243,9 @@ importers:
       '@types/node':
         specifier: ^24.6.2
         version: 24.6.2
+      '@vitest/coverage-v8':
+        specifier: ^3.2.4
+        version: 3.2.4(vitest@3.2.4)
       tsconfig-paths:
         specifier: ^4.2.0
         version: 4.2.0
@@ -8830,7 +8833,7 @@ snapshots:
       std-env: 3.9.0
       test-exclude: 7.0.1
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@edge-runtime/vm@3.2.0)(@types/node@20.19.17)(@vitest/ui@3.2.4)(happy-dom@18.0.1)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+      vitest: 3.2.4(@edge-runtime/vm@3.2.0)(@types/node@24.6.2)(@vitest/ui@3.2.4)(happy-dom@18.0.1)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -8895,7 +8898,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@edge-runtime/vm@3.2.0)(@types/node@20.19.17)(@vitest/ui@3.2.4)(happy-dom@18.0.1)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+      vitest: 3.2.4(@edge-runtime/vm@3.2.0)(@types/node@24.6.2)(@vitest/ui@3.2.4)(happy-dom@18.0.1)(jiti@2.6.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
 
   '@vitest/utils@3.2.4':
     dependencies:

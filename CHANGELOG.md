@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added share controls with QR codes so teammates can access the app login, quests, and individual tasks via generated links.
 - Enhanced mobile responsiveness across the header, quest pages, and auth forms, and added Playwright coverage to guard small-screen layouts in CI.
 
+### 🧪 Tests & Coverage
+- Raised Vitest coverage across Nuxt components, layouts, middleware, and pages to 93%+ statements / 80% branches by adding extensive unit suites and support utilities.
+- Added configuration to emit JSON coverage summaries, expanded the aggregate `test:coverage` script, and refreshed the baseline report for worker/shared packages (now ≥89% statements each).
+
 ### 🧱 Refactors
 - Introduced shared quest task types, queue helpers, and modular task list components.
 - Extracted quest edit/investigation dialogs and action buttons into dedicated Vue components.

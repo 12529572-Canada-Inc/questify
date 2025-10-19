@@ -129,4 +129,20 @@ describe('API /api/tasks/[id]/investigations.post', () => {
     expect(prismaMocks.taskInvestigationCreateMock).not.toHaveBeenCalled()
     expect(addMock).not.toHaveBeenCalled()
   })
+
+  it('warns when the task queue is not available', async () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const response = await handler({
+      context: {},
+    } as unknown as Parameters<typeof handler>[0])
+
+    expect(addMock).not.toHaveBeenCalled()
+    expect(response.investigation).toEqual({
+      id: 'inv-1',
+      status: 'pending',
+      prompt: 'Explore risks and opportunities',
+    })
+    expect(warnSpy).toHaveBeenCalledWith('Task queue not configured; investigation will remain pending until processed manually.')
+    warnSpy.mockRestore()
+  })
 })
