@@ -9,7 +9,7 @@ import { useQuestShareDialog } from '~/composables/useQuestShareDialog'
 import QuestDetailsCard from '~/components/quests/QuestDetailsCard.vue'
 import QuestTaskEditDialog from '~/components/quests/QuestTaskEditDialog.vue'
 import QuestInvestigationDialog from '~/components/quests/QuestInvestigationDialog.vue'
-import type { TaskWithInvestigations } from '~/types/quest-tasks'
+import type { QuestTaskTab, TaskWithInvestigations } from '~/types/quest-tasks'
 
 const route = useRoute()
 const id = route.params.id as string
@@ -119,6 +119,14 @@ function handleTaskShare(task: TaskWithInvestigations) {
   showTaskShareDialog(task.title, questData.value?.title, task.id)
 }
 
+function updateTaskTab(value: QuestTaskTab) {
+  taskTab.value = value
+}
+
+function clearInvestigationError() {
+  investigationError.value = null
+}
+
 const questStatusMeta = computed(() => {
   const status = questData.value?.status ?? 'draft'
   const base = {
@@ -225,12 +233,12 @@ watch(
             :investigating-task-ids="investigatingTaskIdsList"
             :highlighted-task-id="highlightedTaskId"
             :investigation-error="investigationError"
-            @update:task-tab="value => (taskTab.value = value)"
+            @update:task-tab="updateTaskTab"
             @share-quest="handleQuestShare"
             @open-task-edit="openTaskEditDialog"
             @open-investigation="openInvestigationDialog"
             @share-task="handleTaskShare"
-            @clear-investigation-error="investigationError.value = null"
+            @clear-investigation-error="clearInvestigationError"
           >
             <template #after-tasks>
               <QuestTaskEditDialog
