@@ -286,71 +286,17 @@ watch(
                 @investigate-task="openInvestigationDialog"
                 @share-task="handleTaskShare"
               />
-              <v-dialog
+              <QuestTaskEditDialog
                 v-model="taskEditDialogOpen"
-                max-width="640"
-              >
-                <v-card>
-                  <v-card-title class="text-h6">
-                    Edit Task
-                  </v-card-title>
-                  <v-card-text>
-                    <p class="text-body-2 text-medium-emphasis mb-4">
-                      Update the task details or add extra content that helps track progress or results.
-                    </p>
-                    <v-text-field
-                      v-model="taskEditForm.title"
-                      label="Title"
-                      :disabled="taskEditSaving"
-                      autofocus
-                      required
-                    />
-                    <v-textarea
-                      v-model="taskEditForm.details"
-                      label="Details"
-                      :disabled="taskEditSaving"
-                      auto-grow
-                      rows="3"
-                      hint="Optional. Provide additional guidance or notes for this task."
-                      persistent-hint
-                    />
-                    <v-textarea
-                      v-model="taskEditForm.extraContent"
-                      label="Extra Content"
-                      :disabled="taskEditSaving"
-                      auto-grow
-                      rows="4"
-                      hint="Optional. Capture lists, findings, or resources generated while completing this task."
-                      persistent-hint
-                    />
-                    <v-alert
-                      v-if="taskEditError"
-                      type="error"
-                      variant="tonal"
-                      class="mt-4"
-                      :text="taskEditError"
-                    />
-                  </v-card-text>
-                  <v-card-actions>
-                    <v-spacer />
-                    <v-btn
-                      variant="text"
-                      :disabled="taskEditSaving"
-                      @click="closeTaskEditDialog"
-                    >
-                      Cancel
-                    </v-btn>
-                    <v-btn
-                      color="primary"
-                      :loading="taskEditSaving"
-                      :disabled="taskEditSaving || !isTaskEditDirty"
-                      @click="saveTaskEdits"
-                    >
-                      Save Changes
-                    </v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
+                v-model:title="taskEditForm.title"
+                v-model:details="taskEditForm.details"
+                v-model:extra-content="taskEditForm.extraContent"
+                :saving="taskEditSaving"
+                :error="taskEditError"
+                :is-dirty="isTaskEditDirty"
+                @close="closeTaskEditDialog"
+                @save="saveTaskEdits"
+              />
               <v-dialog
                 v-model="investigationDialogOpen"
                 max-width="560"
