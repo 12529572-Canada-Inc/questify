@@ -7,7 +7,6 @@ describe.skip('authenticated middleware', () => {
   type MiddlewareArgs = Parameters<typeof authenticatedMiddleware>
 
   const createTo = (path: string) => ({ path } as MiddlewareArgs[0])
-  const createFrom = () => ({} as MiddlewareArgs[1])
 
   afterEach(() => {
     vi.unstubAllGlobals()
@@ -23,7 +22,7 @@ describe.skip('authenticated middleware', () => {
     }))
     vi.stubGlobal('navigateTo', navigateTo)
 
-    await authenticatedMiddleware(createTo('/quests/new'), createFrom())
+    await authenticatedMiddleware(createTo('/quests/new'))
 
     expect(fetch).toHaveBeenCalledTimes(1)
     expect(navigateTo).not.toHaveBeenCalled()
@@ -39,7 +38,7 @@ describe.skip('authenticated middleware', () => {
     }))
     vi.stubGlobal('navigateTo', navigateTo)
 
-    await authenticatedMiddleware(createTo('/quests/alpha'), createFrom())
+    await authenticatedMiddleware(createTo('/quests/alpha'))
 
     expect(fetch).toHaveBeenCalledTimes(1)
     expect(navigateTo).toHaveBeenCalledWith('/auth/login')
@@ -55,7 +54,7 @@ describe.skip('authenticated middleware', () => {
     }))
     vi.stubGlobal('navigateTo', navigateTo)
 
-    await authenticatedMiddleware(createTo('/quests/beta'), createFrom())
+    await authenticatedMiddleware(createTo('/quests/beta'))
 
     expect(fetch).toHaveBeenCalledTimes(1)
     expect(navigateTo).not.toHaveBeenCalled()

@@ -37,7 +37,6 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllGlobals()
-  globalThis.defineNuxtRouteMiddleware = globalThis.defineNuxtRouteMiddleware ?? (fn => fn)
 })
 
 const sampleQuest = createQuest()

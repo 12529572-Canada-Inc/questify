@@ -59,10 +59,16 @@ describe('common components', () => {
 
     expect(wrapper.find('[data-testid="share-dialog-card"]').exists()).toBe(true)
     expect(wrapper.text()).toContain('Invite a friend')
-    const state = (wrapper.vm as { $: { setupState: Record<string, unknown> } }).$?.setupState
-    await state?.copyLink?.()
-    state?.showCopiedTooltip?.()
-    state?.hideCopiedTooltip?.()
+    const state = (wrapper.vm as unknown as { $: { setupState?: Record<string, unknown> } }).$?.setupState ?? {}
+    if (typeof (state as { copyLink?: () => Promise<void> }).copyLink === 'function') {
+      await (state as { copyLink: () => Promise<void> }).copyLink()
+    }
+    if (typeof (state as { showCopiedTooltip?: () => void }).showCopiedTooltip === 'function') {
+      (state as { showCopiedTooltip: () => void }).showCopiedTooltip()
+    }
+    if (typeof (state as { hideCopiedTooltip?: () => void }).hideCopiedTooltip === 'function') {
+      (state as { hideCopiedTooltip: () => void }).hideCopiedTooltip()
+    }
   })
 
   it('renders QR code display when running on client', async () => {

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { ref } from 'vue'
+import { ref, type ComponentPublicInstance } from 'vue'
 import DefaultLayout from '../../../app/layouts/default.vue'
 import { mountWithBase } from '../support/mount-options'
 
@@ -30,7 +30,6 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllGlobals()
-  globalThis.defineNuxtRouteMiddleware = globalThis.defineNuxtRouteMiddleware ?? (fn => fn)
 })
 
 describe('default layout', () => {
@@ -49,7 +48,8 @@ describe('default layout', () => {
       },
     })
 
-    await (wrapper.vm as unknown as { logout: () => Promise<void> }).logout()
+    const vm = wrapper.vm as ComponentPublicInstance & { logout?: () => Promise<void> }
+    await vm.logout?.()
 
     expect(fetchApi).toHaveBeenCalledWith('/api/auth/logout', { method: 'POST' })
     expect(clearSession).toHaveBeenCalled()

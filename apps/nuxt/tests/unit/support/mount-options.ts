@@ -45,16 +45,16 @@ function mergeMountOptions(overrides?: MountOverrides): MountOverrides {
   }
 }
 
-export function mountWithBase<T extends ComponentPublicInstance>(
+export function mountWithBase(
   component: Component,
   overrides?: MountOverrides,
-): VueWrapper<T> {
+): VueWrapper<ComponentPublicInstance> {
   return mount(component, mergeMountOptions(overrides))
 }
 
-export function shallowMountWithBase<T extends ComponentPublicInstance>(
+export function shallowMountWithBase(
   component: Component,
   overrides?: MountOverrides,
-): VueWrapper<T> {
+): VueWrapper<ComponentPublicInstance> {
   return shallowMount(component, mergeMountOptions(overrides))
 }

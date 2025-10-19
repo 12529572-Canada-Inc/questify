@@ -1,5 +1,7 @@
 import '../support/mocks/vueuse'
 
+import type { ComponentPublicInstance } from 'vue'
+import type { VueWrapper } from '@vue/test-utils'
 import { computed, ref } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 import QuestActionButtons from '../../../app/components/quests/QuestActionButtons.vue'
@@ -28,6 +30,25 @@ type DetailedSection = {
   label: string
   text: string
 }
+
+type SetupState = Record<string, unknown> & {
+  handleComplete?: () => void
+  handleReopen?: () => void
+  toggleOptionalFields?: () => void
+  handleCancel?: () => void
+  handleSubmit?: () => void
+  handleSectionAction?: () => void
+  handleSave?: () => void
+  onToggle?: () => void
+  handleToggle?: (id: string) => void
+  toggleInvestigation?: (id: string) => void
+  executeSectionAction?: (id: string) => void
+  handleAction?: (action: { handler: () => void }) => void
+}
+
+const getSetupState = (wrapper: VueWrapper<ComponentPublicInstance>) => (
+  (wrapper.vm as ComponentPublicInstance & { $: { setupState?: SetupState } }).$?.setupState ?? {}
+) as SetupState
 
 if (!('useQuestDetails' in globalThis)) {
   Object.assign(globalThis, {
@@ -102,8 +123,8 @@ describe('quest components', () => {
     })
 
     expect(wrapper.exists()).toBe(true)
-    const state = (wrapper.vm as { $: { setupState: Record<string, unknown> } }).$?.setupState
-    state?.handleComplete?.()
+    const state = getSetupState(wrapper)
+    state.handleComplete?.()
     expect(wrapper.emitted('complete-quest')).toBeTruthy()
   })
 
@@ -116,8 +137,8 @@ describe('quest components', () => {
     })
 
     expect(wrapper.exists()).toBe(true)
-    const state = (wrapper.vm as { $: { setupState: Record<string, unknown> } }).$?.setupState
-    state?.handleReopen?.()
+    const state = getSetupState(wrapper)
+    state.handleReopen?.()
     expect(wrapper.emitted('reopen-quest')).toBeTruthy()
   })
 
@@ -171,9 +192,10 @@ describe('quest components', () => {
       props: { showBackButton: true },
     })
 
-    await (wrapper.vm as unknown as { submit: () => Promise<void> }).submit()
-    const state = (wrapper.vm as { $: { setupState: Record<string, unknown> } }).$?.setupState
-    state?.toggleOptionalFields?.()
+    const vm = wrapper.vm as ComponentPublicInstance & { submit?: () => Promise<void> }
+    await vm.submit?.()
+    const formState = getSetupState(wrapper)
+    formState.toggleOptionalFields?.()
     expect(wrapper.text()).toContain('Create Quest')
   })
 
@@ -188,9 +210,9 @@ describe('quest components', () => {
     })
 
     expect(wrapper.exists()).toBe(true)
-    const state = (wrapper.vm as { $: { setupState: Record<string, unknown> } }).$?.setupState
-    state?.handleCancel?.()
-    state?.handleSubmit?.()
+    const dialogState = getSetupState(wrapper)
+    dialogState.handleCancel?.()
+    dialogState.handleSubmit?.()
   })
 
   it('renders QuestList with quest entries', () => {
@@ -227,8 +249,8 @@ describe('quest components', () => {
     })
 
     expect(wrapper.exists()).toBe(true)
-    const state = (wrapper.vm as { $: { setupState: Record<string, unknown> } }).$?.setupState
-    ;(state?.handleSectionAction as (() => void) | undefined)?.()
+    const state = getSetupState(wrapper)
+    state.handleSectionAction?.()
     expect(wrapper.emitted('execute-section-action')).toBeTruthy()
   })
 
@@ -262,8 +284,9 @@ describe('quest components', () => {
     })
 
     expect(wrapper.text()).toContain('Edit Task')
-    ;(wrapper.vm as unknown as { handleSave: () => void }).handleSave()
-    ;(wrapper.vm as unknown as { handleCancel: () => void }).handleCancel()
+    const editState = getSetupState(wrapper)
+    editState.handleSave?.()
+    editState.handleCancel?.()
   })
 
   it('renders QuestTaskInvestigationItem summary', () => {
@@ -275,7 +298,8 @@ describe('quest components', () => {
     })
 
     expect(wrapper.text()).toContain('Summary')
-    ;(wrapper.vm as unknown as { onToggle: () => void }).onToggle()
+    const itemState = getSetupState(wrapper)
+    itemState.onToggle?.()
   })
 
   it('renders QuestTaskInvestigationList with list items', () => {
@@ -287,7 +311,8 @@ describe('quest components', () => {
     })
 
     expect(wrapper.findAllComponents(QuestTaskInvestigationItem).length).toBeGreaterThan(0)
-    ;(wrapper.vm as unknown as { handleToggle: (id: string) => void }).handleToggle('inv-1')
+    const listState = getSetupState(wrapper)
+    listState.handleToggle?.('inv-1')
   })
 
   it('renders QuestTaskInvestigations and toggles', () => {
@@ -303,7 +328,8 @@ describe('quest components', () => {
     })
 
     expect(wrapper.text()).toContain('Investigations')
-    ;(wrapper.vm as unknown as { toggleInvestigation: (id: string) => void }).toggleInvestigation('inv-1')
+    const investigationsState = getSetupState(wrapper)
+    investigationsState.toggleInvestigation?.('inv-1')
     expect(toggleSpy).toHaveBeenCalledWith('inv-1')
   })
 
@@ -324,7 +350,8 @@ describe('quest components', () => {
     })
 
     expect(wrapper.find('.task-list-item').exists()).toBe(true)
-    ;(wrapper.vm as unknown as { toggleInvestigation: (id: string) => void }).toggleInvestigation('inv-1')
+    const listItemState = getSetupState(wrapper)
+    listItemState.toggleInvestigation?.('inv-1')
     expect(wrapper.emitted('toggle-investigation')).toBeTruthy()
   })
 
@@ -345,7 +372,8 @@ describe('quest components', () => {
     })
 
     expect(wrapper.exists()).toBe(true)
-    ;(wrapper.vm as unknown as { handleAction: (action: { handler: () => void }) => void }).handleAction({ label: 'Share', icon: 'mdi-share', handler })
+    const compactState = getSetupState(wrapper)
+    compactState.handleAction?.({ label: 'Share', icon: 'mdi-share', handler })
     expect(handler).toHaveBeenCalled()
   })
 
@@ -364,7 +392,8 @@ describe('quest components', () => {
     })
 
     expect(wrapper.text()).toContain(sampleSection.title)
-    ;(wrapper.vm as unknown as { executeSectionAction: (id: string) => void }).executeSectionAction(sampleTask.id)
+    const sectionState = getSetupState(wrapper)
+    sectionState.executeSectionAction?.(sampleTask.id)
     expect(sampleSection.action?.handler).toHaveBeenCalledWith(sampleTask.id)
   })
 
@@ -383,13 +412,14 @@ describe('quest components', () => {
     })
 
     expect(wrapper.text()).toContain('Tasks')
-    const vm = wrapper.vm as unknown as {
-      hasPendingInvestigation: (task: ReturnType<typeof createTask>) => boolean
-      toggleInvestigationExpansion: (id: string) => void
+    const vm = wrapper.vm as ComponentPublicInstance & {
+      hasPendingInvestigation?: (task: ReturnType<typeof createTask>) => boolean
+      toggleInvestigationExpansion?: (id: string) => void
+      taskTab?: { value: string }
     }
     const pendingTask = createTask({ investigations: [createInvestigation({ status: 'pending' })] })
-    expect(vm.hasPendingInvestigation(pendingTask)).toBe(true)
-    vm.toggleInvestigationExpansion('inv-1')
+    expect(vm.hasPendingInvestigation?.(pendingTask)).toBe(true)
+    vm.toggleInvestigationExpansion?.('inv-1')
   })
 
   it('renders QuestDetailsCard with tabs and slots', () => {
@@ -418,6 +448,7 @@ describe('quest components', () => {
 
     expect(wrapper.text()).toContain('Launch Quest')
     expect(wrapper.text()).toContain('Actions Slot')
-    ;(wrapper.vm as unknown as { taskTabModel: { value: string } }).taskTabModel = 'completed'
+    const vm = wrapper.vm as ComponentPublicInstance & { taskTab?: { value: string } }
+    if (vm.taskTab) vm.taskTab.value = 'completed'
   })
 })

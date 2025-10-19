@@ -1,6 +1,6 @@
 import '../support/mocks/vueuse'
 
-import { ref } from 'vue'
+import { ref, type ComponentPublicInstance } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import HomePage from '../../../app/pages/index.vue'
 import QuestsIndexPage from '../../../app/pages/quests/index.vue'
@@ -13,6 +13,12 @@ import { createQuest } from '../support/sample-data'
 const routerPush = vi.fn()
 const fetchSession = vi.fn().mockResolvedValue(undefined)
 const fetchApi = vi.fn().mockResolvedValue(undefined)
+
+type AuthFormVm = ComponentPublicInstance & {
+  email?: string
+  password?: string
+  submit?: () => Promise<void>
+}
 
 beforeEach(() => {
   routerPush.mockReset()
@@ -39,7 +45,6 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllGlobals()
-  globalThis.defineNuxtRouteMiddleware = globalThis.defineNuxtRouteMiddleware ?? (fn => fn)
 })
 
 describe('basic pages', () => {
@@ -92,9 +97,10 @@ describe('basic pages', () => {
       },
     })
 
-    ;(wrapper.vm as { email: string }).email = 'person@example.com'
-    ;(wrapper.vm as { password: string }).password = 'password123'
-    await (wrapper.vm as { submit: () => Promise<void> }).submit()
+    const vm = wrapper.vm as AuthFormVm
+    vm.email = 'person@example.com'
+    vm.password = 'password123'
+    await vm.submit?.()
     expect(fetchApi).toHaveBeenCalledWith('/api/auth/login', expect.any(Object))
   })
 
@@ -110,9 +116,10 @@ describe('basic pages', () => {
       },
     })
 
-    ;(wrapper.vm as { email: string }).email = 'new@example.com'
-    ;(wrapper.vm as { password: string }).password = 'topsecret'
-    await (wrapper.vm as { submit: () => Promise<void> }).submit()
+    const vm = wrapper.vm as AuthFormVm
+    vm.email = 'new@example.com'
+    vm.password = 'topsecret'
+    await vm.submit?.()
     expect(fetchApi).toHaveBeenCalledWith('/api/auth/signup', expect.any(Object))
   })
 })
