@@ -1,9 +1,11 @@
 import { defineConfig } from 'vitest/config'
+import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 
 const r = (p: string) => resolve(__dirname, p)
 
 export default defineConfig({
+  plugins: [vue()],
   resolve: {
     alias: {
       '~': r('app'),
@@ -19,7 +21,7 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    environment: 'node',
+    environment: 'happy-dom',
     include: ['tests/{api,unit}/**/*.{test,spec}.ts'],
     exclude: [
       '**/node_modules/**',
@@ -41,5 +43,27 @@ export default defineConfig({
     testTimeout: 90_000,
     hookTimeout: 90_000,
     reporters: ['default'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'json-summary', 'html'],
+      reportsDirectory: './coverage',
+      include: [
+        'app/composables/useQuest.ts',
+        'app/composables/useQuestTasks.ts',
+        'app/components/**/*.vue',
+        'app/layouts/**/*.vue',
+        'app/middleware/**/*.ts',
+        'app/pages/**/*.vue',
+        'app/utils/**/*.ts',
+        'server/api/**/*.ts',
+        'server/utils/**/*.ts',
+      ],
+      exclude: [
+        'app/composables/**/__mocks__/**',
+        'app/utils/**/__mocks__/**',
+        'server/api/**/__mocks__/**',
+        'server/utils/**/__mocks__/**',
+      ],
+    },
   },
 })

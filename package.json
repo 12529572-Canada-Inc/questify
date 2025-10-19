@@ -24,6 +24,7 @@
     "prisma:clear": "pnpm --filter prisma clear",
     "prisma:reset": "pnpm --filter prisma reset",
     "test": "pnpm test:nuxt && pnpm test:worker && pnpm test:shared",
+    "test:coverage": "pnpm --filter nuxt test:coverage && pnpm --filter worker test:coverage && pnpm --filter shared test:coverage",
     "test:nuxt": "pnpm --filter nuxt test",
     "test:worker": "pnpm --filter worker test",
     "test:shared": "pnpm --filter shared test"

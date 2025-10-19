@@ -112,18 +112,21 @@ jobs:
                   NUXT_TEST_UTILS_BUILD: true
               run: pnpm test
 
-            - name: 📈 Nuxt coverage
-              run: pnpm --filter nuxt test:coverage
+            - name: 📈 Test coverage
+              run: pnpm test:coverage
 
             - name: 🌍 Nuxt E2E tests
               run: pnpm --filter nuxt test:e2e
 
-            - name: 📊 Upload coverage report
+            - name: 📊 Upload coverage reports
               if: always()
               uses: actions/upload-artifact@v4
               with:
-                  name: nuxt-coverage
-                  path: apps/nuxt/coverage
+                  name: coverage-reports
+                  path: |
+                      apps/nuxt/coverage
+                      apps/worker/coverage
+                      packages/shared/coverage
 
             - name: 🗃️ Upload Playwright traces
               if: failure()
