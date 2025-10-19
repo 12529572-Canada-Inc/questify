@@ -8,6 +8,7 @@ import { useQuestInvestigations } from '~/composables/useQuestInvestigations'
 import { useQuestShareDialog } from '~/composables/useQuestShareDialog'
 import QuestDetailsCard from '~/components/quests/QuestDetailsCard.vue'
 import QuestTaskEditDialog from '~/components/quests/QuestTaskEditDialog.vue'
+import QuestInvestigationDialog from '~/components/quests/QuestInvestigationDialog.vue'
 import type { TaskWithInvestigations } from '~/types/quest-tasks'
 
 const route = useRoute()
@@ -243,59 +244,14 @@ watch(
                 @close="closeTaskEditDialog"
                 @save="saveTaskEdits"
               />
-              <v-dialog
+              <QuestInvestigationDialog
                 v-model="investigationDialogOpen"
-                max-width="560"
-              >
-                <v-card>
-                  <v-card-title class="text-h6">
-                    Investigate Task
-                  </v-card-title>
-                  <v-card-text class="d-flex flex-column gap-4">
-                    <div>
-                      <p class="text-body-2 mb-2">
-                        Provide additional context or questions for the Quest Agent to research.
-                      </p>
-                      <v-textarea
-                        v-model="investigationPrompt"
-                        label="Investigation context"
-                        :disabled="investigationDialogSubmitting"
-                        :error="investigationDialogError !== null"
-                        auto-grow
-                        rows="4"
-                        maxlength="1000"
-                        counter
-                        hint="This will help generate insights or suggestions related to the task."
-                        persistent-hint
-                      />
-                    </div>
-                    <v-alert
-                      v-if="investigationDialogError"
-                      type="error"
-                      variant="tonal"
-                      :text="investigationDialogError"
-                    />
-                  </v-card-text>
-                  <v-card-actions>
-                    <v-spacer />
-                    <v-btn
-                      variant="text"
-                      :disabled="investigationDialogSubmitting"
-                      @click="closeInvestigationDialog"
-                    >
-                      Cancel
-                    </v-btn>
-                    <v-btn
-                      color="primary"
-                      :loading="investigationDialogSubmitting"
-                      :disabled="investigationDialogError !== null || investigationPrompt.trim().length === 0"
-                      @click="submitInvestigation"
-                    >
-                      Investigate
-                    </v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
+                v-model:prompt="investigationPrompt"
+                :submitting="investigationDialogSubmitting"
+                :error="investigationDialogError"
+                @cancel="closeInvestigationDialog"
+                @submit="submitInvestigation"
+              />
             </template>
 
             <template #actions>
