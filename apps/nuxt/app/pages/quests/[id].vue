@@ -9,6 +9,7 @@ import { useQuestShareDialog } from '~/composables/useQuestShareDialog'
 import QuestDetailsCard from '~/components/quests/QuestDetailsCard.vue'
 import QuestTaskEditDialog from '~/components/quests/QuestTaskEditDialog.vue'
 import QuestInvestigationDialog from '~/components/quests/QuestInvestigationDialog.vue'
+import QuestActionButtons from '~/components/quests/QuestActionButtons.vue'
 import type { QuestTaskTab, TaskWithInvestigations } from '~/types/quest-tasks'
 
 const route = useRoute()
@@ -290,46 +291,12 @@ watch(
             </template>
 
             <template #actions>
-              <v-row
-                class="w-100"
-                dense
-              >
-                <v-col
-                  cols="12"
-                  sm="6"
-                >
-                  <v-btn
-                    block
-                    color="primary"
-                    :to="`/quests`"
-                  >
-                    Back to Quests
-                  </v-btn>
-                </v-col>
-                <v-col
-                  cols="12"
-                  sm="6"
-                >
-                  <template v-if="isOwner">
-                    <v-btn
-                      v-if="questData.status !== 'completed'"
-                      block
-                      color="success"
-                      @click="completeQuest"
-                    >
-                      Mark as Completed
-                    </v-btn>
-                    <v-btn
-                      v-else
-                      block
-                      color="warning"
-                      @click="reopenQuest"
-                    >
-                      Reopen Quest
-                    </v-btn>
-                  </template>
-                </v-col>
-              </v-row>
+              <QuestActionButtons
+                :is-owner="isOwner"
+                :quest-status="questData.status"
+                @complete-quest="completeQuest"
+                @reopen-quest="reopenQuest"
+              />
             </template>
           </QuestDetailsCard>
 
