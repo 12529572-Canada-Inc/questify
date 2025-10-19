@@ -3,6 +3,9 @@ import { useIntervalFn } from '@vueuse/core'
 import { useQuest } from '~/composables/useQuest'
 import { useQuestActions } from '~/composables/useQuestActions'
 import { useQuestTaskTabs, useQuestTasks } from '~/composables/useQuestTasks'
+import { useQuestTaskEditor } from '~/composables/useQuestTaskEditor'
+import { useQuestInvestigations } from '~/composables/useQuestInvestigations'
+import { useQuestShareDialog } from '~/composables/useQuestShareDialog'
 import type { TaskWithInvestigations } from '~/types/quest-tasks'
 
 const route = useRoute()
@@ -35,27 +38,21 @@ const { markTaskCompleted, markTaskIncomplete, updateTask, investigateTask, comp
   isOwner,
 })
 
-type ShareDialogContent = {
-  title: string
-  description: string
-  url: string
-}
-
-const shareDialogState = ref<ShareDialogContent | null>(null)
-const shareDialogVisible = computed({
-  get: () => shareDialogState.value !== null,
-  set: (value: boolean) => {
-    if (!value) {
-      shareDialogState.value = null
-    }
-  },
-})
-
 const questShareUrl = computed(() => new URL(`/quests/${id}`, requestUrl.origin).toString())
 
 function buildTaskShareUrl(taskId: string) {
   return new URL(`/quests/${id}?task=${taskId}`, requestUrl.origin).toString()
 }
+
+const {
+  shareDialogState,
+  shareDialogVisible,
+  openQuestShare: showQuestShareDialog,
+  openTaskShare: showTaskShareDialog,
+} = useQuestShareDialog(
+  () => questShareUrl.value,
+  (taskId: string) => buildTaskShareUrl(taskId),
+)
 
 const highlightedTaskId = computed(() => {
   const value = route.query.task
@@ -79,206 +76,44 @@ watch(
   { immediate: true },
 )
 
-const taskEditDialogOpen = ref(false)
-const taskEditSaving = ref(false)
-const taskEditError = ref<string | null>(null)
-const taskBeingEdited = ref<TaskWithInvestigations | null>(null)
-const taskEditForm = ref({
-  title: '',
-  details: '',
-  extraContent: '',
-})
-const taskEditBaseline = ref({
-  title: '',
-  details: '',
-  extraContent: '',
-})
-const isTaskEditDirty = computed(() => {
-  if (!taskBeingEdited.value) {
-    return false
-  }
+const {
+  taskEditDialogOpen,
+  taskEditSaving,
+  taskEditError,
+  taskEditForm,
+  isTaskEditDirty,
+  openTaskEditDialog,
+  closeTaskEditDialog,
+  saveTaskEdits,
+} = useQuestTaskEditor(updateTask)
 
-  return (
-    taskEditForm.value.title !== taskEditBaseline.value.title
-    || taskEditForm.value.details !== taskEditBaseline.value.details
-    || taskEditForm.value.extraContent !== taskEditBaseline.value.extraContent
-  )
-})
-const investigationError = ref<string | null>(null)
-const investigatingTaskIds = ref<Set<string>>(new Set())
-const investigatingTaskIdsList = computed(() => Array.from(investigatingTaskIds.value))
-const expandedInvestigationId = ref<string | null>(null)
-const investigationDialogOpen = ref(false)
-const investigationDialogSubmitting = ref(false)
-const investigationDialogError = ref<string | null>(null)
-const investigationPrompt = ref('')
-const investigationTargetTask = ref<TaskWithInvestigations | null>(null)
-const hasPendingInvestigations = computed(() => {
-  const allTasks = [...todoTasks.value, ...completedTasks.value]
-  return allTasks.some(task =>
-    task.investigations.some(investigation => investigation.status === 'pending'),
-  )
+const {
+  investigationError,
+  investigatingTaskIdsList,
+  investigationDialogOpen,
+  investigationDialogSubmitting,
+  investigationDialogError,
+  investigationPrompt,
+  hasPendingInvestigations,
+  openInvestigationDialog,
+  closeInvestigationDialog,
+  submitInvestigation,
+} = useQuestInvestigations({
+  investigateTask,
+  todoTasks,
+  completedTasks,
 })
 
-function normalizeOptionalContent(value: string) {
-  const trimmed = value.trim()
-  return trimmed.length > 0 ? trimmed : null
-}
-
-function pickString(source: Record<string, unknown> | undefined, key: string) {
-  const value = source?.[key]
-  return typeof value === 'string' ? value : undefined
-}
-
-function resolveTaskUpdateError(err: unknown) {
-  if (err && typeof err === 'object') {
-    const maybeError = err as Record<string, unknown>
-    const data = maybeError['data'] as Record<string, unknown> | undefined
-
-    return (
-      pickString(data, 'statusMessage')
-      ?? pickString(data, 'statusText')
-      ?? pickString(data, 'message')
-      ?? pickString(maybeError, 'statusMessage')
-      ?? pickString(maybeError, 'message')
-      ?? 'Unable to update the task. Please try again.'
-    )
-  }
-
-  return 'Unable to update the task. Please try again.'
-}
-
-function openTaskEditDialog(task: TaskWithInvestigations) {
-  taskBeingEdited.value = task
-  taskEditForm.value = {
-    title: task.title,
-    details: task.details ?? '',
-    extraContent: task.extraContent ?? '',
-  }
-  taskEditBaseline.value = { ...taskEditForm.value }
-  taskEditError.value = null
-  taskEditDialogOpen.value = true
-}
-
-function closeTaskEditDialog() {
-  taskEditDialogOpen.value = false
-}
-
-async function saveTaskEdits() {
-  if (!taskBeingEdited.value) {
-    return
-  }
-
-  const title = taskEditForm.value.title.trim()
-
-  if (!title) {
-    taskEditError.value = 'Task title is required.'
-    return
-  }
-
-  taskEditSaving.value = true
-  taskEditError.value = null
-
-  try {
-    await updateTask(taskBeingEdited.value.id, {
-      title,
-      details: normalizeOptionalContent(taskEditForm.value.details),
-      extraContent: normalizeOptionalContent(taskEditForm.value.extraContent),
-    })
-    taskEditDialogOpen.value = false
-    taskEditBaseline.value = { ...taskEditForm.value }
-  }
-  catch (err) {
-    taskEditError.value = resolveTaskUpdateError(err)
-  }
-  finally {
-    taskEditSaving.value = false
-  }
-}
-
-function openInvestigationDialog(task: TaskWithInvestigations) {
-  investigationTargetTask.value = task
-  investigationPrompt.value = ''
-  investigationDialogError.value = null
-  investigationDialogOpen.value = true
-}
-
-function closeInvestigationDialog() {
-  if (investigationDialogSubmitting.value) return
-  investigationDialogOpen.value = false
-  investigationTargetTask.value = null
-  investigationPrompt.value = ''
-}
-
-function addInvestigatingTask(taskId: string) {
-  investigatingTaskIds.value = new Set([...investigatingTaskIds.value, taskId])
-}
-
-function removeInvestigatingTask(taskId: string) {
-  if (!investigatingTaskIds.value.has(taskId)) return
-  const next = new Set(investigatingTaskIds.value)
-  next.delete(taskId)
-  investigatingTaskIds.value = next
-}
-
-function openQuestShare() {
+function handleQuestShare() {
   if (!questData.value) {
     return
   }
 
-  shareDialogState.value = {
-    title: 'Share quest',
-    description: `Share "${questData.value.title}" with teammates. They will need to sign in to view this quest.`,
-    url: questShareUrl.value,
-  }
+  showQuestShareDialog(questData.value.title)
 }
 
-function openTaskShare(task: TaskWithInvestigations) {
-  shareDialogState.value = {
-    title: 'Share task',
-    description: `Share the task "${task.title}" from "${questData.value?.title ?? 'this quest'}". Recipients land on the quest page with the task highlighted.`,
-    url: buildTaskShareUrl(task.id),
-  }
-}
-
-async function submitInvestigation() {
-  if (!investigationTargetTask.value) {
-    return
-  }
-
-  const taskId = investigationTargetTask.value.id
-  const prompt = investigationPrompt.value.trim()
-
-  if (prompt.length === 0) {
-    investigationDialogError.value = 'Please provide some context for the investigation.'
-    return
-  }
-
-  if (prompt.length > 1000) {
-    investigationDialogError.value = 'Please keep investigation context under 1000 characters.'
-    return
-  }
-
-  investigationDialogSubmitting.value = true
-  investigationDialogError.value = null
-  investigationError.value = null
-
-  addInvestigatingTask(taskId)
-
-  try {
-    await investigateTask(taskId, prompt)
-    investigationDialogOpen.value = false
-    investigationTargetTask.value = null
-    investigationPrompt.value = ''
-  }
-  catch (err) {
-    investigationError.value = resolveTaskUpdateError(err)
-    investigationDialogError.value = resolveTaskUpdateError(err)
-  }
-  finally {
-    removeInvestigatingTask(taskId)
-    investigationDialogSubmitting.value = false
-  }
+function handleTaskShare(task: TaskWithInvestigations) {
+  showTaskShareDialog(task.title, questData.value?.title, task.id)
 }
 
 const questStatusMeta = computed(() => {
@@ -368,42 +203,6 @@ watch(
   },
   { immediate: true },
 )
-
-watch(
-  () => expandedInvestigationId.value,
-  () => {
-    // keep expanded id only if it still exists in the refreshed data
-    if (!expandedInvestigationId.value) {
-      return
-    }
-
-    const exists = [...todoTasks.value, ...completedTasks.value].some(task =>
-      task.investigations.some(investigation => investigation.id === expandedInvestigationId.value),
-    )
-
-    if (!exists) {
-      expandedInvestigationId.value = null
-    }
-  },
-)
-
-watch(investigationDialogOpen, (open) => {
-  if (!open) {
-    investigationDialogError.value = null
-  }
-})
-
-watch(taskEditDialogOpen, (isOpen) => {
-  if (!isOpen) {
-    taskBeingEdited.value = null
-    taskEditForm.value = {
-      title: '',
-      details: '',
-      extraContent: '',
-    }
-    taskEditError.value = null
-  }
-})
 </script>
 
 <template>
@@ -451,7 +250,7 @@ watch(taskEditDialogOpen, (isOpen) => {
                     variant="text"
                     color="primary"
                     prepend-icon="mdi-share-variant"
-                    @click="openQuestShare"
+                    @click="handleQuestShare"
                   >
                     Share quest
                   </v-btn>
@@ -485,7 +284,7 @@ watch(taskEditDialogOpen, (isOpen) => {
                 :highlighted-task-id="highlightedTaskId"
                 @edit-task="openTaskEditDialog"
                 @investigate-task="openInvestigationDialog"
-                @share-task="openTaskShare"
+                @share-task="handleTaskShare"
               />
               <v-dialog
                 v-model="taskEditDialogOpen"
