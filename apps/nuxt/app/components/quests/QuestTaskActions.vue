@@ -12,9 +12,10 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'share-task', task: TaskWithInvestigations): void
-  (e: 'investigate-task', task: TaskWithInvestigations): void
-  (e: 'edit-task', task: TaskWithInvestigations): void
+  (
+    e: 'share-task' | 'investigate-task' | 'edit-task',
+    task: TaskWithInvestigations
+  ): void
   (e: 'execute-section-action', taskId: string): void
 }>()
 

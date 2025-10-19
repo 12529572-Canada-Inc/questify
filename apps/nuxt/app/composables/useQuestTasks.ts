@@ -56,8 +56,6 @@ export function useQuestTasks(quest: MaybeRef<QuestWithTasks>) {
   }
 }
 
-type TaskTab = 'todo' | 'completed'
-
 export function useQuestTaskTabs(
   todoTasks: MaybeRef<TaskWithInvestigations[]>,
   completedTasks: MaybeRef<TaskWithInvestigations[]>,
