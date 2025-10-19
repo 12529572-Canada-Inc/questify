@@ -127,6 +127,8 @@ function clearInvestigationError() {
   investigationError.value = null
 }
 
+const investigationErrorMessage = computed(() => investigationError.value ?? null)
+
 const questStatusMeta = computed(() => {
   const status = questData.value?.status ?? 'draft'
   const base = {
@@ -201,6 +203,31 @@ const errorType = computed(() => {
   return 'unknown'
 })
 
+const questErrorAlert = computed(() => {
+  switch (errorType.value) {
+    case 'not-found':
+      return {
+        type: 'error' as const,
+        title: 'Quest Not Found',
+        message: 'This quest does not exist.',
+      }
+    case 'unauthorized':
+      return {
+        type: 'error' as const,
+        title: 'Unauthorized',
+        message: 'You are not authorized to view this quest.',
+      }
+    case 'unknown':
+      return {
+        type: 'error' as const,
+        title: 'Error',
+        message: 'An unexpected error occurred. Please try again later.',
+      }
+    default:
+      return null
+  }
+})
+
 const { pause: pauseRefresh, resume: resumeRefresh } = useIntervalFn(() => {
   refresh()
 }, 2000, { immediate: false })
@@ -232,7 +259,7 @@ watch(
             :has-tasks="hasTasks"
             :investigating-task-ids="investigatingTaskIdsList"
             :highlighted-task-id="highlightedTaskId"
-            :investigation-error="investigationError"
+            :investigation-error="investigationErrorMessage"
             @update:task-tab="updateTaskTab"
             @share-quest="handleQuestShare"
             @open-task-edit="openTaskEditDialog"
@@ -315,21 +342,15 @@ watch(
           />
         </template>
 
-        <v-alert
-          v-else
-          :type="errorType === 'unknown' ? 'error' : 'error'"
-          :title="errorType === 'not-found' ? 'Quest Not Found' : errorType === 'unauthorized' ? 'Unauthorized' : errorType === 'unknown' ? 'Error' : 'Error'"
-        >
-          {{
-            errorType === 'not-found'
-              ? 'This quest does not exist.'
-              : errorType === 'unauthorized'
-                ? 'You are not authorized to view this quest.'
-                : errorType === 'unknown'
-                  ? 'An unexpected error occurred. Please try again later.'
-                  : 'An unexpected error occurred. Please try again later.'
-          }}
-        </v-alert>
+        <template v-else>
+          <v-alert
+            v-if="questErrorAlert"
+            :type="questErrorAlert.type"
+            :title="questErrorAlert.title"
+          >
+            {{ questErrorAlert.message }}
+          </v-alert>
+        </template>
       </v-col>
     </v-row>
   </v-container>
