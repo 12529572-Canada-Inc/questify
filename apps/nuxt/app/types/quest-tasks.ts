@@ -9,3 +9,19 @@ export type TaskWithInvestigations = Task & {
 }
 
 export type QuestTaskTab = 'todo' | 'completed'
+
+export type QuestTaskSectionAction = {
+  label: string
+  color: string
+  handler: (taskId: string) => void
+}
+
+export type QuestTaskSection = {
+  value: QuestTaskTab
+  title: string
+  color: string
+  tasks: TaskWithInvestigations[]
+  completed: boolean
+  emptyMessage: string
+  action?: QuestTaskSectionAction | null
+}
