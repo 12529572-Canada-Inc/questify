@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { useIntervalFn } from '@vueuse/core'
 import { useQuest } from '~/composables/useQuest'
 import { useQuestActions } from '~/composables/useQuestActions'
 import { useQuestTaskTabs, useQuestTasks } from '~/composables/useQuestTasks'
 import { useQuestTaskEditor } from '~/composables/useQuestTaskEditor'
 import { useQuestInvestigations } from '~/composables/useQuestInvestigations'
 import { useQuestShareDialog } from '~/composables/useQuestShareDialog'
+import { useQuestTaskHighlight } from '~/composables/useQuestTaskHighlight'
+import { useQuestPolling } from '~/composables/useQuestPolling'
+import { useQuestDisplay, useQuestErrorAlert } from '~/composables/useQuestDisplay'
 import QuestDetailsCard from '~/components/quests/QuestDetailsCard.vue'
 import QuestTaskEditDialog from '~/components/quests/QuestTaskEditDialog.vue'
 import QuestInvestigationDialog from '~/components/quests/QuestInvestigationDialog.vue'
@@ -63,22 +65,13 @@ const highlightedTaskId = computed(() => {
   return typeof value === 'string' && value.trim().length > 0 ? value : null
 })
 
-watch(
-  [highlightedTaskId, () => tasksLoading.value, todoTaskIds, completedTaskIds],
-  ([taskId, loading, todoIds, completedIds]) => {
-    if (!taskId || loading) {
-      return
-    }
-
-    if (todoIds.includes(taskId)) {
-      taskTab.value = 'todo'
-    }
-    else if (completedIds.includes(taskId)) {
-      taskTab.value = 'completed'
-    }
-  },
-  { immediate: true },
-)
+useQuestTaskHighlight({
+  taskTab,
+  highlightedTaskId,
+  tasksLoading,
+  todoTaskIds,
+  completedTaskIds,
+})
 
 const {
   taskEditDialogOpen,
@@ -129,119 +122,22 @@ function clearInvestigationError() {
 }
 
 const investigationErrorMessage = computed(() => investigationError.value ?? null)
-
-const questStatusMeta = computed(() => {
-  const status = questData.value?.status ?? 'draft'
-  const base = {
-    label: 'Draft',
-    icon: 'mdi-pencil-circle',
-    color: 'secondary',
-  }
-
-  const map: Record<string, typeof base> = {
-    draft: base,
-    active: {
-      label: 'Active',
-      icon: 'mdi-timer-sand',
-      color: 'primary',
-    },
-    completed: {
-      label: 'Completed',
-      icon: 'mdi-check-circle',
-      color: 'success',
-    },
-    failed: {
-      label: 'Failed',
-      icon: 'mdi-alert-octagon',
-      color: 'error',
-    },
-  }
-
-  return map[status] ?? base
+const { questStatusMeta, taskSections } = useQuestDisplay({
+  quest: questData,
+  todoTasks,
+  completedTasks,
+  isOwner,
+  markTaskCompleted,
+  markTaskIncomplete,
 })
 
-const taskSections = computed(() => [
-  {
-    value: 'todo' as const,
-    title: 'To Do',
-    color: 'primary',
-    emptyMessage: 'All tasks are completed!',
-    tasks: todoTasks.value,
-    completed: false,
-    action: isOwner.value
-      ? {
-          label: 'Complete',
-          color: 'success',
-          handler: markTaskCompleted,
-        }
-      : null,
-  },
-  {
-    value: 'completed' as const,
-    title: 'Completed',
-    color: 'success',
-    emptyMessage: 'No tasks have been completed yet.',
-    tasks: completedTasks.value,
-    completed: true,
-    action: isOwner.value
-      ? {
-          label: 'Mark Incomplete',
-          color: 'warning',
-          handler: markTaskIncomplete,
-        }
-      : null,
-  },
-])
+const { questErrorAlert } = useQuestErrorAlert(computed(() => error.value ?? null))
 
-const errorType = computed(() => {
-  if (!error.value) return null
-  if (error.value.statusCode === 404) {
-    return 'not-found'
-  }
-  else if (error.value.statusCode === 403 || error.value.statusCode === 401) {
-    return 'unauthorized'
-  }
-  return 'unknown'
+useQuestPolling(refresh, {
+  tasksLoading,
+  hasPendingInvestigations,
+  investigatingTaskIds: investigatingTaskIdsList,
 })
-
-const questErrorAlert = computed(() => {
-  switch (errorType.value) {
-    case 'not-found':
-      return {
-        type: 'error' as const,
-        title: 'Quest Not Found',
-        message: 'This quest does not exist.',
-      }
-    case 'unauthorized':
-      return {
-        type: 'error' as const,
-        title: 'Unauthorized',
-        message: 'You are not authorized to view this quest.',
-      }
-    case 'unknown':
-      return {
-        type: 'error' as const,
-        title: 'Error',
-        message: 'An unexpected error occurred. Please try again later.',
-      }
-    default:
-      return null
-  }
-})
-
-const { pause: pauseRefresh, resume: resumeRefresh } = useIntervalFn(() => {
-  refresh()
-}, 2000, { immediate: false })
-
-watch(
-  () => [tasksLoading.value, hasPendingInvestigations.value, investigatingTaskIdsList.value.length] as const,
-  ([loading, pendingInvestigations, activeInvestigations]) => {
-    const shouldPoll = loading || pendingInvestigations || activeInvestigations > 0
-    if (shouldPoll) resumeRefresh()
-    else pauseRefresh()
-  },
-  { immediate: true },
-)
 </script>
 
 <template>
