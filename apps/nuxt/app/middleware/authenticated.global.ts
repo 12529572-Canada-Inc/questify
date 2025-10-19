@@ -1,4 +1,9 @@
-export default defineNuxtRouteMiddleware(async (to) => {
+type MiddlewareFn = (to: { path: string }, from?: unknown) => Promise<unknown> | unknown
+
+const registerMiddleware = (globalThis as { defineNuxtRouteMiddleware?: (fn: MiddlewareFn) => MiddlewareFn }).defineNuxtRouteMiddleware
+  ?? ((fn: MiddlewareFn) => fn)
+
+const authenticatedMiddleware: MiddlewareFn = async (to) => {
   const { loggedIn, fetch } = useUserSession()
 
   // Refresh session state if needed
@@ -12,4 +17,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (to.path.startsWith('/quests') && !loggedIn.value) {
     return navigateTo('/auth/login')
   }
-})
+}
+
+export default registerMiddleware(authenticatedMiddleware)

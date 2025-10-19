@@ -200,6 +200,54 @@ describe('worker entrypoint', () => {
     errorSpy.mockRestore();
   });
 
+  it('fills in missing task fields with sensible defaults', async () => {
+    configMock.redisUrl = 'redis://redis-host:6379';
+    parseJsonFromModelMock.mockReturnValue([
+      { title: '  ', details: '   ' },
+      {},
+    ]);
+    openAiCreateMock.mockResolvedValue({
+      choices: [{ message: { content: 'model-content' } }],
+    });
+
+    await importWorker();
+
+    const processor = WorkerMock.mock.calls[0][1];
+    await processor({
+      name: 'decompose',
+      data: { questId: 'quest-3', title: 'Quest Title' },
+    });
+
+    expect(taskCreateMock).toHaveBeenNthCalledWith(1, {
+      data: {
+        questId: 'quest-3',
+        title: 'Task 1',
+        details: null,
+        order: 0,
+      },
+    });
+    expect(taskCreateMock).toHaveBeenNthCalledWith(2, {
+      data: {
+        questId: 'quest-3',
+        title: 'Task 2',
+        details: null,
+        order: 1,
+      },
+    });
+  });
+
+  it('ignores unknown quest job names', async () => {
+    await importWorker();
+    const processor = WorkerMock.mock.calls[0][1];
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    await processor({ name: 'other-job' });
+
+    expect(warnSpy).toHaveBeenCalledWith('Unknown quest job:', 'other-job');
+    expect(openAiCreateMock).not.toHaveBeenCalled();
+    warnSpy.mockRestore();
+  });
+
   it('processes investigate-task jobs and stores investigation results', async () => {
     configMock.redisUrl = 'redis://redis-host:6379';
     parseJsonFromModelMock.mockReturnValue({
@@ -314,5 +362,39 @@ describe('worker entrypoint', () => {
     );
 
     errorSpy.mockRestore();
+  });
+
+  it('ignores investigate-task jobs without matching records', async () => {
+    configMock.redisUrl = 'redis://redis-host:6379';
+    taskInvestigationFindUniqueMock.mockResolvedValue(null);
+
+    await importWorker();
+
+    const processor = WorkerMock.mock.calls[1][1];
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    await processor({
+      name: 'investigate-task',
+      data: { investigationId: 'missing' },
+    });
+
+    expect(taskInvestigationUpdateMock).not.toHaveBeenCalled();
+    expect(warnSpy).toHaveBeenCalledWith('Task investigation record missing:', 'missing');
+
+    warnSpy.mockRestore();
+  });
+
+  it('ignores unknown investigate-task job names', async () => {
+    await importWorker();
+
+    const processor = WorkerMock.mock.calls[1][1];
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    await processor({ name: 'something-else' });
+
+    expect(warnSpy).toHaveBeenCalledWith('Unknown task job:', 'something-else');
+    expect(taskInvestigationFindUniqueMock).not.toHaveBeenCalled();
+
+    warnSpy.mockRestore();
   });
 });

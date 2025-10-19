@@ -59,14 +59,16 @@ jobs:
             - name: 📦 Install pnpm dependencies
               run: pnpm install --frozen-lockfile
 
-            # - name: 🌐 Install Playwright browsers
-            #   run: pnpm exec playwright install --with-deps
+            - name: 💾 Cache Playwright binaries
+              uses: actions/cache@v4
+              with:
+                  path: ~/.cache/ms-playwright
+                  key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: |
+                      ${{ runner.os }}-playwright-
 
-            # - name: 💾 Cache Playwright binaries
-            #   uses: actions/cache@v4
-            #   with:
-            #       path: ~/.cache/ms-playwright
-            #       key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
+            - name: 🌐 Install Playwright browsers
+              run: pnpm exec playwright install --with-deps
 
             - name: 🧱 Generate Nuxt types
               env:
@@ -110,25 +112,28 @@ jobs:
                   NUXT_TEST_UTILS_BUILD: true
               run: pnpm test
 
-            - name: 📈 Nuxt coverage
-              run: pnpm --filter nuxt test:coverage
+            - name: 📈 Test coverage
+              run: pnpm test:coverage
 
-            # - name: 🌍 Nuxt E2E tests
-            #   run: pnpm --filter nuxt test:e2e
+            - name: 🌍 Nuxt E2E tests
+              run: pnpm --filter nuxt test:e2e
 
-            - name: 📊 Upload coverage report
+            - name: 📊 Upload coverage reports
               if: always()
               uses: actions/upload-artifact@v4
               with:
-                  name: nuxt-coverage
-                  path: apps/nuxt/coverage
+                  name: coverage-reports
+                  path: |
+                      apps/nuxt/coverage
+                      apps/worker/coverage
+                      packages/shared/coverage
 
-            # - name: 🗃️ Upload Playwright traces
-            #   if: failure()
-            #   uses: actions/upload-artifact@v4
-            #   with:
-            #       name: playwright-results
-            #       path: apps/nuxt/test-results
+            - name: 🗃️ Upload Playwright traces
+              if: failure()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: playwright-results
+                  path: apps/nuxt/test-results
 
             - name: 💾 Cache Nuxt build
               uses: actions/cache@v4

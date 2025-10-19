@@ -8,18 +8,26 @@ const questsList = computed(() => Array.isArray(quests.value) ? quests.value : [
 
 <template>
   <v-container class="py-6">
-    <v-row
-      justify="space-between"
-      align="center"
-      class="mb-4"
-    >
-      <v-col cols="auto">
-        <h2 class="text-h5 font-weight-bold text-white">
+    <v-row class="quests-header mb-4">
+      <v-col
+        cols="12"
+        sm="6"
+        class="quests-header__title"
+      >
+        <h2 class="text-h5 font-weight-bold text-white mb-0">
           Quests
         </h2>
       </v-col>
-      <v-col cols="auto">
-        <v-btn :to="`/quests/new`">
+      <v-col
+        cols="12"
+        sm="6"
+        class="quests-header__actions"
+      >
+        <v-btn
+          color="primary"
+          class="quests-header__create"
+          :to="`/quests/new`"
+        >
           Create Quest
         </v-btn>
       </v-col>
@@ -30,6 +38,7 @@ const questsList = computed(() => Array.isArray(quests.value) ? quests.value : [
     <v-btn
       color="primary"
       class="fab"
+      aria-label="Create quest"
       icon="mdi-plus"
       :to="`/quests/new`"
     />
@@ -45,5 +54,29 @@ const questsList = computed(() => Array.isArray(quests.value) ? quests.value : [
   width: 56px;
   height: 56px;
   z-index: 1000;
+}
+
+.quests-header {
+  align-items: center;
+  row-gap: 12px;
+}
+
+.quests-header__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.quests-header__create {
+  min-width: 0;
+}
+
+@media (max-width: 600px) {
+  .quests-header__actions {
+    justify-content: flex-start;
+  }
+
+  .quests-header__create {
+    width: 100%;
+  }
 }
 </style>
