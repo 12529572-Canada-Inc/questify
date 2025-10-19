@@ -357,13 +357,12 @@ describe('quest components', () => {
 
   it('renders QuestTaskListItemCompact and handles actions', () => {
     const handler = vi.fn()
+    const shareAction = { label: 'Share', icon: 'mdi-share', handler }
     const wrapper = shallowMountWithBase(QuestTaskListItemCompact, {
       props: {
         highlighted: true,
         taskId: 'task-1',
-        actions: [
-          { label: 'Share', icon: 'mdi-share', handler },
-        ],
+        actions: [shareAction],
       },
       slots: {
         title: '<span>Compact Title</span>',
@@ -373,7 +372,7 @@ describe('quest components', () => {
 
     expect(wrapper.exists()).toBe(true)
     const compactState = getSetupState(wrapper)
-    compactState.handleAction?.({ label: 'Share', icon: 'mdi-share', handler })
+    compactState.handleAction?.(shareAction)
     expect(handler).toHaveBeenCalled()
   })
 
@@ -448,7 +447,5 @@ describe('quest components', () => {
 
     expect(wrapper.text()).toContain('Launch Quest')
     expect(wrapper.text()).toContain('Actions Slot')
-    const vm = wrapper.vm as ComponentPublicInstance & { taskTab?: { value: string } }
-    if (vm.taskTab) vm.taskTab.value = 'completed'
   })
 })
