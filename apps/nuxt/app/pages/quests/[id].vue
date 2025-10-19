@@ -460,25 +460,19 @@ watch(
         </template>
 
         <v-alert
-          v-else-if="errorType === 'not-found'"
-          type="error"
-          title="Quest Not Found"
-        >
-          This quest does not exist.
-        </v-alert>
-        <v-alert
-          v-else-if="errorType === 'unauthorized'"
-          type="error"
-          title="Unauthorized"
-        >
-          You are not authorized to view this quest.
-        </v-alert>
-        <v-alert
           v-else
-          type="error"
-          title="Error"
+          :type="errorType === 'unknown' ? 'error' : 'error'"
+          :title="errorType === 'not-found' ? 'Quest Not Found' : errorType === 'unauthorized' ? 'Unauthorized' : errorType === 'unknown' ? 'Error' : 'Error'"
         >
-          An unexpected error occurred. Please try again later.
+          {{
+            errorType === 'not-found'
+              ? 'This quest does not exist.'
+              : errorType === 'unauthorized'
+                ? 'You are not authorized to view this quest.'
+                : errorType === 'unknown'
+                  ? 'An unexpected error occurred. Please try again later.'
+                  : 'An unexpected error occurred. Please try again later.'
+          }}
         </v-alert>
       </v-col>
     </v-row>
