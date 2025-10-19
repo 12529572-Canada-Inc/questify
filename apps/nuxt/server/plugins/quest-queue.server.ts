@@ -1,25 +1,10 @@
-import { Queue } from 'bullmq'
-import { parseRedisUrl } from 'shared'
+import { setupQueue } from '../utils/queue'
 
 export default defineNitroPlugin((nitroApp) => {
-  if (process.env.NODE_ENV === 'test') {
-    console.log('Skipping quest queue setup in test environment')
-    return
-  }
-
-  const config = useRuntimeConfig()
-
-  const connection = parseRedisUrl(config.redis.url) || {
-    host: config.redis.host,
-    port: Number(config.redis.port),
-    password: config.redis.password || undefined,
-    tls: config.redis.tls ? {} : undefined,
-  }
-
-  const questQueue = new Queue('quests', { connection })
-
-  // Register the queue in Nitro's context
-  nitroApp.hooks.hook('request', (event) => {
-    event.context.questQueue = questQueue
+  setupQueue({
+    nitroApp,
+    queueName: 'quests',
+    contextKey: 'questQueue',
+    label: 'quest',
   })
 })

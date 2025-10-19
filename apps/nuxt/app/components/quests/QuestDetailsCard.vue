@@ -1,0 +1,174 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+import QuestDetailsSections from './QuestDetailsSections.vue'
+import QuestTasksTabs from './QuestTasksTabs.vue'
+import type { QuestTaskSection, QuestTaskTab, TaskWithInvestigations } from '~/types/quest-tasks'
+import type { Quest } from '@prisma/client'
+
+const props = defineProps<{
+  quest: Quest & { owner?: { name?: string | null } | null }
+  isOwner: boolean
+  questStatusMeta: {
+    label: string
+    icon: string
+    color: string
+  }
+  taskSections: QuestTaskSection[]
+  taskTab: QuestTaskTab
+  tasksLoading: boolean
+  pending: boolean
+  hasTasks: boolean
+  investigatingTaskIds: string[]
+  highlightedTaskId: string | null
+  investigationError: string | null
+}>()
+
+const emit = defineEmits<{
+  (e: 'update:taskTab', value: QuestTaskTab): void
+  (e: 'share-quest' | 'clear-investigation-error'): void
+  (e: 'open-task-edit' | 'open-investigation' | 'share-task', task: TaskWithInvestigations): void
+}>()
+
+const taskTabModel = computed({
+  get: () => props.taskTab,
+  set: value => emit('update:taskTab', value),
+})
+</script>
+
+<template>
+  <v-card>
+    <v-card-title class="py-4">
+      <div class="quest-header d-flex align-center flex-wrap justify-space-between">
+        <div class="quest-header__info d-flex align-center flex-wrap">
+          <v-avatar
+            size="56"
+            class="quest-status-avatar elevation-2"
+            :image="'/quest.png'"
+          />
+          <div class="d-flex flex-column gap-2">
+            <div class="quest-title-row d-flex align-center flex-wrap">
+              <span class="quest-title text-h5 font-weight-medium text-truncate">
+                {{ quest.title }}
+              </span>
+              <v-chip
+                size="small"
+                :color="questStatusMeta.color"
+                variant="tonal"
+                :prepend-icon="questStatusMeta.icon"
+                class="quest-status-chip text-uppercase font-weight-medium"
+              >
+                {{ questStatusMeta.label }}
+              </v-chip>
+            </div>
+            <template v-if="!isOwner">
+              <div class="d-flex align-center gap-2 text-medium-emphasis text-body-2 flex-wrap">
+                <v-icon
+                  icon="mdi-account"
+                  size="18"
+                />
+                <span>{{ quest.owner?.name ?? 'Unknown owner' }}</span>
+              </div>
+            </template>
+          </div>
+        </div>
+        <div class="quest-header__actions d-flex align-center gap-2">
+          <v-btn
+            variant="text"
+            color="primary"
+            prepend-icon="mdi-share-variant"
+            @click="emit('share-quest')"
+          >
+            Share quest
+          </v-btn>
+        </div>
+      </div>
+    </v-card-title>
+    <v-card-text class="d-flex flex-column gap-4">
+      <QuestDetailsSections :quest="quest" />
+    </v-card-text>
+    <v-divider class="my-4" />
+
+    <v-card-text>
+      <v-alert
+        v-if="investigationError"
+        type="error"
+        variant="tonal"
+        closable
+        class="mb-4"
+        @click:close="emit('clear-investigation-error')"
+      >
+        {{ investigationError }}
+      </v-alert>
+      <QuestTasksTabs
+        v-model="taskTabModel"
+        :sections="taskSections"
+        :pending="pending"
+        :tasks-loading="tasksLoading"
+        :is-owner="isOwner"
+        :has-tasks="hasTasks"
+        :investigating-task-ids="investigatingTaskIds"
+        :highlighted-task-id="highlightedTaskId"
+        @edit-task="emit('open-task-edit', $event)"
+        @investigate-task="emit('open-investigation', $event)"
+        @share-task="emit('share-task', $event)"
+      />
+      <slot name="after-tasks" />
+    </v-card-text>
+
+    <v-card-actions>
+      <slot name="actions" />
+    </v-card-actions>
+  </v-card>
+</template>
+
+<style scoped>
+.quest-header {
+  min-width: 0;
+  width: 100%;
+  gap: 16px;
+}
+
+.quest-header__info {
+  gap: 16px;
+}
+
+.quest-header__actions {
+  flex: 0 0 auto;
+}
+
+.quest-status-avatar {
+  border-radius: 16px;
+}
+
+.quest-status-chip {
+  letter-spacing: 0.05em;
+}
+
+.quest-title-row {
+  gap: 12px;
+}
+
+.quest-title {
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .quest-header {
+    gap: 12px;
+  }
+
+  .quest-header__info {
+    gap: 12px;
+  }
+
+  .quest-header__actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .quest-header__actions :deep(.v-btn) {
+    width: 100%;
+    justify-content: center;
+  }
+}
+</style>
