@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [1.9.0] - 2025-10-19
+
 ### 🚀 Features
 - Added share controls with QR codes so teammates can access the app login, quests, and individual tasks via generated links.
 - Enhanced mobile responsiveness across the header, quest pages, and auth forms, and added Playwright coverage to guard small-screen layouts in CI.
