@@ -11,6 +11,7 @@ export default defineConfig({
       '~': r('app'),
       '@': r('app'),
       'shared': r('../../packages/shared/src'),
+      '#prisma-utils': r('../../packages/prisma/utils'),
       '#imports': r('.nuxt/imports.mjs'),
       'nuxt/config': r('node_modules/nuxt/config.js'),
       'nuxt': r('node_modules/nuxt/dist/index.mjs'),

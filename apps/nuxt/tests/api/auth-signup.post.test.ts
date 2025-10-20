@@ -26,6 +26,11 @@ const sharedMocks = vi.hoisted(() => ({
   hashPassword: vi.fn(),
 }))
 
+const accessControlMocks = vi.hoisted(() => ({
+  ensureSuperAdmin: vi.fn(),
+  attachSessionWithAccess: vi.fn(),
+}))
+
 vi.mock('@prisma/client', () => ({
   PrismaClient: class {
     user = {
@@ -39,6 +44,14 @@ vi.mock('shared', () => ({
   hashPassword: sharedMocks.hashPassword,
 }))
 
+vi.mock('#prisma-utils/accessControl', () => ({
+  ensureSuperAdmin: accessControlMocks.ensureSuperAdmin,
+}))
+
+vi.mock('../../server/utils/access-control', () => ({
+  attachSessionWithAccess: accessControlMocks.attachSessionWithAccess,
+}))
+
 const globalWithMocks = globalThis as GlobalWithMocks
 
 const originalReadBody = globalWithMocks.readBody
@@ -49,6 +62,8 @@ beforeEach(() => {
   prismaMocks.userFindUnique.mockReset()
   prismaMocks.userCreate.mockReset()
   sharedMocks.hashPassword.mockReset()
+  accessControlMocks.ensureSuperAdmin.mockReset()
+  accessControlMocks.attachSessionWithAccess.mockReset()
 
   prismaMocks.userFindUnique.mockResolvedValue(null)
   prismaMocks.userCreate.mockResolvedValue({
@@ -57,6 +72,11 @@ beforeEach(() => {
     name: 'New User',
   })
   sharedMocks.hashPassword.mockReturnValue('hashed-password')
+  accessControlMocks.ensureSuperAdmin.mockResolvedValue(undefined)
+  accessControlMocks.attachSessionWithAccess.mockResolvedValue({
+    roles: ['SuperAdmin'],
+    privileges: ['user:read'],
+  })
 
   Reflect.set(globalWithMocks, 'readBody', vi.fn(async () => ({
     email: 'new@example.com',
@@ -95,12 +115,11 @@ describe('API /api/auth/signup (POST)', () => {
         name: 'New User',
       },
     })
-    expect(globalWithMocks.setUserSession).toHaveBeenCalledWith(expect.anything(), {
-      user: {
-        id: 'user-1',
-        email: 'new@example.com',
-        name: 'New User',
-      },
+    expect(accessControlMocks.ensureSuperAdmin).toHaveBeenCalledWith(expect.anything())
+    expect(accessControlMocks.attachSessionWithAccess).toHaveBeenCalledWith(expect.anything(), {
+      id: 'user-1',
+      email: 'new@example.com',
+      name: 'New User',
     })
     expect(response).toEqual({
       success: true,
@@ -108,6 +127,8 @@ describe('API /api/auth/signup (POST)', () => {
         id: 'user-1',
         email: 'new@example.com',
         name: 'New User',
+        roles: ['SuperAdmin'],
+        privileges: ['user:read'],
       },
     })
   })

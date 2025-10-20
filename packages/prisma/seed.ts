@@ -1,11 +1,15 @@
 import { PrismaClient } from '@prisma/client'
 import { hashPassword } from 'shared'
 import fs from 'fs';
+import { ensureSuperAdmin, syncPrivilegesAndRoles } from './utils/accessControl'
 
 const prisma = new PrismaClient()
 
 async function main() {
   console.log("🌱 Seeding database...")
+
+  console.log("🔐 Syncing roles & privileges...")
+  await syncPrivilegesAndRoles(prisma)
 
   // Create a test user
   const user = await prisma.user.create({
@@ -17,6 +21,8 @@ async function main() {
   })
 
   console.log("✅ User created:", user)
+
+  await ensureSuperAdmin(prisma)
 
   // Load the merged seed data
   const data = JSON.parse(fs.readFileSync("./seed-data.json", "utf8"));

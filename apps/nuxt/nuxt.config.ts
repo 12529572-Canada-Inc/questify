@@ -12,6 +12,7 @@ export default defineNuxtConfig({
     // Point ~ and @ to new app/ directory
     '~': path.resolve(__dirname, 'app'),
     '@': path.resolve(__dirname, 'app'),
+    '#prisma-utils': path.resolve(__dirname, '..', '..', 'packages', 'prisma', 'utils'),
   },
 
   // ⚙️ Modules

@@ -1,0 +1,139 @@
+import { PrismaClient } from '@prisma/client'
+import type { H3Event } from 'h3'
+import type { PrivilegeKey } from 'shared'
+
+const prisma = new PrismaClient()
+
+export interface UserAccessProfile {
+  roles: string[]
+  privileges: PrivilegeKey[]
+}
+
+export async function getUserAccessProfile(userId: string): Promise<UserAccessProfile> {
+  const assignments = await prisma.userRole.findMany({
+    where: { userId },
+    include: {
+      role: {
+        select: {
+          name: true,
+          privileges: {
+            include: {
+              privilege: {
+                select: { key: true },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+
+  const roleNames = new Set<string>()
+  const privilegeKeys = new Set<PrivilegeKey>()
+
+  for (const assignment of assignments) {
+    roleNames.add(assignment.role.name)
+    for (const privilege of assignment.role.privileges) {
+      privilegeKeys.add(privilege.privilege.key as PrivilegeKey)
+    }
+  }
+
+  return {
+    roles: [...roleNames],
+    privileges: [...privilegeKeys],
+  }
+}
+
+export function sessionHasPrivilege(
+  user: { privileges?: string[] },
+  privilege: PrivilegeKey,
+) {
+  return Array.isArray(user.privileges) && user.privileges.includes(privilege)
+}
+
+export function sessionHasAnyPrivilege(
+  user: { privileges?: string[] },
+  privileges: PrivilegeKey[],
+) {
+  if (!Array.isArray(user.privileges) || user.privileges.length === 0) {
+    return false
+  }
+
+  return privileges.some(privilege => user.privileges!.includes(privilege))
+}
+
+export async function requirePrivilege(event: H3Event, privilege: PrivilegeKey) {
+  const session = await requireUserSession(event)
+  const sessionUser = session.user
+
+  if (!sessionUser) {
+    throw createError({ status: 401, statusMessage: 'Unauthorized' })
+  }
+
+  if (sessionHasPrivilege(sessionUser, privilege)) {
+    return sessionUser
+  }
+
+  const profile = await getUserAccessProfile(sessionUser.id)
+
+  if (!profile.privileges.includes(privilege)) {
+    throw createError({ status: 403, statusMessage: 'Forbidden' })
+  }
+
+  sessionUser.privileges = profile.privileges
+  sessionUser.roles = profile.roles
+  await setUserSession(event, { user: sessionUser })
+
+  return sessionUser
+}
+
+export async function requireAnyPrivilege(
+  event: H3Event,
+  privileges: PrivilegeKey[],
+) {
+  if (privileges.length === 0) {
+    throw createError({ status: 400, statusMessage: 'No privileges specified' })
+  }
+
+  const session = await requireUserSession(event)
+  const sessionUser = session.user
+
+  if (!sessionUser) {
+    throw createError({ status: 401, statusMessage: 'Unauthorized' })
+  }
+
+  if (sessionHasAnyPrivilege(sessionUser, privileges)) {
+    return sessionUser
+  }
+
+  const profile = await getUserAccessProfile(sessionUser.id)
+
+  if (!sessionHasAnyPrivilege({ privileges: profile.privileges }, privileges)) {
+    throw createError({ status: 403, statusMessage: 'Forbidden' })
+  }
+
+  sessionUser.privileges = profile.privileges
+  sessionUser.roles = profile.roles
+  await setUserSession(event, { user: sessionUser })
+
+  return sessionUser
+}
+
+export async function attachSessionWithAccess(
+  event: H3Event,
+  user: { id: string; email?: string | null; name?: string | null },
+) {
+  const profile = await getUserAccessProfile(user.id)
+
+  await setUserSession(event, {
+    user: {
+      id: user.id,
+      email: user.email ?? undefined,
+      name: user.name ?? undefined,
+      roles: profile.roles,
+      privileges: profile.privileges,
+    },
+  })
+
+  return profile
+}

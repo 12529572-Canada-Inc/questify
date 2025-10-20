@@ -6,7 +6,9 @@
       "~/*": ["./app/*"],
       "@/*": ["./app/*"],
       "shared": ["../../packages/shared/src"],
-      "shared/*": ["../../packages/shared/src/*"]
+      "shared/*": ["../../packages/shared/src/*"],
+      "#prisma-utils": ["../../packages/prisma/utils"],
+      "#prisma-utils/*": ["../../packages/prisma/utils/*"]
     },
     "types": [
       "./types/nitro-shim",
