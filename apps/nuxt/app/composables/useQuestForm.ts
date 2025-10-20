@@ -1,6 +1,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSnackbar } from './useSnackbar'
+import { resolveApiError } from '~/utils/error'
 
 interface UseQuestFormOptions {
   onSuccess?: (questId: string) => void
@@ -63,7 +64,7 @@ export function useQuestForm(options: UseQuestFormOptions = {}) {
       showSnackbar(message, { variant: 'error' })
     }
     catch (e: unknown) {
-      const message = e instanceof Error ? e.message : 'Error creating quest'
+      const message = resolveApiError(e, 'Error creating quest')
       error.value = message
       showSnackbar(message, { variant: 'error' })
     }

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useSnackbar } from '~/composables/useSnackbar'
+import { extractStatusCode, resolveApiError } from '~/utils/error'
 
 const { fetch: refreshSession } = useUserSession()
 const router = useRouter()
@@ -28,7 +29,12 @@ async function submit() {
     router.push('/quests')
   }
   catch (e) {
-    const message = e instanceof Error ? e.message : 'Login failed'
+    const statusCode = extractStatusCode(e)
+    const resolved = resolveApiError(e, 'Login failed')
+    const message = statusCode === 401
+      ? 'Invalid email or password.'
+      : resolved
+
     error.value = message
     showSnackbar(message, { variant: 'error' })
   }

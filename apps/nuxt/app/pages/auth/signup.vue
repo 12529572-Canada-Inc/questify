@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useSnackbar } from '~/composables/useSnackbar'
+import { extractStatusCode, resolveApiError } from '~/utils/error'
 
 const router = useRouter()
 const { showSnackbar } = useSnackbar()
@@ -37,7 +38,12 @@ async function submit() {
     await router.push('/quests')
   }
   catch (e) {
-    const message = e instanceof Error ? e.message : 'Signup failed'
+    const statusCode = extractStatusCode(e)
+    const resolved = resolveApiError(e, 'Signup failed')
+    const message = statusCode === 409
+      ? 'An account with that email already exists.'
+      : resolved
+
     error.value = message
     showSnackbar(message, { variant: 'error' })
   }
