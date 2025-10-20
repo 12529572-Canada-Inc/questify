@@ -28,7 +28,7 @@ interface SnackbarState {
 
 const DEFAULT_TIMEOUT = 4000
 
-const VARIANT_META: Record<SnackbarVariant, { color: string; icon: string | null }> = {
+const VARIANT_META: Record<SnackbarVariant, { color: string, icon: string | null }> = {
   success: {
     color: 'success',
     icon: 'mdi-check-circle',

@@ -71,7 +71,7 @@ const taskTabModel = computed({
             </template>
           </div>
         </div>
-      <div class="quest-header__actions d-flex align-center gap-2">
+        <div class="quest-header__actions d-flex align-center gap-2">
           <v-btn
             variant="text"
             color="primary"

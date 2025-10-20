@@ -21,7 +21,7 @@ async function mutateTask(
   canMutate: () => boolean,
   refresh: () => Promise<void>,
   showSnackbar: ReturnType<typeof useSnackbar>['showSnackbar'],
-  messages: { success: string; error: string },
+  messages: { success: string, error: string },
 ) {
   if (!canMutate()) {
     return
@@ -49,7 +49,7 @@ async function updateQuestStatus(
   canMutate: () => boolean,
   refresh: () => Promise<void>,
   showSnackbar: ReturnType<typeof useSnackbar>['showSnackbar'],
-  messages: { success: string; error: string },
+  messages: { success: string, error: string },
 ) {
   if (!canMutate()) {
     return
