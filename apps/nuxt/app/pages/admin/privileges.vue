@@ -18,19 +18,37 @@ const hasPrivileges = computed(() => (privilegesData.value?.length ?? 0) > 0)
           Privileges
         </v-card-title>
         <v-card-text>
-          <div v-if="pending" class="py-8 d-flex justify-center">
-            <v-progress-circular indeterminate color="primary" />
+          <div
+            v-if="pending"
+            class="py-8 d-flex justify-center"
+          >
+            <v-progress-circular
+              indeterminate
+              color="primary"
+            />
           </div>
           <div v-else>
-            <div v-if="!hasPrivileges" class="py-8 text-medium-emphasis text-center">
+            <div
+              v-if="!hasPrivileges"
+              class="py-8 text-medium-emphasis text-center"
+            >
               No privileges found.
             </div>
-            <v-table v-else class="admin-privileges-table">
+            <v-table
+              v-else
+              class="admin-privileges-table"
+            >
               <thead>
                 <tr>
-                  <th class="text-left">Key</th>
-                  <th class="text-left">Label</th>
-                  <th class="text-left">Description</th>
+                  <th class="text-left">
+                    Key
+                  </th>
+                  <th class="text-left">
+                    Label
+                  </th>
+                  <th class="text-left">
+                    Description
+                  </th>
                 </tr>
               </thead>
               <tbody>

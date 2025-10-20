@@ -93,25 +93,25 @@ afterEach(() => {
 
 describe('API /api/auth/login (POST)', () => {
   it('verifies credentials and sets the user session', async () => {
-  const response = await handler({} as never)
+    const response = await handler({} as never)
 
-  expect(prismaMocks.userFindUnique).toHaveBeenCalledWith({ where: { email: 'person@example.com' } })
-  expect(sharedMocks.verifyPassword).toHaveBeenCalledWith('password123', 'hashed')
-  expect(accessControlMocks.attachSessionWithAccess).toHaveBeenCalledWith(expect.anything(), {
-    id: 'user-1',
-    email: 'person@example.com',
-    name: 'Person Example',
-  })
-  expect(response).toEqual({
-    success: true,
-    user: {
+    expect(prismaMocks.userFindUnique).toHaveBeenCalledWith({ where: { email: 'person@example.com' } })
+    expect(sharedMocks.verifyPassword).toHaveBeenCalledWith('password123', 'hashed')
+    expect(accessControlMocks.attachSessionWithAccess).toHaveBeenCalledWith(expect.anything(), {
       id: 'user-1',
       email: 'person@example.com',
       name: 'Person Example',
-      roles: ['Admin'],
-      privileges: ['user:read'],
-    },
-  })
+    })
+    expect(response).toEqual({
+      success: true,
+      user: {
+        id: 'user-1',
+        email: 'person@example.com',
+        name: 'Person Example',
+        roles: ['Admin'],
+        privileges: ['user:read'],
+      },
+    })
   })
 
   it('rejects missing users and invalid passwords', async () => {

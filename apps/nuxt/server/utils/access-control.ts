@@ -121,7 +121,7 @@ export async function requireAnyPrivilege(
 
 export async function attachSessionWithAccess(
   event: H3Event,
-  user: { id: string; email?: string | null; name?: string | null },
+  user: { id: string, email?: string | null, name?: string | null },
 ) {
   const profile = await getUserAccessProfile(user.id)
 

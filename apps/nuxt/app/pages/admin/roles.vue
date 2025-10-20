@@ -174,11 +174,20 @@ const hasRoles = computed(() => (rolesData.value?.length ?? 0) > 0)
         </v-card-title>
         <v-divider />
         <v-card-text>
-          <div v-if="pending" class="py-8 d-flex justify-center">
-            <v-progress-circular indeterminate color="primary" />
+          <div
+            v-if="pending"
+            class="py-8 d-flex justify-center"
+          >
+            <v-progress-circular
+              indeterminate
+              color="primary"
+            />
           </div>
           <div v-else>
-            <div v-if="!hasRoles" class="py-8 text-medium-emphasis text-center">
+            <div
+              v-if="!hasRoles"
+              class="py-8 text-medium-emphasis text-center"
+            >
               No roles are defined yet. Create your first role to begin assigning administrative privileges.
             </div>
             <v-table
@@ -187,11 +196,21 @@ const hasRoles = computed(() => (rolesData.value?.length ?? 0) > 0)
             >
               <thead>
                 <tr>
-                  <th class="text-left">Name</th>
-                  <th class="text-left">Description</th>
-                  <th class="text-left">Privileges</th>
-                  <th class="text-left">Assigned</th>
-                  <th class="text-left">Actions</th>
+                  <th class="text-left">
+                    Name
+                  </th>
+                  <th class="text-left">
+                    Description
+                  </th>
+                  <th class="text-left">
+                    Privileges
+                  </th>
+                  <th class="text-left">
+                    Assigned
+                  </th>
+                  <th class="text-left">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -257,7 +276,10 @@ const hasRoles = computed(() => (rolesData.value?.length ?? 0) > 0)
       </v-card>
     </div>
 
-    <v-dialog v-model="createDialogOpen" max-width="540">
+    <v-dialog
+      v-model="createDialogOpen"
+      max-width="540"
+    >
       <v-card>
         <v-card-title class="text-h6">
           Create Role
@@ -312,7 +334,10 @@ const hasRoles = computed(() => (rolesData.value?.length ?? 0) > 0)
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="editDialogOpen" max-width="540">
+    <v-dialog
+      v-model="editDialogOpen"
+      max-width="540"
+    >
       <v-card>
         <v-card-title class="text-h6">
           Edit Role

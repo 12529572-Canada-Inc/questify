@@ -45,7 +45,10 @@ async function runRecovery() {
           System Settings
         </v-card-title>
         <v-card-text>
-          <div v-if="!canViewSystemSettings" class="py-6 text-medium-emphasis">
+          <div
+            v-if="!canViewSystemSettings"
+            class="py-6 text-medium-emphasis"
+          >
             You can view this overview, but additional privileges are required to update system settings.
           </div>
 

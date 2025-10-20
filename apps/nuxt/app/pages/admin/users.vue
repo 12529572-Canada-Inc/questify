@@ -100,19 +100,40 @@ const hasUsers = computed(() => (usersData.value?.length ?? 0) > 0)
           Users &amp; Roles
         </v-card-title>
         <v-card-text>
-          <div v-if="pending" class="py-8 d-flex justify-center">
-            <v-progress-circular indeterminate color="primary" />
+          <div
+            v-if="pending"
+            class="py-8 d-flex justify-center"
+          >
+            <v-progress-circular
+              indeterminate
+              color="primary"
+            />
           </div>
           <div v-else>
-            <div v-if="!hasUsers" class="py-8 text-medium-emphasis text-center">
+            <div
+              v-if="!hasUsers"
+              class="py-8 text-medium-emphasis text-center"
+            >
               No users found.
             </div>
-            <v-table v-else class="admin-users-table">
+            <v-table
+              v-else
+              class="admin-users-table"
+            >
               <thead>
                 <tr>
-                  <th class="text-left">User</th>
-                  <th class="text-left">Roles</th>
-                  <th class="text-left" style="width: 240px;">Assign Role</th>
+                  <th class="text-left">
+                    User
+                  </th>
+                  <th class="text-left">
+                    Roles
+                  </th>
+                  <th
+                    class="text-left"
+                    style="width: 240px;"
+                  >
+                    Assign Role
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -146,7 +167,10 @@ const hasUsers = computed(() => (usersData.value?.length ?? 0) > 0)
                           @click.stop="removeRole(user.id, role.id)"
                         />
                       </v-chip>
-                      <span v-if="user.roles.length === 0" class="text-medium-emphasis text-body-2">No roles</span>
+                      <span
+                        v-if="user.roles.length === 0"
+                        class="text-medium-emphasis text-body-2"
+                      >No roles</span>
                     </div>
                   </td>
                   <td>
@@ -158,7 +182,7 @@ const hasUsers = computed(() => (usersData.value?.length ?? 0) > 0)
                       variant="outlined"
                       :disabled="isLoading(user.id) || roleOptionsFor(user.id).length === 0"
                       hide-details
-                      @update:modelValue="assignRole(user.id)"
+                      @update:model-value="assignRole(user.id)"
                     />
                   </td>
                 </tr>
