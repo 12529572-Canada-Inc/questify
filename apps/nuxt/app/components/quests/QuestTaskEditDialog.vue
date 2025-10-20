@@ -85,13 +85,12 @@ function handleSave() {
           hint="Optional. Capture lists, findings, or resources generated while completing this task."
           persistent-hint
         />
-        <v-alert
+        <p
           v-if="error"
-          type="error"
-          variant="tonal"
-          class="mt-4"
-          :text="error"
-        />
+          class="task-edit-error mt-4"
+        >
+          {{ error }}
+        </p>
       </v-card-text>
       <v-card-actions>
         <v-spacer />
@@ -114,3 +113,10 @@ function handleSave() {
     </v-card>
   </v-dialog>
 </template>
+
+<style scoped>
+.task-edit-error {
+  color: rgb(var(--v-theme-error));
+  font-size: 0.95rem;
+}
+</style>

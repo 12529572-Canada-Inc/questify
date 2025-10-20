@@ -68,12 +68,9 @@ onMounted(() => {
         class="qr-code__error"
         :style="{ width: `${resolvedSize}px` }"
       >
-        <v-alert
-          type="error"
-          variant="tonal"
-          density="compact"
-          :text="renderError"
-        />
+        <p class="qr-code__error-message">
+          {{ renderError }}
+        </p>
       </div>
 
       <div
@@ -117,11 +114,13 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   border-radius: 16px;
-  background-color: #f8fafc;
   padding: 16px;
 }
 
-.qr-code__error :deep(.v-alert) {
+.qr-code__error-message {
   width: 100%;
+  font-size: 0.9rem;
+  color: rgb(var(--v-theme-error));
+  text-align: center;
 }
 </style>

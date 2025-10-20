@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { useSnackbar } from '~/composables/useSnackbar'
+
 const { clear, loggedIn } = useUserSession()
 const router = useRouter()
 const requestUrl = useRequestURL()
+const { showSnackbar } = useSnackbar()
 
 const shareDialogOpen = ref(false)
 const loginShareUrl = computed(() => new URL('/auth/login', requestUrl.origin).toString())
@@ -17,10 +20,12 @@ async function logout() {
     clear()
 
     // Redirect to login
-    router.push('/auth/login')
+    await router.push('/auth/login')
+    showSnackbar('You have been logged out.', { variant: 'success' })
   }
   catch (e) {
     console.error('Logout failed:', e)
+    showSnackbar('Logout failed. Please try again.', { variant: 'error' })
   }
 }
 </script>

@@ -65,13 +65,12 @@ function handleSubmit() {
         >
           {{ switchLabel }}
         </v-btn>
-        <v-alert
+        <p
           v-if="error"
-          type="error"
-          class="mt-2"
+          class="auth-card__error-text"
         >
           {{ error }}
-        </v-alert>
+        </p>
       </v-form>
     </v-card>
   </v-container>
@@ -101,5 +100,11 @@ function handleSubmit() {
   .auth-card__content {
     padding: 24px 18px;
   }
+}
+
+.auth-card__error-text {
+  margin-top: 12px;
+  font-size: 0.95rem;
+  color: rgb(var(--v-theme-error));
 }
 </style>

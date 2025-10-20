@@ -1,5 +1,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useSnackbar } from './useSnackbar'
+import { resolveApiError } from '~/utils/error'
 
 interface UseQuestFormOptions {
   onSuccess?: (questId: string) => void
@@ -7,6 +9,7 @@ interface UseQuestFormOptions {
 
 export function useQuestForm(options: UseQuestFormOptions = {}) {
   const router = useRouter()
+  const { showSnackbar } = useSnackbar()
 
   const title = ref('')
   const goal = ref('')
@@ -51,19 +54,19 @@ export function useQuestForm(options: UseQuestFormOptions = {}) {
 
       if (res.success && res.quest?.id) {
         options.onSuccess?.(res.quest.id)
+        showSnackbar('Quest created successfully.', { variant: 'success' })
         await router.push(`/quests/${res.quest.id}`)
         return
       }
 
-      error.value = 'Failed to create quest'
+      const message = 'Failed to create quest'
+      error.value = message
+      showSnackbar(message, { variant: 'error' })
     }
     catch (e: unknown) {
-      if (e instanceof Error) {
-        error.value = e.message
-      }
-      else {
-        error.value = 'Error creating quest'
-      }
+      const message = resolveApiError(e, 'Error creating quest')
+      error.value = message
+      showSnackbar(message, { variant: 'error' })
     }
     finally {
       loading.value = false

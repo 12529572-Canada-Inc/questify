@@ -1,5 +1,9 @@
 <script setup lang="ts">
+import { useSnackbar } from '~/composables/useSnackbar'
+import { extractStatusCode, resolveApiError } from '~/utils/error'
+
 const router = useRouter()
+const { showSnackbar } = useSnackbar()
 
 const name = ref('')
 const email = ref('')
@@ -30,10 +34,18 @@ async function submit() {
       method: 'POST',
       body: { email: email.value, password: password.value, name: name.value },
     })
+    showSnackbar('Account created! Welcome to Questify.', { variant: 'success' })
     await router.push('/quests')
   }
   catch (e) {
-    error.value = e instanceof Error ? e.message : 'Signup failed'
+    const statusCode = extractStatusCode(e)
+    const resolved = resolveApiError(e, 'Signup failed')
+    const message = statusCode === 409
+      ? 'An account with that email already exists.'
+      : resolved
+
+    error.value = message
+    showSnackbar(message, { variant: 'error' })
   }
   finally {
     loading.value = false
