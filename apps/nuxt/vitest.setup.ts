@@ -2,6 +2,7 @@ import { config } from 'dotenv'
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch, useAttrs } from 'vue'
+import type { Ref } from 'vue'
 import { splitTextIntoSegments } from './app/utils/text-with-links'
 
 declare global {
@@ -12,6 +13,8 @@ declare global {
   var createError: ((input: { statusCode?: number, status?: number, statusText?: string }) => Error & { statusCode?: number }) | undefined
   var getUserSession: (() => Promise<{ user: { id: string } }>) | undefined
   var defineNuxtRouteMiddleware: (<T>(fn: T) => T) | undefined
+  var useState: (<T>(key: string, init?: () => T) => Ref<T>) | undefined
+  var __resetNuxtState: (() => void) | undefined
 }
 
 config({ path: '.env.test' })
@@ -40,6 +43,31 @@ Object.assign(globalThis, {
   useAttrs,
   splitTextIntoSegments,
 })
+
+const nuxtState = new Map<string, Ref>()
+
+if (!globalThis.useState) {
+  globalThis.useState = function useState<T>(key: string, init?: () => T) {
+    if (!nuxtState.has(key)) {
+      const initialValue = init ? init() : undefined
+      nuxtState.set(key, ref(initialValue) as Ref)
+    }
+
+    const stored = nuxtState.get(key) as Ref<T | undefined>
+
+    if (stored.value === undefined && init) {
+      stored.value = init()
+    }
+
+    return stored as Ref<T>
+  }
+}
+
+if (!globalThis.__resetNuxtState) {
+  globalThis.__resetNuxtState = () => {
+    nuxtState.clear()
+  }
+}
 
 if (!globalThis.getRouterParam) {
   globalThis.getRouterParam = (event: { params?: Record<string, string> }, name: string) => event.params?.[name] ?? ''

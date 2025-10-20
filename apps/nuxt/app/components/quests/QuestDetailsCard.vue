@@ -71,7 +71,7 @@ const taskTabModel = computed({
             </template>
           </div>
         </div>
-        <div class="quest-header__actions d-flex align-center gap-2">
+      <div class="quest-header__actions d-flex align-center gap-2">
           <v-btn
             variant="text"
             color="primary"
@@ -89,16 +89,20 @@ const taskTabModel = computed({
     <v-divider class="my-4" />
 
     <v-card-text>
-      <v-alert
+      <div
         v-if="investigationError"
-        type="error"
-        variant="tonal"
-        closable
-        class="mb-4"
-        @click:close="emit('clear-investigation-error')"
+        class="quest-investigation-error mb-4"
+        role="alert"
       >
-        {{ investigationError }}
-      </v-alert>
+        <span>{{ investigationError }}</span>
+        <v-btn
+          icon="mdi-close"
+          variant="text"
+          size="small"
+          color="error"
+          @click="emit('clear-investigation-error')"
+        />
+      </div>
       <QuestTasksTabs
         v-model="taskTabModel"
         :sections="taskSections"
@@ -138,6 +142,19 @@ const taskTabModel = computed({
 
 .quest-status-avatar {
   border-radius: 16px;
+}
+
+.quest-investigation-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border-left: 4px solid rgba(var(--v-theme-error), 0.85);
+  background: rgba(var(--v-theme-error), 0.08);
+  color: rgb(var(--v-theme-error));
+  font-size: 0.95rem;
 }
 
 .quest-status-chip {

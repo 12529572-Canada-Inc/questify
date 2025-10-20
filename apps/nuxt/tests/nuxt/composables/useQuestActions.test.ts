@@ -2,6 +2,21 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
 import { useQuestActions } from '~/composables/useQuestActions'
 
+const showSnackbar = vi.fn()
+const snackbarCurrent = ref(null)
+const snackbarVisible = ref(false)
+
+vi.mock('~/composables/useSnackbar', () => ({
+  useSnackbar: () => ({
+    current: snackbarCurrent,
+    visible: snackbarVisible,
+    showSnackbar,
+    setVisible: vi.fn(),
+    dismissCurrent: vi.fn(),
+    clearQueue: vi.fn(),
+  }),
+}))
+
 describe('useQuestActions', () => {
   const refresh = vi.fn().mockResolvedValue(undefined)
   const fetchMock = vi.fn().mockResolvedValue(undefined)
@@ -9,7 +24,12 @@ describe('useQuestActions', () => {
   beforeEach(() => {
     refresh.mockClear()
     fetchMock.mockClear()
+    fetchMock.mockResolvedValue(undefined)
     vi.stubGlobal('$fetch', fetchMock)
+    showSnackbar.mockClear()
+    snackbarCurrent.value = null
+    snackbarVisible.value = false
+    globalThis.__resetNuxtState?.()
   })
 
   afterEach(() => {
@@ -30,6 +50,7 @@ describe('useQuestActions', () => {
 
     expect(fetchMock).not.toHaveBeenCalled()
     expect(refresh).not.toHaveBeenCalled()
+    expect(showSnackbar).not.toHaveBeenCalled()
   })
 
   it('issues task and quest mutations and refreshes when permitted', async () => {
@@ -73,6 +94,10 @@ describe('useQuestActions', () => {
       }),
     )
     expect(refresh).toHaveBeenCalledTimes(4)
+    expect(showSnackbar).toHaveBeenCalledWith('Task moved back to to-do.', expect.objectContaining({ variant: 'success' }))
+    expect(showSnackbar).toHaveBeenCalledWith('Task updated successfully.', expect.objectContaining({ variant: 'success' }))
+    expect(showSnackbar).toHaveBeenCalledWith('Quest marked as completed.', expect.objectContaining({ variant: 'success' }))
+    expect(showSnackbar).toHaveBeenCalledWith('Quest reopened and set to active.', expect.objectContaining({ variant: 'success' }))
   })
 
   it('trims investigation prompts and skips empty payloads', async () => {
@@ -108,5 +133,21 @@ describe('useQuestActions', () => {
       }),
     )
     expect(refresh).toHaveBeenCalledTimes(3)
+    expect(showSnackbar).toHaveBeenCalledWith('Investigation request submitted.', expect.objectContaining({ variant: 'success' }))
+  })
+
+  it('surfaces API failures with an error snackbar', async () => {
+    const actions = useQuestActions({
+      questId: 'quest-error',
+      refresh,
+      isOwner: ref(true),
+    })
+
+    fetchMock.mockRejectedValueOnce(new Error('Network down'))
+
+    await expect(actions.completeQuest()).rejects.toThrow('Network down')
+
+    expect(refresh).not.toHaveBeenCalled()
+    expect(showSnackbar).toHaveBeenCalledWith('Network down', expect.objectContaining({ variant: 'error' }))
   })
 })

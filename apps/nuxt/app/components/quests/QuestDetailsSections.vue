@@ -75,19 +75,21 @@ const decoratedSections = computed(() => sections.value.map(section => ({
       </v-list-item>
     </v-list>
   </template>
-  <v-alert
+  <p
     v-else
-    class="mb-0"
-    density="comfortable"
-    type="info"
-    variant="tonal"
+    class="quest-details-empty mb-0"
   >
     {{ fallbackMessage ?? 'No additional details provided for this quest yet.' }}
-  </v-alert>
+  </p>
 </template>
 
 <style scoped>
 .quest-details-item :deep(.v-list-item__subtitle) {
   white-space: pre-line;
+}
+
+.quest-details-empty {
+  color: rgba(var(--v-theme-on-surface), 0.7);
+  font-size: 0.95rem;
 }
 </style>

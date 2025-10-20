@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { useSnackbar } from '~/composables/useSnackbar'
+
 const router = useRouter()
+const { showSnackbar } = useSnackbar()
 
 const name = ref('')
 const email = ref('')
@@ -30,10 +33,13 @@ async function submit() {
       method: 'POST',
       body: { email: email.value, password: password.value, name: name.value },
     })
+    showSnackbar('Account created! Welcome to Questify.', { variant: 'success' })
     await router.push('/quests')
   }
   catch (e) {
-    error.value = e instanceof Error ? e.message : 'Signup failed'
+    const message = e instanceof Error ? e.message : 'Signup failed'
+    error.value = message
+    showSnackbar(message, { variant: 'error' })
   }
   finally {
     loading.value = false

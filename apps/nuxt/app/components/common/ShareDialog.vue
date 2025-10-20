@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useClipboard, useVModel } from '@vueuse/core'
+import { useSnackbar } from '~/composables/useSnackbar'
 
 const props = defineProps<{
   modelValue: boolean
@@ -16,6 +17,7 @@ const dialogOpen = useVModel(props, 'modelValue', emit)
 const copyError = ref(false)
 const showCopyTooltip = ref(false)
 let copyTooltipTimer: ReturnType<typeof setTimeout> | null = null
+const { showSnackbar } = useSnackbar()
 
 const { copy, copied, isSupported } = useClipboard({
   source: computed(() => props.shareUrl),
@@ -26,6 +28,7 @@ async function copyLink() {
 
   if (!isSupported.value) {
     copyError.value = true
+    showSnackbar('Copy is not supported in this browser. You can copy the link manually.', { variant: 'warning' })
     return
   }
 
@@ -36,6 +39,7 @@ async function copyLink() {
     console.error('Failed to copy link', err)
     copyError.value = true
     hideCopiedTooltip()
+    showSnackbar('Unable to copy the link. Please try again.', { variant: 'error' })
   }
 }
 
@@ -60,6 +64,7 @@ watch(copied, (value) => {
   if (value) {
     copyError.value = false
     showCopiedTooltip()
+    showSnackbar('Link copied to clipboard.', { variant: 'success' })
   }
 })
 
@@ -125,13 +130,12 @@ onBeforeUnmount(() => {
               </template>
             </v-tooltip>
           </div>
-          <v-alert
+          <p
             v-if="copyError"
-            type="error"
-            variant="tonal"
-            density="compact"
-            text="Unable to copy link. You can copy it manually."
-          />
+            class="share-dialog__error"
+          >
+            Unable to copy link. You can copy it manually.
+          </p>
         </div>
 
         <ClientOnly>
@@ -173,5 +177,11 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: flex-start;
   gap: 12px;
+}
+
+.share-dialog__error {
+  font-size: 0.9rem;
+  padding: 4px 0;
+  color: rgb(var(--v-theme-error));
 }
 </style>

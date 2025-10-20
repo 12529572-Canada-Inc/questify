@@ -206,15 +206,32 @@ useQuestPolling(refresh, {
         </template>
 
         <template v-else>
-          <v-alert
+          <div
             v-if="questErrorAlert"
-            :type="questErrorAlert.type"
-            :title="questErrorAlert.title"
+            class="quest-error-banner"
+            role="alert"
           >
+            <strong>{{ questErrorAlert.title }}:</strong>
             {{ questErrorAlert.message }}
-          </v-alert>
+          </div>
         </template>
       </v-col>
     </v-row>
   </v-container>
 </template>
+
+<style scoped>
+.quest-error-banner {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border-left: 4px solid rgba(var(--v-theme-error), 0.85);
+  background: rgba(var(--v-theme-error), 0.08);
+  color: rgb(var(--v-theme-error));
+}
+
+.quest-error-banner strong {
+  font-weight: 600;
+  margin-right: 4px;
+}
+</style>

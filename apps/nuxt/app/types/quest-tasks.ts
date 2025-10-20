@@ -13,7 +13,7 @@ export type QuestTaskTab = 'todo' | 'completed'
 export type QuestTaskSectionAction = {
   label: string
   color: string
-  handler: (taskId: string) => void
+  handler: (taskId: string) => void | Promise<void>
 }
 
 export type QuestTaskSection = {

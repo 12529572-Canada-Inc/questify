@@ -61,12 +61,12 @@ function handleSubmit() {
             persistent-hint
           />
         </div>
-        <v-alert
+        <p
           v-if="error"
-          type="error"
-          variant="tonal"
-          :text="error"
-        />
+          class="investigation-error"
+        >
+          {{ error }}
+        </p>
       </v-card-text>
       <v-card-actions>
         <v-spacer />
@@ -89,3 +89,10 @@ function handleSubmit() {
     </v-card>
   </v-dialog>
 </template>
+
+<style scoped>
+.investigation-error {
+  color: rgb(var(--v-theme-error));
+  font-size: 0.95rem;
+}
+</style>
