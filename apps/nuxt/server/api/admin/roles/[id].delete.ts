@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
 
   if (!id) {
-    throw createError({ status: 400, statusMessage: 'Role id is required' })
+    throw createError({ status: 400, statusText: 'Role id is required' })
   }
 
   const role = await prisma.role.findUnique({
@@ -19,20 +19,20 @@ export default defineEventHandler(async (event) => {
   })
 
   if (!role) {
-    throw createError({ status: 404, statusMessage: 'Role not found' })
+    throw createError({ status: 404, statusText: 'Role not found' })
   }
 
   if (role.system || role.name === SUPER_ADMIN_ROLE_NAME) {
     throw createError({
       status: 400,
-      statusMessage: 'System roles cannot be deleted.',
+      statusText: 'System roles cannot be deleted.',
     })
   }
 
   if (role._count.users > 0) {
     throw createError({
       status: 400,
-      statusMessage: 'Remove this role from all users before deleting it.',
+      statusText: 'Remove this role from all users before deleting it.',
     })
   }
 

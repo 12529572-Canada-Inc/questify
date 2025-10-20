@@ -3,10 +3,18 @@ import { ref } from 'vue'
 import { useAccessControl } from '~/composables/useAccessControl'
 
 describe('useAccessControl', () => {
-  const originalUseUserSession = globalThis.useUserSession
+  const globalWithMocks = globalThis as typeof globalThis & {
+    useUserSession?: () => {
+      user: ReturnType<typeof ref>
+      loggedIn: ReturnType<typeof ref>
+      fetch: () => Promise<unknown>
+    }
+  }
+
+  const originalUseUserSession = globalWithMocks.useUserSession
 
   beforeEach(() => {
-    vi.stubGlobal('useUserSession', () => ({
+    globalWithMocks.useUserSession = () => ({
       user: ref({
         id: 'user-1',
         roles: ['Admin'],
@@ -14,13 +22,15 @@ describe('useAccessControl', () => {
       }),
       loggedIn: ref(true),
       fetch: vi.fn(),
-    }))
+    })
   })
 
   afterEach(() => {
-    vi.unstubAllGlobals()
     if (originalUseUserSession) {
-      vi.stubGlobal('useUserSession', originalUseUserSession)
+      globalWithMocks.useUserSession = originalUseUserSession
+    }
+    else {
+      delete globalWithMocks.useUserSession
     }
   })
 

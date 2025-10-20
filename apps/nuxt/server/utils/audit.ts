@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { Prisma, PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -18,7 +18,7 @@ export async function recordAuditLog(entry: AuditLogInput) {
         action: entry.action,
         targetType: entry.targetType,
         targetId: entry.targetId ?? null,
-        metadata: entry.metadata ?? null,
+        metadata: entry.metadata as Prisma.InputJsonValue | undefined,
       },
     })
   }

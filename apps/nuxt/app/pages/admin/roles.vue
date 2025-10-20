@@ -1,21 +1,7 @@
 <script setup lang="ts">
 import type { PrivilegeKey } from 'shared'
 import { useSnackbar } from '~/composables/useSnackbar'
-
-interface RolePrivilege {
-  key: PrivilegeKey
-  label: string
-  description: string | null
-}
-
-interface SerializedRole {
-  id: string
-  name: string
-  description: string | null
-  system: boolean
-  userCount: number
-  privileges: RolePrivilege[]
-}
+import type { AdminPrivilege, AdminRole } from '~/types/admin'
 
 definePageMeta({
   middleware: ['admin'],
@@ -27,10 +13,16 @@ const {
   data: rolesData,
   pending: rolesPending,
   refresh: refreshRoles,
-} = await useFetch<SerializedRole[]>('/api/admin/roles')
+} = await useFetch<AdminRole[]>('/api/admin/roles', {
+  default: () => [],
+})
 
-const { data: privilegeData, pending: privilegesPending } = await useFetch('/api/admin/privileges')
+const { data: privilegeData, pending: privilegesPending } = await useFetch<AdminPrivilege[]>('/api/admin/privileges', {
+  default: () => [],
+})
 
+const roles = computed(() => rolesData.value)
+const privileges = computed(() => privilegeData.value)
 const pending = computed(() => rolesPending.value || privilegesPending.value)
 
 const createDialogOpen = ref(false)
@@ -47,7 +39,7 @@ const form = reactive({
 })
 
 const privilegeOptions = computed(() =>
-  (privilegeData.value ?? []).map((privilege: { key: PrivilegeKey, label: string }) => ({
+  privileges.value.map(privilege => ({
     value: privilege.key,
     title: privilege.label,
   })),
@@ -67,7 +59,7 @@ function openCreateDialog() {
   createDialogOpen.value = true
 }
 
-function openEditDialog(role: SerializedRole) {
+function openEditDialog(role: AdminRole) {
   form.id = role.id
   form.name = role.name
   form.description = role.description ?? null
@@ -134,7 +126,7 @@ async function handleUpdateRole() {
   }
 }
 
-async function handleDeleteRole(role: SerializedRole) {
+async function handleDeleteRole(role: AdminRole) {
   if (!window.confirm(`Delete role "${role.name}"? This cannot be undone.`)) {
     return
   }
@@ -153,7 +145,7 @@ async function handleDeleteRole(role: SerializedRole) {
   }
 }
 
-const hasRoles = computed(() => (rolesData.value?.length ?? 0) > 0)
+const hasRoles = computed(() => roles.value.length > 0)
 </script>
 
 <template>
@@ -215,7 +207,7 @@ const hasRoles = computed(() => (rolesData.value?.length ?? 0) > 0)
               </thead>
               <tbody>
                 <tr
-                  v-for="role in rolesData"
+                  v-for="role in roles"
                   :key="role.id"
                 >
                   <td>

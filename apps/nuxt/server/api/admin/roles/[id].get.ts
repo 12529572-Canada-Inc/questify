@@ -9,12 +9,12 @@ export default defineEventHandler(async (event) => {
 
   const id = getRouterParam(event, 'id')
   if (!id) {
-    throw createError({ status: 400, statusMessage: 'Role id is required' })
+    throw createError({ status: 400, statusText: 'Role id is required' })
   }
 
   const role = await fetchRole(prisma, id)
   if (!role) {
-    throw createError({ status: 404, statusMessage: 'Role not found' })
+    throw createError({ status: 404, statusText: 'Role not found' })
   }
 
   return role

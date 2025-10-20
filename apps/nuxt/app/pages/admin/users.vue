@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useSnackbar } from '~/composables/useSnackbar'
+import type { AdminRole, AdminUser } from '~/types/admin'
 
 definePageMeta({
   middleware: ['admin'],
@@ -11,9 +12,17 @@ const {
   data: usersData,
   pending: usersPending,
   refresh: refreshUsers,
-} = await useFetch('/api/admin/users')
+} = await useFetch<AdminUser[]>('/api/admin/users', {
+  default: () => [],
+})
 
-const { data: rolesData, pending: rolesPending, refresh: refreshRoles } = await useFetch('/api/admin/roles')
+const {
+  data: rolesData,
+  pending: rolesPending,
+  refresh: refreshRoles,
+} = await useFetch<AdminRole[]>('/api/admin/roles', {
+  default: () => [],
+})
 
 const pending = computed(() => usersPending.value || rolesPending.value)
 
@@ -29,12 +38,13 @@ function setLoading(userId: string, value: boolean) {
   else loadingUsers.delete(userId)
 }
 
-const assignableRoles = computed(() => rolesData.value ?? [])
+const users = computed(() => usersData.value)
+const assignableRoles = computed(() => rolesData.value)
 
 function roleOptionsFor(userId: string) {
   const assigned = new Set(
-    (usersData.value ?? [])
-      .find(user => user.id === userId)?.roles.map((role: { id: string }) => role.id) ?? [],
+    users.value
+      .find(user => user.id === userId)?.roles.map(role => role.id) ?? [],
   )
 
   return assignableRoles.value
@@ -87,7 +97,7 @@ async function removeRole(userId: string, roleId: string) {
   }
 }
 
-const hasUsers = computed(() => (usersData.value?.length ?? 0) > 0)
+const hasUsers = computed(() => users.value.length > 0)
 </script>
 
 <template>
@@ -138,7 +148,7 @@ const hasUsers = computed(() => (usersData.value?.length ?? 0) > 0)
               </thead>
               <tbody>
                 <tr
-                  v-for="user in usersData"
+                  v-for="user in users"
                   :key="user.id"
                 >
                   <td>

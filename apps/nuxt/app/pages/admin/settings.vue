@@ -2,6 +2,7 @@
 import { SUPER_ADMIN_ROLE_NAME } from 'shared'
 import { useSnackbar } from '~/composables/useSnackbar'
 import { useAccessControl } from '~/composables/useAccessControl'
+import type { AdminRole } from '~/types/admin'
 
 definePageMeta({
   middleware: ['admin'],
@@ -14,9 +15,12 @@ const {
   data: rolesData,
   pending,
   refresh,
-} = await useFetch('/api/admin/roles')
+} = await useFetch<AdminRole[]>('/api/admin/roles', {
+  default: () => [],
+})
 
-const superAdminRole = computed(() => (rolesData.value ?? []).find(role => role.name === SUPER_ADMIN_ROLE_NAME))
+const roles = computed(() => rolesData.value)
+const superAdminRole = computed(() => roles.value.find(role => role.name === SUPER_ADMIN_ROLE_NAME))
 const superAdminCount = computed(() => superAdminRole.value?.userCount ?? 0)
 
 async function runRecovery() {

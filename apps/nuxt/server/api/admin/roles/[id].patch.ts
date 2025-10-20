@@ -1,5 +1,4 @@
 import { Prisma, PrismaClient } from '@prisma/client'
-import type { H3Event } from 'h3'
 import type { PrivilegeKey } from 'shared'
 import { requirePrivilege, sessionHasPrivilege } from '../../../utils/access-control'
 import { recordAuditLog } from '../../../utils/audit'
@@ -20,21 +19,21 @@ function sanitizeOptionalName(name: string | undefined) {
 
   const value = name.trim()
   if (!value) {
-    throw createError({ status: 400, statusMessage: 'Role name cannot be empty' })
+    throw createError({ status: 400, statusText: 'Role name cannot be empty' })
   }
 
   return value
 }
 
-export default defineEventHandler(async (event: H3Event) => {
+export default defineEventHandler(async (event) => {
   const actor = await requirePrivilege(event, 'role:update')
   const id = getRouterParam(event, 'id')
 
   if (!id) {
-    throw createError({ status: 400, statusMessage: 'Role id is required' })
+    throw createError({ status: 400, statusText: 'Role id is required' })
   }
 
-  const payload = (await readBody<UpdateRoleBody>(event)) || {}
+  const payload = (await readBody<UpdateRoleBody>(event)) ?? {} as UpdateRoleBody
 
   const role = await prisma.role.findUnique({
     where: { id },
@@ -46,7 +45,7 @@ export default defineEventHandler(async (event: H3Event) => {
   })
 
   if (!role) {
-    throw createError({ status: 404, statusMessage: 'Role not found' })
+    throw createError({ status: 404, statusText: 'Role not found' })
   }
 
   if (role.system && payload.name && payload.name !== role.name) {
@@ -54,7 +53,7 @@ export default defineEventHandler(async (event: H3Event) => {
     if (!sessionHasPrivilege(actor, 'system:settings:update')) {
       throw createError({
         status: 403,
-        statusMessage: 'You are not allowed to rename a system role.',
+        statusText: 'You are not allowed to rename a system role.',
       })
     }
   }
@@ -111,7 +110,7 @@ export default defineEventHandler(async (event: H3Event) => {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
       throw createError({
         status: 409,
-        statusMessage: 'A role with that name already exists.',
+        statusText: 'A role with that name already exists.',
       })
     }
 

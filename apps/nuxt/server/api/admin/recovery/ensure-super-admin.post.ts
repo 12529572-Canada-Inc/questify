@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
   const actor = session.user
 
   if (!actor) {
-    throw createError({ status: 401, statusMessage: 'Unauthorized' })
+    throw createError({ status: 401, statusText: 'Unauthorized' })
   }
 
   const existingSuperAdmins = await prisma.userRole.count({
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
   if (existingSuperAdmins > 0) {
     throw createError({
       status: 400,
-      statusMessage: 'A SuperAdmin already exists. Recovery is not required.',
+      statusText: 'A SuperAdmin already exists. Recovery is not required.',
     })
   }
 
@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
   if (!role) {
     throw createError({
       status: 500,
-      statusMessage: 'SuperAdmin role is missing from the system.',
+      statusText: 'SuperAdmin role is missing from the system.',
     })
   }
 

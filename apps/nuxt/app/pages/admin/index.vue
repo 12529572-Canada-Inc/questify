@@ -1,20 +1,53 @@
 <script setup lang="ts">
+import type { AdminPrivilege, AdminRole, AdminUser } from '~/types/admin'
+
 definePageMeta({
   middleware: ['admin'],
 })
 
-const { data: rolesData, refresh: refreshRoles, pending: rolesPending, error: rolesError } = await useFetch('/api/admin/roles')
-const { data: usersData, refresh: refreshUsers, pending: usersPending, error: usersError } = await useFetch('/api/admin/users')
-const { data: privilegesData, pending: privilegesPending, error: privilegesError } = await useFetch('/api/admin/privileges')
+const {
+  data: rolesData,
+  refresh: refreshRoles,
+  pending: rolesPending,
+  error: rolesError,
+} = await useFetch<AdminRole[]>('/api/admin/roles', {
+  default: () => [],
+})
+
+const {
+  data: usersData,
+  refresh: refreshUsers,
+  pending: usersPending,
+  error: usersError,
+} = await useFetch<AdminUser[]>('/api/admin/users', {
+  default: () => [],
+})
+
+const {
+  data: privilegesData,
+  pending: privilegesPending,
+  error: privilegesError,
+} = await useFetch<AdminPrivilege[]>('/api/admin/privileges', {
+  default: () => [],
+})
+
+const roles = computed(() => rolesData.value)
+const users = computed(() => usersData.value)
+const privileges = computed(() => privilegesData.value)
 
 const pending = computed(() => rolesPending.value || usersPending.value || privilegesPending.value)
 
-const errorMessage = computed(() => rolesError.value?.message || usersError.value?.message || privilegesError.value?.message || null)
+const errorMessage = computed(() => {
+  return rolesError.value?.message
+    || usersError.value?.message
+    || privilegesError.value?.message
+    || null
+})
 
 const metrics = computed(() => ({
-  roles: rolesData.value?.length ?? 0,
-  users: usersData.value?.length ?? 0,
-  privileges: privilegesData.value?.length ?? 0,
+  roles: roles.value.length,
+  users: users.value.length,
+  privileges: privileges.value.length,
 }))
 
 async function refreshOverview() {

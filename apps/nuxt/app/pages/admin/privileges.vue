@@ -1,11 +1,16 @@
 <script setup lang="ts">
+import type { AdminPrivilege } from '~/types/admin'
+
 definePageMeta({
   middleware: ['admin'],
 })
 
-const { data: privilegesData, pending } = await useFetch('/api/admin/privileges')
+const { data: privilegesData, pending } = await useFetch<AdminPrivilege[]>('/api/admin/privileges', {
+  default: () => [],
+})
 
-const hasPrivileges = computed(() => (privilegesData.value?.length ?? 0) > 0)
+const privileges = computed(() => privilegesData.value)
+const hasPrivileges = computed(() => privileges.value.length > 0)
 </script>
 
 <template>
@@ -53,7 +58,7 @@ const hasPrivileges = computed(() => (privilegesData.value?.length ?? 0) > 0)
               </thead>
               <tbody>
                 <tr
-                  v-for="privilege in privilegesData"
+                  v-for="privilege in privileges"
                   :key="privilege.id"
                 >
                   <td class="font-mono text-body-2">

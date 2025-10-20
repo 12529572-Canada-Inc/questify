@@ -1,5 +1,4 @@
 import { Prisma, PrismaClient } from '@prisma/client'
-import type { H3Event } from 'h3'
 import { SUPER_ADMIN_ROLE_NAME } from 'shared'
 import {
   attachSessionWithAccess,
@@ -15,25 +14,25 @@ interface AssignRoleBody {
   roleId?: string
 }
 
-export default defineEventHandler(async (event: H3Event) => {
+export default defineEventHandler(async (event) => {
   const actor = await requirePrivilege(event, 'user:role:assign')
   const userId = getRouterParam(event, 'id')
 
   if (!userId) {
-    throw createError({ status: 400, statusMessage: 'User id is required' })
+    throw createError({ status: 400, statusText: 'User id is required' })
   }
 
-  const body = (await readBody<AssignRoleBody>(event)) || {}
+  const body = (await readBody<AssignRoleBody>(event)) ?? {} as AssignRoleBody
   const roleId = body.roleId?.trim()
 
   if (!roleId) {
-    throw createError({ status: 400, statusMessage: 'roleId is required' })
+    throw createError({ status: 400, statusText: 'roleId is required' })
   }
 
   const role = await prisma.role.findUnique({ where: { id: roleId } })
 
   if (!role) {
-    throw createError({ status: 404, statusMessage: 'Role not found' })
+    throw createError({ status: 404, statusText: 'Role not found' })
   }
 
   if (role.system && role.name === SUPER_ADMIN_ROLE_NAME) {
@@ -41,14 +40,14 @@ export default defineEventHandler(async (event: H3Event) => {
     if (!canManageSystem) {
       throw createError({
         status: 403,
-        statusMessage: 'Only system administrators can assign the SuperAdmin role.',
+        statusText: 'Only system administrators can assign the SuperAdmin role.',
       })
     }
   }
 
   const user = await prisma.user.findUnique({ where: { id: userId } })
   if (!user) {
-    throw createError({ status: 404, statusMessage: 'User not found' })
+    throw createError({ status: 404, statusText: 'User not found' })
   }
 
   try {

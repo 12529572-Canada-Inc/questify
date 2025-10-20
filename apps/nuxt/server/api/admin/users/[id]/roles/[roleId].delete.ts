@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
   const roleId = getRouterParam(event, 'roleId')
 
   if (!userId || !roleId) {
-    throw createError({ status: 400, statusMessage: 'User id and role id are required' })
+    throw createError({ status: 400, statusText: 'User id and role id are required' })
   }
 
   const assignment = await prisma.userRole.findUnique({
@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
   const role = await prisma.role.findUnique({ where: { id: roleId } })
 
   if (!role) {
-    throw createError({ status: 404, statusMessage: 'Role not found' })
+    throw createError({ status: 404, statusText: 'Role not found' })
   }
 
   if (role.system && role.name === SUPER_ADMIN_ROLE_NAME) {
@@ -44,7 +44,7 @@ export default defineEventHandler(async (event) => {
     if (!canManageSystem) {
       throw createError({
         status: 403,
-        statusMessage: 'Only system administrators can modify the SuperAdmin role.',
+        statusText: 'Only system administrators can modify the SuperAdmin role.',
       })
     }
 
@@ -58,7 +58,7 @@ export default defineEventHandler(async (event) => {
     if (remainingSuperAdmins === 0) {
       throw createError({
         status: 400,
-        statusMessage: 'At least one SuperAdmin must remain assigned.',
+        statusText: 'At least one SuperAdmin must remain assigned.',
       })
     }
   }

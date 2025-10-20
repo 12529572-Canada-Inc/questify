@@ -1,5 +1,4 @@
 import { Prisma, PrismaClient } from '@prisma/client'
-import type { H3Event } from 'h3'
 import type { PrivilegeKey } from 'shared'
 import { requirePrivilege } from '../../../utils/access-control'
 import { recordAuditLog } from '../../../utils/audit'
@@ -16,14 +15,14 @@ interface CreateRoleBody {
 function sanitizeName(name: string | undefined) {
   const value = (name ?? '').trim()
   if (!value) {
-    throw createError({ status: 400, statusMessage: 'Role name is required' })
+    throw createError({ status: 400, statusText: 'Role name is required' })
   }
   return value
 }
 
-export default defineEventHandler(async (event: H3Event) => {
+export default defineEventHandler(async (event) => {
   const actor = await requirePrivilege(event, 'role:create')
-  const body = (await readBody<CreateRoleBody>(event)) || {}
+  const body = (await readBody<CreateRoleBody>(event)) ?? {} as CreateRoleBody
 
   const name = sanitizeName(body.name)
   const description = body.description?.trim() || null
@@ -63,7 +62,7 @@ export default defineEventHandler(async (event: H3Event) => {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
       throw createError({
         status: 409,
-        statusMessage: 'A role with that name already exists.',
+        statusText: 'A role with that name already exists.',
       })
     }
 

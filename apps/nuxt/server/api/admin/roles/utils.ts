@@ -88,7 +88,7 @@ export async function resolvePrivilegeIds(
     const missing = uniqueKeys.filter(key => !found.has(key))
     throw createError({
       status: 400,
-      statusMessage: `Unknown privileges: ${missing.join(', ')}`,
+      statusText: `Unknown privileges: ${missing.join(', ')}`,
     })
   }
 
