@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 🚀 Features
+- Implemented global snackbar notifications for auth, quest management, and background actions with cleaned status messaging.
+
+### 🛠 Fixes
+- Removed legacy inline alerts and normalized API error text to avoid leaking HTTP metadata into the UI.
+
 ---
 
 ## [1.9.0] - 2025-10-19
