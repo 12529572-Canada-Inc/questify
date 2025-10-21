@@ -14,6 +14,7 @@ interface AssignRoleBody {
   roleId?: string
 }
 
+// Adds a role to a user, performing SuperAdmin safety checks and logging the change.
 export default defineEventHandler(async (event) => {
   const actor = await requirePrivilege(event, 'user:role:assign')
   const userId = getRouterParam(event, 'id')

@@ -3,6 +3,7 @@ import { requirePrivilege } from '../../../utils/access-control'
 
 const prisma = new PrismaClient()
 
+// Lists all privilege definitions so admins can inspect available capability keys.
 export default defineEventHandler(async (event) => {
   await requirePrivilege(event, 'role:read')
 

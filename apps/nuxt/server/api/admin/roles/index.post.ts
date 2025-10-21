@@ -12,6 +12,7 @@ interface CreateRoleBody {
   privileges?: PrivilegeKey[]
 }
 
+// Creates a new custom role and associates the requested privilege keys.
 function sanitizeName(name: string | undefined) {
   const value = (name ?? '').trim()
   if (!value) {

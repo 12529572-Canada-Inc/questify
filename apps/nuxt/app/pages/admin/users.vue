@@ -6,6 +6,7 @@ definePageMeta({
   middleware: ['admin'],
 })
 
+// User management view: view staff accounts, inspect their roles, and assign/revoke access.
 const { showSnackbar } = useSnackbar()
 
 const {

@@ -1,3 +1,4 @@
+// Ensures that only signed-in users with admin privileges can access routes in /admin.
 export default defineNuxtRouteMiddleware(async () => {
   const session = useUserSession()
   const { isAdmin } = useAccessControl()

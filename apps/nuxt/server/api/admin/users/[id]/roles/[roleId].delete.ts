@@ -10,6 +10,7 @@ import { fetchAdminUser } from '../../../users/utils'
 
 const prisma = new PrismaClient()
 
+// Removes a role assignment, guarding against locking the platform out of SuperAdmin access.
 export default defineEventHandler(async (event) => {
   const actor = await requirePrivilege(event, 'user:role:assign')
 

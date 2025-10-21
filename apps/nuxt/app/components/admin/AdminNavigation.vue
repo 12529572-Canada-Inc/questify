@@ -4,6 +4,8 @@ import { useAccessControl } from '~/composables/useAccessControl'
 const route = useRoute()
 const { canManageRoles, canManageUsers, canViewSystemSettings } = useAccessControl()
 
+// Centralized admin nav links, automatically hidden when the current user lacks the privilege.
+
 interface NavLink {
   to: string
   label: string

@@ -14,6 +14,8 @@ const {
   default: () => [],
 })
 
+// Fetch supporting data sets used to render a quick admin dashboard snapshot.
+
 const {
   data: usersData,
   refresh: refreshUsers,

@@ -67,6 +67,7 @@ export default defineEventHandler(async (event) => {
     ? await resolvePrivilegeIds(prisma, payload.privileges)
     : null
 
+  // Apply database changes inside a transaction so metadata and privilege lists stay in sync.
   try {
     await prisma.$transaction(async (tx) => {
       const data: Prisma.RoleUpdateInput = {}

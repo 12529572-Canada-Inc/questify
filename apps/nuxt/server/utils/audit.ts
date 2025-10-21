@@ -11,6 +11,10 @@ export interface AuditLogInput {
   metadata?: Record<string, unknown> | null
 }
 
+/**
+ * Lightweight helper for recording administrative actions. Errors are swallowed
+ * so that audit logging never prevents the main action from completing.
+ */
 export async function recordAuditLog(entry: AuditLogInput) {
   try {
     await prisma.adminAuditLog.create({

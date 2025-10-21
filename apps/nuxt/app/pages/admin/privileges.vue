@@ -9,6 +9,7 @@ const { data: privilegesData, pending } = await useFetch<AdminPrivilege[]>('/api
   default: () => [],
 })
 
+// Read-only catalog of available permissions to aid admin education and role design.
 const privileges = computed(() => privilegesData.value)
 const hasPrivileges = computed(() => privileges.value.length > 0)
 </script>

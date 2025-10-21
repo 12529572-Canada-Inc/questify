@@ -4,6 +4,7 @@ import { adminUserInclude, serializeAdminUser } from './utils'
 
 const prisma = new PrismaClient()
 
+// Returns admin-focused user profiles with their assigned roles.
 export default defineEventHandler(async (event) => {
   await requirePrivilege(event, 'user:read')
 

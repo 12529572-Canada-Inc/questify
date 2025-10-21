@@ -1,5 +1,7 @@
 import type { Prisma, PrismaClient } from '@prisma/client'
 
+// Shared include + serializer helpers so admin user APIs return consistent shapes.
+
 type PrismaOrTransaction = PrismaClient | Prisma.TransactionClient
 
 export const adminUserInclude = {

@@ -6,6 +6,12 @@ import {
   type PrivilegeKey,
 } from 'shared'
 
+/**
+ * Utility helpers that keep the RBAC tables (roles, privileges, user-role links)
+ * in sync with the shared definitions. These run during migrations/seed as well
+ * as at Nitro bootstrap to guarantee system roles are present.
+ */
+
 export async function syncPrivilegesAndRoles(prisma: PrismaClient) {
   await prisma.$transaction(
     PRIVILEGE_DEFINITIONS.map(def =>

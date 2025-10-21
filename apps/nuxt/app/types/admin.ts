@@ -1,5 +1,7 @@
 import type { PrivilegeKey } from 'shared'
 
+// Shared client-side typings for the admin dashboard API responses.
+
 export interface AdminRolePrivilege {
   key: PrivilegeKey
   label: string

@@ -1,6 +1,11 @@
 import { computed, ref } from 'vue'
 import { ADMIN_ROLE_NAME, SUPER_ADMIN_ROLE_NAME, type PrivilegeKey } from 'shared'
 
+/**
+ * Client-side RBAC helper that reads the current session payload and exposes
+ * convenience booleans for feature gating admin navigation and actions.
+ */
+
 const ADMIN_PRIVILEGE_KEYS: PrivilegeKey[] = [
   'role:read',
   'user:read',

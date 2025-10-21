@@ -8,6 +8,13 @@ export interface UserAccessProfile {
   privileges: PrivilegeKey[]
 }
 
+/**
+ * Access-control helpers shared across Nitro API handlers. They hydrate the
+ * current session with role + privilege information and provide guard helpers
+ * (`requirePrivilege`, `requireAnyPrivilege`) that short-circuit unauthorized
+ * requests before hitting business logic.
+ */
+
 export async function getUserAccessProfile(userId: string): Promise<UserAccessProfile> {
   const assignments = await prisma.userRole.findMany({
     where: { userId },

@@ -7,6 +7,7 @@ definePageMeta({
   middleware: ['admin'],
 })
 
+// Roles management surface: list, create, edit, delete role definitions & privilege assignments.
 const { showSnackbar } = useSnackbar()
 
 const {

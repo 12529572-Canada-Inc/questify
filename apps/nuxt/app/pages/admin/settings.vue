@@ -8,6 +8,7 @@ definePageMeta({
   middleware: ['admin'],
 })
 
+// System-level tools, currently hosting the SuperAdmin recovery workflow and future global settings.
 const { showSnackbar } = useSnackbar()
 const { canViewSystemSettings } = useAccessControl()
 

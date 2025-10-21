@@ -1,3 +1,9 @@
+/**
+ * Canonical list of RBAC privileges and default roles shared across the stack.
+ * These definitions are consumed by Prisma seeders, Nitro APIs, and Nuxt client
+ * code to ensure consistent keys and labels for admin capabilities.
+ */
+
 export type PrivilegeKey =
   | 'user:read'
   | 'user:create'

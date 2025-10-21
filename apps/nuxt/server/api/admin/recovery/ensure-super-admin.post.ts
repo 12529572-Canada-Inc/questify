@@ -5,6 +5,7 @@ import { recordAuditLog } from '../../../utils/audit'
 
 const prisma = new PrismaClient()
 
+// Emergency endpoint promoted through the admin UI to restore SuperAdmin access if none remain.
 export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event)
   const actor = session.user
