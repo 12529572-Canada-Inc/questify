@@ -1,4 +1,16 @@
-import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
+let randomBytes: typeof import('node:crypto').randomBytes
+let scryptSync: typeof import('node:crypto').scryptSync
+let timingSafeEqual: typeof import('node:crypto').timingSafeEqual
+
+if (typeof process !== 'undefined' && process.versions?.node) {
+  const crypto = require('node:crypto') as typeof import('node:crypto')
+  randomBytes = crypto.randomBytes
+  scryptSync = crypto.scryptSync
+  timingSafeEqual = crypto.timingSafeEqual
+}
+else {
+  throw new Error('Password utilities require a Node.js environment')
+}
 
 /**
  * Create a Scrypt password hash.
