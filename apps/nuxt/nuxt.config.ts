@@ -13,6 +13,7 @@ export default defineNuxtConfig({
     '~': path.resolve(__dirname, 'app'),
     '@': path.resolve(__dirname, 'app'),
     '#prisma-utils': path.resolve(__dirname, '..', '..', 'packages', 'prisma', 'utils'),
+    shared: path.resolve(__dirname, '..', '..', 'packages', 'shared', 'src'),
   },
 
   // ⚙️ Modules
