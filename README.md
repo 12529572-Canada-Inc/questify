@@ -251,6 +251,15 @@ git push origin --tags
 * Develop Nuxt + BullMQ integrated features
 * Follow a clear **release & hotfix process**
 
+## Administration
+
+Questify now ships with role-based access control and an administrative workspace:
+
+* **Default roles** – `SuperAdmin`, `Admin`, and `Support` are seeded automatically with curated privileges. Custom roles can be created in the UI.
+* **Privileges** – Fine-grained permissions (e.g. `user:role:assign`, `system:settings:update`) govern access to protected APIs and routes.
+* **Admin area** – Users with the appropriate privileges see an **Administration** link in the main navigation with views for roles, users, privileges, and system recovery.
+* **Bootstrap & recovery** – On first install, the earliest user is promoted to `SuperAdmin`. If all SuperAdmin assignments are lost, any authenticated user can restore access from *Administration → System Settings*.
+
 ---
 
 ## 10. Creating a Database Migration

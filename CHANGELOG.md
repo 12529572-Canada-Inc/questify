@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🚀 Features
 - Implemented global snackbar notifications for auth, quest management, and background actions with cleaned status messaging.
+- Added role-based administration: data model, guarded APIs, and Nuxt admin views for roles, users, privileges, and recovery.
 
 ### 🛠 Fixes
 - Removed legacy inline alerts and normalized API error text to avoid leaking HTTP metadata into the UI.

@@ -16,6 +16,7 @@ export default defineConfig({
           alias: {
             '~': r('app'),
             '@': r('app'),
+            '#prisma-utils': resolve(__dirname, '..', '..', 'packages', 'prisma', 'utils'),
           },
         },
       }),

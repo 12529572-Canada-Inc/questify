@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { useSnackbar } from '~/composables/useSnackbar'
+import { useAccessControl } from '~/composables/useAccessControl'
 
 const { clear, loggedIn } = useUserSession()
 const router = useRouter()
 const requestUrl = useRequestURL()
 const { showSnackbar } = useSnackbar()
+const { isAdmin } = useAccessControl()
 
 const shareDialogOpen = ref(false)
 const loginShareUrl = computed(() => new URL('/auth/login', requestUrl.origin).toString())
@@ -73,6 +75,23 @@ async function logout() {
           />
           <span class="app-bar-share-label">
             Share App
+          </span>
+        </v-btn>
+        <v-btn
+          v-if="isAdmin"
+          class="app-bar-admin-btn"
+          variant="text"
+          color="primary"
+          density="comfortable"
+          to="/admin"
+        >
+          <v-icon
+            icon="mdi-shield-crown"
+            size="20"
+            class="app-bar-admin-icon"
+          />
+          <span class="app-bar-admin-label">
+            Administration
           </span>
         </v-btn>
 
@@ -175,6 +194,18 @@ async function logout() {
 }
 
 .app-bar-share-icon {
+  flex: 0 0 auto;
+}
+
+.app-bar-admin-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding-inline: 10px 14px;
+}
+
+.app-bar-admin-icon {
   flex: 0 0 auto;
 }
 
