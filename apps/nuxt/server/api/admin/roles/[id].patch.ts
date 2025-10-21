@@ -67,6 +67,13 @@ export default defineEventHandler(async (event) => {
     ? await resolvePrivilegeIds(prisma, payload.privileges)
     : null
 
+  if (role.system && privilegeRecords && !sessionHasPrivilege(actor, 'system:settings:update')) {
+    throw createError({
+      status: 403,
+      statusText: 'You are not allowed to modify system role privileges.',
+    })
+  }
+
   // Apply database changes inside a transaction so metadata and privilege lists stay in sync.
   try {
     await prisma.$transaction(async (tx) => {
