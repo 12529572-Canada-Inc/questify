@@ -1,14 +1,8 @@
-let randomBytes: typeof import('node:crypto').randomBytes
-let scryptSync: typeof import('node:crypto').scryptSync
-let timingSafeEqual: typeof import('node:crypto').timingSafeEqual
+function getNodeCrypto() {
+  if (typeof process !== 'undefined' && process.versions?.node) {
+    return require('node:crypto') as typeof import('node:crypto')
+  }
 
-if (typeof process !== 'undefined' && process.versions?.node) {
-  const crypto = require('node:crypto') as typeof import('node:crypto')
-  randomBytes = crypto.randomBytes
-  scryptSync = crypto.scryptSync
-  timingSafeEqual = crypto.timingSafeEqual
-}
-else {
   throw new Error('Password utilities require a Node.js environment')
 }
 
@@ -17,6 +11,8 @@ else {
  * Format: $scrypt$n=16384,r=8,p=1$<saltB64>$<keyB64>
  */
 export function hashPassword(password: string): string {
+  const { randomBytes, scryptSync } = getNodeCrypto()
+
   const N = 16384;
   const r = 8;
   const p = 1;
@@ -33,6 +29,8 @@ export function hashPassword(password: string): string {
  */
 export function verifyPassword(password: string, stored: string): boolean {
   try {
+    const { scryptSync, timingSafeEqual } = getNodeCrypto()
+
     // Expected format: $scrypt$n=16384,r=8,p=1$<salt>$<key>
     const match = /^\$scrypt\$n=(\d+),r=(\d+),p=(\d+)\$([^$]+)\$([^$]+)$/.exec(stored);
 
