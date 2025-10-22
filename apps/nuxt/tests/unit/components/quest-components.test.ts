@@ -192,14 +192,9 @@ describe('quest components', () => {
   })
 
   it('renders QuestCard summary', () => {
-    const wrapper = shallowMountWithBase(QuestCard, {
+    const wrapper = mountWithBase(QuestCard, {
       props: {
         quest: sampleQuest,
-      },
-      global: {
-        stubs: {
-          ...vuetifyStubFlags,
-        },
       },
     })
 

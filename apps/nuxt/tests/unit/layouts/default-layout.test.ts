@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ref, type ComponentPublicInstance } from 'vue'
 import { createPinia, setActivePinia } from 'pinia'
+import { flushPromises } from '@vue/test-utils'
 import DefaultLayout from '../../../app/layouts/default.vue'
 import { mountWithBase } from '../support/mount-options'
 import { useUserStore } from '~/stores/user'
@@ -13,10 +14,6 @@ const fetchSession = vi.fn().mockResolvedValue(undefined)
 const fetchApi = vi.fn().mockResolvedValue(undefined)
 const clearSession = vi.fn()
 const mockTheme = { global: { name: { value: 'light' as 'light' | 'dark' } } }
-
-vi.mock('nuxt/app', () => ({
-  useCookie: () => ref<'light' | 'dark'>('light'),
-}))
 
 vi.mock('vuetify', () => ({
   useTheme: () => mockTheme,
@@ -44,7 +41,8 @@ beforeEach(() => {
   const questStore = useQuestStore()
   questStore.setQuests([createQuest()])
 
-  useUiStore().setTheme('light')
+  const uiStore = useUiStore()
+  uiStore.setTheme('light')
 
   vi.stubGlobal('useRouter', () => ({
     push: routerPush,
@@ -52,7 +50,14 @@ beforeEach(() => {
   vi.stubGlobal('useRequestURL', () => ({
     origin: 'https://example.com',
   }))
+  // Stub both $fetch global and the useSnackbar composable
   vi.stubGlobal('$fetch', fetchApi)
+  vi.stubGlobal('useSnackbar', () => ({
+    showSnackbar: vi.fn(),
+  }))
+  vi.stubGlobal('useAccessControl', () => ({
+    isAdmin: ref(false),
+  }))
 })
 
 afterEach(() => {
@@ -61,51 +66,67 @@ afterEach(() => {
 
 describe('default layout', () => {
   it('logs out and clears the session', async () => {
-    const wrapper = mountWithBase(DefaultLayout, {
-      slots: {
-        default: '<div class="slot-marker">Content</div>',
-      },
+    const SuspenseWrapper = {
+      components: { DefaultLayout },
+      template: '<Suspense><DefaultLayout><div class="slot-marker">Content</div></DefaultLayout></Suspense>',
+    }
+
+    const wrapper = mountWithBase(SuspenseWrapper, {
       global: {
         stubs: {
           ShareDialog: { template: '<div class="share-dialog-stub"></div>' },
-        },
-        mocks: {
-          $fetch: fetchApi,
+          VImg: { template: '<img />' },
         },
       },
     })
 
-    const vm = wrapper.vm as ComponentPublicInstance & { logout?: () => Promise<void> }
-    await vm.logout?.()
+    // Wait for async setup to complete
+    await flushPromises()
+
+    // Find and click the logout button
+    const logoutButton = wrapper.find('.app-bar-auth__btn')
+    await logoutButton.trigger('click')
+    await flushPromises()
 
     expect(fetchApi).toHaveBeenCalledWith('/api/auth/logout', { method: 'POST' })
     expect(clearSession).toHaveBeenCalled()
     expect(routerPush).toHaveBeenCalledWith('/auth/login')
   })
 
-  it('renders login/signup links when logged out', () => {
+  it('renders login/signup links when logged out', async () => {
+    // Set up logged out state BEFORE creating stores
     const sessionUser = ref(null)
+    const loggedInRef = ref(false)
     vi.stubGlobal('useUserSession', () => ({
       user: sessionUser,
-      loggedIn: ref(false),
+      loggedIn: loggedInRef,
       clear: clearSession,
       fetch: fetchSession,
     }))
+
+    // Recreate pinia to pick up the new stub
+    setActivePinia(createPinia())
 
     const userStore = useUserStore()
     userStore.setUser(null)
     useQuestStore().setQuests([])
 
-    const wrapper = mountWithBase(DefaultLayout, {
+    const SuspenseWrapper = {
+      components: { DefaultLayout },
+      template: '<Suspense><DefaultLayout /></Suspense>',
+    }
+
+    const wrapper = mountWithBase(SuspenseWrapper, {
       global: {
         stubs: {
           ShareDialog: { template: '<div class="share-dialog-stub"></div>' },
-        },
-        mocks: {
-          $fetch: fetchApi,
+          VImg: { template: '<img />' },
         },
       },
     })
+
+    // Wait for async setup to complete
+    await flushPromises()
 
     expect(wrapper.text()).toContain('Login')
     expect(wrapper.text()).toContain('Signup')

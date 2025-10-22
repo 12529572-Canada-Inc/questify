@@ -1,6 +1,5 @@
 import { computed, ref, watch } from 'vue'
 import { acceptHMRUpdate, defineStore } from 'pinia'
-import { useCookie } from 'nuxt/app'
 import { useTheme } from 'vuetify'
 
 type ThemeMode = 'light' | 'dark'
