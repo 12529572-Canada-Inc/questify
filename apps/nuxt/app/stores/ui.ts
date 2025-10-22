@@ -1,5 +1,6 @@
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { acceptHMRUpdate, defineStore } from 'pinia'
+import { useCookie } from 'nuxt/app'
 import { useTheme } from 'vuetify'
 
 type ThemeMode = 'light' | 'dark'
@@ -13,12 +14,13 @@ export const useUiStore = defineStore('ui', () => {
   const isDarkMode = computed(() => themeMode.value === 'dark')
 
   function applyVuetifyTheme(mode: ThemeMode) {
-    if (!import.meta.client) {
-      return
+    try {
+      const theme = useTheme()
+      theme.global.name.value = mode
     }
-
-    const theme = useTheme()
-    theme.global.name.value = mode
+    catch {
+      // Vuetify is only available client-side; swallow errors during SSR/tests.
+    }
   }
 
   function setTheme(mode: ThemeMode) {
@@ -31,10 +33,6 @@ export const useUiStore = defineStore('ui', () => {
   function toggleTheme() {
     setTheme(isDarkMode.value ? 'light' : 'dark')
   }
-
-  onMounted(() => {
-    applyVuetifyTheme(themeMode.value)
-  })
 
   watch(themeMode, (mode) => {
     cookie.value = mode
@@ -49,6 +47,6 @@ export const useUiStore = defineStore('ui', () => {
   }
 })
 
-if (import.meta.hot) {
+if (import.meta.hot?.accept) {
   import.meta.hot.accept(acceptHMRUpdate(useUiStore, import.meta.hot))
 }

@@ -75,6 +75,6 @@ export const useQuestStore = defineStore('quests', () => {
   }
 })
 
-if (import.meta.hot) {
+if (import.meta.hot?.accept) {
   import.meta.hot.accept(acceptHMRUpdate(useQuestStore, import.meta.hot))
 }

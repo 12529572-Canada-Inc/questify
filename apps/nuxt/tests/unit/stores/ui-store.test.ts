@@ -7,6 +7,10 @@ type ThemeMode = 'light' | 'dark'
 const cookieRef = ref<ThemeMode | null>('light')
 const mockTheme = { global: { name: { value: 'light' as ThemeMode } } }
 
+vi.mock('nuxt/app', () => ({
+  useCookie: () => cookieRef,
+}))
+
 vi.mock('vuetify', () => ({
   useTheme: () => mockTheme,
 }))
@@ -17,13 +21,11 @@ beforeEach(async () => {
   setActivePinia(createPinia())
   cookieRef.value = 'light'
   mockTheme.global.name.value = 'light'
-  globalThis.useCookie = (() => cookieRef) as typeof useCookie
   ;({ useUiStore } = await import('~/stores/ui'))
 })
 
 afterEach(() => {
   vi.unstubAllGlobals()
-  delete (globalThis as Partial<typeof globalThis>).useCookie
 })
 
 describe('useUiStore', () => {

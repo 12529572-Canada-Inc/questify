@@ -24,6 +24,14 @@ declare global {
   const useCookie: typeof import('nuxt/app')['useCookie']
 }
 
+declare global {
+  interface ImportMeta {
+    hot?: {
+      accept: (cb?: (mod: unknown) => void) => void
+    }
+  }
+}
+
 // ----------------------------------------------------
 // ✅ User session composable typing
 // ----------------------------------------------------

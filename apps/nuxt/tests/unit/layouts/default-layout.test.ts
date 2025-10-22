@@ -14,6 +14,10 @@ const fetchApi = vi.fn().mockResolvedValue(undefined)
 const clearSession = vi.fn()
 const mockTheme = { global: { name: { value: 'light' as 'light' | 'dark' } } }
 
+vi.mock('nuxt/app', () => ({
+  useCookie: () => ref<'light' | 'dark'>('light'),
+}))
+
 vi.mock('vuetify', () => ({
   useTheme: () => mockTheme,
 }))
