@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { useSnackbar } from '~/composables/useSnackbar'
 import { extractStatusCode, resolveApiError } from '~/utils/error'
+import { useUserStore } from '~/stores/user'
 
-const { fetch: refreshSession } = useUserSession()
+const userStore = useUserStore()
 const router = useRouter()
 const { showSnackbar } = useSnackbar()
 
@@ -24,7 +25,7 @@ async function submit() {
 
   try {
     await $fetch('/api/auth/login', { method: 'POST', body: { email: email.value, password: password.value } })
-    await refreshSession()
+    await userStore.fetchSession()
     showSnackbar('Welcome back! You are logged in.', { variant: 'success' })
     router.push('/quests')
   }

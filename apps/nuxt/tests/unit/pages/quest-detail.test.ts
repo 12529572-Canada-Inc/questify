@@ -1,10 +1,12 @@
 import '../support/mocks/vueuse'
 
-import { computed, ref } from 'vue'
+import { computed, ref, h, Suspense } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { createPinia, setActivePinia } from 'pinia'
 import QuestDetailPage from '../../../app/pages/quests/[id].vue'
 import { shallowMountWithBase } from '../support/mount-options'
 import { createQuest, createTask, createTaskSection } from '../support/sample-data'
+import { useUserStore } from '~/stores/user'
 
 const refreshMock = vi.fn()
 const completeQuest = vi.fn()
@@ -22,6 +24,8 @@ const todoTasks = ref([createTask()])
 const completedTasks = ref([createTask({ id: 'task-2', status: 'completed' })])
 
 beforeEach(() => {
+  setActivePinia(createPinia())
+
   refreshMock.mockReset()
   completeQuest.mockReset()
   reopenQuest.mockReset()
@@ -156,11 +160,21 @@ describe('Quest detail page', () => {
     vi.stubGlobal('useRequestURL', () => ({
       origin: 'https://example.com',
     }))
+    const sessionUser = ref({ id: 'user-1' })
     vi.stubGlobal('useUserSession', () => ({
-      user: ref({ id: 'user-1' }),
+      user: sessionUser,
+      loggedIn: ref(true),
+      fetch: vi.fn(),
+      clear: vi.fn(),
     }))
+    const userStore = useUserStore()
+    userStore.setUser(sessionUser.value)
 
-    const wrapper = shallowMountWithBase(QuestDetailPage, {
+    const wrapper = shallowMountWithBase({
+      render() {
+        return h(Suspense, {}, { default: () => h(QuestDetailPage) })
+      },
+    }, {
       global: {
         stubs: {
           QuestDetailsCard: { template: '<div class="quest-details-card-stub"></div>' },

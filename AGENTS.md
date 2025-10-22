@@ -2,6 +2,7 @@
 
 ## Project Structure & Module Organization
 - `apps/nuxt/` is the Nuxt 4 UI; pages and components live in `app/`, layouts in `layouts/`, API handlers in `server/`, and static assets in `public/`.
+- `apps/nuxt/stores/` hosts Pinia stores (`useUserStore`, `useQuestStore`, `useUiStore`) for global session, quest, and UI state.
 - `apps/worker/` runs the background queue processor with entry `src/index.ts` and Vitest suites in `tests/`.
 - `packages/shared/` holds reusable TypeScript utilities shared across workspaces; keep browser- or worker-specific logic out of this package.
 - `packages/prisma/` centralizes the Prisma schema, migrations, and seeds (`seed.ts`); treat it as the source of truth for database changes.
@@ -13,11 +14,13 @@
 - `pnpm lint` (or `pnpm lint:nuxt`, `pnpm lint:worker`) applies the ESLint configs; fix issues with `pnpm format`.
 - `pnpm test` runs Nuxt, worker, and shared unit suites; use `pnpm test:coverage` when coverage is required for approvals.
 - Database work: `pnpm prisma:migrate` for local migrations, `pnpm prisma:deploy` for environments, always followed by `pnpm prisma:generate`.
+- Store-specific unit coverage lives in `apps/nuxt/tests/unit/stores/`; run `pnpm --filter nuxt test -- tests/unit/stores` to focus on Pinia regressions.
 
 ## Coding Style & Naming Conventions
 - TypeScript and Vue files use two-space indentation, single quotes, and the shared ESLint rules in each workspace’s `eslint.config.mjs`.
 - Vue components and composables use `PascalCase` filenames and Nuxt auto-imports; composables start with `use`.
 - Worker and shared modules use `camelCase` functions, `PascalCase` classes, and colocated `.spec.ts` tests or `__mocks__` directories when needed.
+- Pinia stores should use `defineStore` with a short id (e.g., `'user'`, `'quests'`), export a `useXStore` hook, and accompany complex logic with focused unit tests under `tests/unit/stores/`.
 
 ## Testing Guidelines
 - Unit tests rely on Vitest; keep Nuxt specs in `apps/nuxt/tests/`, worker specs beside source files, and shared specs in `packages/shared/tests/`.

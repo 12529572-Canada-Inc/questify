@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import { useQuest } from '~/composables/useQuest'
 import { useQuestActions } from '~/composables/useQuestActions'
 import { useQuestTaskTabs, useQuestTasks } from '~/composables/useQuestTasks'
@@ -13,13 +14,19 @@ import QuestTaskEditDialog from '~/components/quests/QuestTaskEditDialog.vue'
 import QuestInvestigationDialog from '~/components/quests/QuestInvestigationDialog.vue'
 import QuestActionButtons from '~/components/quests/QuestActionButtons.vue'
 import type { QuestTaskTab, TaskWithInvestigations } from '~/types/quest-tasks'
+import { useUserStore } from '~/stores/user'
 
 const route = useRoute()
 const id = route.params.id as string
 const requestUrl = useRequestURL()
 
 const { data: quest, refresh, pending, error } = await useQuest(id)
-const { user } = useUserSession()
+const userStore = useUserStore()
+const { user } = storeToRefs(userStore)
+
+if (!user.value) {
+  await userStore.fetchSession().catch(() => null)
+}
 
 const questData = computed(() => quest.value ?? null)
 const userData = computed(() => user.value ?? null)

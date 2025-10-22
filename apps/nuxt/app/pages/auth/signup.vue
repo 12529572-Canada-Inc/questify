@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { useSnackbar } from '~/composables/useSnackbar'
 import { extractStatusCode, resolveApiError } from '~/utils/error'
+import { useUserStore } from '~/stores/user'
 
+const userStore = useUserStore()
 const router = useRouter()
 const { showSnackbar } = useSnackbar()
 
@@ -35,6 +37,7 @@ async function submit() {
       body: { email: email.value, password: password.value, name: name.value },
     })
     showSnackbar('Account created! Welcome to Questify.', { variant: 'success' })
+    await userStore.fetchSession().catch(() => null)
     await router.push('/quests')
   }
   catch (e) {

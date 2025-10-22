@@ -28,6 +28,18 @@ describe('common components', () => {
       slots: {
         default: '<input data-test="slot-input" />',
       },
+      global: {
+        stubs: {
+          VCard: { template: '<div><slot /></div>' },
+          VCardTitle: { template: '<div><slot /></div>' },
+          VCardText: { template: '<div><slot /></div>' },
+          VBtn: { template: '<button><slot /></button>' },
+          VForm: { emits: ['submit'], template: '<form @submit.prevent="$emit(\'submit\')"><slot /></form>' },
+          VContainer: { template: '<div><slot /></div>' },
+          VRow: { template: '<div><slot /></div>' },
+          VCol: { template: '<div><slot /></div>' },
+        },
+      },
     })
 
     await (wrapper.vm as unknown as { handleSubmit: () => void }).handleSubmit()
@@ -51,6 +63,24 @@ describe('common components', () => {
         title: 'Share Quest',
         shareUrl: 'https://example.com/quests/1',
         description: 'Invite a friend',
+      },
+      global: {
+        stubs: {
+          VDialog: { template: '<div><slot /></div>' },
+          VCard: { template: '<div><slot /></div>' },
+          VCardTitle: { template: '<div><slot /></div>' },
+          VCardText: { template: '<div><slot /></div>' },
+          VCardActions: { template: '<div><slot /></div>' },
+          VRow: { template: '<div><slot /></div>' },
+          VCol: { template: '<div><slot /></div>' },
+          VBtn: { template: '<button><slot /></button>' },
+          VIcon: { template: '<span><slot /></span>' },
+          VTextField: { template: '<input />' },
+          VTooltip: { template: '<div><slot /></div>' },
+          VProgressCircular: { template: '<div class="progress"><slot /></div>' },
+          VSpacer: { template: '<span />' },
+          QrCodeDisplay: { template: '<div class="qr-code-mock"></div>' },
+        },
       },
     })
 
@@ -77,6 +107,12 @@ describe('common components', () => {
         value: 'https://example.com',
         alt: 'Quest QR',
       },
+      global: {
+        stubs: {
+          VProgressCircular: { template: '<div class="progress"><slot /></div>' },
+          VImg: { template: '<img />' },
+        },
+      },
     })
 
     await flushPromises()
@@ -95,7 +131,18 @@ describe('common components', () => {
   })
 
   it('renders HomeHeroCard actions', () => {
-    const wrapper = mountWithBase(HomeHeroCard)
+    const wrapper = mountWithBase(HomeHeroCard, {
+      global: {
+        stubs: {
+          VCard: { template: '<div><slot /></div>' },
+          VCardTitle: { template: '<div><slot /></div>' },
+          VCardText: { template: '<div><slot /></div>' },
+          VBtn: { template: '<button><slot /></button>' },
+          VIcon: { template: '<span><slot /></span>' },
+          VCardActions: { template: '<div><slot /></div>' },
+        },
+      },
+    })
     expect(wrapper.text()).toContain('Welcome to Questify')
     expect(wrapper.text()).toContain('View Quests')
     expect(wrapper.text()).toContain('Create Quest')

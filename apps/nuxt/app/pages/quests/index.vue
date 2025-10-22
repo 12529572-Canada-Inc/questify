@@ -1,9 +1,17 @@
 <script setup lang="ts">
-import { useQuests } from '~/composables/useQuest'
+import { storeToRefs } from 'pinia'
+import { useQuestStore } from '~/stores/quest'
 
-const { data: quests } = await useQuests()
+const questStore = useQuestStore()
+const { quests, loading, loaded } = storeToRefs(questStore)
 
-const questsList = computed(() => Array.isArray(quests.value) ? quests.value : [])
+if (!loaded.value) {
+  await questStore.fetchQuests().catch((error) => {
+    console.error('Failed to load quests:', error)
+  })
+}
+
+const questsList = computed(() => quests.value ?? [])
 </script>
 
 <template>

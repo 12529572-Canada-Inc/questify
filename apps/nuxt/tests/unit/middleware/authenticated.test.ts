@@ -1,17 +1,31 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { ref, type Ref } from 'vue'
+import { createPinia, setActivePinia } from 'pinia'
 import middleware from '../../../app/middleware/authenticated.global'
+import { useUserStore } from '~/stores/user'
 
 const fetchMock = vi.fn()
 const navigateToMock = vi.fn()
+let sessionUser: Ref<SessionUser | null>
+let sessionLoggedIn: Ref<boolean>
 
 beforeEach(() => {
+  setActivePinia(createPinia())
+
   fetchMock.mockReset()
   navigateToMock.mockReset()
 
+  sessionUser = ref(null)
+  sessionLoggedIn = ref(false)
+  fetchMock.mockResolvedValue({ user: sessionUser.value })
   vi.stubGlobal('useUserSession', () => ({
-    loggedIn: { value: false },
+    user: sessionUser,
+    loggedIn: sessionLoggedIn,
     fetch: fetchMock,
+    clear: vi.fn(),
   }))
+
+  useUserStore().setUser(null)
 
   vi.stubGlobal('navigateTo', navigateToMock)
 })
@@ -33,10 +47,10 @@ describe('authenticated middleware', () => {
   })
 
   it('allows quest routes for authenticated users', async () => {
-    vi.stubGlobal('useUserSession', () => ({
-      loggedIn: { value: true },
-      fetch: fetchMock,
-    }))
+    sessionUser.value = { id: 'user-1' } as SessionUser
+    sessionLoggedIn.value = true
+    fetchMock.mockResolvedValue({ user: sessionUser.value })
+    useUserStore().setUser(sessionUser.value)
 
     await middleware({ path: '/quests/abc' } as never)
     expect(navigateToMock).not.toHaveBeenCalled()

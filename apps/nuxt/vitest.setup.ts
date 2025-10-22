@@ -3,6 +3,7 @@ import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch, useAttrs } from 'vue'
 import type { Ref } from 'vue'
+import { vi } from 'vitest'
 import { splitTextIntoSegments } from './app/utils/text-with-links'
 
 declare global {
@@ -88,3 +89,10 @@ if (!globalThis.createError) {
 if (!globalThis.getUserSession) {
   globalThis.getUserSession = async () => ({ user: { id: 'test-user' } })
 }
+vi.mock('vuetify', () => ({
+  useTheme: () => ({
+    global: {
+      name: { value: 'light' as 'light' | 'dark' },
+    },
+  }),
+}))

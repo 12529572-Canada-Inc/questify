@@ -7,6 +7,7 @@ Questify turns personal and team goals into narrative quests powered by AI-assis
 | Path | Purpose |
 | --- | --- |
 | `apps/nuxt/` | Nuxt 4 UI + Nitro API, Playwright E2E suites, and Vitest component tests |
+| `apps/nuxt/stores/` | Pinia stores for user session, quest listings, and UI preferences |
 | `apps/worker/` | BullMQ-backed worker processing quest decomposition and notifications |
 | `packages/shared/` | Reusable TypeScript utilities consumed by the Nuxt app and worker |
 | `packages/prisma/` | Prisma schema, migrations, generated client, and seed scripts |
@@ -43,6 +44,14 @@ pnpm dev:worker               # runs the queue worker with hot reload
 - Build all workspaces: `pnpm build`
 - Linting + formatting: `pnpm lint` and `pnpm format`
 - Database operations: `pnpm prisma:migrate`, `pnpm prisma:deploy`, `pnpm prisma:generate`, `pnpm prisma:seed`
+
+## State Management
+
+- Global state now uses [Pinia](https://pinia.vuejs.org/) through the `@pinia/nuxt` module with stores in `apps/nuxt/stores/`.
+- `useUserStore()` wraps the session plugin to expose a typed `user`, role/privilege helpers, and `fetchSession()`/`clearSession()` actions.
+- `useQuestStore()` caches quest listings, exposes mutation helpers (`setQuests`, `upsertQuest`), and refreshes after quest creation.
+- `useUiStore()` controls UI preferences such as dark/light mode and persists selections via cookies while synchronising Vuetify theme state.
+- Store unit tests live under `apps/nuxt/tests/unit/stores/` so behaviour stays covered as modules evolve.
 
 ## Testing
 

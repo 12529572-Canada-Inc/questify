@@ -1,27 +1,39 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import { useSnackbar } from '~/composables/useSnackbar'
 import { useAccessControl } from '~/composables/useAccessControl'
+import { useUserStore } from '~/stores/user'
+import { useUiStore } from '~/stores/ui'
+import { useQuestStore } from '~/stores/quest'
 
-const { clear, loggedIn } = useUserSession()
+const userStore = useUserStore()
+const uiStore = useUiStore()
+const questStore = useQuestStore()
+
 const router = useRouter()
 const requestUrl = useRequestURL()
 const { showSnackbar } = useSnackbar()
 const { isAdmin } = useAccessControl()
+
+const { loggedIn } = storeToRefs(userStore)
+const { isDarkMode } = storeToRefs(uiStore)
+const { toggleTheme } = uiStore
+
+if (!loggedIn.value) {
+  await userStore.fetchSession().catch(() => null)
+}
 
 const shareDialogOpen = ref(false)
 const loginShareUrl = computed(() => new URL('/auth/login', requestUrl.origin).toString())
 
 async function logout() {
   try {
-    // Call your API logout endpoint
     await $fetch('/api/auth/logout', {
       method: 'POST',
     })
 
-    // Clear local session state (if you’re storing it via auth-utils)
-    clear()
-
-    // Redirect to login
+    await userStore.clearSession()
+    questStore.setQuests([])
     await router.push('/auth/login')
     showSnackbar('You have been logged out.', { variant: 'success' })
   }
@@ -75,6 +87,23 @@ async function logout() {
           />
           <span class="app-bar-share-label">
             Share App
+          </span>
+        </v-btn>
+        <v-btn
+          class="app-bar-theme-btn"
+          variant="text"
+          color="primary"
+          density="comfortable"
+          aria-label="Toggle theme"
+          @click="toggleTheme"
+        >
+          <v-icon
+            :icon="isDarkMode ? 'mdi-weather-sunny' : 'mdi-weather-night'"
+            size="20"
+            class="app-bar-theme-icon"
+          />
+          <span class="app-bar-theme-label">
+            {{ isDarkMode ? 'Light' : 'Dark' }} Mode
           </span>
         </v-btn>
         <v-btn
@@ -194,6 +223,18 @@ async function logout() {
 }
 
 .app-bar-share-icon {
+  flex: 0 0 auto;
+}
+
+.app-bar-theme-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding-inline: 10px 14px;
+}
+
+.app-bar-theme-icon {
   flex: 0 0 auto;
 }
 
