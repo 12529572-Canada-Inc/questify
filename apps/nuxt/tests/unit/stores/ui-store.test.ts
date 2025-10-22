@@ -1,4 +1,4 @@
-import { ref, nextTick } from 'vue'
+import { nextTick } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 import { useUiStore } from '~/stores/ui'
