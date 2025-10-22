@@ -3,7 +3,7 @@ import { storeToRefs } from 'pinia'
 import { useQuestStore } from '~/stores/quest'
 
 const questStore = useQuestStore()
-const { quests, loading, loaded } = storeToRefs(questStore)
+const { quests, loaded } = storeToRefs(questStore)
 
 if (!loaded.value) {
   await questStore.fetchQuests().catch((error) => {
