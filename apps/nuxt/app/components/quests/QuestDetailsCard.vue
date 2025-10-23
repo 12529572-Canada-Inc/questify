@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import QuestDetailsSections from './QuestDetailsSections.vue'
 import QuestTasksTabs from './QuestTasksTabs.vue'
+import QuestVisibilityToggle from './QuestVisibilityToggle.vue'
 import type { QuestTaskSection, QuestTaskTab, TaskWithInvestigations } from '~/types/quest-tasks'
 import type { Quest } from '@prisma/client'
 
@@ -25,7 +26,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:taskTab', value: QuestTaskTab): void
-  (e: 'share-quest' | 'clear-investigation-error'): void
+  (e: 'share-quest' | 'clear-investigation-error' | 'update-visibility'): void
   (e: 'open-task-edit' | 'open-investigation' | 'share-task', task: TaskWithInvestigations): void
 }>()
 
@@ -33,6 +34,10 @@ const taskTabModel = computed({
   get: () => props.taskTab,
   set: value => emit('update:taskTab', value),
 })
+
+function handleVisibilityUpdate() {
+  emit('update-visibility')
+}
 </script>
 
 <template>
@@ -59,6 +64,13 @@ const taskTabModel = computed({
               >
                 {{ questStatusMeta.label }}
               </v-chip>
+              <QuestVisibilityToggle
+                v-if="isOwner"
+                :is-public="quest.isPublic"
+                :quest-id="quest.id"
+                :disabled="pending"
+                @update:is-public="handleVisibilityUpdate"
+              />
             </div>
             <template v-if="!isOwner">
               <div class="d-flex align-center gap-2 text-medium-emphasis text-body-2 flex-wrap">
