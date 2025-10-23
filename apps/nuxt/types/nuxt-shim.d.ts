@@ -21,6 +21,15 @@ declare global {
   const useFetch: typeof import('#app')['useFetch']
   const useAsyncData: typeof import('#app')['useAsyncData']
   const useRuntimeConfig: typeof import('#app')['useRuntimeConfig']
+  const useCookie: typeof import('nuxt/app')['useCookie']
+}
+
+declare global {
+  interface ImportMeta {
+    hot?: {
+      accept: (cb?: (mod: unknown) => void) => void
+    }
+  }
 }
 
 // ----------------------------------------------------

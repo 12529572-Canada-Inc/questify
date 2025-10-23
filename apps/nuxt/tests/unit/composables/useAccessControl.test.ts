@@ -1,37 +1,32 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
+import { createPinia, setActivePinia } from 'pinia'
+import { useUserStore } from '~/stores/user'
 import { useAccessControl } from '~/composables/useAccessControl'
 
 describe('useAccessControl', () => {
-  const globalWithMocks = globalThis as typeof globalThis & {
-    useUserSession?: () => {
-      user: ReturnType<typeof ref>
-      loggedIn: ReturnType<typeof ref>
-      fetch: () => Promise<unknown>
-    }
-  }
-
-  const originalUseUserSession = globalWithMocks.useUserSession
-
   beforeEach(() => {
-    globalWithMocks.useUserSession = () => ({
-      user: ref({
-        id: 'user-1',
-        roles: ['Admin'],
-        privileges: ['role:read', 'user:read', 'user:role:assign'],
-      }),
+    setActivePinia(createPinia())
+
+    const sessionUser = ref({
+      id: 'user-1',
+      roles: ['Admin'],
+      privileges: ['role:read', 'user:read', 'user:role:assign'],
+    })
+
+    vi.stubGlobal('useUserSession', () => ({
+      user: sessionUser,
       loggedIn: ref(true),
       fetch: vi.fn(),
-    })
+      clear: vi.fn(),
+    }))
+
+    const userStore = useUserStore()
+    userStore.setUser(sessionUser.value)
   })
 
   afterEach(() => {
-    if (originalUseUserSession) {
-      globalWithMocks.useUserSession = originalUseUserSession
-    }
-    else {
-      delete globalWithMocks.useUserSession
-    }
+    vi.unstubAllGlobals()
   })
 
   it('computes derived privilege checks', () => {

@@ -1,7 +1,10 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
-import { h, Suspense, ref } from 'vue'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { h, Suspense } from 'vue'
 import { flushPromises, mount } from '@vue/test-utils'
+import { createPinia, setActivePinia } from 'pinia'
 import QuestsIndexPage from '~/pages/quests/index.vue'
+import { useQuestStore } from '~/stores/quest'
+import { createQuest } from '../../unit/support/sample-data'
 
 const buttonStub = {
   props: ['to'],
@@ -9,28 +12,22 @@ const buttonStub = {
 }
 
 describe('quests index page', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+  })
+
   afterEach(() => {
     vi.unstubAllGlobals()
     vi.restoreAllMocks()
   })
 
   it('renders quests returned from the data provider', async () => {
-    const quests = ref([
-      { id: 'quest-1', title: 'Document testing strategy' },
-    ])
-
-    const questModule = await import('~/composables/useQuest')
-    const asyncDataMock = {
-      data: quests,
-      pending: ref(false),
-      refresh: vi.fn(),
-      execute: vi.fn(),
-      clear: vi.fn(),
-      status: ref<'success'>('success'),
-      error: ref(null),
-    } as unknown as Awaited<ReturnType<typeof questModule.useQuests>>
-
-    vi.spyOn(questModule, 'useQuests').mockResolvedValue(asyncDataMock)
+    const questStore = useQuestStore()
+    const quests = [createQuest({ id: 'quest-1', title: 'Document testing strategy' })]
+    vi.spyOn(questStore, 'fetchQuests').mockImplementation(async () => {
+      questStore.setQuests(quests as never)
+      return quests as never
+    })
 
     const wrapper = mount({
       render() {

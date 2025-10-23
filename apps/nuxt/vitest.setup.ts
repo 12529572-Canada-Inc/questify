@@ -3,6 +3,7 @@ import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch, useAttrs } from 'vue'
 import type { Ref } from 'vue'
+import { vi } from 'vitest'
 import { splitTextIntoSegments } from './app/utils/text-with-links'
 
 declare global {
@@ -14,6 +15,7 @@ declare global {
   var getUserSession: (() => Promise<{ user: { id: string } }>) | undefined
   var defineNuxtRouteMiddleware: (<T>(fn: T) => T) | undefined
   var useState: (<T>(key: string, init?: () => T) => Ref<T>) | undefined
+  var useCookie: (<T>(key: string, options?: unknown) => Ref<T>) | undefined
   var __resetNuxtState: (() => void) | undefined
 }
 
@@ -88,3 +90,22 @@ if (!globalThis.createError) {
 if (!globalThis.getUserSession) {
   globalThis.getUserSession = async () => ({ user: { id: 'test-user' } })
 }
+
+const cookieStore = new Map<string, Ref>()
+
+if (!globalThis.useCookie) {
+  globalThis.useCookie = function useCookie<T>(key: string) {
+    if (!cookieStore.has(key)) {
+      cookieStore.set(key, ref(null) as Ref)
+    }
+    return cookieStore.get(key) as Ref<T>
+  }
+}
+
+vi.mock('vuetify', () => ({
+  useTheme: () => ({
+    global: {
+      name: { value: 'light' as 'light' | 'dark' },
+    },
+  }),
+}))

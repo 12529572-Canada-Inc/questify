@@ -10,6 +10,7 @@ export function createQuest(overrides: Base = {}) {
     goal: 'Ship the new feature',
     context: 'Work with the product team to coordinate rollout.',
     constraints: 'Must launch by Friday.',
+    isPublic: false,
     ownerId: 'user-1',
     owner: { id: 'user-1', name: 'Quest Owner', email: 'owner@example.com' },
     createdAt: new Date(0),

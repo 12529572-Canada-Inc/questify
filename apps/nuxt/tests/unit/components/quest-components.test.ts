@@ -25,6 +25,45 @@ import QuestTasksTabs from '../../../app/components/quests/QuestTasksTabs.vue'
 import { shallowMountWithBase, mountWithBase } from '../support/mount-options'
 import { createInvestigation, createQuest, createTask, createTaskSection } from '../support/sample-data'
 
+const vuetifyStubFlags = {
+  VBtn: true,
+  VRow: true,
+  VCol: true,
+  VCard: true,
+  VCardTitle: true,
+  VCardText: true,
+  VCardActions: true,
+  VIcon: true,
+  VTooltip: true,
+  VDialog: true,
+  VTextField: true,
+  VTextarea: true,
+  VForm: true,
+  VChip: true,
+  VAlert: true,
+  VTabs: true,
+  VTab: true,
+  VTabItem: true,
+  VWindow: true,
+  VWindowItem: true,
+  VExpansionPanels: true,
+  VExpansionPanel: true,
+  VExpansionPanelTitle: true,
+  VExpansionPanelText: true,
+  VDivider: true,
+  VList: true,
+  VListItem: true,
+  VListItemTitle: true,
+  VListItemSubtitle: true,
+  VBadge: true,
+  VChipGroup: true,
+  VMenu: true,
+  VSheet: true,
+  VOverlay: true,
+  VProgressCircular: true,
+  VSpacer: true,
+}
+
 type DetailedSection = {
   key: string
   label: string
@@ -120,6 +159,11 @@ describe('quest components', () => {
         isOwner: true,
         questStatus: 'draft',
       },
+      global: {
+        stubs: {
+          ...vuetifyStubFlags,
+        },
+      },
     })
 
     expect(wrapper.exists()).toBe(true)
@@ -134,6 +178,11 @@ describe('quest components', () => {
         isOwner: true,
         questStatus: 'completed',
       },
+      global: {
+        stubs: {
+          ...vuetifyStubFlags,
+        },
+      },
     })
 
     expect(wrapper.exists()).toBe(true)
@@ -143,7 +192,7 @@ describe('quest components', () => {
   })
 
   it('renders QuestCard summary', () => {
-    const wrapper = shallowMountWithBase(QuestCard, {
+    const wrapper = mountWithBase(QuestCard, {
       props: {
         quest: sampleQuest,
       },
@@ -156,6 +205,11 @@ describe('quest components', () => {
     const wrapper = shallowMountWithBase(QuestDetailsSections, {
       props: {
         quest: sampleQuest,
+      },
+      global: {
+        stubs: {
+          ...vuetifyStubFlags,
+        },
       },
     })
 

@@ -1,5 +1,7 @@
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { ADMIN_ROLE_NAME, SUPER_ADMIN_ROLE_NAME, type PrivilegeKey } from 'shared'
+import { storeToRefs } from 'pinia'
+import { useUserStore } from '~/stores/user'
 
 /**
  * Client-side RBAC helper that reads the current session payload and exposes
@@ -13,11 +15,11 @@ const ADMIN_PRIVILEGE_KEYS: PrivilegeKey[] = [
 ]
 
 export function useAccessControl() {
-  const session = useUserSession()
-  const user = session.user ?? ref(null)
+  const userStore = useUserStore()
+  const { roles: userRoles, privileges: userPrivileges } = storeToRefs(userStore)
 
-  const roles = computed(() => (user.value?.roles ?? []) as string[])
-  const privileges = computed<PrivilegeKey[]>(() => (user.value?.privileges ?? []) as PrivilegeKey[])
+  const roles = computed(() => (userRoles.value ?? []) as string[])
+  const privileges = computed<PrivilegeKey[]>(() => (userPrivileges.value ?? []) as PrivilegeKey[])
 
   function hasPrivilege(privilege: PrivilegeKey) {
     return privileges.value.includes(privilege)

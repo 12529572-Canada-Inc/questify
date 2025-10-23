@@ -21,6 +21,7 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     'vuetify-nuxt-module',
     'nuxt-auth-utils',
+    '@pinia/nuxt',
   ],
 
   // 🌐 App metadata and head configuration
