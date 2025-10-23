@@ -128,6 +128,11 @@ function clearInvestigationError() {
   investigationError.value = null
 }
 
+function handleVisibilityUpdate() {
+  // Refresh quest data to reflect the updated visibility
+  refresh()
+}
+
 const investigationErrorMessage = computed(() => investigationError.value ?? null)
 const { questStatusMeta, taskSections } = useQuestDisplay({
   quest: questData,
@@ -170,6 +175,7 @@ useQuestPolling(refresh, {
             @open-investigation="openInvestigationDialog"
             @share-task="handleTaskShare"
             @clear-investigation-error="clearInvestigationError"
+            @update-visibility="handleVisibilityUpdate"
           >
             <template #after-tasks>
               <QuestTaskEditDialog
