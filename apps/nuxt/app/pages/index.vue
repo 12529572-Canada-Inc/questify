@@ -24,12 +24,13 @@ const sortOrder = ref<'asc' | 'desc'>('desc')
 async function fetchPublicQuests() {
   loading.value = true
   try {
-    publicQuests.value = await $fetch('/api/quests/public', {
+    const data = await $fetch('/api/quests/public', {
       query: {
         sortBy: sortBy.value,
         order: sortOrder.value,
       },
     })
+    publicQuests.value = data as PublicQuest[]
   }
   catch (error) {
     console.error('Failed to fetch public quests:', error)
@@ -186,6 +187,7 @@ function handleSortChange() {
 .text-truncate-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
