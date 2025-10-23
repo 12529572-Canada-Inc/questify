@@ -15,7 +15,15 @@ export const useUiStore = defineStore('ui', () => {
   function applyVuetifyTheme(mode: ThemeMode) {
     try {
       const theme = useTheme()
-      theme.global.name.value = mode
+      // Use new API if available, fallback to legacy API
+      // @ts-expect-error - theme.global.change() is not yet in TS types but exists in runtime
+      if (typeof theme.global.change === 'function') {
+        // @ts-expect-error - theme.global.change() is not yet in TS types
+        theme.global.change(mode)
+      }
+      else {
+        theme.global.name.value = mode
+      }
     }
     catch {
       // Vuetify is only available client-side; swallow errors during SSR/tests.
