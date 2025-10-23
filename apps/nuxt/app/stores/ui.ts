@@ -21,6 +21,11 @@ export const useUiStore = defineStore('ui', () => {
         // @ts-expect-error - theme.global.change() is not yet in TS types
         theme.global.change(mode)
       }
+      // @ts-ignore - theme.change() is not yet in TS types but exists in runtime
+      else if (typeof theme.change === 'function') {
+        // @ts-ignore - theme.change() is not yet in TS types
+        theme.change(mode)
+      }
       else {
         theme.global.name.value = mode
       }
