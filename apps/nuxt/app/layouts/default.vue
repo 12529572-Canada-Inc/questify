@@ -33,7 +33,7 @@ async function logout() {
     })
 
     await userStore.clearSession()
-    questStore.setQuests([])
+    questStore.reset()
     await router.push('/auth/login')
     showSnackbar('You have been logged out.', { variant: 'success' })
   }

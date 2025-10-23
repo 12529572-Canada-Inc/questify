@@ -61,6 +61,13 @@ export const useQuestStore = defineStore('quests', () => {
     return quests.value.find(quest => quest.id === id) ?? null
   }
 
+  function reset() {
+    quests.value = []
+    loaded.value = false
+    loading.value = false
+    error.value = null
+  }
+
   return {
     quests,
     loading,
@@ -72,6 +79,7 @@ export const useQuestStore = defineStore('quests', () => {
     upsertQuest,
     removeQuest,
     getQuestById,
+    reset,
   }
 })
 

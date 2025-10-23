@@ -109,7 +109,7 @@ describe('default layout', () => {
 
     const userStore = useUserStore()
     userStore.setUser(null)
-    useQuestStore().setQuests([])
+    useQuestStore().reset()
 
     const SuspenseWrapper = {
       components: { DefaultLayout },

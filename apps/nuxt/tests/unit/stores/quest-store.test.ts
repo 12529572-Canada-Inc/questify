@@ -53,4 +53,19 @@ describe('useQuestStore', () => {
     store.removeQuest(updated.id as string)
     expect(store.quests).toHaveLength(0)
   })
+
+  it('resets store state including loaded flag', () => {
+    const store = useQuestStore()
+    store.setQuests([sampleQuest])
+
+    expect(store.quests).toHaveLength(1)
+    expect(store.loaded).toBe(true)
+
+    store.reset()
+
+    expect(store.quests).toHaveLength(0)
+    expect(store.loaded).toBe(false)
+    expect(store.loading).toBe(false)
+    expect(store.error).toBe(null)
+  })
 })
