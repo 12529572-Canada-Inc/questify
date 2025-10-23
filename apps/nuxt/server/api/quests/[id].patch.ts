@@ -24,24 +24,43 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = (await readBody<QuestBody>(event)) || {} as QuestBody
-  const status = body.status
+  const { status, isPublic } = body
 
-  if (!status) {
-    throw createError({ status: 400, statusText: 'Status is required' })
+  // Validate that at least one field is being updated
+  if (status === undefined && isPublic === undefined) {
+    throw createError({ status: 400, statusText: 'At least one field (status or isPublic) is required' })
   }
 
-  const allowedStatuses = ['draft', 'active', 'completed', 'failed'] as const
+  // Prepare update data
+  const updateData: { status?: string, isPublic?: boolean } = {}
 
-  if (!allowedStatuses.includes(status as typeof allowedStatuses[number])) {
-    throw createError({ status: 400, statusText: 'Invalid quest status' })
+  // Validate and add status if provided
+  if (status !== undefined) {
+    const allowedStatuses = ['draft', 'active', 'completed', 'failed'] as const
+
+    if (!allowedStatuses.includes(status as typeof allowedStatuses[number])) {
+      throw createError({ status: 400, statusText: 'Invalid quest status' })
+    }
+
+    updateData.status = status
   }
 
+  // Validate and add isPublic if provided
+  if (isPublic !== undefined) {
+    if (typeof isPublic !== 'boolean') {
+      throw createError({ status: 400, statusText: 'isPublic must be a boolean' })
+    }
+
+    updateData.isPublic = isPublic
+  }
+
+  // Handle status changes that affect tasks
   if (status === 'completed') {
     // Transaction: complete quest + all tasks
     const [updatedQuest] = await prisma.$transaction([
       prisma.quest.update({
         where: { id },
-        data: { status: 'completed' },
+        data: updateData,
       }),
       prisma.task.updateMany({
         where: { questId: id },
@@ -56,7 +75,7 @@ export default defineEventHandler(async (event) => {
     const [updatedQuest] = await prisma.$transaction([
       prisma.quest.update({
         where: { id },
-        data: { status },
+        data: updateData,
       }),
       prisma.task.updateMany({
         where: { questId: id, status: 'completed' },
@@ -67,9 +86,9 @@ export default defineEventHandler(async (event) => {
     return updatedQuest
   }
 
-  // fallback for statuses that don't impact task completion
+  // Fallback for updates that don't impact task completion
   return prisma.quest.update({
     where: { id },
-    data: { status },
+    data: updateData,
   })
 })

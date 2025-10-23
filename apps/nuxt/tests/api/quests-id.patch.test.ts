@@ -141,4 +141,45 @@ describe('API /api/quests/[id] (PATCH)', () => {
     prismaMocks.questFindUnique.mockResolvedValueOnce({ ownerId: 'someone-else' })
     await expect(handler({} as never)).rejects.toMatchObject({ statusCode: 403 })
   })
+
+  it('updates quest visibility when isPublic is provided', async () => {
+    Reflect.set(globalWithMocks, 'readBody', vi.fn(async () => ({ isPublic: true })))
+    prismaMocks.questUpdate.mockImplementation(async ({ data }) => ({ id: 'quest-1', isPublic: data.isPublic }))
+
+    const result = await handler({} as never)
+
+    expect(prismaMocks.questUpdate).toHaveBeenCalledWith({
+      where: { id: 'quest-1' },
+      data: { isPublic: true },
+    })
+    expect(result).toEqual({ id: 'quest-1', isPublic: true })
+  })
+
+  it('updates both status and visibility when both are provided', async () => {
+    Reflect.set(globalWithMocks, 'readBody', vi.fn(async () => ({ status: 'active', isPublic: true })))
+    prismaMocks.questUpdate.mockImplementation(async ({ data }) => ({
+      id: 'quest-1',
+      status: data.status,
+      isPublic: data.isPublic,
+    }))
+
+    await handler({} as never)
+
+    expect(prismaMocks.questUpdate).toHaveBeenCalledWith({
+      where: { id: 'quest-1' },
+      data: { status: 'active', isPublic: true },
+    })
+  })
+
+  it('rejects when isPublic is not a boolean', async () => {
+    Reflect.set(globalWithMocks, 'readBody', vi.fn(async () => ({ isPublic: 'invalid' })))
+
+    await expect(handler({} as never)).rejects.toMatchObject({ statusCode: 400 })
+  })
+
+  it('rejects when neither status nor isPublic is provided', async () => {
+    Reflect.set(globalWithMocks, 'readBody', vi.fn(async () => ({})))
+
+    await expect(handler({} as never)).rejects.toMatchObject({ statusCode: 400 })
+  })
 })

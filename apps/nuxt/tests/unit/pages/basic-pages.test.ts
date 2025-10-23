@@ -61,15 +61,34 @@ afterEach(() => {
 })
 
 describe('basic pages', () => {
-  it('renders the home page hero', () => {
+  it('renders the home page hero', async () => {
+    fetchApi.mockResolvedValueOnce([])
+
     const wrapper = shallowMountWithBase(HomePage, {
       global: {
         stubs: {
           HomeHeroCard: { template: '<div class="hero-stub">Hero</div>' },
+          VContainer: { template: '<div><slot /></div>' },
+          VRow: { template: '<div><slot /></div>' },
+          VCol: { template: '<div><slot /></div>' },
+          VSelect: { template: '<div />' },
+          VBtnToggle: { template: '<div />' },
+          VBtn: { template: '<button />' },
+          VProgressCircular: { template: '<div />' },
+          VIcon: { template: '<span />' },
+          VCard: { template: '<div><slot /></div>' },
+          VCardTitle: { template: '<div><slot /></div>' },
+          VCardSubtitle: { template: '<div><slot /></div>' },
+          VCardText: { template: '<div><slot /></div>' },
+          VChip: { template: '<span><slot /></span>' },
+        },
+        mocks: {
+          $fetch: fetchApi,
         },
       },
     })
 
+    await Promise.resolve()
     expect(wrapper.text()).toContain('Hero')
   })
 
