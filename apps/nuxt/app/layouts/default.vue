@@ -186,6 +186,9 @@ async function logout() {
   width: 2.25rem;
   height: 2.25rem;
   flex: 0 0 auto;
+  position: relative;
+  top: 5px;
+  left: -5px;
 }
 
 .app-title-text {
