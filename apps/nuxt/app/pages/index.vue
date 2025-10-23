@@ -61,18 +61,37 @@ function handleSortChange() {
             density="compact"
             @update:model-value="handleSortChange"
           >
-            <v-btn value="desc" icon="mdi-sort-descending" />
-            <v-btn value="asc" icon="mdi-sort-ascending" />
+            <v-btn
+              value="desc"
+              icon="mdi-sort-descending"
+            />
+            <v-btn
+              value="asc"
+              icon="mdi-sort-ascending"
+            />
           </v-btn-toggle>
         </div>
       </div>
 
-      <div v-if="loading" class="d-flex justify-center py-8">
-        <v-progress-circular indeterminate color="primary" />
+      <div
+        v-if="loading"
+        class="d-flex justify-center py-8"
+      >
+        <v-progress-circular
+          indeterminate
+          color="primary"
+        />
       </div>
 
-      <div v-else-if="publicQuests.length === 0" class="text-center py-8 text-medium-emphasis">
-        <v-icon icon="mdi-earth-off" size="64" class="mb-4" />
+      <div
+        v-else-if="publicQuests.length === 0"
+        class="text-center py-8 text-medium-emphasis"
+      >
+        <v-icon
+          icon="mdi-earth-off"
+          size="64"
+          class="mb-4"
+        />
         <p class="text-h6">
           No public quests available yet
         </p>
@@ -104,11 +123,17 @@ function handleSortChange() {
               </v-chip>
             </v-card-title>
             <v-card-subtitle class="d-flex align-center gap-1">
-              <v-icon icon="mdi-account" size="small" />
+              <v-icon
+                icon="mdi-account"
+                size="small"
+              />
               {{ quest.owner.name || quest.owner.email }}
             </v-card-subtitle>
             <v-card-text>
-              <div v-if="quest.goal" class="mb-2 text-truncate-2">
+              <div
+                v-if="quest.goal"
+                class="mb-2 text-truncate-2"
+              >
                 {{ quest.goal }}
               </div>
               <div class="d-flex flex-wrap gap-2 mt-2">
