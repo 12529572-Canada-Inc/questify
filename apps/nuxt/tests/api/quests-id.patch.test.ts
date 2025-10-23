@@ -163,7 +163,7 @@ describe('API /api/quests/[id] (PATCH)', () => {
       isPublic: data.isPublic,
     }))
 
-    const result = await handler({} as never)
+    await handler({} as never)
 
     expect(prismaMocks.questUpdate).toHaveBeenCalledWith({
       where: { id: 'quest-1' },
