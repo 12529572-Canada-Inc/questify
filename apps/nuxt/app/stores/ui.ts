@@ -16,15 +16,17 @@ export const useUiStore = defineStore('ui', () => {
     try {
       const theme = useTheme()
       // Use new API if available, fallback to legacy API
-      // @ts-expect-error - theme.global.change() is not yet in TS types but exists in runtime
-      if (typeof theme.global.change === 'function') {
-        // @ts-expect-error - theme.global.change() is not yet in TS types
-        theme.global.change(mode)
+      // Check for future Vuetify API methods that aren't in types yet
+      const themeWithChange = theme as typeof theme & {
+        global?: { change?: (theme: string) => void }
+        change?: (theme: string) => void
       }
-      // @ts-ignore - theme.change() is not yet in TS types but exists in runtime
-      else if (typeof theme.change === 'function') {
-        // @ts-ignore - theme.change() is not yet in TS types
-        theme.change(mode)
+
+      if (typeof themeWithChange.global?.change === 'function') {
+        themeWithChange.global.change(mode)
+      }
+      else if (typeof themeWithChange.change === 'function') {
+        themeWithChange.change(mode)
       }
       else {
         theme.global.name.value = mode
