@@ -1,8 +1,22 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import type { PublicQuestsResponse } from '~/server/api/quests/public.get'
+import type { Quest } from '@prisma/client'
 
-const publicQuests = ref<PublicQuestsResponse>([])
+type PublicQuest = Quest & {
+  owner: {
+    id: string
+    name: string | null
+    email: string
+  }
+  taskCounts: {
+    total: number
+    todo: number
+    inProgress: number
+    completed: number
+  }
+}
+
+const publicQuests = ref<PublicQuest[]>([])
 const loading = ref(true)
 const sortBy = ref<'createdAt' | 'updatedAt'>('createdAt')
 const sortOrder = ref<'asc' | 'desc'>('desc')
