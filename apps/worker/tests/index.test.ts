@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import * as shared from 'shared';
+import * as shared from 'shared/server';
 
 const workerInstance = {};
 const WorkerMock = vi.fn(() => workerInstance);
