@@ -133,6 +133,13 @@ export default defineNuxtConfig({
           plugin => !(plugin && typeof plugin === 'object' && 'name' in plugin && String(plugin.name).includes('vite:checker')),
         )
       }
+
+      // Externalize node:crypto to prevent client-side bundling
+      if (config.ssr) {
+        config.ssr = config.ssr || {}
+        config.ssr.noExternal = config.ssr.noExternal || []
+        // Don't externalize shared - let it be bundled normally for server
+      }
     },
   },
 

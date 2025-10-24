@@ -1,27 +1,10 @@
-async function getNodeCrypto() {
-  if (typeof process !== 'undefined' && process.versions?.node) {
-    return await import('node:crypto')
-  }
-
-  throw new Error('Password utilities require a Node.js environment')
-}
-
-function getNodeCryptoSync() {
-  if (typeof process !== 'undefined' && process.versions?.node) {
-    // Use eval to avoid bundler trying to process require at build time
-    // eslint-disable-next-line no-eval
-    return eval('require')('node:crypto') as typeof import('node:crypto')
-  }
-
-  throw new Error('Password utilities require a Node.js environment')
-}
+import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto'
 
 /**
  * Create a Scrypt password hash.
  * Format: $scrypt$n=16384,r=8,p=1$<saltB64>$<keyB64>
  */
 export function hashPassword(password: string): string {
-  const { randomBytes, scryptSync } = getNodeCryptoSync()
 
   const N = 16384;
   const r = 8;
@@ -39,7 +22,6 @@ export function hashPassword(password: string): string {
  */
 export function verifyPassword(password: string, stored: string): boolean {
   try {
-    const { scryptSync, timingSafeEqual } = getNodeCryptoSync()
 
     // Expected format: $scrypt$n=16384,r=8,p=1$<salt>$<key>
     const match = /^\$scrypt\$n=(\d+),r=(\d+),p=(\d+)\$([^$]+)\$([^$]+)$/.exec(stored);
