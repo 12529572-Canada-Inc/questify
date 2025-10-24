@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import type { H3Event } from 'h3'
-import { verifyPassword } from 'shared'
+import { verifyPassword } from 'shared/server'
 import { attachSessionWithAccess } from '../../utils/access-control'
 
 /**

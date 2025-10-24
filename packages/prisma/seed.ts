@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import { hashPassword } from 'shared'
+import { hashPassword } from 'shared/server'
 import fs from 'fs';
 import { ensureSuperAdmin, syncPrivilegesAndRoles } from './utils/accessControl'
 

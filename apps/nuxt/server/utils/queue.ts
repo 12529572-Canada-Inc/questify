@@ -1,5 +1,5 @@
 import { Queue } from 'bullmq'
-import { parseRedisUrl } from 'shared'
+import { parseRedisUrl } from 'shared/server'
 import type { NitroApp } from 'nitropack'
 
 type QueueContextKey = 'questQueue' | 'taskQueue'
