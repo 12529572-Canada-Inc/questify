@@ -37,7 +37,7 @@ vi.mock('@prisma/client', () => ({
   },
 }))
 
-vi.mock('shared', () => ({
+vi.mock('shared/server', () => ({
   verifyPassword: sharedMocks.verifyPassword,
 }))
 

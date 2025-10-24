@@ -26,7 +26,7 @@ vi.mock('bullmq', () => ({
   Queue: mocks.Queue,
 }))
 
-vi.mock('shared', () => ({
+vi.mock('shared/server', () => ({
   parseRedisUrl: mocks.parseRedisUrl,
 }))
 
