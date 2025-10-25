@@ -24,6 +24,7 @@ export default defineEventHandler(async (event) => {
     },
   })
 
+  // Ensure at least one SuperAdmin exists after a new signup
   await ensureSuperAdmin(prisma)
 
   const profile = await attachSessionWithAccess(event as unknown as H3Event, {
