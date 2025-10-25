@@ -7,5 +7,9 @@ export default defineConfig({
     port: 3000, // Port your Nuxt app runs on
     reuseExistingServer: !process.env.CI, // Reuse server in local development
   },
+  use: {
+    baseURL: 'http://localhost:3000',
+    headless: true,
+  },
   // ... other Playwright configurations (e.g., projects for different browsers)
 })

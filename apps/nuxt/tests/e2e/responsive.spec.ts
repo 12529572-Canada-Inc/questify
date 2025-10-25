@@ -58,4 +58,27 @@ test.describe('Mobile responsiveness', () => {
     })
     expect(buttonFits).toBeTruthy()
   })
+
+  test('header menu collapses actions and keeps controls accessible', async ({ page }) => {
+    await page.goto('/')
+
+    const menuButton = page.getByTestId('app-bar-menu-button')
+    await menuButton.waitFor({ state: 'visible' })
+
+    await expect(page.locator('.app-bar-actions')).toHaveCount(0)
+
+    await menuButton.click()
+    const shareItem = page.getByTestId('app-bar-menu-item-share')
+    await expect(shareItem).toBeVisible()
+
+    await shareItem.click()
+
+    const shareDialog = page.getByTestId('share-dialog-card')
+    await expect(shareDialog).toBeVisible()
+
+    await expect(page.getByTestId('app-bar-menu-item-share')).toBeHidden()
+
+    await page.getByTestId('share-dialog-close').click()
+    await expect(shareDialog).toBeHidden()
+  })
 })

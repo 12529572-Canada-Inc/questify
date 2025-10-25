@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { useDisplay } from 'vuetify'
+import { useMediaQuery } from '@vueuse/core'
 import { useSnackbar } from '~/composables/useSnackbar'
 import { useAccessControl } from '~/composables/useAccessControl'
 import { useUserStore } from '~/stores/user'
@@ -21,8 +21,7 @@ const { isDarkMode } = storeToRefs(uiStore)
 const { toggleTheme } = uiStore
 const MOBILE_MENU_BREAKPOINT = 768
 
-const display = useDisplay()
-const isMobile = computed(() => (display.width.value || MOBILE_MENU_BREAKPOINT) < MOBILE_MENU_BREAKPOINT)
+const isMobile = useMediaQuery(`(max-width: ${MOBILE_MENU_BREAKPOINT - 1}px)`)
 const mobileMenuOpen = ref(false)
 
 if (!loggedIn.value) {
@@ -221,8 +220,6 @@ async function logout() {
               variant="text"
               density="comfortable"
               @click="logout"
-              :aria-expanded="mobileMenuOpen"
-              aria-haspopup="menu"
             >
               Logout
             </v-btn>

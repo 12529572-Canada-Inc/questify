@@ -14,13 +14,14 @@ const fetchSession = vi.fn().mockResolvedValue(undefined)
 const fetchApi = vi.fn().mockResolvedValue(undefined)
 const clearSession = vi.fn()
 const mockTheme = { global: { name: { value: 'light' as 'light' | 'dark' } } }
-const displayWidth = ref(1200)
+const isMobileRef = ref(false)
 
 vi.mock('vuetify', () => ({
   useTheme: () => mockTheme,
-  useDisplay: () => ({
-    width: displayWidth,
-  }),
+}))
+
+vi.mock('@vueuse/core', () => ({
+  useMediaQuery: () => isMobileRef,
 }))
 
 beforeEach(() => {
@@ -30,7 +31,7 @@ beforeEach(() => {
   clearSession.mockReset()
   fetchSession.mockReset()
   fetchApi.mockReset()
-  displayWidth.value = 1200
+  isMobileRef.value = false
 
   const sessionUser = ref({ id: 'user-1' })
   vi.stubGlobal('useUserSession', () => ({
@@ -138,7 +139,7 @@ describe('default layout', () => {
   })
 
   it('shows mobile menu under breakpoint and opens share dialog from menu', async () => {
-    displayWidth.value = 480
+    isMobileRef.value = true
 
     const SuspenseWrapper = {
       components: { DefaultLayout },
