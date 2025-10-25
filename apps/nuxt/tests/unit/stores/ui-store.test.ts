@@ -6,9 +6,10 @@ import { useUiStore } from '~/stores/ui'
 type ThemeMode = 'light' | 'dark'
 
 const mockTheme = { global: { name: { value: 'light' as ThemeMode } } }
+const useThemeMock = vi.fn(() => mockTheme)
 
 vi.mock('vuetify', () => ({
-  useTheme: () => mockTheme,
+  useTheme: () => useThemeMock(),
 }))
 
 beforeEach(() => {
@@ -16,6 +17,8 @@ beforeEach(() => {
   const cookieRef = useCookie<ThemeMode | null>('questify-theme')
   cookieRef.value = 'light'
   mockTheme.global.name.value = 'light'
+  useThemeMock.mockReset()
+  useThemeMock.mockImplementation(() => mockTheme)
   setActivePinia(createPinia())
 })
 
@@ -53,5 +56,18 @@ describe('useUiStore', () => {
 
     store.toggleTheme()
     expect(store.themeMode).toBe('light')
+  })
+
+  it('re-applies theme once Vuetify context becomes available', async () => {
+    useThemeMock.mockImplementationOnce(() => {
+      throw new Error('missing context')
+    })
+    const store = useUiStore()
+
+    store.setTheme('dark')
+    await nextTick()
+
+    expect(store.isDarkMode).toBe(true)
+    expect(mockTheme.global.name.value).toBe('dark')
   })
 })

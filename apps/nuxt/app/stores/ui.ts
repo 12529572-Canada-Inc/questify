@@ -10,30 +10,46 @@ export const useUiStore = defineStore('ui', () => {
   const cookie = useCookie<ThemeMode | null>(THEME_COOKIE_KEY)
   const themeMode = ref<ThemeMode>(cookie.value ?? 'light')
 
+  let cachedTheme: ReturnType<typeof useTheme> | null = null
+
   const isDarkMode = computed(() => themeMode.value === 'dark')
 
-  function applyVuetifyTheme(mode: ThemeMode) {
-    try {
-      const theme = useTheme()
-      // Use new API if available, fallback to legacy API
-      // Check for future Vuetify API methods that aren't in types yet
-      const themeWithChange = theme as typeof theme & {
-        global?: { change?: (theme: string) => void }
-        change?: (theme: string) => void
-      }
+  function resolveThemeInstance() {
+    if (cachedTheme) {
+      return cachedTheme
+    }
 
-      if (typeof themeWithChange.global?.change === 'function') {
-        themeWithChange.global.change(mode)
-      }
-      else if (typeof themeWithChange.change === 'function') {
-        themeWithChange.change(mode)
-      }
-      else {
-        theme.global.name.value = mode
-      }
+    try {
+      cachedTheme = useTheme()
+      return cachedTheme
     }
     catch {
       // Vuetify is only available client-side; swallow errors during SSR/tests.
+      return null
+    }
+  }
+
+  function applyVuetifyTheme(mode: ThemeMode) {
+    const theme = resolveThemeInstance()
+    if (!theme) {
+      return
+    }
+
+    // Use new API if available, fallback to legacy API
+    // Check for future Vuetify API methods that aren't in types yet
+    const themeWithChange = theme as typeof theme & {
+      global?: { change?: (theme: string) => void }
+      change?: (theme: string) => void
+    }
+
+    if (typeof themeWithChange.global?.change === 'function') {
+      themeWithChange.global.change(mode)
+    }
+    else if (typeof themeWithChange.change === 'function') {
+      themeWithChange.change(mode)
+    }
+    else {
+      theme.global.name.value = mode
     }
   }
 
