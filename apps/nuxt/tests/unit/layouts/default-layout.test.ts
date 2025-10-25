@@ -14,9 +14,13 @@ const fetchSession = vi.fn().mockResolvedValue(undefined)
 const fetchApi = vi.fn().mockResolvedValue(undefined)
 const clearSession = vi.fn()
 const mockTheme = { global: { name: { value: 'light' as 'light' | 'dark' } } }
+const displayWidth = ref(1200)
 
 vi.mock('vuetify', () => ({
   useTheme: () => mockTheme,
+  useDisplay: () => ({
+    width: displayWidth,
+  }),
 }))
 
 beforeEach(() => {
@@ -26,6 +30,7 @@ beforeEach(() => {
   clearSession.mockReset()
   fetchSession.mockReset()
   fetchApi.mockReset()
+  displayWidth.value = 1200
 
   const sessionUser = ref({ id: 'user-1' })
   vi.stubGlobal('useUserSession', () => ({
@@ -130,5 +135,40 @@ describe('default layout', () => {
 
     expect(wrapper.text()).toContain('Login')
     expect(wrapper.text()).toContain('Signup')
+  })
+
+  it('shows mobile menu under breakpoint and opens share dialog from menu', async () => {
+    displayWidth.value = 480
+
+    const SuspenseWrapper = {
+      components: { DefaultLayout },
+      template: '<Suspense><DefaultLayout /></Suspense>',
+    }
+
+    const wrapper = mountWithBase(SuspenseWrapper, {
+      global: {
+        stubs: {
+          ShareDialog: { template: '<div class="share-dialog-stub"></div>' },
+          VImg: { template: '<img />' },
+        },
+      },
+    })
+
+    await flushPromises()
+
+    expect(wrapper.find('.app-bar-actions').exists()).toBe(false)
+    const menuBtn = wrapper.find('[data-testid="app-bar-menu-button"]')
+    expect(menuBtn.exists()).toBe(true)
+
+    await menuBtn.trigger('click')
+    await flushPromises()
+
+    const shareItem = wrapper.get('[data-testid="app-bar-menu-item-share"]')
+    await shareItem.trigger('click')
+    await flushPromises()
+
+    const layoutComponent = wrapper.findComponent(DefaultLayout)
+    expect(layoutComponent.vm.shareDialogOpen).toBe(true)
+    expect(layoutComponent.vm.mobileMenuOpen).toBe(false)
   })
 })
