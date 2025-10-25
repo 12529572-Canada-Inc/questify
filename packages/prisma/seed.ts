@@ -11,14 +11,14 @@ async function main() {
   console.log("🔐 Syncing roles & privileges...")
   await syncPrivilegesAndRoles(prisma)
 
-  // Create a test user
+  // Create an initial Super Admin user
   const user = await prisma.user.create({
     data: {
-      name: "Test User",
-      email: "test@example.com",
-      password: hashPassword("password123"),
+        name: 'Super Admin',
+        email: 'superadmin@example.com',
+        password: hashPassword('supersecurepassword'),
     },
-  })
+})
 
   console.log("✅ User created:", user)
 
