@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Placeholder for upcoming changes.
+
+---
+
+## [1.10.0] - 2025-10-25
+
 ### 🚀 Features
 - Added a mobile header menu that collapses all navigation, theme, admin, and auth actions into an accessible Vuetify dropdown when the viewport is under 768px, keeping controls usable on phones. (#72)
 - **Public Quest Sharing** (#46)
