@@ -1,8 +1,6 @@
 import { computed, ref, watch } from 'vue'
 import { acceptHMRUpdate, defineStore } from 'pinia'
 
-type SessionFetchResponse = Awaited<ReturnType<UserSession['fetch']>>
-
 export const useUserStore = defineStore('user', () => {
   const session = useUserSession()
 
@@ -23,8 +21,8 @@ export const useUserStore = defineStore('user', () => {
     error.value = null
 
     try {
-      const result: SessionFetchResponse | undefined = await session.fetch()
-      user.value = result?.user ?? null
+      await session.fetch()
+      user.value = session.user.value ?? null
       status.value = 'idle'
       return user.value
     }
