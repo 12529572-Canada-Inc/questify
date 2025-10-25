@@ -1,6 +1,7 @@
 import type { VueWrapper } from '@vue/test-utils'
 import { mount, shallowMount } from '@vue/test-utils'
 import type { Component, ComponentPublicInstance } from 'vue'
+import { h } from 'vue'
 import { vi } from 'vitest'
 import TextWithLinks from '../../../app/components/TextWithLinks.vue'
 import QuestDetailsSummary from '../../../app/components/quests/QuestDetailsSummary.vue'
@@ -9,6 +10,26 @@ import QuestCard from '../../../app/components/quests/QuestCard.vue'
 
 const simpleDivStub = { template: '<div><slot /></div>' }
 const simpleButtonStub = { template: '<button><slot /></button>' }
+
+const menuStub = {
+  props: {
+    modelValue: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: ['update:modelValue'],
+  setup(props, { slots, emit }) {
+    const toggle = () => {
+      emit('update:modelValue', !props.modelValue)
+    }
+
+    return () => h('div', { class: 'v-menu-stub' }, [
+      slots.activator?.({ props: { onClick: toggle } }) ?? null,
+      props.modelValue ? h('div', { class: 'v-menu-stub__content' }, slots.default?.() ?? null) : null,
+    ])
+  },
+}
 
 const baseGlobal = {
   config: {
@@ -65,7 +86,7 @@ const baseGlobal = {
     VBadge: simpleDivStub,
     VChip: simpleDivStub,
     VChipGroup: simpleDivStub,
-    VMenu: simpleDivStub,
+    VMenu: menuStub,
     VSheet: simpleDivStub,
     VOverlay: simpleDivStub,
     VDivider: simpleDivStub,

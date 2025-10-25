@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
+import { useMediaQuery } from '@vueuse/core'
 import { useSnackbar } from '~/composables/useSnackbar'
 import { useAccessControl } from '~/composables/useAccessControl'
 import { useUserStore } from '~/stores/user'
@@ -18,6 +19,10 @@ const { isAdmin } = useAccessControl()
 const { loggedIn } = storeToRefs(userStore)
 const { isDarkMode } = storeToRefs(uiStore)
 const { toggleTheme } = uiStore
+const MOBILE_MENU_BREAKPOINT = 768
+
+const isMobile = useMediaQuery(`(max-width: ${MOBILE_MENU_BREAKPOINT - 1}px)`)
+const mobileMenuOpen = ref(false)
 
 if (!loggedIn.value) {
   await userStore.fetchSession().catch(() => null)
@@ -25,6 +30,87 @@ if (!loggedIn.value) {
 
 const shareDialogOpen = ref(false)
 const loginShareUrl = computed(() => new URL('/auth/login', requestUrl.origin).toString())
+
+watch(isMobile, (value) => {
+  if (!value) {
+    mobileMenuOpen.value = false
+  }
+})
+
+type MobileMenuItem = {
+  key: string
+  label: string
+  icon: string
+  action?: () => Promise<void> | void
+  to?: string
+}
+
+const mobileMenuItems = computed<MobileMenuItem[]>(() => {
+  const items: MobileMenuItem[] = [
+    {
+      key: 'share',
+      label: 'Share App',
+      icon: 'mdi-share-variant',
+      action: () => {
+        shareDialogOpen.value = true
+      },
+    },
+    {
+      key: 'theme',
+      label: `${isDarkMode.value ? 'Switch to Light' : 'Switch to Dark'}`,
+      icon: isDarkMode.value ? 'mdi-weather-sunny' : 'mdi-weather-night',
+      action: () => toggleTheme(),
+    },
+  ]
+
+  if (isAdmin.value) {
+    items.push({
+      key: 'admin',
+      label: 'Administration',
+      icon: 'mdi-shield-crown',
+      to: '/admin',
+    })
+  }
+
+  if (loggedIn.value) {
+    items.push({
+      key: 'logout',
+      label: 'Logout',
+      icon: 'mdi-logout',
+      action: () => logout(),
+    })
+  }
+  else {
+    items.push(
+      {
+        key: 'login',
+        label: 'Login',
+        icon: 'mdi-login',
+        to: '/auth/login',
+      },
+      {
+        key: 'signup',
+        label: 'Signup',
+        icon: 'mdi-account-plus',
+        to: '/auth/signup',
+      },
+    )
+  }
+
+  return items
+})
+
+async function handleMenuItemClick(item: MobileMenuItem) {
+  mobileMenuOpen.value = false
+
+  if (item.action) {
+    await item.action()
+  }
+
+  if (item.to) {
+    await router.push(item.to)
+  }
+}
 
 async function logout() {
   try {
@@ -71,7 +157,10 @@ async function logout() {
           </span>
         </NuxtLink>
       </v-app-bar-title>
-      <div class="app-bar-actions">
+      <div
+        v-if="!isMobile"
+        class="app-bar-actions"
+      >
         <v-btn
           class="app-bar-share-btn"
           variant="text"
@@ -155,6 +244,50 @@ async function logout() {
           </template>
         </div>
       </div>
+      <div
+        v-else
+        class="app-bar-mobile-actions"
+      >
+        <v-menu
+          v-model="mobileMenuOpen"
+          class="app-bar-mobile-menu"
+          max-width="280"
+          :close-on-content-click="false"
+          transition="scale-transition"
+        >
+          <template #activator="{ props: activatorProps }">
+            <v-btn
+              class="app-bar-menu-btn"
+              icon
+              variant="text"
+              color="primary"
+              aria-label="Open navigation menu"
+              v-bind="activatorProps"
+              :aria-expanded="mobileMenuOpen"
+              aria-haspopup="menu"
+              data-testid="app-bar-menu-button"
+            >
+              <v-icon icon="mdi-menu" />
+            </v-btn>
+          </template>
+          <v-list
+            class="app-bar-menu-list"
+            density="comfortable"
+            nav
+            role="menu"
+          >
+            <v-list-item
+              v-for="item in mobileMenuItems"
+              :key="item.key"
+              :prepend-icon="item.icon"
+              :title="item.label"
+              :data-testid="`app-bar-menu-item-${item.key}`"
+              role="menuitem"
+              @click="handleMenuItemClick(item)"
+            />
+          </v-list>
+        </v-menu>
+      </div>
     </v-app-bar>
     <slot />
     <ShareDialog
@@ -215,6 +348,19 @@ async function logout() {
   gap: 12px;
   margin-left: auto;
   min-width: 0;
+}
+
+.app-bar-mobile-actions {
+  margin-left: auto;
+}
+
+.app-bar-menu-btn {
+  width: 48px;
+  height: 48px;
+}
+
+.app-bar-menu-list {
+  min-width: 220px;
 }
 
 .app-bar-share-btn {
