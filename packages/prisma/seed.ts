@@ -1,25 +1,50 @@
 import { PrismaClient } from '@prisma/client'
-import { hashPassword } from 'shared'
+import { hashPassword } from 'shared/server'
 import fs from 'fs';
+import { ensureSuperAdmin, syncPrivilegesAndRoles } from './utils/accessControl'
 
 const prisma = new PrismaClient()
 
 async function main() {
   console.log("🌱 Seeding database...")
 
-  // Create a test user
-  const user = await prisma.user.create({
-    data: {
-      name: "Test User",
-      email: "test@example.com",
-      password: hashPassword("password123"),
-    },
-  })
+  console.log("🔐 Syncing roles & privileges...")
+  await syncPrivilegesAndRoles(prisma)
 
-  console.log("✅ User created:", user)
+  // Create an initial Super Admin user (only if no users exist)
+  const userCount = await prisma.user.count()
+  let user = null
+  if (userCount === 0) {
+    user = await prisma.user.create({
+      data: {
+          name: 'Super Admin',
+          email: 'superadmin@example.com',
+          password: hashPassword('supersecurepassword'),
+        },
+    })
+    console.log("✅ Created Super Admin user:", user)
+  }
 
+  console.log("🔐 Ensuring Super Admin exists...")
+  await ensureSuperAdmin(prisma)
+
+  // Check if there are existing quests
+  const existingQuests = await prisma.quest.count()
+  if (existingQuests > 0) {
+    console.log("⚠️ Quests already exist in the database. Skipping quest seeding.")
+    return
+  }
   // Load the merged seed data
   const data = JSON.parse(fs.readFileSync("./seed-data.json", "utf8"));
+
+  // Create a user to own the quests
+  user = await prisma.user.create({
+    data: {
+      name: 'Sample Quest Owner',
+      email: 'questowner@example.com',
+      password: hashPassword('questownerpassword'),
+    },
+  });
 
   for (const quest of data) {
     await prisma.quest.create({

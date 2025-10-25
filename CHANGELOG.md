@@ -9,6 +9,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Placeholder for upcoming changes.
+
+---
+
+## [1.10.0] - 2025-10-25
+
+### 🚀 Features
+- Added a mobile header menu that collapses all navigation, theme, admin, and auth actions into an accessible Vuetify dropdown when the viewport is under 768px, keeping controls usable on phones. (#72)
+- **Public Quest Sharing** (#46)
+  - Added visibility toggle allowing quest owners to share quests publicly or keep them private.
+  - Implemented "Discover Public Quests" section on home page with sortable quest cards.
+  - Created public quests API endpoint with sorting by creation/update date.
+  - Added confirmation dialog when making quests private, warning that public URLs will stop working.
+  - Quest visibility changes now immediately update the UI without page reload.
+  - Public quests are viewable by anyone; private quests remain owner-only.
+- Implemented global snackbar notifications for auth, quest management, and background actions with cleaned status messaging.
+- Added role-based administration: data model, guarded APIs, and Nuxt admin views for roles, users, privileges, and recovery.
+
+### 🧪 Tests
+- Added a Playwright regression that drives the mobile header menu to ensure the hamburger activator exposes share controls and opens the dialog without reloading. (#72)
+
+### 🛠 Fixes
+- Removed legacy inline alerts and normalized API error text to avoid leaking HTTP metadata into the UI.
+- Fixed quest store state management to properly reset the `loaded` flag on logout, preventing stale empty quest lists after re-login.
+
 ---
 
 ## [1.9.0] - 2025-10-19

@@ -1,9 +1,19 @@
 {
   "name": "shared",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "private": true,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "default": "./dist/server.js"
+    }
+  },
   "files": [
     "dist"
   ],

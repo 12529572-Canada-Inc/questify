@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import { useQuest } from '~/composables/useQuest'
 import { useQuestActions } from '~/composables/useQuestActions'
 import { useQuestTaskTabs, useQuestTasks } from '~/composables/useQuestTasks'
@@ -13,13 +14,19 @@ import QuestTaskEditDialog from '~/components/quests/QuestTaskEditDialog.vue'
 import QuestInvestigationDialog from '~/components/quests/QuestInvestigationDialog.vue'
 import QuestActionButtons from '~/components/quests/QuestActionButtons.vue'
 import type { QuestTaskTab, TaskWithInvestigations } from '~/types/quest-tasks'
+import { useUserStore } from '~/stores/user'
 
 const route = useRoute()
 const id = route.params.id as string
 const requestUrl = useRequestURL()
 
 const { data: quest, refresh, pending, error } = await useQuest(id)
-const { user } = useUserSession()
+const userStore = useUserStore()
+const { user } = storeToRefs(userStore)
+
+if (!user.value) {
+  await userStore.fetchSession().catch(() => null)
+}
 
 const questData = computed(() => quest.value ?? null)
 const userData = computed(() => user.value ?? null)
@@ -121,6 +128,11 @@ function clearInvestigationError() {
   investigationError.value = null
 }
 
+function handleVisibilityUpdate() {
+  // Refresh quest data to reflect the updated visibility
+  refresh()
+}
+
 const investigationErrorMessage = computed(() => investigationError.value ?? null)
 const { questStatusMeta, taskSections } = useQuestDisplay({
   quest: questData,
@@ -163,6 +175,7 @@ useQuestPolling(refresh, {
             @open-investigation="openInvestigationDialog"
             @share-task="handleTaskShare"
             @clear-investigation-error="clearInvestigationError"
+            @update-visibility="handleVisibilityUpdate"
           >
             <template #after-tasks>
               <QuestTaskEditDialog
@@ -206,15 +219,32 @@ useQuestPolling(refresh, {
         </template>
 
         <template v-else>
-          <v-alert
+          <div
             v-if="questErrorAlert"
-            :type="questErrorAlert.type"
-            :title="questErrorAlert.title"
+            class="quest-error-banner"
+            role="alert"
           >
+            <strong>{{ questErrorAlert.title }}:</strong>
             {{ questErrorAlert.message }}
-          </v-alert>
+          </div>
         </template>
       </v-col>
     </v-row>
   </v-container>
 </template>
+
+<style scoped>
+.quest-error-banner {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border-left: 4px solid rgba(var(--v-theme-error), 0.85);
+  background: rgba(var(--v-theme-error), 0.08);
+  color: rgb(var(--v-theme-error));
+}
+
+.quest-error-banner strong {
+  font-weight: 600;
+  margin-right: 4px;
+}
+</style>

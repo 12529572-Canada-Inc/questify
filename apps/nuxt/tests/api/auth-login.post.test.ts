@@ -25,6 +25,10 @@ const sharedMocks = vi.hoisted(() => ({
   verifyPassword: vi.fn(),
 }))
 
+const accessControlMocks = vi.hoisted(() => ({
+  attachSessionWithAccess: vi.fn(),
+}))
+
 vi.mock('@prisma/client', () => ({
   PrismaClient: class {
     user = {
@@ -33,8 +37,12 @@ vi.mock('@prisma/client', () => ({
   },
 }))
 
-vi.mock('shared', () => ({
+vi.mock('shared/server', () => ({
   verifyPassword: sharedMocks.verifyPassword,
+}))
+
+vi.mock('../../server/utils/access-control', () => ({
+  attachSessionWithAccess: accessControlMocks.attachSessionWithAccess,
 }))
 
 const globalWithMocks = globalThis as GlobalWithMocks
@@ -46,6 +54,7 @@ const originalSetUserSession = globalWithMocks.setUserSession
 beforeEach(() => {
   prismaMocks.userFindUnique.mockReset()
   sharedMocks.verifyPassword.mockReset()
+  accessControlMocks.attachSessionWithAccess.mockReset()
 
   prismaMocks.userFindUnique.mockResolvedValue({
     id: 'user-1',
@@ -54,6 +63,10 @@ beforeEach(() => {
     password: 'hashed',
   })
   sharedMocks.verifyPassword.mockReturnValue(true)
+  accessControlMocks.attachSessionWithAccess.mockResolvedValue({
+    roles: ['Admin'],
+    privileges: ['user:read'],
+  })
 
   Reflect.set(globalWithMocks, 'readBody', vi.fn(async () => ({
     email: 'person@example.com',
@@ -84,12 +97,10 @@ describe('API /api/auth/login (POST)', () => {
 
     expect(prismaMocks.userFindUnique).toHaveBeenCalledWith({ where: { email: 'person@example.com' } })
     expect(sharedMocks.verifyPassword).toHaveBeenCalledWith('password123', 'hashed')
-    expect(globalWithMocks.setUserSession).toHaveBeenCalledWith(expect.anything(), {
-      user: {
-        id: 'user-1',
-        email: 'person@example.com',
-        name: 'Person Example',
-      },
+    expect(accessControlMocks.attachSessionWithAccess).toHaveBeenCalledWith(expect.anything(), {
+      id: 'user-1',
+      email: 'person@example.com',
+      name: 'Person Example',
     })
     expect(response).toEqual({
       success: true,
@@ -97,6 +108,8 @@ describe('API /api/auth/login (POST)', () => {
         id: 'user-1',
         email: 'person@example.com',
         name: 'Person Example',
+        roles: ['Admin'],
+        privileges: ['user:read'],
       },
     })
   })

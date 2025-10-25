@@ -1,285 +1,81 @@
 # Questify
 
-## Overview
+Questify turns personal and team goals into narrative quests powered by AI-assisted planning. The monorepo pairs a Nuxt 4 application with Prisma-backed persistence and a background worker that orchestrates queue-heavy workloads.
 
-Questify transforms goals into epic quests.
+## Monorepo Layout
 
-This monorepo uses **Nuxt** for the frontend + API layer, **Prisma** for the database, and a **Worker** for AI-driven quest decomposition.
+| Path | Purpose |
+| --- | --- |
+| `apps/nuxt/` | Nuxt 4 UI + Nitro API, Playwright E2E suites, and Vitest component tests |
+| `apps/nuxt/stores/` | Pinia stores for user session, quest listings, and UI preferences |
+| `apps/worker/` | BullMQ-backed worker processing quest decomposition and notifications |
+| `packages/shared/` | Reusable TypeScript utilities consumed by the Nuxt app and worker |
+| `packages/prisma/` | Prisma schema, migrations, generated client, and seed scripts |
+| `scripts/` | Operational helpers (`prepare-safe.sh`, `upgrade-nuxt.sh`, etc.) |
 
-## Structure
+## Requirements
 
-* `apps/nuxt` — Frontend & API
-* `apps/worker` — Worker for background jobs
-* `packages/prisma` — Prisma schema & client
-* `packages/shared` — Shared types & utilities
+- Node.js 18+
+- pnpm 8+
+- Docker (for local Postgres + Redis)
 
-# Development Setup
-
-## Prerequisites
-
-* [Node.js](https://nodejs.org/) (>=18.x)
-* [pnpm](https://pnpm.io/) (>=8.x)
-* [Docker](https://www.docker.com/) (for Postgres + Redis)
-
----
-
-## 1. Clone & Install
+## Quick Start
 
 ```bash
-git clone https://github.com/YOUR_ORG/questify.git
-cd questify
 pnpm install
-```
-
----
-
-## 2. Environment Variables
-
-Copy `.env.example` to `.env` in the **root**:
-
-```bash
-cp .env.example .env
-```
-
-Example contents:
-
-```env
-# Database
-DATABASE_URL=postgresql://questify:questify@localhost:5432/questify
-
-# Redis
-REDIS_HOST=localhost
-REDIS_PORT=6379
-# REDIS_PASSWORD=optional_password
-```
-
----
-
-## 3. Start Postgres & Redis
-
-Using Docker Compose:
-
-```bash
-docker compose up -d
-```
-
-This will start:
-
-* **Postgres** on port `5432`
-* **Redis** on port `6379`
-
----
-
-## 4. Database Setup
-
-Run Prisma migrations + seed:
-
-```bash
+cp .env.example .env          # adjust secrets as needed
+docker compose up -d          # launches Postgres (5432) + Redis (6379)
 pnpm prisma:migrate
 pnpm prisma:seed
+pnpm dev:nuxt                 # http://localhost:3000
+pnpm dev:worker               # runs the queue worker with hot reload
 ```
 
----
+### Environment Notes
 
-## 5. Nuxt Development
+- `.env` in the repository root configures both Nuxt runtime config and worker bindings.
+- Set `OPENAI_API_KEY` (or equivalent provider key) before enabling AI-powered quest generation.
+- Redis credentials map to `runtimeConfig.redis` (Nuxt) and `packages/shared/src/config/redis.ts` (worker).
 
-Start the Nuxt 4 frontend + API:
+## Development Workflow
 
-```bash
-pnpm dev:nuxt
-```
+- Frontend/API: `pnpm dev:nuxt` supports Hot Module Reloading and auto-imported composables.
+- Background jobs: `pnpm dev:worker` runs `src/index.ts` via `tsx`. Jobs enqueue from Nuxt server plugins (`apps/nuxt/plugins/queue.server.ts`).
+- Build all workspaces: `pnpm build`
+- Linting + formatting: `pnpm lint` and `pnpm format`
+- Database operations: `pnpm prisma:migrate`, `pnpm prisma:deploy`, `pnpm prisma:generate`, `pnpm prisma:seed`
 
-Available at:
-👉 [http://localhost:3000](http://localhost:3000)
+## State Management
 
----
+- Global state now uses [Pinia](https://pinia.vuejs.org/) through the `@pinia/nuxt` module with stores in `apps/nuxt/stores/`.
+- `useUserStore()` wraps the session plugin to expose a typed `user`, role/privilege helpers, and `fetchSession()`/`clearSession()` actions.
+- `useQuestStore()` caches quest listings, exposes mutation helpers (`setQuests`, `upsertQuest`), and refreshes after quest creation.
+- `useUiStore()` controls UI preferences such as dark/light mode and persists selections via cookies while synchronising Vuetify theme state.
+- Store unit tests live under `apps/nuxt/tests/unit/stores/` so behaviour stays covered as modules evolve.
 
-## 6. Testing
+## Testing
 
-Questify uses [Vitest](https://vitest.dev/) for unit, integration, and UI/component tests, plus [Playwright](https://playwright.dev/) for end-to-end coverage.
+- Unit/component suites: `pnpm test` runs Vitest across Nuxt, worker, and shared packages.
+- Coverage: `pnpm test:coverage` (Vitest + V8 outputs under each workspace `coverage/` directory)
+- End-to-end: `pnpm --filter nuxt test:e2e` executes Playwright specs located in `apps/nuxt/tests/e2e/`.
+- Run a focused test: `pnpm --filter worker exec vitest run src/queues/__tests__/quest.queue.spec.ts`
 
-### 6.1 Run All Tests
+## Background Jobs & RBAC
 
-```bash
-pnpm --filter nuxt test
-```
+- BullMQ queues initialise through Nuxt server plugins and reuse the Redis connection defined in runtime config.
+- The worker loads shared Prisma clients for transactional work; keep long-running tasks idempotent to support retries.
+- Questify ships with seeded RBAC roles (`SuperAdmin`, `Admin`, `Support`). Administration views surface under the **Administration** navigation item for privileged users. Recovery flows live in *Administration → System Settings*.
 
-This prepares Nuxt, runs the Vitest project matrix (unit + UI suites), and reuses Prisma mocks when `USE_MOCKS=true`.
+## Release Process
 
-### 6.2 Run Specific Suites
+- Branching follows Git Flow conventions (`develop` → `release/*` → `main`).
+- Tagging `v*.*.*` triggers the deployment pipeline through GitHub Actions.
+- Hotfixes branch directly from `main` (`git flow hotfix start`) and merge back into both `main` and `develop`.
 
-```bash
-# Unit/API/utils (node environment)
-pnpm --filter nuxt exec vitest run --project unit
+## Contributing
 
-# UI/component/layout/page tests (happy-dom)
-pnpm --filter nuxt exec vitest run --project ui
+- Review the contributor guide in [`AGENTS.md`](./AGENTS.md) for coding standards, testing expectations, and PR etiquette.
+- File issues or feature requests via GitHub Discussions; link them in pull request descriptions.
+- Editors such as VS Code should enable ESLint auto-fixes on save (`.vscode/settings.json` has sample defaults).
 
-# Playwright end-to-end tests
-pnpm --filter nuxt test:e2e
-```
-
-To run a single file, pass its path:
-
-```bash
-pnpm --filter nuxt exec vitest run tests/unit/composables/useQuestActions.test.ts
-```
-
-### 6.3 Folder Mapping
-
-| Folder | Environment | Description |
-| --- | --- | --- |
-| `tests/api/**` | 🧪 Node | API route handlers with mocked Nitro contexts |
-| `tests/e2e/**` | 🚀 Playwright | Full-stack browser tests |
-| `tests/mocks/**` | 🧪 Node | 3rd-party service mocks (eg. Prisma) |
-| `tests/nuxt/**` | 🟩 Nuxt | Nuxt-specific features (components, composables, layouts, middleware, pages) |
-| `tests/unit/**` | 🧪 Node | Pure utility helpers like `text-with-links` |
-
-### 6.4 Coverage
-
-```bash
-pnpm --filter nuxt exec vitest run --project unit --coverage
-```
-
-Coverage reports are saved to `apps/nuxt/coverage/`.
-
----
-
-## 7. Redis Queue Plugin (BullMQ)
-
-Questify uses [BullMQ](https://docs.bullmq.io/) for background job processing.
-
-* The queue is initialized in a Nuxt **server plugin**:
-  `apps/nuxt/plugins/queue.server.ts`
-
-* Config is loaded from Nuxt runtime config:
-
-```ts
-export default defineNuxtConfig({
-  runtimeConfig: {
-    redis: {
-      host: process.env.REDIS_HOST || "localhost",
-      port: process.env.REDIS_PORT || "6379",
-      password: process.env.REDIS_PASSWORD || "",
-    },
-  },
-});
-```
-
-* Access inside API routes or server code:
-
-```ts
-const { $questQueue } = useNuxtApp();
-await $questQueue.add("decompose", { questId, title, description });
-```
-
----
-
-## 8. TypeScript Support
-
-Custom types for Nuxt app injections are declared in:
-`apps/nuxt/plugins/types.d.ts`
-
-This ensures `$questQueue` is strongly typed across the app.
-
----
-
-# Release & Hotfix Workflow
-
-Questify follows **Git Flow** conventions.
-
-## 9. Creating a Release
-
-```bash
-# Make sure you're on develop
-git checkout develop
-git pull origin develop
-
-# Start a release branch
-git flow release start X.Y.Z
-
-# Update changelog and version
-# Commit any release-specific changes
-git add .
-git commit -m "Release X.Y.Z"
-
-# Finish the release (merges into main & develop, tags it)
-git flow release finish X.Y.Z
-
-# Push changes and tags
-git push origin main
-git push origin develop
-git push origin --tags
-```
-
-> The GitHub Actions workflow will automatically deploy on push tags like `v*.*.*`.
-
----
-
-## 10. Creating a Hotfix
-
-Hotfixes fix urgent production issues.
-
-```bash
-# Start a hotfix branch from main
-git checkout main
-git pull origin main
-git flow hotfix start X.Y.Z
-
-# Apply your hotfix changes
-# Commit them
-git add .
-git commit -m "Hotfix: describe the fix"
-
-# Finish the hotfix (merges into main & develop, tags it)
-git flow hotfix finish X.Y.Z
-
-# Push changes and tags
-git push origin main
-git push origin develop
-git push origin --tags
-```
-
-> The release pipeline will run automatically for the new hotfix tag.
-
----
-
-✅ With this setup, contributors can:
-
-* Run Postgres + Redis locally
-* Use Prisma migrations and seed data
-* Develop Nuxt + BullMQ integrated features
-* Follow a clear **release & hotfix process**
-
----
-
-## 10. Creating a Database Migration
-
-When you need to change the database schema, create a new Prisma migration:
-
-```bash
-pnpm prisma:migrate
-```
-This will:
-* Create a new migration file in `packages/prisma/migrations`
-* Apply the migration to your local database
-
-Make sure to commit the new migration files to version control.
-
----
-
-## 11. VSCode Settings
-
-Add the following to `.vscode/settings.json` for automatic ESLint fixes on save:
-
-```json
-{
-  "editor.formatOnSave": true,
-  "editor.defaultFormatter": "dbaeumer.vscode-eslint",
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "always"
-  },
-  "eslint.validate": ["javascript", "typescript", "vue"]
-}
-
-```
+Happy questing! 🚀

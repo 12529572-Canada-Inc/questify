@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import QuestDetailsSections from './QuestDetailsSections.vue'
 import QuestTasksTabs from './QuestTasksTabs.vue'
+import QuestVisibilityToggle from './QuestVisibilityToggle.vue'
 import type { QuestTaskSection, QuestTaskTab, TaskWithInvestigations } from '~/types/quest-tasks'
 import type { Quest } from '@prisma/client'
 
@@ -25,7 +26,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:taskTab', value: QuestTaskTab): void
-  (e: 'share-quest' | 'clear-investigation-error'): void
+  (e: 'share-quest' | 'clear-investigation-error' | 'update-visibility'): void
   (e: 'open-task-edit' | 'open-investigation' | 'share-task', task: TaskWithInvestigations): void
 }>()
 
@@ -33,6 +34,10 @@ const taskTabModel = computed({
   get: () => props.taskTab,
   set: value => emit('update:taskTab', value),
 })
+
+function handleVisibilityUpdate() {
+  emit('update-visibility')
+}
 </script>
 
 <template>
@@ -59,6 +64,13 @@ const taskTabModel = computed({
               >
                 {{ questStatusMeta.label }}
               </v-chip>
+              <QuestVisibilityToggle
+                v-if="isOwner"
+                :is-public="quest.isPublic"
+                :quest-id="quest.id"
+                :disabled="pending"
+                @update:is-public="handleVisibilityUpdate"
+              />
             </div>
             <template v-if="!isOwner">
               <div class="d-flex align-center gap-2 text-medium-emphasis text-body-2 flex-wrap">
@@ -89,16 +101,20 @@ const taskTabModel = computed({
     <v-divider class="my-4" />
 
     <v-card-text>
-      <v-alert
+      <div
         v-if="investigationError"
-        type="error"
-        variant="tonal"
-        closable
-        class="mb-4"
-        @click:close="emit('clear-investigation-error')"
+        class="quest-investigation-error mb-4"
+        role="alert"
       >
-        {{ investigationError }}
-      </v-alert>
+        <span>{{ investigationError }}</span>
+        <v-btn
+          icon="mdi-close"
+          variant="text"
+          size="small"
+          color="error"
+          @click="emit('clear-investigation-error')"
+        />
+      </div>
       <QuestTasksTabs
         v-model="taskTabModel"
         :sections="taskSections"
@@ -138,6 +154,19 @@ const taskTabModel = computed({
 
 .quest-status-avatar {
   border-radius: 16px;
+}
+
+.quest-investigation-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border-left: 4px solid rgba(var(--v-theme-error), 0.85);
+  background: rgba(var(--v-theme-error), 0.08);
+  color: rgb(var(--v-theme-error));
+  font-size: 0.95rem;
 }
 
 .quest-status-chip {

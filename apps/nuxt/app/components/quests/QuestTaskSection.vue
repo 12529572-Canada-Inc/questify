@@ -20,8 +20,12 @@ const emit = defineEmits<{
   (e: 'toggle-investigation', investigationId: string): void
 }>()
 
-function executeSectionAction(taskId: string) {
-  props.section.action?.handler(taskId)
+async function executeSectionAction(taskId: string) {
+  if (!props.section.action) {
+    return
+  }
+
+  await props.section.action.handler(taskId)
 }
 </script>
 

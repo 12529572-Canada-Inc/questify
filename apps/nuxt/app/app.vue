@@ -1,5 +1,6 @@
 <template>
   <v-app>
+    <GlobalSnackbar />
     <div class="app-background d-flex flex-column fill-height">
       <NuxtLayout>
         <NuxtPage />

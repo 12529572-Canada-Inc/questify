@@ -1,10 +1,11 @@
-import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
+import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto'
 
 /**
  * Create a Scrypt password hash.
  * Format: $scrypt$n=16384,r=8,p=1$<saltB64>$<keyB64>
  */
 export function hashPassword(password: string): string {
+
   const N = 16384;
   const r = 8;
   const p = 1;
@@ -21,6 +22,7 @@ export function hashPassword(password: string): string {
  */
 export function verifyPassword(password: string, stored: string): boolean {
   try {
+
     // Expected format: $scrypt$n=16384,r=8,p=1$<salt>$<key>
     const match = /^\$scrypt\$n=(\d+),r=(\d+),p=(\d+)\$([^$]+)\$([^$]+)$/.exec(stored);
 

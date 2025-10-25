@@ -129,14 +129,18 @@ const {
       </v-col>
     </v-row>
 
-    <v-alert
+    <p
       v-if="error"
-      type="error"
-      class="mt-4"
-      border="start"
-      prominent
+      class="quest-form__error mt-4"
     >
       {{ error }}
-    </v-alert>
+    </p>
   </v-form>
 </template>
+
+<style scoped>
+.quest-form__error {
+  font-size: 0.95rem;
+  color: rgb(var(--v-theme-error));
+}
+</style>

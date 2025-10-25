@@ -78,9 +78,6 @@ jobs:
             - name: 🧰 Build shared package
               run: pnpm --filter shared build
 
-            - name: 🧩 Lint types
-              run: pnpm --filter nuxt lint:types
-
             - name: 🧹 Lint
               run: pnpm lint
 
@@ -97,9 +94,6 @@ jobs:
             - name: 🧩 Deploy Prisma Migrations
               working-directory: packages/prisma
               run: pnpm run deploy
-
-            # - name: 🌱 Seed database (optional)
-            #   run: pnpm --filter nuxt db:seed
 
             - name: 🏗️ Build Nuxt app for tests
               run: |

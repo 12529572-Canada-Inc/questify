@@ -150,15 +150,12 @@ function onToggle() {
           </v-card>
         </template>
       </div>
-      <v-alert
+      <p
         v-if="investigation.status === 'failed' && investigation.error"
-        type="error"
-        class="mt-3 mb-0"
-        density="compact"
-        border="start"
+        class="task-investigation-error mt-3 mb-0"
       >
         {{ investigation.error }}
-      </v-alert>
+      </p>
       <v-btn
         v-if="investigation.summary || investigation.details"
         variant="text"
@@ -230,6 +227,11 @@ function onToggle() {
   font-weight: 500;
   letter-spacing: 0.02em;
   padding: 0 0.25rem;
+}
+
+.task-investigation-error {
+  color: rgb(var(--v-theme-error));
+  font-size: 0.9rem;
 }
 
 @media (max-width: 600px) {

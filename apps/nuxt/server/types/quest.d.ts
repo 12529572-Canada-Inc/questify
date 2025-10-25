@@ -4,6 +4,7 @@ declare interface QuestBody {
   context?: string | null
   constraints?: string | null
   status?: 'draft' | 'active' | 'completed' | 'failed'
+  isPublic?: boolean
 }
 
 declare interface CreateQuestResponse {

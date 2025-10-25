@@ -1,9 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { createPinia, setActivePinia } from 'pinia'
+import { useQuestStore } from '~/stores/quest'
 import { useQuest, useQuests } from '../../../app/composables/useQuest'
 
 const useFetchMock = vi.fn()
 
 beforeEach(() => {
+  setActivePinia(createPinia())
   useFetchMock.mockReset()
   vi.stubGlobal('useFetch', useFetchMock)
 })
@@ -21,9 +24,12 @@ describe('useQuest composables', () => {
     })
   })
 
-  it('fetches quest collections', () => {
-    useQuests()
+  it('fetches quest collections via the store', async () => {
+    const questStore = useQuestStore()
+    const fetchSpy = vi.spyOn(questStore, 'fetchQuests').mockResolvedValue([])
 
-    expect(useFetchMock).toHaveBeenCalledWith('/api/quests')
+    await useQuests()
+
+    expect(fetchSpy).toHaveBeenCalled()
   })
 })

@@ -21,25 +21,42 @@ declare global {
   const useFetch: typeof import('#app')['useFetch']
   const useAsyncData: typeof import('#app')['useAsyncData']
   const useRuntimeConfig: typeof import('#app')['useRuntimeConfig']
+  const useCookie: typeof import('nuxt/app')['useCookie']
+}
+
+declare global {
+  interface ImportMeta {
+    hot?: {
+      accept: (cb?: (mod: unknown) => void) => void
+    }
+  }
 }
 
 // ----------------------------------------------------
 // ✅ User session composable typing
 // ----------------------------------------------------
 declare global {
+  interface SessionUser {
+    id: string
+    email?: string
+    name?: string
+    roles?: string[]
+    privileges?: string[]
+  }
+
   interface UserSession {
-    user: Ref<{ id: string, email?: string, name?: string } | null>
+    user: Ref<SessionUser | null>
     loggedIn: Ref<boolean>
-    fetch: () => Promise<{ user?: { id: string, email?: string, name?: string } }>
+    fetch: () => Promise<{ user?: SessionUser }>
     clear: () => Promise<void>
   }
 
   // 👉 return non-null object (recommended)
   const useUserSession: (event?: unknown) => UserSession
-  const getUserSession: (event?: unknown) => Promise<{ user?: { id: string, email?: string, name?: string } } | null>
+  const getUserSession: (event?: unknown) => Promise<{ user?: SessionUser } | null>
   const setUserSession: (event?: unknown, data?: unknown) => Promise<void>
   const clearUserSession: (event?: unknown) => Promise<void>
-  const requireUserSession: (event?: unknown) => Promise<{ user: { id: string, email?: string, name?: string } }>
+  const requireUserSession: (event?: unknown) => Promise<{ user: SessionUser }>
 }
 
 // ----------------------------------------------------

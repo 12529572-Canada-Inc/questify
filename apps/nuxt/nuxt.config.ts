@@ -12,6 +12,8 @@ export default defineNuxtConfig({
     // Point ~ and @ to new app/ directory
     '~': path.resolve(__dirname, 'app'),
     '@': path.resolve(__dirname, 'app'),
+    '#prisma-utils': path.resolve(__dirname, '..', '..', 'packages', 'prisma', 'utils'),
+    'shared': path.resolve(__dirname, '..', '..', 'packages', 'shared', 'src'),
   },
 
   // ⚙️ Modules
@@ -19,6 +21,7 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     'vuetify-nuxt-module',
     'nuxt-auth-utils',
+    '@pinia/nuxt',
   ],
 
   // 🌐 App metadata and head configuration
@@ -129,6 +132,13 @@ export default defineNuxtConfig({
         config.plugins = (config.plugins || []).filter(
           plugin => !(plugin && typeof plugin === 'object' && 'name' in plugin && String(plugin.name).includes('vite:checker')),
         )
+      }
+
+      // Externalize node:crypto to prevent client-side bundling
+      if (config.ssr) {
+        config.ssr = config.ssr || {}
+        config.ssr.noExternal = config.ssr.noExternal || []
+        // Don't externalize shared - let it be bundled normally for server
       }
     },
   },

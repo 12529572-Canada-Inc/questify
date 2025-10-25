@@ -1,2 +1,2 @@
-export * from "./password"
-export * from "./redis"
+// Client-safe exports only (no Node.js dependencies)
+export * from "./permissions"

@@ -14,6 +14,9 @@ model User {
   name      String?
   quests    Quest[]
   investigations TaskInvestigation[]
+  roles     UserRole[]
+  assignedRoles UserRole[] @relation("UserRoleAssignedBy")
+  auditEntries AdminAuditLog[] @relation("AuditActor")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -62,4 +65,63 @@ model TaskInvestigation {
 
   @@index([taskId])
   @@index([createdAt])
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  system      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  users       UserRole[]
+  privileges  RolePrivilege[]
+}
+
+model Privilege {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  label       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  roles       RolePrivilege[]
+}
+
+model RolePrivilege {
+  roleId      String
+  privilegeId String
+  assignedAt  DateTime @default(now())
+  role        Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  privilege   Privilege @relation(fields: [privilegeId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, privilegeId])
+}
+
+model UserRole {
+  userId        String
+  roleId        String
+  assignedById  String?
+  assignedAt    DateTime @default(now())
+  user          User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role          Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  assignedBy    User? @relation("UserRoleAssignedBy", fields: [assignedById], references: [id])
+
+  @@id([userId, roleId])
+  @@index([roleId])
+}
+
+model AdminAuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  action     String
+  targetType String
+  targetId   String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  actor User? @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([targetType, targetId])
 }
