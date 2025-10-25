@@ -169,7 +169,11 @@ describe('default layout', () => {
     await flushPromises()
 
     const layoutComponent = wrapper.findComponent(DefaultLayout)
-    expect(layoutComponent.vm.shareDialogOpen).toBe(true)
-    expect(layoutComponent.vm.mobileMenuOpen).toBe(false)
+    const layoutVm = layoutComponent.vm as unknown as {
+      shareDialogOpen: boolean
+      mobileMenuOpen: boolean
+    }
+    expect(layoutVm.shareDialogOpen).toBe(true)
+    expect(layoutVm.mobileMenuOpen).toBe(false)
   })
 })
