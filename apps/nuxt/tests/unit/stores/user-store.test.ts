@@ -14,7 +14,6 @@ const fetchMock = vi.fn(async () => {
     privileges: ['user:read'],
   }
   loggedIn.value = true
-  return { user: sessionUser.value }
 })
 const clearMock = vi.fn(async () => {
   sessionUser.value = null
@@ -44,13 +43,14 @@ describe('useUserStore', () => {
   it('fetches and stores session data', async () => {
     const store = useUserStore()
 
-    await store.fetchSession()
+    const result = await store.fetchSession()
 
     expect(fetchMock).toHaveBeenCalled()
     expect(store.user).not.toBeNull()
     expect(store.user?.id).toBe('user-1')
     expect(store.loggedIn).toBe(true)
     expect(store.roles).toEqual(['Admin'])
+    expect(result?.roles).toEqual(['Admin'])
   })
 
   it('clears session details', async () => {
