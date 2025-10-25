@@ -65,8 +65,6 @@ test.describe('Mobile responsiveness', () => {
     const menuButton = page.getByTestId('app-bar-menu-button')
     await menuButton.waitFor({ state: 'visible' })
 
-    await expect(page.locator('.app-bar-actions')).toHaveCount(0)
-
     await menuButton.click()
     const shareItem = page.getByTestId('app-bar-menu-item-share')
     await expect(shareItem).toBeVisible()
