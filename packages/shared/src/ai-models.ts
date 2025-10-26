@@ -148,7 +148,10 @@ export function sanitizeModelOptions(models: AiModelOption[] | null | undefined)
       fallback.default = true
     }
     else {
-      sanitized[0].default = true
+      const firstModel = sanitized[0]
+      if (firstModel) {
+        firstModel.default = true
+      }
     }
   }
 

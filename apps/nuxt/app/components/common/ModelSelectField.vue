@@ -14,6 +14,13 @@ const items = computed(() => props.models.map(item => ({
   raw: item,
 })))
 
+function toModel(value: unknown): AiModelOption | null {
+  if (value && typeof value === 'object') {
+    return value as AiModelOption
+  }
+  return null
+}
+
 </script>
 
 <template>
@@ -32,19 +39,19 @@ const items = computed(() => props.models.map(item => ({
       :menu-props="{ maxHeight: 420 }"
     >
       <template #selection="{ item }">
-        <span>{{ item.raw.label }}</span>
+        <span>{{ toModel(item.raw)?.label ?? item.title }}</span>
         <span class="text-caption text-medium-emphasis ml-2">
-          {{ item.raw.providerLabel }}
+          {{ toModel(item.raw)?.providerLabel ?? '' }}
         </span>
       </template>
       <template #item="{ item, props: itemProps }">
         <v-list-item
           v-bind="itemProps"
-          :title="item.raw.label"
-          :subtitle="item.raw.providerLabel"
+          :title="toModel(item.raw)?.label ?? item.title"
+          :subtitle="toModel(item.raw)?.providerLabel ?? ''"
         >
           <template #append>
-            <v-tooltip :text="item.raw.description">
+            <v-tooltip :text="toModel(item.raw)?.description ?? ''">
               <template #activator="{ props: tooltipProps }">
                 <v-btn
                   v-bind="tooltipProps"
