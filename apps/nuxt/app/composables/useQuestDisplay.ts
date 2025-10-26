@@ -1,5 +1,5 @@
 import { computed, type ComputedRef } from 'vue'
-import type { Quest } from '@prisma/client'
+import { QuestStatus, type Quest } from '@prisma/client'
 import type { QuestTaskSection, QuestTaskTab, TaskWithInvestigations } from '~/types/quest-tasks'
 
 type QuestWithOwner = Quest & { owner?: { name?: string | null } | null }
@@ -24,7 +24,7 @@ export function useQuestDisplay({
   markTaskIncomplete,
 }: Options) {
   const questStatusMeta = computed(() => {
-    const status = quest.value?.status ?? 'draft'
+    const status = quest.value?.status ?? QuestStatus.draft
     const base = {
       label: 'Draft',
       icon: 'mdi-pencil-circle',
@@ -32,21 +32,26 @@ export function useQuestDisplay({
     }
 
     const map: Record<string, typeof base> = {
-      draft: base,
-      active: {
+      [QuestStatus.draft]: base,
+      [QuestStatus.active]: {
         label: 'Active',
         icon: 'mdi-timer-sand',
         color: 'primary',
       },
-      completed: {
+      [QuestStatus.completed]: {
         label: 'Completed',
         icon: 'mdi-check-circle',
         color: 'success',
       },
-      failed: {
+      [QuestStatus.failed]: {
         label: 'Failed',
         icon: 'mdi-alert-octagon',
         color: 'error',
+      },
+      [QuestStatus.archived]: {
+        label: 'Archived',
+        icon: 'mdi-archive-outline',
+        color: 'grey-darken-1',
       },
     }
 

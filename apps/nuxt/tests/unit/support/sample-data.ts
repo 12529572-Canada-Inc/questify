@@ -16,6 +16,7 @@ export function createQuest(overrides: Base = {}) {
     owner: { id: 'user-1', name: 'Quest Owner', email: 'owner@example.com' },
     createdAt: new Date(0),
     updatedAt: new Date(0),
+    deletedAt: null,
     ...overrides,
   }
 }

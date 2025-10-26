@@ -1,13 +1,29 @@
-import type { Prisma } from '@prisma/client'
+import { QuestStatus, type Prisma } from '@prisma/client'
 
 export type QuestVisibilityTarget = {
   ownerId: string
   isPublic: boolean
+  status: QuestStatus
+  deletedAt: Date | null
 }
 
-export function buildQuestVisibilityFilter(userId?: string | null): Prisma.QuestWhereInput {
+export type QuestVisibilityOptions = {
+  includeArchived?: boolean
+}
+
+export function buildQuestVisibilityFilter(userId?: string | null, options: QuestVisibilityOptions = {}): Prisma.QuestWhereInput {
+  const includeArchived = Boolean(options.includeArchived && userId)
+  const baseFilter: Prisma.QuestWhereInput = {
+    deletedAt: null,
+  }
+
+  if (!includeArchived) {
+    baseFilter.status = { not: QuestStatus.archived }
+  }
+
   if (userId) {
     return {
+      ...baseFilter,
       OR: [
         { ownerId: userId },
         { isPublic: true },
@@ -15,17 +31,28 @@ export function buildQuestVisibilityFilter(userId?: string | null): Prisma.Quest
     }
   }
 
-  return { isPublic: true }
+  return {
+    ...baseFilter,
+    isPublic: true,
+  }
 }
 
 export function canViewQuest(quest: QuestVisibilityTarget, userId?: string | null) {
-  if (quest.isPublic) {
-    return true
-  }
-
-  if (!userId) {
+  if (quest.deletedAt) {
     return false
   }
 
-  return quest.ownerId === userId
+  if (quest.ownerId === userId) {
+    return true
+  }
+
+  if (quest.status === QuestStatus.archived) {
+    return false
+  }
+
+  if (!userId && quest.isPublic) {
+    return true
+  }
+
+  return quest.isPublic
 }

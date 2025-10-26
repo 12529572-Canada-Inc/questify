@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, QuestStatus } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -19,7 +19,11 @@ const handler = defineEventHandler(async (event) => {
   }
 
   const quests = await prisma.quest.findMany({
-    where: { isPublic: true },
+    where: {
+      isPublic: true,
+      deletedAt: null,
+      status: { not: QuestStatus.archived },
+    },
     orderBy,
     include: {
       owner: {

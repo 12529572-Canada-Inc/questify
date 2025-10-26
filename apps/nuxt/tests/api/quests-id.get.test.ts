@@ -21,12 +21,21 @@ const prismaMocks = vi.hoisted(() => ({
   questFindUnique: vi.fn(),
 }))
 
+const questStatusMock = vi.hoisted(() => ({
+  draft: 'draft',
+  active: 'active',
+  completed: 'completed',
+  failed: 'failed',
+  archived: 'archived',
+} as const))
+
 vi.mock('@prisma/client', () => ({
   PrismaClient: class {
     quest = {
       findUnique: prismaMocks.questFindUnique,
     }
   },
+  QuestStatus: questStatusMock,
 }))
 
 const globalWithMocks = globalThis as GlobalWithMocks
@@ -41,6 +50,8 @@ beforeEach(() => {
     id: 'quest-1',
     ownerId: 'user-1',
     isPublic: false,
+    status: 'active',
+    deletedAt: null,
     tasks: [],
     owner: { id: 'user-1', email: 'person@example.com', name: 'Person Example' },
   })
@@ -105,8 +116,19 @@ describe('API /api/quests/[id] (GET)', () => {
       id: 'quest-1',
       ownerId: 'owner-2',
       isPublic: false,
+      status: 'active',
+      deletedAt: null,
     })
     await expect(handler({} as never)).rejects.toMatchObject({ statusCode: 403 })
+
+    prismaMocks.questFindUnique.mockResolvedValueOnce({
+      id: 'quest-1',
+      ownerId: 'user-1',
+      isPublic: false,
+      status: 'active',
+      deletedAt: new Date(),
+    })
+    await expect(handler({} as never)).rejects.toMatchObject({ statusCode: 404 })
   })
 
   it('requires a quest id parameter', async () => {

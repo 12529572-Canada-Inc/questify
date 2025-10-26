@@ -1,17 +1,82 @@
 <script setup lang="ts">
+import type { Quest } from '@prisma/client'
+import { computed, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useQuestLifecycle } from '~/composables/useQuestLifecycle'
 import { useQuestStore } from '~/stores/quest'
+import { useUserStore } from '~/stores/user'
 
 const questStore = useQuestStore()
-const { quests, loaded } = storeToRefs(questStore)
+const userStore = useUserStore()
 
-if (!loaded.value) {
-  await questStore.fetchQuests().catch((error) => {
-    console.error('Failed to load quests:', error)
-  })
+const { quests, loaded } = storeToRefs(questStore)
+const { user } = storeToRefs(userStore)
+
+if (!user.value) {
+  await userStore.fetchSession().catch(() => null)
 }
 
+const showArchived = ref(false)
+
+await questStore.fetchQuests({ includeArchived: showArchived.value }).catch((error) => {
+  console.error('Failed to load quests:', error)
+})
+
+watch(showArchived, async (value) => {
+  try {
+    await questStore.fetchQuests({ includeArchived: value, force: true })
+  }
+  catch (error) {
+    console.error('Failed to toggle archived quests:', error)
+  }
+})
+
 const questsList = computed(() => quests.value ?? [])
+const currentUserId = computed(() => user.value?.id ?? null)
+
+const lifecycleDialogOpen = ref(false)
+const lifecycleTarget = ref<Quest | null>(null)
+
+const { archiveQuest, deleteQuest, archiveLoading, deleteLoading } = useQuestLifecycle({
+  questId: computed(() => lifecycleTarget.value?.id ?? null),
+  isOwner: computed(() => lifecycleTarget.value?.ownerId === currentUserId.value),
+  onArchived: async () => {
+    await questStore.fetchQuests({ includeArchived: showArchived.value, force: true })
+  },
+  onDeleted: async () => {
+    const questId = lifecycleTarget.value?.id
+    if (questId) {
+      questStore.removeQuest(questId)
+    }
+    await questStore.fetchQuests({ includeArchived: showArchived.value, force: true })
+  },
+})
+
+function openLifecycleDialog(quest: Quest) {
+  lifecycleTarget.value = quest
+  lifecycleDialogOpen.value = true
+}
+
+function closeLifecycleDialog() {
+  lifecycleDialogOpen.value = false
+  lifecycleTarget.value = null
+}
+
+async function handleArchiveQuest() {
+  const success = await archiveQuest()
+  if (success) {
+    closeLifecycleDialog()
+  }
+}
+
+async function handleDeleteQuest() {
+  const success = await deleteQuest()
+  if (success) {
+    closeLifecycleDialog()
+  }
+}
+
+const dialogQuestTitle = computed(() => lifecycleTarget.value?.title ?? 'this quest')
 </script>
 
 <template>
@@ -41,7 +106,28 @@ const questsList = computed(() => quests.value ?? [])
       </v-col>
     </v-row>
 
-    <QuestList :quests="questsList" />
+    <v-row
+      v-if="currentUserId"
+      class="mb-2"
+    >
+      <v-col
+        cols="12"
+        sm="6"
+      >
+        <v-switch
+          v-model="showArchived"
+          inset
+          color="primary"
+          label="Show Archived Quests"
+        />
+      </v-col>
+    </v-row>
+
+    <QuestList
+      :quests="questsList"
+      :current-user-id="currentUserId"
+      @delete-quest="openLifecycleDialog"
+    />
 
     <v-btn
       color="primary"
@@ -49,6 +135,16 @@ const questsList = computed(() => quests.value ?? [])
       aria-label="Create quest"
       icon="mdi-plus"
       :to="`/quests/new`"
+    />
+
+    <QuestDeleteDialog
+      v-model="lifecycleDialogOpen"
+      :quest-title="dialogQuestTitle"
+      :archive-loading="archiveLoading"
+      :delete-loading="deleteLoading"
+      @archive="handleArchiveQuest"
+      @delete="handleDeleteQuest"
+      @cancel="closeLifecycleDialog"
     />
   </v-container>
 </template>

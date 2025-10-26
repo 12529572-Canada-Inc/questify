@@ -1,4 +1,5 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { QuestStatus } from '@prisma/client';
 import * as shared from 'shared/server';
 
 const workerInstance = {};
@@ -196,7 +197,7 @@ describe('worker entrypoint', () => {
     });
     expect(questUpdateMock).toHaveBeenCalledWith({
       where: { id: 'quest-1' },
-      data: { status: 'active' },
+      data: { status: QuestStatus.active },
     });
   });
 
@@ -219,7 +220,7 @@ describe('worker entrypoint', () => {
     expect(taskCreateMock).not.toHaveBeenCalled();
     expect(questUpdateMock).toHaveBeenCalledWith({
       where: { id: 'quest-2' },
-      data: { status: 'failed' },
+      data: { status: QuestStatus.failed },
     });
     expect(errorSpy).toHaveBeenCalledWith(
       'Error during quest decomposition:',

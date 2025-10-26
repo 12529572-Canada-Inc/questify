@@ -4,6 +4,7 @@ import type { Quest } from '@prisma/client'
 
 type FetchOptions = {
   force?: boolean
+  includeArchived?: boolean
 }
 
 export const useQuestStore = defineStore('quests', () => {
@@ -11,11 +12,14 @@ export const useQuestStore = defineStore('quests', () => {
   const loading = ref(false)
   const loaded = ref(false)
   const error = ref<unknown>(null)
+  const includeArchivedFilter = ref(false)
 
   const hasQuests = computed(() => quests.value.length > 0)
 
   async function fetchQuests(options: FetchOptions = {}) {
-    if (loaded.value && !options.force) {
+    const nextIncludeArchived = options.includeArchived ?? includeArchivedFilter.value
+
+    if (loaded.value && !options.force && nextIncludeArchived === includeArchivedFilter.value) {
       return quests.value
     }
 
@@ -23,9 +27,12 @@ export const useQuestStore = defineStore('quests', () => {
     error.value = null
 
     try {
-      const data = await $fetch<Quest[]>('/api/quests')
+      const data = nextIncludeArchived
+        ? await $fetch<Quest[]>('/api/quests', { params: { includeArchived: 'true' } })
+        : await $fetch<Quest[]>('/api/quests')
       quests.value = Array.isArray(data) ? data : []
       loaded.value = true
+      includeArchivedFilter.value = nextIncludeArchived
       return quests.value
     }
     catch (err) {
@@ -66,6 +73,7 @@ export const useQuestStore = defineStore('quests', () => {
     loaded.value = false
     loading.value = false
     error.value = null
+    includeArchivedFilter.value = false
   }
 
   return {
@@ -80,6 +88,7 @@ export const useQuestStore = defineStore('quests', () => {
     removeQuest,
     getQuestById,
     reset,
+    includeArchivedFilter,
   }
 })
 

@@ -1,17 +1,19 @@
 <script setup lang="ts">
+import { QuestStatus } from '@prisma/client'
 import { computed } from 'vue'
 
 const props = defineProps<{
   isOwner: boolean
-  questStatus: string | null | undefined
+  questStatus: QuestStatus | string | null | undefined
 }>()
 
 const emit = defineEmits<{
-  (e: 'complete-quest' | 'reopen-quest'): void
+  (e: 'complete-quest' | 'reopen-quest' | 'request-delete'): void
 }>()
 
-const showComplete = computed(() => props.isOwner && props.questStatus !== 'completed')
-const showReopen = computed(() => props.isOwner && props.questStatus === 'completed')
+const showComplete = computed(() => props.isOwner && props.questStatus !== QuestStatus.completed && props.questStatus !== QuestStatus.archived)
+const showReopen = computed(() => props.isOwner && props.questStatus === QuestStatus.completed)
+const showDelete = computed(() => props.isOwner)
 
 function handleComplete() {
   emit('complete-quest')
@@ -20,6 +22,10 @@ function handleComplete() {
 function handleReopen() {
   emit('reopen-quest')
 }
+
+function handleDelete() {
+  emit('request-delete')
+}
 </script>
 
 <template>
@@ -27,10 +33,7 @@ function handleReopen() {
     class="w-100"
     dense
   >
-    <v-col
-      cols="12"
-      sm="6"
-    >
+    <v-col cols="12" sm="4">
       <v-btn
         block
         color="primary"
@@ -39,10 +42,7 @@ function handleReopen() {
         Back to Quests
       </v-btn>
     </v-col>
-    <v-col
-      cols="12"
-      sm="6"
-    >
+    <v-col cols="12" sm="4">
       <template v-if="showComplete">
         <v-btn
           block
@@ -61,6 +61,21 @@ function handleReopen() {
           Reopen Quest
         </v-btn>
       </template>
+    </v-col>
+    <v-col
+      v-if="showDelete"
+      cols="12"
+      sm="4"
+    >
+      <v-btn
+        block
+        color="error"
+        variant="outlined"
+        prepend-icon="mdi-trash-can-outline"
+        @click="handleDelete"
+      >
+        Delete / Archive
+      </v-btn>
     </v-col>
   </v-row>
 </template>

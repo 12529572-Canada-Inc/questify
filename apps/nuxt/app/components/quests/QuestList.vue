@@ -1,9 +1,21 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { Quest } from '@prisma/client'
 
-defineProps<{
+const props = defineProps<{
   quests: Quest[]
+  currentUserId?: string | null
 }>()
+
+const emit = defineEmits<{
+  (e: 'delete-quest', quest: Quest): void
+}>()
+
+function handleDelete(quest: Quest) {
+  emit('delete-quest', quest)
+}
+
+const currentUserId = computed(() => props.currentUserId ?? null)
 </script>
 
 <template>
@@ -15,7 +27,11 @@ defineProps<{
       sm="6"
       md="4"
     >
-      <QuestCard :quest="quest" />
+      <QuestCard
+        :quest="quest"
+        :current-user-id="currentUserId"
+        @delete-quest="handleDelete"
+      />
     </v-col>
   </v-row>
 </template>

@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, QuestStatus } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -12,10 +12,14 @@ export default defineEventHandler(async (event) => {
 
   const quest = await prisma.quest.findUnique({
     where: { id },
-    select: { ownerId: true },
+    select: { ownerId: true, deletedAt: true },
   })
 
   if (!quest) {
+    throw createError({ status: 404, statusText: 'Quest not found' })
+  }
+
+  if (quest.deletedAt) {
     throw createError({ status: 404, statusText: 'Quest not found' })
   }
 
@@ -32,17 +36,28 @@ export default defineEventHandler(async (event) => {
   }
 
   // Prepare update data
-  const updateData: { status?: string, isPublic?: boolean } = {}
+  const updateData: { status?: QuestStatus, isPublic?: boolean } = {}
+  let normalizedStatus: QuestStatus | undefined
 
   // Validate and add status if provided
   if (status !== undefined) {
-    const allowedStatuses = ['draft', 'active', 'completed', 'failed'] as const
-
-    if (!allowedStatuses.includes(status as typeof allowedStatuses[number])) {
+    if (typeof status !== 'string') {
       throw createError({ status: 400, statusText: 'Invalid quest status' })
     }
 
-    updateData.status = status
+    const allowedStatuses: QuestStatus[] = [
+      QuestStatus.draft,
+      QuestStatus.active,
+      QuestStatus.completed,
+      QuestStatus.failed,
+    ]
+
+    if (!allowedStatuses.includes(status as QuestStatus)) {
+      throw createError({ status: 400, statusText: 'Invalid quest status' })
+    }
+
+    normalizedStatus = status as QuestStatus
+    updateData.status = normalizedStatus
   }
 
   // Validate and add isPublic if provided
@@ -55,7 +70,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Handle status changes that affect tasks
-  if (status === 'completed') {
+  if (normalizedStatus === QuestStatus.completed) {
     // Transaction: complete quest + all tasks
     const [updatedQuest] = await prisma.$transaction([
       prisma.quest.update({
@@ -71,7 +86,7 @@ export default defineEventHandler(async (event) => {
     return updatedQuest
   }
 
-  if (status === 'draft' || status === 'active') {
+  if (normalizedStatus === QuestStatus.draft || normalizedStatus === QuestStatus.active) {
     const [updatedQuest] = await prisma.$transaction([
       prisma.quest.update({
         where: { id },
