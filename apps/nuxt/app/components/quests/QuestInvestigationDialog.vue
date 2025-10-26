@@ -13,8 +13,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
-  (e: 'update:prompt', value: string): void
-  (e: 'update:modelType', value: string): void
+  (e: 'update:prompt' | 'update:modelType', value: string): void
   (e: 'cancel' | 'submit'): void
 }>()
 

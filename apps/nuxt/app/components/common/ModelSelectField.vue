@@ -20,7 +20,6 @@ function toModel(value: unknown): AiModelOption | null {
   }
   return null
 }
-
 </script>
 
 <template>

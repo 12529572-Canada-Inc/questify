@@ -79,7 +79,13 @@ async function callAnthropicModel(model: AiModelOption, prompt: string) {
     .trim();
 }
 
-async function runModel(prompt: string, requestedModelId?: string | null, allowFallback = true): Promise<{ content: string, modelId: string }> {
+type RunModelResult = { content: string, modelId: string };
+
+async function runModel(
+  prompt: string,
+  requestedModelId?: string | null,
+  allowFallback = true,
+): Promise<RunModelResult> {
   const model = resolveModel(requestedModelId);
 
   try {
