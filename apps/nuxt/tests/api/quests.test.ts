@@ -79,7 +79,7 @@ describe('API /api/quests (GET)', () => {
         status: { not: QuestStatus.archived },
         OR: [
           { ownerId: 'user-1' },
-          { isPublic: true },
+          { isPublic: true, status: { not: QuestStatus.archived } },
         ],
       },
       orderBy: { createdAt: 'desc' },
@@ -97,7 +97,7 @@ describe('API /api/quests (GET)', () => {
         deletedAt: null,
         OR: [
           { ownerId: 'user-99' },
-          { isPublic: true },
+          { isPublic: true, status: { not: QuestStatus.archived } },
         ],
       },
       orderBy: { createdAt: 'desc' },

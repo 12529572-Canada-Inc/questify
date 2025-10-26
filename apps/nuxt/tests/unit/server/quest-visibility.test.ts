@@ -14,7 +14,7 @@ describe('quest visibility utilities', () => {
       status: { not: QuestStatus.archived },
       OR: [
         { ownerId: 'user-1' },
-        { isPublic: true },
+        { isPublic: true, status: { not: QuestStatus.archived } },
       ],
     })
   })

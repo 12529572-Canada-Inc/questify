@@ -22,11 +22,16 @@ export function buildQuestVisibilityFilter(userId?: string | null, options: Ques
   }
 
   if (userId) {
+    const publicFilter: Prisma.QuestWhereInput = {
+      isPublic: true,
+      status: { not: QuestStatus.archived },
+    }
+
     return {
       ...baseFilter,
       OR: [
         { ownerId: userId },
-        { isPublic: true },
+        publicFilter,
       ],
     }
   }
