@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { TaskInvestigationWithUser } from '~/types/quest-tasks'
+import { useAiModels } from '~/composables/useAiModels'
 
 const props = defineProps<{
   investigation: TaskInvestigationWithUser
@@ -9,6 +11,9 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'toggle', investigationId: string): void
 }>()
+
+const { findModelById } = useAiModels()
+const modelMeta = computed(() => findModelById(props.investigation.modelType))
 
 const investigationStatusMeta = {
   pending: {
@@ -70,6 +75,22 @@ function onToggle() {
             </template>
           </span>
         </div>
+        <v-tooltip
+          v-if="modelMeta"
+          :text="modelMeta.description"
+        >
+          <template #activator="{ props: tooltipProps }">
+            <v-chip
+              v-bind="tooltipProps"
+              class="task-investigation-model"
+              variant="outlined"
+              size="small"
+              prepend-icon="mdi-robot-outline"
+            >
+              {{ modelMeta.label }}
+            </v-chip>
+          </template>
+        </v-tooltip>
         <v-chip
           v-if="investigation.status === 'pending'"
           color="warning"
@@ -177,6 +198,10 @@ function onToggle() {
 
 .task-investigation-meta {
   gap: 6px;
+}
+
+.task-investigation-model {
+  font-weight: 500;
 }
 
 .task-investigation-pending {

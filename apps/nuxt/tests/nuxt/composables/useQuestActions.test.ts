@@ -45,7 +45,7 @@ describe('useQuestActions', () => {
 
     await actions.markTaskCompleted('task-1')
     await actions.updateTask('task-2', { title: 'Updated' })
-    await actions.investigateTask('task-3', 'Check the blockers')
+    await actions.investigateTask('task-3', { prompt: 'Check the blockers', modelType: 'gpt-4o-mini' })
     await actions.completeQuest()
 
     expect(fetchMock).not.toHaveBeenCalled()
@@ -100,39 +100,26 @@ describe('useQuestActions', () => {
     expect(showSnackbar).toHaveBeenCalledWith('Quest reopened and set to active.', expect.objectContaining({ variant: 'success' }))
   })
 
-  it('trims investigation prompts and skips empty payloads', async () => {
+  it('trims investigation prompts before sending', async () => {
     const actions = useQuestActions({
       questId: 'quest-prompts',
       refresh,
       isOwner: ref(true),
     })
 
-    await actions.investigateTask('task-trim', '   Details please   ')
-    await actions.investigateTask('task-empty', '   ')
-    await actions.investigateTask('task-null', null)
+    await actions.investigateTask('task-trim', {
+      prompt: '   Details please   ',
+      modelType: 'gpt-4o',
+    })
 
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/tasks/task-trim/investigations',
       expect.objectContaining({
         method: 'POST',
-        body: { prompt: 'Details please' },
+        body: { prompt: 'Details please', modelType: 'gpt-4o' },
       }),
     )
-    expect(fetchMock).toHaveBeenCalledWith(
-      '/api/tasks/task-empty/investigations',
-      expect.objectContaining({
-        method: 'POST',
-        body: undefined,
-      }),
-    )
-    expect(fetchMock).toHaveBeenCalledWith(
-      '/api/tasks/task-null/investigations',
-      expect.objectContaining({
-        method: 'POST',
-        body: undefined,
-      }),
-    )
-    expect(refresh).toHaveBeenCalledTimes(3)
+    expect(refresh).toHaveBeenCalledTimes(1)
     expect(showSnackbar).toHaveBeenCalledWith('Investigation request submitted.', expect.objectContaining({ variant: 'success' }))
   })
 

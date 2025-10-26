@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import { getDefaultModelId, normalizeModelType } from '../../utils/model-options'
 
 const prisma = new PrismaClient()
 
@@ -11,6 +12,7 @@ const handler = defineEventHandler(async (event) => {
     goal,
     context,
     constraints,
+    modelType,
   } = body
 
   if (typeof title !== 'string' || title.trim().length === 0) {
@@ -27,6 +29,8 @@ const handler = defineEventHandler(async (event) => {
   // TODO: deretmine potentially better way to access this
   const questQueue = event.context.questQueue as QuestQueue
 
+  const selectedModelType = normalizeModelType(modelType, getDefaultModelId())
+
   const quest = await prisma.quest.create({
     data: {
       title: title.trim(),
@@ -34,6 +38,7 @@ const handler = defineEventHandler(async (event) => {
       context: sanitizeOptionalField(context),
       constraints: sanitizeOptionalField(constraints),
       ownerId: user.id,
+      modelType: selectedModelType,
     },
   })
 
@@ -43,6 +48,7 @@ const handler = defineEventHandler(async (event) => {
     goal: sanitizeOptionalField(goal),
     context: sanitizeOptionalField(context),
     constraints: sanitizeOptionalField(constraints),
+    modelType: selectedModelType,
   })
 
   return { success: true, quest }

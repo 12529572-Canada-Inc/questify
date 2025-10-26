@@ -25,6 +25,7 @@ model Quest {
   id          String   @id @default(cuid())
   ownerId     String
   title       String
+  modelType   String   @default("gpt-4o-mini")
   goal        String?
   context     String?
   constraints String?
@@ -53,6 +54,7 @@ model TaskInvestigation {
   id            String   @id @default(cuid())
   taskId        String
   status        String   @default("pending")
+  modelType     String   @default("gpt-4o-mini")
   summary       String?
   details       String?
   error         String?

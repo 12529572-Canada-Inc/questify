@@ -4,6 +4,7 @@ import { storeToRefs } from 'pinia'
 import { useSnackbar } from './useSnackbar'
 import { resolveApiError } from '~/utils/error'
 import { useQuestStore } from '~/stores/quest'
+import { useAiModels } from './useAiModels'
 
 interface UseQuestFormOptions {
   onSuccess?: (questId: string) => void
@@ -20,6 +21,14 @@ export function useQuestForm(options: UseQuestFormOptions = {}) {
   const context = ref('')
   const constraints = ref('')
   const showOptionalFields = ref(false)
+  const { models: aiModels, defaultModel } = useAiModels()
+  const modelType = ref(defaultModel.value?.id ?? 'gpt-4o-mini')
+
+  watch(defaultModel, (next) => {
+    if (next && !modelType.value) {
+      modelType.value = next.id
+    }
+  })
 
   const valid = ref(false)
   const loading = ref(false)
@@ -53,6 +62,7 @@ export function useQuestForm(options: UseQuestFormOptions = {}) {
           goal: goal.value,
           context: context.value,
           constraints: constraints.value,
+          modelType: modelType.value,
         },
       })
 
@@ -89,6 +99,8 @@ export function useQuestForm(options: UseQuestFormOptions = {}) {
     goal,
     context,
     constraints,
+    modelType,
+    modelOptions: aiModels,
     showOptionalFields,
     valid,
     loading,

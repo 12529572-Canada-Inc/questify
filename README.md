@@ -35,6 +35,10 @@ pnpm dev:worker               # runs the queue worker with hot reload
 
 - `.env` in the repository root configures both Nuxt runtime config and worker bindings.
 - Set `OPENAI_API_KEY` (or equivalent provider key) before enabling AI-powered quest generation.
+- Optional providers:
+  - `ANTHROPIC_API_KEY` unlocks Claude models (defaults to API version `2023-06-01`, override via `ANTHROPIC_API_VERSION`).
+  - `DEEPSEEK_API_KEY` + `DEEPSEEK_BASE_URL` (defaults to `https://api.deepseek.com/v1`) enable DeepSeek chat/coder models.
+- Configure the model catalog via `AI_MODEL_CONFIG_JSON` (inline JSON) or `AI_MODEL_CONFIG_PATH` (JSON file). When unset, Questify falls back to the built-in mix of OpenAI, Anthropic, and DeepSeek models.
 - Redis credentials map to `runtimeConfig.redis` (Nuxt) and `packages/shared/src/config/redis.ts` (worker).
 
 ## Development Workflow

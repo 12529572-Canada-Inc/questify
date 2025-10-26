@@ -10,6 +10,8 @@ const {
   goal,
   context,
   constraints,
+  modelType,
+  modelOptions,
   showOptionalFields,
   valid,
   loading,
@@ -31,6 +33,12 @@ const {
       label="Title"
       :rules="rules.title"
       required
+    />
+
+    <ModelSelectField
+      v-model="modelType"
+      :models="modelOptions"
+      class="mb-4"
     />
 
     <v-btn
