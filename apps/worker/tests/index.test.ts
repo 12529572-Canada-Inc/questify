@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import * as shared from 'shared/server';
 
 const workerInstance = {};
@@ -22,6 +22,10 @@ const OpenAIMock = vi.fn(() => ({
 }));
 const configMock = {
   openaiApiKey: 'test-openai-key',
+  anthropicApiKey: '',
+  anthropicApiVersion: '2023-06-01',
+  deepseekApiKey: '',
+  deepseekBaseUrl: 'https://api.deepseek.com/v1',
   redisHost: 'fallback-host',
   redisPort: 6380,
   redisPassword: 'fallback-pass',
@@ -29,6 +33,27 @@ const configMock = {
   redisTls: false,
   databaseUrl: 'postgres://example',
 };
+
+const originalFetch = globalThis.fetch;
+
+beforeAll(() => {
+  if (!globalThis.fetch) {
+    globalThis.fetch = vi.fn(async () => ({
+      ok: true,
+      json: async () => ({ content: [] }),
+      text: async () => '',
+    })) as unknown as typeof fetch;
+  }
+});
+
+afterAll(() => {
+  if (originalFetch) {
+    globalThis.fetch = originalFetch;
+  }
+  else {
+    Reflect.deleteProperty(globalThis as typeof globalThis & { fetch?: typeof fetch }, 'fetch');
+  }
+});
 
 vi.mock('bullmq', () => ({
   Worker: WorkerMock,
@@ -63,7 +88,11 @@ describe('worker entrypoint', () => {
     openAiCreateMock.mockReset();
     OpenAIMock.mockClear();
     Object.assign(configMock, {
-      openaiApiKey: 'test-openai-key',
+    openaiApiKey: 'test-openai-key',
+    anthropicApiKey: '',
+    anthropicApiVersion: '2023-06-01',
+    deepseekApiKey: '',
+    deepseekBaseUrl: 'https://api.deepseek.com/v1',
       redisHost: 'fallback-host',
       redisPort: 6380,
       redisPassword: 'fallback-pass',
@@ -315,6 +344,7 @@ describe('worker entrypoint', () => {
         summary: 'Key findings',
         details: 'Detailed analysis',
         error: null,
+        modelType: 'gpt-4o-mini',
       },
     });
   });

@@ -1,16 +1,20 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import type { AiModelOption } from 'shared/ai-models'
 
 const props = defineProps<{
   modelValue: boolean
   prompt: string
+  modelType: string
   submitting: boolean
   error: string | null
+  models: AiModelOption[]
 }>()
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
   (e: 'update:prompt', value: string): void
+  (e: 'update:modelType', value: string): void
   (e: 'cancel' | 'submit'): void
 }>()
 
@@ -22,6 +26,11 @@ const dialogOpen = computed({
 const promptModel = computed({
   get: () => props.prompt,
   set: value => emit('update:prompt', value),
+})
+
+const modelTypeModel = computed({
+  get: () => props.modelType,
+  set: value => emit('update:modelType', value),
 })
 
 function handleCancel() {
@@ -44,6 +53,11 @@ function handleSubmit() {
         Investigate Task
       </v-card-title>
       <v-card-text class="d-flex flex-column gap-4">
+        <ModelSelectField
+          v-model="modelTypeModel"
+          :models="props.models"
+          :disabled="submitting"
+        />
         <div>
           <p class="text-body-2 mb-2">
             Provide additional context or questions for the Quest Agent to research.

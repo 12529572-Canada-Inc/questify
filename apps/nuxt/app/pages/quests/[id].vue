@@ -98,6 +98,8 @@ const {
   investigationDialogSubmitting,
   investigationDialogError,
   investigationPrompt,
+  investigationModelType,
+  investigationModelOptions,
   hasPendingInvestigations,
   openInvestigationDialog,
   closeInvestigationDialog,
@@ -106,6 +108,7 @@ const {
   investigateTask,
   todoTasks,
   completedTasks,
+  questModelType: computed(() => questData.value?.modelType ?? null),
 })
 
 function handleQuestShare() {
@@ -192,6 +195,8 @@ useQuestPolling(refresh, {
               <QuestInvestigationDialog
                 v-model="investigationDialogOpen"
                 v-model:prompt="investigationPrompt"
+                v-model:model-type="investigationModelType"
+                :models="investigationModelOptions"
                 :submitting="investigationDialogSubmitting"
                 :error="investigationDialogError"
                 @cancel="closeInvestigationDialog"

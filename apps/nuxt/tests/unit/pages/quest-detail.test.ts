@@ -113,6 +113,8 @@ vi.mock('~/composables/useQuestInvestigations', () => ({
     investigationDialogSubmitting: ref(false),
     investigationDialogError: ref(null),
     investigationPrompt: ref(''),
+    investigationModelType: ref('gpt-4o-mini'),
+    investigationModelOptions: ref([]),
     hasPendingInvestigations: ref(false),
     openInvestigationDialog: vi.fn(),
     closeInvestigationDialog: vi.fn(),

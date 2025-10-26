@@ -1,0 +1,5 @@
+ALTER TABLE "Quest"
+ADD COLUMN IF NOT EXISTS "modelType" TEXT NOT NULL DEFAULT 'gpt-4o-mini';
+
+ALTER TABLE "TaskInvestigation"
+ADD COLUMN IF NOT EXISTS "modelType" TEXT NOT NULL DEFAULT 'gpt-4o-mini';

@@ -3,7 +3,8 @@ import '../support/mocks/vueuse'
 import type { ComponentPublicInstance } from 'vue'
 import type { VueWrapper } from '@vue/test-utils'
 import { computed, ref } from 'vue'
-import { describe, expect, it, vi } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
+import { defaultAiModels } from 'shared/ai-models'
 import QuestActionButtons from '../../../app/components/quests/QuestActionButtons.vue'
 import QuestCard from '../../../app/components/quests/QuestCard.vue'
 import QuestDetailsCard from '../../../app/components/quests/QuestDetailsCard.vue'
@@ -62,7 +63,28 @@ const vuetifyStubFlags = {
   VOverlay: true,
   VProgressCircular: true,
   VSpacer: true,
+  ModelSelectField: true,
 }
+
+const originalUseRuntimeConfig = (globalThis as typeof globalThis & { useRuntimeConfig?: () => unknown }).useRuntimeConfig
+
+beforeAll(() => {
+  Reflect.set(globalThis, 'useRuntimeConfig', vi.fn(() => ({
+    public: {
+      aiModels: defaultAiModels,
+      aiModelDefaultId: 'gpt-4o-mini',
+    },
+  })))
+})
+
+afterAll(() => {
+  if (originalUseRuntimeConfig) {
+    Reflect.set(globalThis, 'useRuntimeConfig', originalUseRuntimeConfig)
+  }
+  else {
+    Reflect.deleteProperty(globalThis, 'useRuntimeConfig')
+  }
+})
 
 type DetailedSection = {
   key: string
@@ -128,12 +150,15 @@ vi.mock('~/composables/useQuestForm', () => {
   const context = ref('Some context')
   const constraints = ref('No constraints')
   const showOptionalFields = ref(true)
+  const modelType = ref('gpt-4o-mini')
   return {
     useQuestForm: () => ({
       title,
       goal,
       context,
       constraints,
+      modelType,
+      modelOptions: ref(defaultAiModels),
       showOptionalFields,
       valid: ref(true),
       loading: ref(false),
@@ -244,6 +269,11 @@ describe('quest components', () => {
   it('renders QuestForm with mocked composable', async () => {
     const wrapper = mountWithBase(QuestForm, {
       props: { showBackButton: true },
+      global: {
+        stubs: {
+          ModelSelectField: true,
+        },
+      },
     })
 
     const vm = wrapper.vm as ComponentPublicInstance & { submit?: () => Promise<void> }
@@ -260,6 +290,13 @@ describe('quest components', () => {
         prompt: 'Investigate blockers',
         submitting: false,
         error: null,
+        modelType: 'gpt-4o-mini',
+        models: defaultAiModels,
+      },
+      global: {
+        stubs: {
+          ...vuetifyStubFlags,
+        },
       },
     })
 
