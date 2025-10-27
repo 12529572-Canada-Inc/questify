@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { defaultAiModels } from 'shared/ai-models'
 import handler from '../../server/api/quests/index.post'
 
 type ErrorPayload = {
@@ -15,6 +16,7 @@ type GlobalWithMocks = typeof globalThis & {
   requireUserSession?: RequireUserSessionMock
   readBody?: ReadBodyMock
   createError?: CreateErrorMock
+  useRuntimeConfig?: () => { aiModels?: typeof defaultAiModels, aiModelDefaultId?: string }
 }
 
 const prismaMocks = vi.hoisted(() => ({
@@ -33,6 +35,7 @@ const queueAddMock = vi.fn()
 const originalRequireUserSession = (globalThis as GlobalWithMocks).requireUserSession
 const originalReadBody = (globalThis as GlobalWithMocks).readBody
 const originalCreateError = (globalThis as GlobalWithMocks).createError
+const originalUseRuntimeConfig = (globalThis as GlobalWithMocks).useRuntimeConfig
 
 beforeEach(() => {
   prismaMocks.questCreate.mockReset()
@@ -63,6 +66,11 @@ beforeEach(() => {
     error.statusCode = status ?? statusCode ?? 500
     return error
   })
+
+  Reflect.set(globalThis as GlobalWithMocks, 'useRuntimeConfig', vi.fn(() => ({
+    aiModels: defaultAiModels,
+    aiModelDefaultId: 'gpt-4o-mini',
+  })))
 })
 
 afterEach(() => {
@@ -74,6 +82,9 @@ afterEach(() => {
 
   if (originalCreateError) Reflect.set(globalThis as GlobalWithMocks, 'createError', originalCreateError)
   else Reflect.deleteProperty(globalThis as GlobalWithMocks, 'createError')
+
+  if (originalUseRuntimeConfig) Reflect.set(globalThis as GlobalWithMocks, 'useRuntimeConfig', originalUseRuntimeConfig)
+  else Reflect.deleteProperty(globalThis as GlobalWithMocks, 'useRuntimeConfig')
 })
 
 describe('API /api/quests (POST)', () => {
@@ -95,6 +106,7 @@ describe('API /api/quests (POST)', () => {
         context: null,
         constraints: null,
         ownerId: 'user-1',
+        modelType: 'gpt-4o-mini',
       },
     })
     expect(queueAddMock).toHaveBeenCalledWith('decompose', {
@@ -103,6 +115,7 @@ describe('API /api/quests (POST)', () => {
       goal: 'Ship feature',
       context: null,
       constraints: null,
+      modelType: 'gpt-4o-mini',
     })
     expect(response).toEqual({
       success: true,

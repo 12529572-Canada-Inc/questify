@@ -47,6 +47,10 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 404, statusText: 'Quest not found' })
   }
 
+  if (quest.deletedAt) {
+    throw createError({ status: 404, statusText: 'Quest not found' })
+  }
+
   if (!canViewQuest(quest, userId)) {
     throw createError({ status: 403, statusText: 'You do not have permission to view this quest' })
   }

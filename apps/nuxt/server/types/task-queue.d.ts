@@ -3,5 +3,6 @@ declare interface TaskQueue {
     investigationId: string
     taskId: string
     prompt?: string | null
+    modelType: string
   }) => Promise<void>
 }

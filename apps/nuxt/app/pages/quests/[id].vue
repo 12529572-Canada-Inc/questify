@@ -9,12 +9,15 @@ import { useQuestShareDialog } from '~/composables/useQuestShareDialog'
 import { useQuestTaskHighlight } from '~/composables/useQuestTaskHighlight'
 import { useQuestPolling } from '~/composables/useQuestPolling'
 import { useQuestDisplay, useQuestErrorAlert } from '~/composables/useQuestDisplay'
+import { useQuestLifecycle } from '~/composables/useQuestLifecycle'
 import QuestDetailsCard from '~/components/quests/QuestDetailsCard.vue'
 import QuestTaskEditDialog from '~/components/quests/QuestTaskEditDialog.vue'
 import QuestInvestigationDialog from '~/components/quests/QuestInvestigationDialog.vue'
 import QuestActionButtons from '~/components/quests/QuestActionButtons.vue'
+import QuestDeleteDialog from '~/components/quests/QuestDeleteDialog.vue'
 import type { QuestTaskTab, TaskWithInvestigations } from '~/types/quest-tasks'
 import { useUserStore } from '~/stores/user'
+import { useQuestStore } from '~/stores/quest'
 
 const route = useRoute()
 const id = route.params.id as string
@@ -22,6 +25,7 @@ const requestUrl = useRequestURL()
 
 const { data: quest, refresh, pending, error } = await useQuest(id)
 const userStore = useUserStore()
+const questStore = useQuestStore()
 const { user } = storeToRefs(userStore)
 
 if (!user.value) {
@@ -98,6 +102,8 @@ const {
   investigationDialogSubmitting,
   investigationDialogError,
   investigationPrompt,
+  investigationModelType,
+  investigationModelOptions,
   hasPendingInvestigations,
   openInvestigationDialog,
   closeInvestigationDialog,
@@ -106,6 +112,7 @@ const {
   investigateTask,
   todoTasks,
   completedTasks,
+  questModelType: computed(() => questData.value?.modelType ?? null),
 })
 
 function handleQuestShare() {
@@ -150,6 +157,45 @@ useQuestPolling(refresh, {
   hasPendingInvestigations,
   investigatingTaskIds: investigatingTaskIdsList,
 })
+
+const lifecycleDialogOpen = ref(false)
+
+const {
+  archiveQuest: archiveQuestLifecycle,
+  deleteQuest: deleteQuestLifecycle,
+  archiveLoading,
+  deleteLoading,
+} = useQuestLifecycle({
+  questId: computed(() => questData.value?.id ?? null),
+  isOwner,
+  onArchived: refresh,
+  onDeleted: async () => {
+    questStore.removeQuest(id)
+    await navigateTo('/quests')
+  },
+})
+
+function requestQuestDeletion() {
+  lifecycleDialogOpen.value = true
+}
+
+function handleLifecycleCancel() {
+  lifecycleDialogOpen.value = false
+}
+
+async function handleArchiveQuest() {
+  const success = await archiveQuestLifecycle()
+  if (success) {
+    lifecycleDialogOpen.value = false
+  }
+}
+
+async function handleDeleteQuest() {
+  const success = await deleteQuestLifecycle()
+  if (success) {
+    lifecycleDialogOpen.value = false
+  }
+}
 </script>
 
 <template>
@@ -192,6 +238,8 @@ useQuestPolling(refresh, {
               <QuestInvestigationDialog
                 v-model="investigationDialogOpen"
                 v-model:prompt="investigationPrompt"
+                v-model:model-type="investigationModelType"
+                :models="investigationModelOptions"
                 :submitting="investigationDialogSubmitting"
                 :error="investigationDialogError"
                 @cancel="closeInvestigationDialog"
@@ -205,6 +253,7 @@ useQuestPolling(refresh, {
                 :quest-status="questData.status"
                 @complete-quest="completeQuest"
                 @reopen-quest="reopenQuest"
+                @request-delete="requestQuestDeletion"
               />
             </template>
           </QuestDetailsCard>
@@ -230,6 +279,15 @@ useQuestPolling(refresh, {
         </template>
       </v-col>
     </v-row>
+    <QuestDeleteDialog
+      v-model="lifecycleDialogOpen"
+      :quest-title="questData?.title ?? 'this quest'"
+      :archive-loading="archiveLoading"
+      :delete-loading="deleteLoading"
+      @archive="handleArchiveQuest"
+      @delete="handleDeleteQuest"
+      @cancel="handleLifecycleCancel"
+    />
   </v-container>
 </template>
 

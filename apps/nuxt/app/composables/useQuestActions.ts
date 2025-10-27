@@ -117,7 +117,7 @@ export function useQuestActions(options: QuestActionsOptions) {
     )
   }
 
-  async function investigateTask(taskId: string, prompt?: string | null) {
+  async function investigateTask(taskId: string, payload: { prompt: string, modelType: string }) {
     if (!canMutate()) {
       return
     }
@@ -125,7 +125,10 @@ export function useQuestActions(options: QuestActionsOptions) {
     try {
       await $fetch(`/api/tasks/${taskId}/investigations`, {
         method: 'POST',
-        body: prompt && prompt.trim().length > 0 ? { prompt: prompt.trim() } : undefined,
+        body: {
+          prompt: payload.prompt.trim(),
+          modelType: payload.modelType,
+        },
       })
 
       await options.refresh()

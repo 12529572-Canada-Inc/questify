@@ -1,12 +1,27 @@
 import { Worker, type Job } from 'bullmq';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, QuestStatus } from '@prisma/client';
 import OpenAI from 'openai';
+import { findModelOption, resolveModelId, type AiModelOption } from 'shared';
+import { loadModelConfig, parseRedisUrl } from 'shared/server';
 import { config } from './config.js';
 import { parseJsonFromModel } from './helpers.js';
-import { parseRedisUrl } from 'shared/server';
 
 const prisma = new PrismaClient();
-const openai = new OpenAI({ apiKey: config.openaiApiKey });
+
+const { models: aiModels, defaultModelId } = loadModelConfig();
+if (!aiModels.length) {
+  throw new Error('No AI models configured. Provide at least one AI model in the configuration.');
+}
+
+const openai = config.openaiApiKey ? new OpenAI({ apiKey: config.openaiApiKey }) : null;
+const deepseek = config.deepseekApiKey
+  ? new OpenAI({
+    apiKey: config.deepseekApiKey,
+    baseURL: config.deepseekBaseUrl,
+  })
+  : null;
+const anthropicApiKey = config.anthropicApiKey;
+const anthropicApiVersion = config.anthropicApiVersion;
 
 const connection = parseRedisUrl(config.redisUrl) || {
   host: config.redisHost,
@@ -15,12 +30,94 @@ const connection = parseRedisUrl(config.redisUrl) || {
   tls: config.redisTls ? {} : undefined,
 };
 
+function resolveModel(modelId?: string | null): AiModelOption {
+  const normalizedId = resolveModelId(aiModels, modelId ?? defaultModelId);
+  return findModelOption(aiModels, normalizedId) ?? aiModels[0];
+}
+
+async function callOpenAiClient(client: OpenAI | null, model: AiModelOption, prompt: string) {
+  if (!client) {
+    throw new Error(`Missing API client for provider ${model.provider}`);
+  }
+
+  const response = await client.chat.completions.create({
+    model: model.apiModel,
+    messages: [{ role: 'user', content: prompt }],
+  });
+
+  return response.choices[0].message?.content ?? '';
+}
+
+async function callAnthropicModel(model: AiModelOption, prompt: string) {
+  if (!anthropicApiKey) {
+    throw new Error('Missing API client for provider anthropic');
+  }
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'x-api-key': anthropicApiKey,
+      'anthropic-version': anthropicApiVersion,
+    },
+    body: JSON.stringify({
+      model: model.apiModel,
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: 1200,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Anthropic API error: ${errorText || response.statusText}`);
+  }
+
+  const payload = await response.json() as { content?: Array<{ text?: string }> };
+  return (payload.content ?? [])
+    .map(item => (typeof item.text === 'string' ? item.text : ''))
+    .join('\n')
+    .trim();
+}
+
+type RunModelResult = { content: string, modelId: string };
+
+async function runModel(
+  prompt: string,
+  requestedModelId?: string | null,
+  allowFallback = true,
+): Promise<RunModelResult> {
+  const model = resolveModel(requestedModelId);
+
+  try {
+    let content = '';
+    if (model.provider === 'openai') {
+      content = await callOpenAiClient(openai, model, prompt);
+    }
+    else if (model.provider === 'deepseek') {
+      content = await callOpenAiClient(deepseek, model, prompt);
+    }
+    else {
+      content = await callAnthropicModel(model, prompt);
+    }
+
+    return { content, modelId: model.id };
+  }
+  catch (error) {
+    if (allowFallback && model.id !== defaultModelId) {
+      console.warn(`Model ${model.id} failed (${(error as Error).message}); falling back to ${defaultModelId}`);
+      return runModel(prompt, defaultModelId, false);
+    }
+    throw error;
+  }
+}
+
 type DecomposeJobData = {
   questId: string
   title: string
   goal?: string | null
   context?: string | null
   constraints?: string | null
+  modelType?: string | null
 }
 
 async function processQuestJob(job: Job<DecomposeJobData>) {
@@ -49,15 +146,8 @@ Return the plan as a JSON array where each item has the shape {"title": string, 
   console.log('Prompt:', prompt);
 
   try {
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [{ role: 'user', content: prompt }],
-    });
-
-    console.log('OpenAI response:', response);
-
-    const content = response.choices[0].message?.content || '';
-    console.log('OpenAI content:', content);
+    const { content, modelId } = await runModel(prompt, job.data.modelType);
+    console.log(`AI (${modelId}) content:`, content);
 
     type GeneratedTask = {
       title?: string
@@ -89,13 +179,13 @@ Return the plan as a JSON array where each item has the shape {"title": string, 
 
     await prisma.quest.update({
       where: { id: questId },
-      data: { status: 'active' },
+      data: { status: QuestStatus.active },
     });
   } catch (error) {
     console.error('Error during quest decomposition:', error);
     await prisma.quest.update({
       where: { id: questId },
-      data: { status: 'failed' },
+      data: { status: QuestStatus.failed },
     });
   }
 }
@@ -104,6 +194,7 @@ type InvestigateJobData = {
   investigationId: string
   taskId: string
   prompt?: string | null
+  modelType?: string | null
 }
 
 async function processTaskInvestigation(job: Job<InvestigateJobData>) {
@@ -165,13 +256,11 @@ Return a JSON object with the shape {"summary": string, "details": string}. "sum
 ${promptSections.join('\n')}`;
 
   try {
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [{ role: 'user', content: prompt }],
-    });
-
-    const content = response.choices[0].message?.content || '';
-    console.log('Investigation content:', content);
+    const { content, modelId } = await runModel(
+      prompt,
+      investigation.modelType ?? job.data.modelType,
+    );
+    console.log(`Investigation content (${modelId}):`, content);
 
     const result = parseJsonFromModel<{ summary?: string; details?: string }>(content);
 
@@ -182,6 +271,7 @@ ${promptSections.join('\n')}`;
         summary: result?.summary ?? 'Investigation completed.',
         details: result?.details ?? '',
         error: null,
+        modelType: modelId,
       },
     });
   } catch (error) {

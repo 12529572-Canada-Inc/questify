@@ -1,4 +1,5 @@
 import { describe, beforeEach, afterEach, expect, it, vi } from 'vitest'
+import { defaultAiModels } from 'shared/ai-models'
 import handler from '../../server/api/tasks/[id]/investigations.post'
 
 type RequireUserSessionMock = (event?: unknown) => Promise<{ user: { id: string } }>
@@ -15,6 +16,7 @@ type GlobalWithMocks = typeof globalThis & {
   getRouterParam?: GetRouterParamMock
   readBody?: ReadBodyMock
   createError?: CreateErrorMock
+  useRuntimeConfig?: () => { aiModels?: typeof defaultAiModels, aiModelDefaultId?: string }
 }
 
 const prismaMocks = vi.hoisted(() => ({
@@ -39,6 +41,7 @@ const originalRequireUserSession = (globalThis as GlobalWithMocks).requireUserSe
 const originalGetRouterParam = (globalThis as GlobalWithMocks).getRouterParam
 const originalReadBody = (globalThis as GlobalWithMocks).readBody
 const originalCreateError = (globalThis as GlobalWithMocks).createError
+const originalUseRuntimeConfig = (globalThis as GlobalWithMocks).useRuntimeConfig
 
 beforeEach(() => {
   prismaMocks.taskFindUniqueMock.mockReset()
@@ -57,7 +60,12 @@ beforeEach(() => {
     return error
   })
 
-  prismaMocks.taskFindUniqueMock.mockResolvedValue({ id: 'task-1', quest: { ownerId: 'user-1' } })
+  Reflect.set(globalThis as GlobalWithMocks, 'useRuntimeConfig', vi.fn(() => ({
+    aiModels: defaultAiModels,
+    aiModelDefaultId: 'gpt-4o-mini',
+  })))
+
+  prismaMocks.taskFindUniqueMock.mockResolvedValue({ id: 'task-1', quest: { ownerId: 'user-1', modelType: 'gpt-4o-mini' } })
   prismaMocks.taskInvestigationCreateMock.mockResolvedValue({
     id: 'inv-1',
     status: 'pending',
@@ -77,6 +85,9 @@ afterEach(() => {
 
   if (originalCreateError) Reflect.set(globalThis as GlobalWithMocks, 'createError', originalCreateError)
   else Reflect.deleteProperty(globalThis as GlobalWithMocks, 'createError')
+
+  if (originalUseRuntimeConfig) Reflect.set(globalThis as GlobalWithMocks, 'useRuntimeConfig', originalUseRuntimeConfig)
+  else Reflect.deleteProperty(globalThis as GlobalWithMocks, 'useRuntimeConfig')
 })
 
 describe('API /api/tasks/[id]/investigations.post', () => {
@@ -98,6 +109,7 @@ describe('API /api/tasks/[id]/investigations.post', () => {
         quest: {
           select: {
             ownerId: true,
+            modelType: true,
           },
         },
       },
@@ -108,12 +120,14 @@ describe('API /api/tasks/[id]/investigations.post', () => {
         initiatedById: 'user-1',
         prompt: 'Explore risks and opportunities',
         status: 'pending',
+        modelType: 'gpt-4o-mini',
       },
     })
     expect(addMock).toHaveBeenCalledWith('investigate-task', {
       investigationId: 'inv-1',
       taskId: 'task-1',
       prompt: 'Explore risks and opportunities',
+      modelType: 'gpt-4o-mini',
     })
     expect(response.investigation).toEqual({
       id: 'inv-1',

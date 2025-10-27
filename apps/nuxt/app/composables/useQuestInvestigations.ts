@@ -1,15 +1,18 @@
 import { computed, ref, unref, watch, type MaybeRef } from 'vue'
 import type { TaskWithInvestigations } from '~/types/quest-tasks'
 import { resolveApiError } from '~/utils/error'
+import { useAiModels } from './useAiModels'
 
-type InvestigateTaskFn = (taskId: string, prompt: string) => Promise<void>
+type InvestigateTaskFn = (taskId: string, payload: { prompt: string, modelType: string }) => Promise<void>
 
 export function useQuestInvestigations(options: {
   investigateTask: InvestigateTaskFn
   todoTasks: MaybeRef<TaskWithInvestigations[]>
   completedTasks: MaybeRef<TaskWithInvestigations[]>
+  questModelType?: MaybeRef<string | null>
 }) {
-  const { investigateTask, todoTasks, completedTasks } = options
+  const { investigateTask, todoTasks, completedTasks, questModelType } = options
+  const { models: modelOptions, findModelById } = useAiModels()
 
   const investigationError = ref<string | null>(null)
   const investigatingTaskIds = ref<Set<string>>(new Set())
@@ -19,6 +22,8 @@ export function useQuestInvestigations(options: {
   const investigationDialogError = ref<string | null>(null)
   const investigationPrompt = ref('')
   const investigationTargetTask = ref<TaskWithInvestigations | null>(null)
+  const questModel = computed(() => unref(questModelType) ?? null)
+  const investigationModelType = ref(findModelById(questModel.value)?.id ?? findModelById(null)?.id ?? 'gpt-4o-mini')
 
   const allTasks = computed(() => [...unref(todoTasks), ...unref(completedTasks)])
 
@@ -34,6 +39,7 @@ export function useQuestInvestigations(options: {
     investigationTargetTask.value = task
     investigationPrompt.value = ''
     investigationDialogError.value = null
+    investigationModelType.value = findModelById(questModel.value)?.id ?? findModelById(null)?.id ?? investigationModelType.value
     investigationDialogOpen.value = true
   }
 
@@ -80,7 +86,10 @@ export function useQuestInvestigations(options: {
     addInvestigatingTask(taskId)
 
     try {
-      await investigateTask(taskId, prompt)
+      await investigateTask(taskId, {
+        prompt,
+        modelType: investigationModelType.value,
+      })
       investigationDialogOpen.value = false
       investigationTargetTask.value = null
       investigationPrompt.value = ''
@@ -120,6 +129,12 @@ export function useQuestInvestigations(options: {
     }
   })
 
+  watch(questModel, (next) => {
+    if (!investigationDialogOpen.value) {
+      investigationModelType.value = findModelById(next)?.id ?? investigationModelType.value
+    }
+  }, { immediate: true })
+
   return {
     investigationError,
     investigatingTaskIds,
@@ -130,6 +145,8 @@ export function useQuestInvestigations(options: {
     investigationDialogError,
     investigationPrompt,
     investigationTargetTask,
+    investigationModelType,
+    investigationModelOptions: modelOptions,
     hasPendingInvestigations,
     openInvestigationDialog,
     closeInvestigationDialog,

@@ -1,6 +1,9 @@
 import { defineNuxtConfig } from 'nuxt/config'
 import type { NuxtConfig } from 'nuxt/schema'
 import path from 'path'
+import { loadModelConfig } from '../../packages/shared/src/model-config'
+
+const aiModelConfig = loadModelConfig()
 
 // 🧠 Nuxt 4 Configuration — Questify
 export default defineNuxtConfig({
@@ -55,6 +58,8 @@ export default defineNuxtConfig({
 
   // 🧩 Runtime configuration
   runtimeConfig: {
+    aiModels: aiModelConfig.models,
+    aiModelDefaultId: aiModelConfig.defaultModelId,
     // 🔒 Server-only (not exposed to client)
     redis: {
       host: process.env.REDIS_HOST || 'localhost',
@@ -69,6 +74,8 @@ export default defineNuxtConfig({
       appEnv: process.env.NODE_ENV,
       apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || '/api',
       questifyVersion: '4.1.3',
+      aiModels: aiModelConfig.models,
+      aiModelDefaultId: aiModelConfig.defaultModelId,
     },
   },
 

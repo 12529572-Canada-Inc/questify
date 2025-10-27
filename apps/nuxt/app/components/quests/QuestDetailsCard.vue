@@ -5,6 +5,7 @@ import QuestTasksTabs from './QuestTasksTabs.vue'
 import QuestVisibilityToggle from './QuestVisibilityToggle.vue'
 import type { QuestTaskSection, QuestTaskTab, TaskWithInvestigations } from '~/types/quest-tasks'
 import type { Quest } from '@prisma/client'
+import { useAiModels } from '~/composables/useAiModels'
 
 const props = defineProps<{
   quest: Quest & { owner?: { name?: string | null } | null }
@@ -38,6 +39,9 @@ const taskTabModel = computed({
 function handleVisibilityUpdate() {
   emit('update-visibility')
 }
+
+const { findModelById } = useAiModels()
+const questModel = computed(() => findModelById(props.quest.modelType))
 </script>
 
 <template>
@@ -71,6 +75,22 @@ function handleVisibilityUpdate() {
                 :disabled="pending"
                 @update:is-public="handleVisibilityUpdate"
               />
+              <v-tooltip
+                v-if="questModel"
+                :text="questModel.description"
+              >
+                <template #activator="{ props: tooltipProps }">
+                  <v-chip
+                    v-bind="tooltipProps"
+                    class="quest-model-chip text-capitalize"
+                    size="small"
+                    variant="outlined"
+                    prepend-icon="mdi-robot-outline"
+                  >
+                    {{ questModel.label }}
+                  </v-chip>
+                </template>
+              </v-tooltip>
             </div>
             <template v-if="!isOwner">
               <div class="d-flex align-center gap-2 text-medium-emphasis text-body-2 flex-wrap">
@@ -171,6 +191,10 @@ function handleVisibilityUpdate() {
 
 .quest-status-chip {
   letter-spacing: 0.05em;
+}
+
+.quest-model-chip {
+  font-weight: 500;
 }
 
 .quest-title-row {

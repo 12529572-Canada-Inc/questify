@@ -157,7 +157,11 @@ describe('default layout', () => {
 
     await flushPromises()
 
-    expect(wrapper.find('.app-bar-actions').exists()).toBe(false)
+    const desktopActions = wrapper.get('.app-bar-actions')
+    expect(desktopActions.classes()).toContain('app-bar-actions--hidden')
+
+    const mobileActions = wrapper.get('.app-bar-mobile-actions')
+    expect(mobileActions.classes()).toContain('app-bar-mobile-actions--visible')
     const menuBtn = wrapper.find('[data-testid="app-bar-menu-button"]')
     expect(menuBtn.exists()).toBe(true)
 

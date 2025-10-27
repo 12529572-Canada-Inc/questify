@@ -3,7 +3,8 @@ import '../support/mocks/vueuse'
 import type { ComponentPublicInstance } from 'vue'
 import type { VueWrapper } from '@vue/test-utils'
 import { computed, ref } from 'vue'
-import { describe, expect, it, vi } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
+import { defaultAiModels } from 'shared/ai-models'
 import QuestActionButtons from '../../../app/components/quests/QuestActionButtons.vue'
 import QuestCard from '../../../app/components/quests/QuestCard.vue'
 import QuestDetailsCard from '../../../app/components/quests/QuestDetailsCard.vue'
@@ -12,6 +13,7 @@ import QuestDetailsSummary from '../../../app/components/quests/QuestDetailsSumm
 import QuestForm from '../../../app/components/quests/QuestForm.vue'
 import QuestInvestigationDialog from '../../../app/components/quests/QuestInvestigationDialog.vue'
 import QuestList from '../../../app/components/quests/QuestList.vue'
+import QuestDeleteDialog from '../../../app/components/quests/QuestDeleteDialog.vue'
 import QuestOwnerInfo from '../../../app/components/quests/QuestOwnerInfo.vue'
 import QuestTaskActions from '../../../app/components/quests/QuestTaskActions.vue'
 import QuestTaskEditDialog from '../../../app/components/quests/QuestTaskEditDialog.vue'
@@ -62,7 +64,28 @@ const vuetifyStubFlags = {
   VOverlay: true,
   VProgressCircular: true,
   VSpacer: true,
+  ModelSelectField: true,
 }
+
+const originalUseRuntimeConfig = (globalThis as typeof globalThis & { useRuntimeConfig?: () => unknown }).useRuntimeConfig
+
+beforeAll(() => {
+  Reflect.set(globalThis, 'useRuntimeConfig', vi.fn(() => ({
+    public: {
+      aiModels: defaultAiModels,
+      aiModelDefaultId: 'gpt-4o-mini',
+    },
+  })))
+})
+
+afterAll(() => {
+  if (originalUseRuntimeConfig) {
+    Reflect.set(globalThis, 'useRuntimeConfig', originalUseRuntimeConfig)
+  }
+  else {
+    Reflect.deleteProperty(globalThis, 'useRuntimeConfig')
+  }
+})
 
 type DetailedSection = {
   key: string
@@ -73,6 +96,9 @@ type DetailedSection = {
 type SetupState = Record<string, unknown> & {
   handleComplete?: () => void
   handleReopen?: () => void
+  handleDelete?: () => void
+  requestDelete?: () => void
+  handleArchive?: () => void
   toggleOptionalFields?: () => void
   handleCancel?: () => void
   handleSubmit?: () => void
@@ -128,12 +154,15 @@ vi.mock('~/composables/useQuestForm', () => {
   const context = ref('Some context')
   const constraints = ref('No constraints')
   const showOptionalFields = ref(true)
+  const modelType = ref('gpt-4o-mini')
   return {
     useQuestForm: () => ({
       title,
       goal,
       context,
       constraints,
+      modelType,
+      modelOptions: ref(defaultAiModels),
       showOptionalFields,
       valid: ref(true),
       loading: ref(false),
@@ -191,14 +220,74 @@ describe('quest components', () => {
     expect(wrapper.emitted('reopen-quest')).toBeTruthy()
   })
 
+  it('emits delete requests from QuestActionButtons', () => {
+    const wrapper = shallowMountWithBase(QuestActionButtons, {
+      props: {
+        isOwner: true,
+        questStatus: 'active',
+      },
+      global: {
+        stubs: {
+          ...vuetifyStubFlags,
+        },
+      },
+    })
+
+    const state = getSetupState(wrapper)
+    state.handleDelete?.()
+    expect(wrapper.emitted('request-delete')).toBeTruthy()
+  })
+
   it('renders QuestCard summary', () => {
     const wrapper = mountWithBase(QuestCard, {
       props: {
         quest: sampleQuest,
+        currentUserId: 'user-2',
       },
     })
 
     expect(wrapper.text()).toContain('Launch Quest')
+  })
+
+  it('emits QuestCard delete events for the owner', () => {
+    const wrapper = shallowMountWithBase(QuestCard, {
+      props: {
+        quest: sampleQuest,
+        currentUserId: 'user-1',
+      },
+      global: {
+        stubs: {
+          ...vuetifyStubFlags,
+        },
+      },
+    })
+
+    const state = getSetupState(wrapper)
+    state.requestDelete?.()
+    expect(wrapper.emitted('delete-quest')).toBeTruthy()
+  })
+
+  it('renders QuestDeleteDialog and emits lifecycle events', () => {
+    const wrapper = shallowMountWithBase(QuestDeleteDialog, {
+      props: {
+        modelValue: true,
+        questTitle: 'Launch Quest',
+      },
+      global: {
+        stubs: {
+          ...vuetifyStubFlags,
+        },
+      },
+    })
+
+    const state = getSetupState(wrapper)
+    state.handleArchive?.()
+    state.handleDelete?.()
+    state.handleCancel?.()
+
+    expect(wrapper.emitted('archive')).toBeTruthy()
+    expect(wrapper.emitted('delete')).toBeTruthy()
+    expect(wrapper.emitted('cancel')).toBeTruthy()
   })
 
   it('renders QuestDetailsSections with decorated output', () => {
@@ -244,6 +333,11 @@ describe('quest components', () => {
   it('renders QuestForm with mocked composable', async () => {
     const wrapper = mountWithBase(QuestForm, {
       props: { showBackButton: true },
+      global: {
+        stubs: {
+          ModelSelectField: true,
+        },
+      },
     })
 
     const vm = wrapper.vm as ComponentPublicInstance & { submit?: () => Promise<void> }
@@ -260,6 +354,13 @@ describe('quest components', () => {
         prompt: 'Investigate blockers',
         submitting: false,
         error: null,
+        modelType: 'gpt-4o-mini',
+        models: defaultAiModels,
+      },
+      global: {
+        stubs: {
+          ...vuetifyStubFlags,
+        },
       },
     })
 
@@ -273,10 +374,14 @@ describe('quest components', () => {
     const wrapper = shallowMountWithBase(QuestList, {
       props: {
         quests: [sampleQuest],
+        currentUserId: 'user-1',
       },
     })
 
     expect(wrapper.exists()).toBe(true)
+    const state = getSetupState(wrapper)
+    state.handleDelete?.()
+    expect(wrapper.emitted('delete-quest')).toBeTruthy()
   })
 
   it('renders QuestOwnerInfo', () => {

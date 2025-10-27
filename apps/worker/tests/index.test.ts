@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import * as shared from 'shared/server';
 
 const workerInstance = {};
@@ -22,6 +22,10 @@ const OpenAIMock = vi.fn(() => ({
 }));
 const configMock = {
   openaiApiKey: 'test-openai-key',
+  anthropicApiKey: '',
+  anthropicApiVersion: '2023-06-01',
+  deepseekApiKey: '',
+  deepseekBaseUrl: 'https://api.deepseek.com/v1',
   redisHost: 'fallback-host',
   redisPort: 6380,
   redisPassword: 'fallback-pass',
@@ -29,6 +33,32 @@ const configMock = {
   redisTls: false,
   databaseUrl: 'postgres://example',
 };
+
+const QUEST_STATUS = {
+  active: 'active',
+  failed: 'failed',
+} as const;
+
+const originalFetch = globalThis.fetch;
+
+beforeAll(() => {
+  if (!globalThis.fetch) {
+    globalThis.fetch = vi.fn(async () => ({
+      ok: true,
+      json: async () => ({ content: [] }),
+      text: async () => '',
+    })) as unknown as typeof fetch;
+  }
+});
+
+afterAll(() => {
+  if (originalFetch) {
+    globalThis.fetch = originalFetch;
+  }
+  else {
+    Reflect.deleteProperty(globalThis as typeof globalThis & { fetch?: typeof fetch }, 'fetch');
+  }
+});
 
 vi.mock('bullmq', () => ({
   Worker: WorkerMock,
@@ -38,6 +68,7 @@ vi.mock('../src/helpers.js', () => ({
 }));
 vi.mock('@prisma/client', () => ({
   PrismaClient: PrismaClientMock,
+  QuestStatus: QUEST_STATUS,
 }));
 vi.mock('openai', () => ({
   default: OpenAIMock,
@@ -63,7 +94,11 @@ describe('worker entrypoint', () => {
     openAiCreateMock.mockReset();
     OpenAIMock.mockClear();
     Object.assign(configMock, {
-      openaiApiKey: 'test-openai-key',
+    openaiApiKey: 'test-openai-key',
+    anthropicApiKey: '',
+    anthropicApiVersion: '2023-06-01',
+    deepseekApiKey: '',
+    deepseekBaseUrl: 'https://api.deepseek.com/v1',
       redisHost: 'fallback-host',
       redisPort: 6380,
       redisPassword: 'fallback-pass',
@@ -167,7 +202,7 @@ describe('worker entrypoint', () => {
     });
     expect(questUpdateMock).toHaveBeenCalledWith({
       where: { id: 'quest-1' },
-      data: { status: 'active' },
+      data: { status: QUEST_STATUS.active },
     });
   });
 
@@ -190,7 +225,7 @@ describe('worker entrypoint', () => {
     expect(taskCreateMock).not.toHaveBeenCalled();
     expect(questUpdateMock).toHaveBeenCalledWith({
       where: { id: 'quest-2' },
-      data: { status: 'failed' },
+      data: { status: QUEST_STATUS.failed },
     });
     expect(errorSpy).toHaveBeenCalledWith(
       'Error during quest decomposition:',
@@ -315,6 +350,7 @@ describe('worker entrypoint', () => {
         summary: 'Key findings',
         details: 'Detailed analysis',
         error: null,
+        modelType: 'gpt-4o-mini',
       },
     });
   });

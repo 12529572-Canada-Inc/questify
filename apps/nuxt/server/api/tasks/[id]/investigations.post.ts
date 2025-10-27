@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import { normalizeModelType } from '../../../utils/model-options'
 
 const prisma = new PrismaClient()
 
@@ -24,6 +25,7 @@ export default defineEventHandler(async (event) => {
       quest: {
         select: {
           ownerId: true,
+          modelType: true,
         },
       },
     },
@@ -37,12 +39,15 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 403, statusText: 'You do not have permission to investigate this task' })
   }
 
+  const selectedModelType = normalizeModelType(body.modelType, task.quest.modelType)
+
   const investigation = await prisma.taskInvestigation.create({
     data: {
       taskId: id,
       initiatedById: user.id,
       prompt,
       status: 'pending',
+      modelType: selectedModelType,
     },
   })
 
@@ -53,6 +58,7 @@ export default defineEventHandler(async (event) => {
       investigationId: investigation.id,
       taskId: id,
       prompt,
+      modelType: selectedModelType,
     })
   }
   else {

@@ -3,7 +3,8 @@ declare interface QuestBody {
   goal?: string | null
   context?: string | null
   constraints?: string | null
-  status?: 'draft' | 'active' | 'completed' | 'failed'
+  modelType?: string | null
+  status?: 'draft' | 'active' | 'completed' | 'failed' | 'archived'
   isPublic?: boolean
 }
 
@@ -23,5 +24,6 @@ declare interface QuestQueue {
     goal?: string | null
     context?: string | null
     constraints?: string | null
+    modelType: string
   }) => Promise<void>
 }
