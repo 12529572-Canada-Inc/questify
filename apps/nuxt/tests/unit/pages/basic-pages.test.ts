@@ -104,7 +104,7 @@ describe('basic pages', () => {
           VRow: { template: '<div><slot /></div>' },
           VCol: { template: '<div><slot /></div>' },
           VBtn: { props: ['to'], template: '<button :data-to="to"><slot /></button>' },
-          QuestList: { template: '<div class="quest-list-stub" />' },
+          QuestList: { props: ['quests', 'currentUserId'], template: '<div class="quest-list-stub" />' },
         },
       },
     })

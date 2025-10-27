@@ -31,6 +31,17 @@ describe('useQuestStore', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 
+  it('requests archived quests when the flag is provided', async () => {
+    fetchMock.mockResolvedValueOnce([sampleQuest])
+
+    const store = useQuestStore()
+    await store.fetchQuests({ includeArchived: true })
+
+    expect(fetchMock).toHaveBeenCalledWith('/api/quests', {
+      params: { includeArchived: 'true' },
+    })
+  })
+
   it('forces refetch when requested', async () => {
     fetchMock.mockResolvedValue([sampleQuest])
     const store = useQuestStore()
