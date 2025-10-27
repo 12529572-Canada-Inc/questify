@@ -90,7 +90,7 @@ describe('quests index page', () => {
           VCol: { template: '<div><slot /></div>' },
           VBtn: buttonStub,
           VSwitch: switchStub,
-          QuestList: { props: ['quests', 'currentUserId'], template: '<div class=\"quest-list\" />' },
+          QuestList: { props: ['quests', 'currentUserId'], template: '<div class="quest-list" />' },
           QuestDeleteDialog: { template: '<div />' },
         },
       },
@@ -99,8 +99,9 @@ describe('quests index page', () => {
     await flushPromises()
     fetchSpy.mockClear()
 
-    const toggle = wrapper.find('input[type=\"checkbox\"]')
-    await toggle.setChecked(true)
+    const toggle = wrapper.find('input[type="checkbox"]')
+    await toggle.setValue(true)
+    await toggle.trigger('change')
     await flushPromises()
 
     expect(fetchSpy).toHaveBeenCalledWith(expect.objectContaining({ includeArchived: true, force: true }))

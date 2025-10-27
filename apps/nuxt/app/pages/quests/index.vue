@@ -9,7 +9,7 @@ import { useUserStore } from '~/stores/user'
 const questStore = useQuestStore()
 const userStore = useUserStore()
 
-const { quests, loaded } = storeToRefs(questStore)
+const { quests } = storeToRefs(questStore)
 const { user } = storeToRefs(userStore)
 
 if (!user.value) {

@@ -3,7 +3,7 @@ import { computed } from 'vue'
 
 interface Props {
   modelValue: boolean
-  questTitle: string
+  questTitle?: string
   archiveLoading?: boolean
   deleteLoading?: boolean
 }
@@ -16,9 +16,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
-  (e: 'archive'): void
-  (e: 'delete'): void
-  (e: 'cancel'): void
+  (e: 'archive' | 'delete' | 'cancel'): void
 }>()
 
 const dialogModel = computed({
