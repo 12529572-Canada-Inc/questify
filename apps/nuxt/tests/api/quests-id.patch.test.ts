@@ -71,7 +71,7 @@ beforeEach(() => {
 
   Reflect.set(globalWithMocks, 'requireUserSession', vi.fn(async () => ({ user: { id: 'user-1' } })))
   Reflect.set(globalWithMocks, 'getRouterParam', vi.fn(() => 'quest-1'))
-    Reflect.set(globalWithMocks, 'readBody', vi.fn(async () => ({ status: QuestStatus.completed })))
+  Reflect.set(globalWithMocks, 'readBody', vi.fn(async () => ({ status: QuestStatus.completed })))
   Reflect.set(globalWithMocks, 'createError', ({ status, statusCode, statusText }) => {
     const error = new Error(statusText ?? 'Error') as Error & { statusCode?: number }
     error.statusCode = status ?? statusCode ?? 500

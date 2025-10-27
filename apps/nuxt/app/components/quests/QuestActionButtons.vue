@@ -33,7 +33,10 @@ function handleDelete() {
     class="w-100"
     dense
   >
-    <v-col cols="12" sm="4">
+    <v-col
+      cols="12"
+      sm="4"
+    >
       <v-btn
         block
         color="primary"
@@ -42,7 +45,10 @@ function handleDelete() {
         Back to Quests
       </v-btn>
     </v-col>
-    <v-col cols="12" sm="4">
+    <v-col
+      cols="12"
+      sm="4"
+    >
       <template v-if="showComplete">
         <v-btn
           block

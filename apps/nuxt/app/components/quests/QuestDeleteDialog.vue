@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+
 interface Props {
   modelValue: boolean
   questTitle: string
@@ -74,11 +75,11 @@ function handleDelete() {
         </v-btn>
         <v-btn
           color="secondary"
-        :loading="archiveLoading"
-        :disabled="isBusy"
-        variant="outlined"
-        prepend-icon="mdi-archive-outline"
-        @click="handleArchive"
+          :loading="archiveLoading"
+          :disabled="isBusy"
+          variant="outlined"
+          prepend-icon="mdi-archive-outline"
+          @click="handleArchive"
         >
           Archive Instead
         </v-btn>
