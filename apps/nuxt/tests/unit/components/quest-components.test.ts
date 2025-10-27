@@ -96,6 +96,9 @@ type DetailedSection = {
 type SetupState = Record<string, unknown> & {
   handleComplete?: () => void
   handleReopen?: () => void
+  handleDelete?: () => void
+  requestDelete?: () => void
+  handleArchive?: () => void
   toggleOptionalFields?: () => void
   handleCancel?: () => void
   handleSubmit?: () => void
@@ -377,7 +380,7 @@ describe('quest components', () => {
 
     expect(wrapper.exists()).toBe(true)
     const state = getSetupState(wrapper)
-    state.handleDelete?.(sampleQuest as never)
+    state.handleDelete?.()
     expect(wrapper.emitted('delete-quest')).toBeTruthy()
   })
 
