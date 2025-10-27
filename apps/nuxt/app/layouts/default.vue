@@ -158,8 +158,8 @@ async function logout() {
         </NuxtLink>
       </v-app-bar-title>
       <div
-        v-if="!isMobile"
         class="app-bar-actions"
+        :class="{ 'app-bar-actions--hidden': isMobile }"
       >
         <v-btn
           class="app-bar-share-btn"
@@ -245,8 +245,8 @@ async function logout() {
         </div>
       </div>
       <div
-        v-else
         class="app-bar-mobile-actions"
+        :class="{ 'app-bar-mobile-actions--visible': isMobile }"
       >
         <v-menu
           v-model="mobileMenuOpen"
@@ -351,7 +351,17 @@ async function logout() {
 }
 
 .app-bar-mobile-actions {
+  display: none;
+  align-items: center;
   margin-left: auto;
+}
+
+.app-bar-actions--hidden {
+  display: none;
+}
+
+.app-bar-mobile-actions--visible {
+  display: flex;
 }
 
 .app-bar-menu-btn {
@@ -408,6 +418,16 @@ async function logout() {
 
 .app-bar-auth__btn {
   min-width: 0;
+}
+
+@media (max-width: 767px) {
+  .app-bar-actions {
+    display: none;
+  }
+
+  .app-bar-mobile-actions {
+    display: flex;
+  }
 }
 
 @media (max-width: 600px) {
