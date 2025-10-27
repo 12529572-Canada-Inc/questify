@@ -1,5 +1,4 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { QuestStatus } from '@prisma/client';
 import * as shared from 'shared/server';
 
 const workerInstance = {};
@@ -35,6 +34,11 @@ const configMock = {
   databaseUrl: 'postgres://example',
 };
 
+const QUEST_STATUS = {
+  active: 'active',
+  failed: 'failed',
+} as const;
+
 const originalFetch = globalThis.fetch;
 
 beforeAll(() => {
@@ -64,6 +68,7 @@ vi.mock('../src/helpers.js', () => ({
 }));
 vi.mock('@prisma/client', () => ({
   PrismaClient: PrismaClientMock,
+  QuestStatus: QUEST_STATUS,
 }));
 vi.mock('openai', () => ({
   default: OpenAIMock,
@@ -197,7 +202,7 @@ describe('worker entrypoint', () => {
     });
     expect(questUpdateMock).toHaveBeenCalledWith({
       where: { id: 'quest-1' },
-      data: { status: QuestStatus.active },
+      data: { status: QUEST_STATUS.active },
     });
   });
 
@@ -220,7 +225,7 @@ describe('worker entrypoint', () => {
     expect(taskCreateMock).not.toHaveBeenCalled();
     expect(questUpdateMock).toHaveBeenCalledWith({
       where: { id: 'quest-2' },
-      data: { status: QuestStatus.failed },
+      data: { status: QUEST_STATUS.failed },
     });
     expect(errorSpy).toHaveBeenCalledWith(
       'Error during quest decomposition:',
