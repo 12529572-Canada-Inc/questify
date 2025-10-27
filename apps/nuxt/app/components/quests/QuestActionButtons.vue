@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { QuestStatus } from '@prisma/client'
 import { computed } from 'vue'
+import { QUEST_STATUS, type QuestStatus } from '~/types/quest'
 
 const props = defineProps<{
   isOwner: boolean
@@ -11,8 +11,8 @@ const emit = defineEmits<{
   (e: 'complete-quest' | 'reopen-quest' | 'request-delete'): void
 }>()
 
-const showComplete = computed(() => props.isOwner && props.questStatus !== QuestStatus.completed && props.questStatus !== QuestStatus.archived)
-const showReopen = computed(() => props.isOwner && props.questStatus === QuestStatus.completed)
+const showComplete = computed(() => props.isOwner && props.questStatus !== QUEST_STATUS.completed && props.questStatus !== QUEST_STATUS.archived)
+const showReopen = computed(() => props.isOwner && props.questStatus === QUEST_STATUS.completed)
 const showDelete = computed(() => props.isOwner)
 
 function handleComplete() {

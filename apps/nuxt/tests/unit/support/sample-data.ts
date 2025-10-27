@@ -1,4 +1,3 @@
-import { QuestStatus } from '@prisma/client'
 import { vi } from 'vitest'
 
 type Base = Record<string, unknown>
@@ -7,7 +6,7 @@ export function createQuest(overrides: Base = {}) {
   return {
     id: 'quest-1',
     title: 'Launch Quest',
-    status: QuestStatus.draft,
+    status: 'draft' as const,
     modelType: 'gpt-4o-mini',
     goal: 'Ship the new feature',
     context: 'Work with the product team to coordinate rollout.',
