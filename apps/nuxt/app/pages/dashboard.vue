@@ -181,7 +181,10 @@ async function handleRefresh() {
         </v-card-text>
       </v-card>
 
-      <v-row class="mt-4" dense>
+      <v-row
+        class="mt-4"
+        dense
+      >
         <v-col
           v-for="link in quickLinks"
           :key="link.key"
@@ -214,12 +217,18 @@ async function handleRefresh() {
         </v-col>
       </v-row>
 
-      <v-row class="mt-2" dense>
+      <v-row
+        class="mt-2"
+        dense
+      >
         <v-col
           cols="12"
           lg="8"
         >
-          <v-card class="dashboard__metrics-card" elevation="2">
+          <v-card
+            class="dashboard__metrics-card"
+            elevation="2"
+          >
             <v-card-title class="d-flex align-center justify-space-between">
               <span class="text-subtitle-1 font-weight-medium">
                 Quest Overview
@@ -275,7 +284,10 @@ async function handleRefresh() {
           cols="12"
           lg="4"
         >
-          <v-card class="dashboard__completion-card" elevation="2">
+          <v-card
+            class="dashboard__completion-card"
+            elevation="2"
+          >
             <v-card-text class="d-flex flex-column align-center text-center gap-3">
               <span class="text-subtitle-1 font-weight-medium">
                 Completion Rate
@@ -306,7 +318,10 @@ async function handleRefresh() {
         </v-col>
       </v-row>
 
-      <v-card class="dashboard__tasks-card mt-4" elevation="2">
+      <v-card
+        class="dashboard__tasks-card mt-4"
+        elevation="2"
+      >
         <v-card-title>
           <span class="text-subtitle-1 font-weight-medium">
             Task Highlights

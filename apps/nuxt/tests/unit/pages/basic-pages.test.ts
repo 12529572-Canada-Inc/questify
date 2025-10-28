@@ -49,7 +49,7 @@ beforeEach(() => {
     clear: vi.fn(),
   }))
   const userStore = useUserStore()
-  userStore.setUser(sessionUser.value)
+  userStore.setUser(sessionUser.value as SessionUser | null)
 
   const questStore = useQuestStore()
   vi.spyOn(questStore, 'fetchQuests').mockResolvedValue([createQuest()])
@@ -125,7 +125,7 @@ describe('basic pages', () => {
     sessionUser.value = { id: 'user-1', email: 'hero@example.com' } as SessionUser
     sessionLoggedIn.value = true
     const userStore = useUserStore()
-    userStore.setUser(sessionUser.value)
+    userStore.setUser(sessionUser.value as SessionUser)
 
     shallowMountWithBase(HomePage, {
       global: {
@@ -175,11 +175,11 @@ describe('basic pages', () => {
           VDivider: { template: '<div><slot /></div>' },
           VRow: { template: '<div><slot /></div>' },
           VCol: { template: '<div><slot /></div>' },
-          VBtn: { props: ['to'], template: '<button :data-to=\"to\"><slot /></button>' },
-          VIcon: { props: ['icon'], template: '<i :data-icon=\"icon\"></i>' },
+          VBtn: { props: ['to'], template: '<button :data-to="to"><slot /></button>' },
+          VIcon: { props: ['icon'], template: '<i :data-icon="icon"></i>' },
           VAvatar: { template: '<div><slot /></div>' },
-          VSkeletonLoader: { template: '<div class=\"skeleton\"></div>' },
-          VProgressCircular: { props: ['modelValue'], template: '<div class=\"progress\"><slot /></div>' },
+          VSkeletonLoader: { template: '<div class="skeleton"></div>' },
+          VProgressCircular: { props: ['modelValue'], template: '<div class="progress"><slot /></div>' },
         },
       },
     })
