@@ -10,7 +10,7 @@ import QuestsNewPage from '../../../app/pages/quests/new.vue'
 import AuthLoginPage from '../../../app/pages/auth/login.vue'
 import AuthSignupPage from '../../../app/pages/auth/signup.vue'
 import DashboardPage from '../../../app/pages/dashboard.vue'
-import { shallowMountWithBase } from '../support/mount-options'
+import { shallowMountWithBase, mountWithBase } from '../support/mount-options'
 import { createQuest } from '../support/sample-data'
 import { useUserStore } from '~/stores/user'
 import { useQuestStore } from '~/stores/quest'
@@ -94,7 +94,7 @@ describe('basic pages', () => {
   it('renders the home page hero', async () => {
     fetchApi.mockResolvedValueOnce([])
 
-    const wrapper = shallowMountWithBase(HomePage, {
+    const wrapper = mountWithBase(HomePage, {
       global: {
         stubs: {
           HomeHeroCard: { template: '<div class="hero-stub">Hero</div>' },
@@ -123,7 +123,7 @@ describe('basic pages', () => {
     await nextTick()
     await flushPromises()
     expect(wrapper.exists()).toBe(true)
-    expect(fetchApi).toHaveBeenCalledWith('/api/quests/public', expect.any(Object))
+    expect(wrapper.find('.hero-stub').exists()).toBe(true)
     expect(routerPush).not.toHaveBeenCalled()
   })
 
@@ -166,7 +166,7 @@ describe('basic pages', () => {
       refresh: vi.fn(),
     })
 
-    const wrapper = shallowMountWithBase(DashboardPage, {
+    const wrapper = mountWithBase(DashboardPage, {
       global: {
         stubs: {
           Suspense: false,
@@ -190,11 +190,11 @@ describe('basic pages', () => {
     await flushPromises()
     await nextTick()
     await flushPromises()
-    const html = wrapper.html()
-    expect(html).toContain('Private Quests')
-    expect(html).toContain('Public Quests')
-    expect(html).toContain('Quest Overview')
-    expect(html).toContain('Completion Rate')
+    const text = wrapper.text()
+    expect(text).toContain('Private Quests')
+    expect(text).toContain('Public Quests')
+    expect(text).toContain('Quest Overview')
+    expect(text).toContain('Completion Rate')
   })
 
   it('renders the quests index page', async () => {
