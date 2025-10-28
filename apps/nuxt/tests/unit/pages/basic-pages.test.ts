@@ -94,41 +94,41 @@ describe('basic pages', () => {
   it('renders the home page hero', async () => {
     fetchApi.mockResolvedValueOnce([])
 
-  const wrapper = shallowMountWithBase({
-    render() {
-      return h(Suspense, {}, { default: () => h(HomePage) })
-    },
-  }, {
-    global: {
-      stubs: {
-        HomeHeroCard: { template: '<div class="hero-stub">Hero</div>' },
-        VContainer: { template: '<div><slot /></div>' },
-        VRow: { template: '<div><slot /></div>' },
-        VCol: { template: '<div><slot /></div>' },
-        VSelect: { template: '<div />' },
-        VBtnToggle: { template: '<div />' },
-        VBtn: { template: '<button />' },
-        VProgressCircular: { template: '<div />' },
-        VIcon: { template: '<span />' },
-        VCard: { template: '<div><slot /></div>' },
-        VCardTitle: { template: '<div><slot /></div>' },
-        VCardSubtitle: { template: '<div><slot /></div>' },
-        VCardText: { template: '<div><slot /></div>' },
-        VChip: { template: '<span><slot /></span>' },
+    const wrapper = shallowMountWithBase({
+      render() {
+        return h(Suspense, {}, { default: () => h(HomePage) })
       },
-      mocks: {
-        $fetch: fetchApi,
+    }, {
+      global: {
+        stubs: {
+          HomeHeroCard: { template: '<div class="hero-stub">Hero</div>' },
+          VContainer: { template: '<div><slot /></div>' },
+          VRow: { template: '<div><slot /></div>' },
+          VCol: { template: '<div><slot /></div>' },
+          VSelect: { template: '<div />' },
+          VBtnToggle: { template: '<div />' },
+          VBtn: { template: '<button />' },
+          VProgressCircular: { template: '<div />' },
+          VIcon: { template: '<span />' },
+          VCard: { template: '<div><slot /></div>' },
+          VCardTitle: { template: '<div><slot /></div>' },
+          VCardSubtitle: { template: '<div><slot /></div>' },
+          VCardText: { template: '<div><slot /></div>' },
+          VChip: { template: '<span><slot /></span>' },
+        },
+        mocks: {
+          $fetch: fetchApi,
+        },
       },
-    },
-  })
+    })
 
-  await flushPromises()
-  await nextTick()
-  await flushPromises()
-  expect(wrapper.findComponent(HomePage).exists()).toBe(true)
-  expect(fetchApi).toHaveBeenCalledWith('/api/quests/public', expect.any(Object))
-  expect(routerPush).not.toHaveBeenCalled()
-})
+    await flushPromises()
+    await nextTick()
+    await flushPromises()
+    expect(wrapper.findComponent(HomePage).exists()).toBe(true)
+    expect(fetchApi).toHaveBeenCalledWith('/api/quests/public', expect.any(Object))
+    expect(routerPush).not.toHaveBeenCalled()
+  })
 
   it('redirects the root page to the dashboard when logged in', async () => {
     sessionUser.value = { id: 'user-1', email: 'hero@example.com' } as SessionUser
