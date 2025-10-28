@@ -210,7 +210,7 @@ async function handleDeleteQuest() {
             :task-sections="taskSections"
             :task-tab="taskTab"
             :tasks-loading="tasksLoading"
-            :pending="pending.value || false"
+            :pending="pending || false"
             :has-tasks="hasTasks"
             :investigating-task-ids="investigatingTaskIdsList"
             :highlighted-task-id="highlightedTaskId"
