@@ -1,6 +1,6 @@
 import '../support/mocks/vueuse'
 
-import { ref, h, Suspense, type ComponentPublicInstance } from 'vue'
+import { ref, h, Suspense, type ComponentPublicInstance, type Ref } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
@@ -19,6 +19,8 @@ const routerPush = vi.fn()
 const fetchSession = vi.fn().mockResolvedValue(undefined)
 const fetchApi = vi.fn().mockResolvedValue(undefined)
 const useMetricsMock = vi.fn()
+let sessionUser: Ref<unknown>
+let sessionLoggedIn: Ref<boolean>
 
 vi.mock('~/composables/useMetrics', () => ({
   useMetrics: (...args: unknown[]) => useMetricsMock(...args),
@@ -38,10 +40,11 @@ beforeEach(() => {
   fetchApi.mockReset()
   useMetricsMock.mockReset()
 
-  const sessionUser = ref(null)
+  sessionUser = ref<SessionUser | null>(null)
+  sessionLoggedIn = ref(false)
   vi.stubGlobal('useUserSession', () => ({
     user: sessionUser,
-    loggedIn: ref(false),
+    loggedIn: sessionLoggedIn,
     fetch: fetchSession,
     clear: vi.fn(),
   }))
@@ -62,6 +65,7 @@ beforeEach(() => {
     error: ref(null),
   })))
   vi.stubGlobal('$fetch', fetchApi)
+  vi.stubGlobal('navigateTo', routerPush)
 
   useMetricsMock.mockResolvedValue({
     data: ref({
@@ -115,6 +119,27 @@ describe('basic pages', () => {
 
     await Promise.resolve()
     expect(wrapper.text()).toContain('Hero')
+  })
+
+  it('redirects the root page to the dashboard when logged in', async () => {
+    sessionUser.value = { id: 'user-1', email: 'hero@example.com' } as SessionUser
+    sessionLoggedIn.value = true
+    const userStore = useUserStore()
+    userStore.setUser(sessionUser.value)
+
+    shallowMountWithBase(HomePage, {
+      global: {
+        stubs: {
+          HomeHeroCard: { template: '<div class="hero-stub">Hero</div>' },
+        },
+        mocks: {
+          $fetch: fetchApi,
+        },
+      },
+    })
+
+    await flushPromises()
+    expect(routerPush).toHaveBeenCalledWith('/dashboard', { replace: true })
   })
 
   it('renders the dashboard page with metrics', async () => {

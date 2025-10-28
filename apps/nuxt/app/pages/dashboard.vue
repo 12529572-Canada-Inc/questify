@@ -115,6 +115,10 @@ const quickLinks = [
     color: 'secondary',
   },
 ]
+
+async function handleRefresh() {
+  await refresh()
+}
 </script>
 
 <template>
@@ -126,7 +130,7 @@ const quickLinks = [
         variant="tonal"
         class="mb-4"
         closable
-        @click:close="refresh"
+        @click:close="handleRefresh"
       >
         {{ metricsError }}
       </v-alert>
@@ -225,7 +229,7 @@ const quickLinks = [
                 color="primary"
                 size="small"
                 :loading="metricsPending"
-                @click="refresh"
+                @click="handleRefresh"
               >
                 Refresh
               </v-btn>
