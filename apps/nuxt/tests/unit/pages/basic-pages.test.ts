@@ -98,6 +98,7 @@ describe('basic pages', () => {
       global: {
         stubs: {
           HomeHeroCard: { template: '<div class="hero-stub">Hero</div>' },
+          Suspense: false,
           VContainer: { template: '<div><slot /></div>' },
           VRow: { template: '<div><slot /></div>' },
           VCol: { template: '<div><slot /></div>' },
@@ -122,7 +123,7 @@ describe('basic pages', () => {
     await nextTick()
     await flushPromises()
     expect(wrapper.exists()).toBe(true)
-    expect(fetchApi).not.toHaveBeenCalled()
+    expect(fetchApi).toHaveBeenCalledWith('/api/quests/public', expect.any(Object))
     expect(routerPush).not.toHaveBeenCalled()
   })
 
@@ -168,6 +169,7 @@ describe('basic pages', () => {
     const wrapper = shallowMountWithBase(DashboardPage, {
       global: {
         stubs: {
+          Suspense: false,
           VContainer: { template: '<div><slot /></div>' },
           VAlert: { template: '<div><slot /></div>' },
           VCard: { template: '<div><slot /></div>' },
