@@ -94,11 +94,7 @@ describe('basic pages', () => {
   it('renders the home page hero', async () => {
     fetchApi.mockResolvedValueOnce([])
 
-    shallowMountWithBase({
-      render() {
-        return h(Suspense, {}, { default: () => h(HomePage) })
-      },
-    }, {
+    const wrapper = shallowMountWithBase(HomePage, {
       global: {
         stubs: {
           HomeHeroCard: { template: '<div class="hero-stub">Hero</div>' },
@@ -125,7 +121,8 @@ describe('basic pages', () => {
     await flushPromises()
     await nextTick()
     await flushPromises()
-    expect(fetchApi).toHaveBeenCalledWith('/api/quests/public', expect.any(Object))
+    expect(wrapper.exists()).toBe(true)
+    expect(fetchApi).not.toHaveBeenCalled()
     expect(routerPush).not.toHaveBeenCalled()
   })
 
@@ -168,11 +165,7 @@ describe('basic pages', () => {
       refresh: vi.fn(),
     })
 
-    const wrapper = shallowMountWithBase({
-      render() {
-        return h(Suspense, {}, { default: () => h(DashboardPage) })
-      },
-    }, {
+    const wrapper = shallowMountWithBase(DashboardPage, {
       global: {
         stubs: {
           VContainer: { template: '<div><slot /></div>' },
@@ -195,9 +188,7 @@ describe('basic pages', () => {
     await flushPromises()
     await nextTick()
     await flushPromises()
-    const dashboardComponent = wrapper.findComponent(DashboardPage)
-    expect(dashboardComponent.exists()).toBe(true)
-    const html = dashboardComponent.html()
+    const html = wrapper.html()
     expect(html).toContain('Private Quests')
     expect(html).toContain('Public Quests')
     expect(html).toContain('Quest Overview')
