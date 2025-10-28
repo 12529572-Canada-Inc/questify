@@ -36,6 +36,7 @@ beforeEach(() => {
   setActivePinia(createPinia())
 
   routerPush.mockReset()
+  routerPush.mockResolvedValue(undefined)
   fetchSession.mockReset()
   fetchApi.mockReset()
   useMetricsMock.mockReset()
@@ -93,35 +94,41 @@ describe('basic pages', () => {
   it('renders the home page hero', async () => {
     fetchApi.mockResolvedValueOnce([])
 
-    const wrapper = shallowMountWithBase(HomePage, {
-      global: {
-        stubs: {
-          HomeHeroCard: { template: '<div class="hero-stub">Hero</div>' },
-          VContainer: { template: '<div><slot /></div>' },
-          VRow: { template: '<div><slot /></div>' },
-          VCol: { template: '<div><slot /></div>' },
-          VSelect: { template: '<div />' },
-          VBtnToggle: { template: '<div />' },
-          VBtn: { template: '<button />' },
-          VProgressCircular: { template: '<div />' },
-          VIcon: { template: '<span />' },
-          VCard: { template: '<div><slot /></div>' },
-          VCardTitle: { template: '<div><slot /></div>' },
-          VCardSubtitle: { template: '<div><slot /></div>' },
-          VCardText: { template: '<div><slot /></div>' },
-          VChip: { template: '<span><slot /></span>' },
-        },
-        mocks: {
-          $fetch: fetchApi,
-        },
+  const wrapper = shallowMountWithBase({
+    render() {
+      return h(Suspense, {}, { default: () => h(HomePage) })
+    },
+  }, {
+    global: {
+      stubs: {
+        HomeHeroCard: { template: '<div class="hero-stub">Hero</div>' },
+        VContainer: { template: '<div><slot /></div>' },
+        VRow: { template: '<div><slot /></div>' },
+        VCol: { template: '<div><slot /></div>' },
+        VSelect: { template: '<div />' },
+        VBtnToggle: { template: '<div />' },
+        VBtn: { template: '<button />' },
+        VProgressCircular: { template: '<div />' },
+        VIcon: { template: '<span />' },
+        VCard: { template: '<div><slot /></div>' },
+        VCardTitle: { template: '<div><slot /></div>' },
+        VCardSubtitle: { template: '<div><slot /></div>' },
+        VCardText: { template: '<div><slot /></div>' },
+        VChip: { template: '<span><slot /></span>' },
       },
-    })
-
-    await flushPromises()
-    await nextTick()
-    expect(wrapper.find('.hero-stub').exists()).toBe(true)
-    expect(routerPush).not.toHaveBeenCalled()
+      mocks: {
+        $fetch: fetchApi,
+      },
+    },
   })
+
+  await flushPromises()
+  await nextTick()
+  await flushPromises()
+  expect(wrapper.findComponent(HomePage).exists()).toBe(true)
+  expect(fetchApi).toHaveBeenCalledWith('/api/quests/public', expect.any(Object))
+  expect(routerPush).not.toHaveBeenCalled()
+})
 
   it('redirects the root page to the dashboard when logged in', async () => {
     sessionUser.value = { id: 'user-1', email: 'hero@example.com' } as SessionUser
@@ -188,10 +195,12 @@ describe('basic pages', () => {
 
     await flushPromises()
     await nextTick()
-    expect(wrapper.text()).toContain('Private Quests')
-    expect(wrapper.text()).toContain('Public Quests')
-    expect(wrapper.text()).toContain('Quest Overview')
-    expect(wrapper.text()).toContain('Completion Rate')
+    await flushPromises()
+    const html = wrapper.html()
+    expect(html).toContain('Private Quests')
+    expect(html).toContain('Public Quests')
+    expect(html).toContain('Quest Overview')
+    expect(html).toContain('Completion Rate')
   })
 
   it('renders the quests index page', async () => {
