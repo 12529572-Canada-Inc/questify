@@ -67,6 +67,7 @@ beforeEach(() => {
   })))
   vi.stubGlobal('$fetch', fetchApi)
   vi.stubGlobal('navigateTo', routerPush)
+  vi.stubGlobal('definePageMeta', vi.fn())
 
   useMetricsMock.mockResolvedValue({
     data: ref({
@@ -94,11 +95,14 @@ describe('basic pages', () => {
   it('renders the home page hero', async () => {
     fetchApi.mockResolvedValueOnce([])
 
-    const wrapper = mountWithBase(HomePage, {
+    const wrapper = mountWithBase({
+      render() {
+        return h(Suspense, {}, { default: () => h(HomePage) })
+      },
+    }, {
       global: {
         stubs: {
           HomeHeroCard: { template: '<div class="hero-stub">Hero</div>' },
-          Suspense: false,
           VContainer: { template: '<div><slot /></div>' },
           VRow: { template: '<div><slot /></div>' },
           VCol: { template: '<div><slot /></div>' },
@@ -128,15 +132,26 @@ describe('basic pages', () => {
   })
 
   it('redirects the root page to the dashboard when logged in', async () => {
+    // Set logged in state BEFORE mounting
     sessionUser.value = { id: 'user-1', email: 'hero@example.com' } as SessionUser
     sessionLoggedIn.value = true
+
+    // Force the store to update
     const userStore = useUserStore()
     userStore.setUser(sessionUser.value as SessionUser)
 
-    shallowMountWithBase(HomePage, {
+    // Mount the component
+    mountWithBase({
+      render() {
+        return h(Suspense, {}, { default: () => h(HomePage) })
+      },
+    }, {
       global: {
         stubs: {
           HomeHeroCard: { template: '<div class="hero-stub">Hero</div>' },
+          VContainer: { template: '<div><slot /></div>' },
+          VRow: { template: '<div><slot /></div>' },
+          VCol: { template: '<div><slot /></div>' },
         },
         mocks: {
           $fetch: fetchApi,
@@ -144,7 +159,12 @@ describe('basic pages', () => {
       },
     })
 
+    // Wait for async component to resolve
     await flushPromises()
+    await nextTick()
+    await flushPromises()
+
+    // Check that navigation was called
     expect(routerPush).toHaveBeenCalledWith('/dashboard', { replace: true })
   })
 
@@ -166,10 +186,13 @@ describe('basic pages', () => {
       refresh: vi.fn(),
     })
 
-    const wrapper = mountWithBase(DashboardPage, {
+    const wrapper = mountWithBase({
+      render() {
+        return h(Suspense, {}, { default: () => h(DashboardPage) })
+      },
+    }, {
       global: {
         stubs: {
-          Suspense: false,
           VContainer: { template: '<div><slot /></div>' },
           VAlert: { template: '<div><slot /></div>' },
           VCard: { template: '<div><slot /></div>' },
