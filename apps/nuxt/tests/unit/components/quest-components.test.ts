@@ -13,6 +13,7 @@ import QuestDetailsSummary from '../../../app/components/quests/QuestDetailsSumm
 import QuestForm from '../../../app/components/quests/QuestForm.vue'
 import QuestInvestigationDialog from '../../../app/components/quests/QuestInvestigationDialog.vue'
 import QuestList from '../../../app/components/quests/QuestList.vue'
+import QuestDeleteDialog from '../../../app/components/quests/QuestDeleteDialog.vue'
 import QuestOwnerInfo from '../../../app/components/quests/QuestOwnerInfo.vue'
 import QuestTaskActions from '../../../app/components/quests/QuestTaskActions.vue'
 import QuestTaskEditDialog from '../../../app/components/quests/QuestTaskEditDialog.vue'
@@ -95,6 +96,9 @@ type DetailedSection = {
 type SetupState = Record<string, unknown> & {
   handleComplete?: () => void
   handleReopen?: () => void
+  handleDelete?: () => void
+  requestDelete?: () => void
+  handleArchive?: () => void
   toggleOptionalFields?: () => void
   handleCancel?: () => void
   handleSubmit?: () => void
@@ -216,14 +220,74 @@ describe('quest components', () => {
     expect(wrapper.emitted('reopen-quest')).toBeTruthy()
   })
 
+  it('emits delete requests from QuestActionButtons', () => {
+    const wrapper = shallowMountWithBase(QuestActionButtons, {
+      props: {
+        isOwner: true,
+        questStatus: 'active',
+      },
+      global: {
+        stubs: {
+          ...vuetifyStubFlags,
+        },
+      },
+    })
+
+    const state = getSetupState(wrapper)
+    state.handleDelete?.()
+    expect(wrapper.emitted('request-delete')).toBeTruthy()
+  })
+
   it('renders QuestCard summary', () => {
     const wrapper = mountWithBase(QuestCard, {
       props: {
         quest: sampleQuest,
+        currentUserId: 'user-2',
       },
     })
 
     expect(wrapper.text()).toContain('Launch Quest')
+  })
+
+  it('emits QuestCard delete events for the owner', () => {
+    const wrapper = shallowMountWithBase(QuestCard, {
+      props: {
+        quest: sampleQuest,
+        currentUserId: 'user-1',
+      },
+      global: {
+        stubs: {
+          ...vuetifyStubFlags,
+        },
+      },
+    })
+
+    const state = getSetupState(wrapper)
+    state.requestDelete?.()
+    expect(wrapper.emitted('delete-quest')).toBeTruthy()
+  })
+
+  it('renders QuestDeleteDialog and emits lifecycle events', () => {
+    const wrapper = shallowMountWithBase(QuestDeleteDialog, {
+      props: {
+        modelValue: true,
+        questTitle: 'Launch Quest',
+      },
+      global: {
+        stubs: {
+          ...vuetifyStubFlags,
+        },
+      },
+    })
+
+    const state = getSetupState(wrapper)
+    state.handleArchive?.()
+    state.handleDelete?.()
+    state.handleCancel?.()
+
+    expect(wrapper.emitted('archive')).toBeTruthy()
+    expect(wrapper.emitted('delete')).toBeTruthy()
+    expect(wrapper.emitted('cancel')).toBeTruthy()
   })
 
   it('renders QuestDetailsSections with decorated output', () => {
@@ -310,10 +374,14 @@ describe('quest components', () => {
     const wrapper = shallowMountWithBase(QuestList, {
       props: {
         quests: [sampleQuest],
+        currentUserId: 'user-1',
       },
     })
 
     expect(wrapper.exists()).toBe(true)
+    const state = getSetupState(wrapper)
+    state.handleDelete?.()
+    expect(wrapper.emitted('delete-quest')).toBeTruthy()
   })
 
   it('renders QuestOwnerInfo', () => {

@@ -19,12 +19,15 @@ const submitInvestigation = vi.fn()
 const saveTaskEdits = vi.fn()
 const showQuestShareDialog = vi.fn()
 const showTaskShareDialog = vi.fn()
+const globalWithNavigate = globalThis as typeof globalThis & { navigateTo?: (path: string) => Promise<unknown> }
+const originalNavigateTo = globalWithNavigate.navigateTo
 
 const todoTasks = ref([createTask()])
 const completedTasks = ref([createTask({ id: 'task-2', status: 'completed' })])
 
 beforeEach(() => {
   setActivePinia(createPinia())
+  Reflect.set(globalWithNavigate, 'navigateTo', vi.fn(async () => undefined))
 
   refreshMock.mockReset()
   completeQuest.mockReset()
@@ -41,6 +44,9 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllGlobals()
+
+  if (originalNavigateTo) Reflect.set(globalWithNavigate, 'navigateTo', originalNavigateTo)
+  else Reflect.deleteProperty(globalWithNavigate, 'navigateTo')
 })
 
 const sampleQuest = createQuest()
@@ -153,6 +159,15 @@ vi.mock('~/composables/useQuestDisplay', () => ({
   })),
 }))
 
+vi.mock('~/composables/useQuestLifecycle', () => ({
+  useQuestLifecycle: vi.fn(() => ({
+    archiveQuest: vi.fn(async () => true),
+    deleteQuest: vi.fn(async () => true),
+    archiveLoading: ref(false),
+    deleteLoading: ref(false),
+  })),
+}))
+
 describe('Quest detail page', () => {
   it('renders quest detail information with mocked composables', async () => {
     vi.stubGlobal('useRoute', () => ({
@@ -184,6 +199,7 @@ describe('Quest detail page', () => {
           QuestInvestigationDialog: { template: '<div />' },
           ShareDialog: { template: '<div />' },
           QuestActionButtons: { template: '<div />' },
+          QuestDeleteDialog: { template: '<div />' },
         },
       },
     })

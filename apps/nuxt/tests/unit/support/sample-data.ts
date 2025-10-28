@@ -6,7 +6,7 @@ export function createQuest(overrides: Base = {}) {
   return {
     id: 'quest-1',
     title: 'Launch Quest',
-    status: 'draft',
+    status: 'draft' as const,
     modelType: 'gpt-4o-mini',
     goal: 'Ship the new feature',
     context: 'Work with the product team to coordinate rollout.',
@@ -16,6 +16,7 @@ export function createQuest(overrides: Base = {}) {
     owner: { id: 'user-1', name: 'Quest Owner', email: 'owner@example.com' },
     createdAt: new Date(0),
     updatedAt: new Date(0),
+    deletedAt: null,
     ...overrides,
   }
 }

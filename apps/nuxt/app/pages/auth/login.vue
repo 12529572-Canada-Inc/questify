@@ -27,7 +27,7 @@ async function submit() {
     await $fetch('/api/auth/login', { method: 'POST', body: { email: email.value, password: password.value } })
     await userStore.fetchSession()
     showSnackbar('Welcome back! You are logged in.', { variant: 'success' })
-    router.push('/quests')
+    router.push('/dashboard')
   }
   catch (e) {
     const statusCode = extractStatusCode(e)

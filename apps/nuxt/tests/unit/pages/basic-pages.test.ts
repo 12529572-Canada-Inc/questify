@@ -1,14 +1,16 @@
 import '../support/mocks/vueuse'
 
-import { ref, h, Suspense, type ComponentPublicInstance } from 'vue'
+import { ref, h, Suspense, nextTick, type ComponentPublicInstance, type Ref } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { flushPromises } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import HomePage from '../../../app/pages/index.vue'
 import QuestsIndexPage from '../../../app/pages/quests/index.vue'
 import QuestsNewPage from '../../../app/pages/quests/new.vue'
 import AuthLoginPage from '../../../app/pages/auth/login.vue'
 import AuthSignupPage from '../../../app/pages/auth/signup.vue'
-import { shallowMountWithBase } from '../support/mount-options'
+import DashboardPage from '../../../app/pages/dashboard.vue'
+import { shallowMountWithBase, mountWithBase } from '../support/mount-options'
 import { createQuest } from '../support/sample-data'
 import { useUserStore } from '~/stores/user'
 import { useQuestStore } from '~/stores/quest'
@@ -16,6 +18,13 @@ import { useQuestStore } from '~/stores/quest'
 const routerPush = vi.fn()
 const fetchSession = vi.fn().mockResolvedValue(undefined)
 const fetchApi = vi.fn().mockResolvedValue(undefined)
+const useMetricsMock = vi.fn()
+let sessionUser: Ref<unknown>
+let sessionLoggedIn: Ref<boolean>
+
+vi.mock('~/composables/useMetrics', () => ({
+  useMetrics: (...args: unknown[]) => useMetricsMock(...args),
+}))
 
 type AuthFormVm = ComponentPublicInstance & {
   email?: string
@@ -27,18 +36,21 @@ beforeEach(() => {
   setActivePinia(createPinia())
 
   routerPush.mockReset()
+  routerPush.mockResolvedValue(undefined)
   fetchSession.mockReset()
   fetchApi.mockReset()
+  useMetricsMock.mockReset()
 
-  const sessionUser = ref(null)
+  sessionUser = ref<SessionUser | null>(null)
+  sessionLoggedIn = ref(false)
   vi.stubGlobal('useUserSession', () => ({
     user: sessionUser,
-    loggedIn: ref(false),
+    loggedIn: sessionLoggedIn,
     fetch: fetchSession,
     clear: vi.fn(),
   }))
   const userStore = useUserStore()
-  userStore.setUser(sessionUser.value)
+  userStore.setUser(sessionUser.value as SessionUser | null)
 
   const questStore = useQuestStore()
   vi.spyOn(questStore, 'fetchQuests').mockResolvedValue([createQuest()])
@@ -54,6 +66,25 @@ beforeEach(() => {
     error: ref(null),
   })))
   vi.stubGlobal('$fetch', fetchApi)
+  vi.stubGlobal('navigateTo', routerPush)
+  vi.stubGlobal('definePageMeta', vi.fn())
+
+  useMetricsMock.mockResolvedValue({
+    data: ref({
+      totalQuests: 0,
+      activeQuests: 0,
+      completedQuests: 0,
+      publicQuests: 0,
+      privateQuests: 0,
+      totalTasks: 0,
+      completedTasks: 0,
+      completionRate: 0,
+      lastActiveAt: null,
+    }),
+    pending: ref(false),
+    error: ref(null),
+    refresh: vi.fn(),
+  })
 })
 
 afterEach(() => {
@@ -64,7 +95,11 @@ describe('basic pages', () => {
   it('renders the home page hero', async () => {
     fetchApi.mockResolvedValueOnce([])
 
-    const wrapper = shallowMountWithBase(HomePage, {
+    const wrapper = mountWithBase({
+      render() {
+        return h(Suspense, {}, { default: () => h(HomePage) })
+      },
+    }, {
       global: {
         stubs: {
           HomeHeroCard: { template: '<div class="hero-stub">Hero</div>' },
@@ -88,8 +123,101 @@ describe('basic pages', () => {
       },
     })
 
-    await Promise.resolve()
-    expect(wrapper.text()).toContain('Hero')
+    await flushPromises()
+    await nextTick()
+    await flushPromises()
+    expect(wrapper.exists()).toBe(true)
+    expect(wrapper.find('.hero-stub').exists()).toBe(true)
+    expect(routerPush).not.toHaveBeenCalled()
+  })
+
+  it('redirects the root page to the dashboard when logged in', async () => {
+    // Set logged in state BEFORE mounting
+    sessionUser.value = { id: 'user-1', email: 'hero@example.com' } as SessionUser
+    sessionLoggedIn.value = true
+
+    // Force the store to update
+    const userStore = useUserStore()
+    userStore.setUser(sessionUser.value as SessionUser)
+
+    // Mount the component
+    mountWithBase({
+      render() {
+        return h(Suspense, {}, { default: () => h(HomePage) })
+      },
+    }, {
+      global: {
+        stubs: {
+          HomeHeroCard: { template: '<div class="hero-stub">Hero</div>' },
+          VContainer: { template: '<div><slot /></div>' },
+          VRow: { template: '<div><slot /></div>' },
+          VCol: { template: '<div><slot /></div>' },
+        },
+        mocks: {
+          $fetch: fetchApi,
+        },
+      },
+    })
+
+    // Wait for async component to resolve
+    await flushPromises()
+    await nextTick()
+    await flushPromises()
+
+    // Check that navigation was called
+    expect(routerPush).toHaveBeenCalledWith('/dashboard', { replace: true })
+  })
+
+  it('renders the dashboard page with metrics', async () => {
+    useMetricsMock.mockResolvedValueOnce({
+      data: ref({
+        totalQuests: 5,
+        activeQuests: 3,
+        completedQuests: 2,
+        publicQuests: 1,
+        privateQuests: 4,
+        totalTasks: 12,
+        completedTasks: 9,
+        completionRate: 0.75,
+        lastActiveAt: new Date('2024-01-01T12:00:00Z').toISOString(),
+      }),
+      pending: ref(false),
+      error: ref(null),
+      refresh: vi.fn(),
+    })
+
+    const wrapper = mountWithBase({
+      render() {
+        return h(Suspense, {}, { default: () => h(DashboardPage) })
+      },
+    }, {
+      global: {
+        stubs: {
+          VContainer: { template: '<div><slot /></div>' },
+          VAlert: { template: '<div><slot /></div>' },
+          VCard: { template: '<div><slot /></div>' },
+          VCardText: { template: '<div><slot /></div>' },
+          VCardTitle: { template: '<div><slot /></div>' },
+          VDivider: { template: '<div><slot /></div>' },
+          VRow: { template: '<div><slot /></div>' },
+          VCol: { template: '<div><slot /></div>' },
+          VBtn: { props: ['to'], template: '<button :data-to="to"><slot /></button>' },
+          VIcon: { props: ['icon'], template: '<i :data-icon="icon"></i>' },
+          VAvatar: { template: '<div><slot /></div>' },
+          VSkeletonLoader: { template: '<div class="skeleton"></div>' },
+          VProgressCircular: { props: ['modelValue'], template: '<div class="progress"><slot /></div>' },
+        },
+      },
+    })
+
+    await flushPromises()
+    await nextTick()
+    await flushPromises()
+    const text = wrapper.text()
+    expect(text).toContain('Private Quests')
+    expect(text).toContain('Public Quests')
+    expect(text).toContain('Quest Overview')
+    expect(text).toContain('Completion Rate')
   })
 
   it('renders the quests index page', async () => {
@@ -104,7 +232,7 @@ describe('basic pages', () => {
           VRow: { template: '<div><slot /></div>' },
           VCol: { template: '<div><slot /></div>' },
           VBtn: { props: ['to'], template: '<button :data-to="to"><slot /></button>' },
-          QuestList: { template: '<div class="quest-list-stub" />' },
+          QuestList: { props: ['quests', 'currentUserId'], template: '<div class="quest-list-stub" />' },
         },
       },
     })
@@ -131,7 +259,7 @@ describe('basic pages', () => {
     expect(wrapper.find('.quest-form-stub').exists()).toBe(true)
   })
 
-  it('submits the login form and navigates to quests', async () => {
+  it('submits the login form and navigates to the dashboard', async () => {
     const wrapper = shallowMountWithBase(AuthLoginPage, {
       global: {
         stubs: {
@@ -149,9 +277,10 @@ describe('basic pages', () => {
     vm.password = 'password123'
     await vm.submit?.()
     expect(fetchApi).toHaveBeenCalledWith('/api/auth/login', expect.any(Object))
+    expect(routerPush).toHaveBeenCalledWith('/dashboard')
   })
 
-  it('submits the signup form and navigates to quests', async () => {
+  it('submits the signup form and navigates to the dashboard', async () => {
     const wrapper = shallowMountWithBase(AuthSignupPage, {
       global: {
         stubs: {
@@ -169,5 +298,6 @@ describe('basic pages', () => {
     vm.password = 'topsecret'
     await vm.submit?.()
     expect(fetchApi).toHaveBeenCalledWith('/api/auth/signup', expect.any(Object))
+    expect(routerPush).toHaveBeenCalledWith('/dashboard')
   })
 })

@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { QuestStatus } from '@prisma/client'
 import handler from '../../server/api/quests/[id].patch'
 
 type ErrorPayload = {
@@ -26,6 +27,14 @@ const prismaMocks = vi.hoisted(() => ({
   transaction: vi.fn(),
 }))
 
+const questStatusMock = vi.hoisted(() => ({
+  draft: 'draft',
+  active: 'active',
+  completed: 'completed',
+  failed: 'failed',
+  archived: 'archived',
+} as const))
+
 vi.mock('@prisma/client', () => ({
   PrismaClient: class {
     quest = {
@@ -39,6 +48,7 @@ vi.mock('@prisma/client', () => ({
 
     $transaction = prismaMocks.transaction
   },
+  QuestStatus: questStatusMock,
 }))
 
 const globalWithMocks = globalThis as GlobalWithMocks
@@ -54,14 +64,14 @@ beforeEach(() => {
   prismaMocks.taskUpdateMany.mockReset()
   prismaMocks.transaction.mockReset()
 
-  prismaMocks.questFindUnique.mockResolvedValue({ ownerId: 'user-1' })
+  prismaMocks.questFindUnique.mockResolvedValue({ ownerId: 'user-1', deletedAt: null })
   prismaMocks.questUpdate.mockImplementation(async ({ data }) => ({ id: 'quest-1', status: data.status }))
   prismaMocks.taskUpdateMany.mockResolvedValue({ count: 2 })
   prismaMocks.transaction.mockImplementation(async (operations: unknown[]) => Promise.all(operations as Promise<unknown>[]))
 
   Reflect.set(globalWithMocks, 'requireUserSession', vi.fn(async () => ({ user: { id: 'user-1' } })))
   Reflect.set(globalWithMocks, 'getRouterParam', vi.fn(() => 'quest-1'))
-  Reflect.set(globalWithMocks, 'readBody', vi.fn(async () => ({ status: 'completed' })))
+  Reflect.set(globalWithMocks, 'readBody', vi.fn(async () => ({ status: QuestStatus.completed })))
   Reflect.set(globalWithMocks, 'createError', ({ status, statusCode, statusText }) => {
     const error = new Error(statusText ?? 'Error') as Error & { statusCode?: number }
     error.statusCode = status ?? statusCode ?? 500
@@ -90,42 +100,42 @@ describe('API /api/quests/[id] (PATCH)', () => {
     expect(prismaMocks.transaction).toHaveBeenCalledTimes(1)
     expect(prismaMocks.questUpdate).toHaveBeenCalledWith({
       where: { id: 'quest-1' },
-      data: { status: 'completed' },
+      data: { status: QuestStatus.completed },
     })
     expect(prismaMocks.taskUpdateMany).toHaveBeenCalledWith({
       where: { questId: 'quest-1' },
       data: { status: 'completed' },
     })
-    expect(result).toEqual({ id: 'quest-1', status: 'completed' })
+    expect(result).toEqual({ id: 'quest-1', status: QuestStatus.completed })
   })
 
   it('moves completed tasks back to todo when quest reopens', async () => {
-    Reflect.set(globalWithMocks, 'readBody', vi.fn(async () => ({ status: 'draft' })))
+    Reflect.set(globalWithMocks, 'readBody', vi.fn(async () => ({ status: QuestStatus.draft })))
 
     const result = await handler({} as never)
 
     expect(prismaMocks.questUpdate).toHaveBeenCalledWith({
       where: { id: 'quest-1' },
-      data: { status: 'draft' },
+      data: { status: QuestStatus.draft },
     })
     expect(prismaMocks.taskUpdateMany).toHaveBeenCalledWith({
       where: { questId: 'quest-1', status: 'completed' },
       data: { status: 'todo' },
     })
-    expect(result).toEqual({ id: 'quest-1', status: 'draft' })
+    expect(result).toEqual({ id: 'quest-1', status: QuestStatus.draft })
   })
 
   it('updates quest with other valid statuses using fallback path', async () => {
-    Reflect.set(globalWithMocks, 'readBody', vi.fn(async () => ({ status: 'failed' })))
+    Reflect.set(globalWithMocks, 'readBody', vi.fn(async () => ({ status: QuestStatus.failed })))
 
     const result = await handler({} as never)
 
     expect(prismaMocks.transaction).not.toHaveBeenCalled()
     expect(prismaMocks.questUpdate).toHaveBeenCalledWith({
       where: { id: 'quest-1' },
-      data: { status: 'failed' },
+      data: { status: QuestStatus.failed },
     })
-    expect(result).toEqual({ id: 'quest-1', status: 'failed' })
+    expect(result).toEqual({ id: 'quest-1', status: QuestStatus.failed })
   })
 
   it('rejects requests with invalid status values', async () => {
@@ -138,8 +148,11 @@ describe('API /api/quests/[id] (PATCH)', () => {
     prismaMocks.questFindUnique.mockResolvedValueOnce(null)
     await expect(handler({} as never)).rejects.toMatchObject({ statusCode: 404 })
 
-    prismaMocks.questFindUnique.mockResolvedValueOnce({ ownerId: 'someone-else' })
+    prismaMocks.questFindUnique.mockResolvedValueOnce({ ownerId: 'someone-else', deletedAt: null })
     await expect(handler({} as never)).rejects.toMatchObject({ statusCode: 403 })
+
+    prismaMocks.questFindUnique.mockResolvedValueOnce({ ownerId: 'user-1', deletedAt: new Date() })
+    await expect(handler({} as never)).rejects.toMatchObject({ statusCode: 404 })
   })
 
   it('updates quest visibility when isPublic is provided', async () => {
@@ -156,7 +169,7 @@ describe('API /api/quests/[id] (PATCH)', () => {
   })
 
   it('updates both status and visibility when both are provided', async () => {
-    Reflect.set(globalWithMocks, 'readBody', vi.fn(async () => ({ status: 'active', isPublic: true })))
+    Reflect.set(globalWithMocks, 'readBody', vi.fn(async () => ({ status: QuestStatus.active, isPublic: true })))
     prismaMocks.questUpdate.mockImplementation(async ({ data }) => ({
       id: 'quest-1',
       status: data.status,
@@ -167,7 +180,7 @@ describe('API /api/quests/[id] (PATCH)', () => {
 
     expect(prismaMocks.questUpdate).toHaveBeenCalledWith({
       where: { id: 'quest-1' },
-      data: { status: 'active', isPublic: true },
+      data: { status: QuestStatus.active, isPublic: true },
     })
   })
 

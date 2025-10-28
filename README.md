@@ -49,6 +49,12 @@ pnpm dev:worker               # runs the queue worker with hot reload
 - Linting + formatting: `pnpm lint` and `pnpm format`
 - Database operations: `pnpm prisma:migrate`, `pnpm prisma:deploy`, `pnpm prisma:generate`, `pnpm prisma:seed`
 
+## Dashboard View
+
+- Authenticated users land on `/dashboard`, a Vuetify-driven overview replacing the legacy hero card home after login.
+- Metrics load from `/api/users/me/metrics` to surface quest totals, task completion rate, and last active timestamps.
+- Quick actions link directly to private quest management (`/quests`) and community public quests (`/`), keeping navigation snappy on desktop and mobile.
+
 ## State Management
 
 - Global state now uses [Pinia](https://pinia.vuejs.org/) through the `@pinia/nuxt` module with stores in `apps/nuxt/stores/`.

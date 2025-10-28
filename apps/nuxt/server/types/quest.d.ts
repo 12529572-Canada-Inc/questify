@@ -4,7 +4,7 @@ declare interface QuestBody {
   context?: string | null
   constraints?: string | null
   modelType?: string | null
-  status?: 'draft' | 'active' | 'completed' | 'failed'
+  status?: 'draft' | 'active' | 'completed' | 'failed' | 'archived'
   isPublic?: boolean
 }
 

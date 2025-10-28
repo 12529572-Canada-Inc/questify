@@ -12,9 +12,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 🚀 Features
 - Added a configurable AI model selector for quests and task investigations, exposing OpenAI/Anthropic/DeepSeek options in the UI with tooltips and persisting the chosen model per record.
 - Worker now routes jobs to provider-specific APIs (with automatic fallback) using the shared model catalog that can be overridden via `AI_MODEL_CONFIG_JSON` / `AI_MODEL_CONFIG_PATH` and new `ANTHROPIC_*` / `DEEPSEEK_*` keys.
+- Quest owners can now archive or permanently delete quests from list/detail views via a confirmation dialog; new `/api/quests/:id/archive` and DELETE `/api/quests/:id` endpoints enforce ownership, log actions, filter archived data, and update the Prisma schema with a `QuestStatus` enum + `deletedAt` column to keep analytics clean.
+- Introduced an authenticated dashboard at `/dashboard` with quest/task metrics, quick links to private and public quests, and login/signup redirects that land users on the new overview. (#82)
 
 ### 🛠 Fixes
 - Ensured Prisma schema + generated client include `modelType` fields and tightened queue payloads so builds/linting succeed across workspaces.
+
+---
+
+## [1.10.1] - 2025-10-27
+
+### 🛠 Fixes
+- Fixed layout issues in the mobile header menu, ensuring proper visibility and accessibility of actions.
 
 ---
 

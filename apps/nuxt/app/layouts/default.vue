@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useMediaQuery } from '@vueuse/core'
 import { useSnackbar } from '~/composables/useSnackbar'
@@ -30,6 +31,7 @@ if (!loggedIn.value) {
 
 const shareDialogOpen = ref(false)
 const loginShareUrl = computed(() => new URL('/auth/login', requestUrl.origin).toString())
+const homeRoute = computed(() => (loggedIn.value ? '/dashboard' : '/'))
 
 watch(isMobile, (value) => {
   if (!value) {
@@ -140,7 +142,7 @@ async function logout() {
     >
       <v-app-bar-title class="app-bar-title">
         <NuxtLink
-          to="/"
+          :to="homeRoute"
           class="app-title-link"
           aria-label="Go to Questify home"
         >
@@ -158,8 +160,8 @@ async function logout() {
         </NuxtLink>
       </v-app-bar-title>
       <div
-        v-if="!isMobile"
         class="app-bar-actions"
+        :class="{ 'app-bar-actions--hidden': isMobile }"
       >
         <v-btn
           class="app-bar-share-btn"
@@ -245,8 +247,8 @@ async function logout() {
         </div>
       </div>
       <div
-        v-else
         class="app-bar-mobile-actions"
+        :class="{ 'app-bar-mobile-actions--visible': isMobile }"
       >
         <v-menu
           v-model="mobileMenuOpen"
@@ -351,7 +353,17 @@ async function logout() {
 }
 
 .app-bar-mobile-actions {
+  display: none;
+  align-items: center;
   margin-left: auto;
+}
+
+.app-bar-actions--hidden {
+  display: none;
+}
+
+.app-bar-mobile-actions--visible {
+  display: flex;
 }
 
 .app-bar-menu-btn {
@@ -408,6 +420,16 @@ async function logout() {
 
 .app-bar-auth__btn {
   min-width: 0;
+}
+
+@media (max-width: 767px) {
+  .app-bar-actions {
+    display: none;
+  }
+
+  .app-bar-mobile-actions {
+    display: flex;
+  }
 }
 
 @media (max-width: 600px) {

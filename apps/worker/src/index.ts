@@ -1,5 +1,5 @@
 import { Worker, type Job } from 'bullmq';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, QuestStatus } from '@prisma/client';
 import OpenAI from 'openai';
 import { findModelOption, resolveModelId, type AiModelOption } from 'shared';
 import { loadModelConfig, parseRedisUrl } from 'shared/server';
@@ -179,13 +179,13 @@ Return the plan as a JSON array where each item has the shape {"title": string, 
 
     await prisma.quest.update({
       where: { id: questId },
-      data: { status: 'active' },
+      data: { status: QuestStatus.active },
     });
   } catch (error) {
     console.error('Error during quest decomposition:', error);
     await prisma.quest.update({
       where: { id: questId },
-      data: { status: 'failed' },
+      data: { status: QuestStatus.failed },
     });
   }
 }

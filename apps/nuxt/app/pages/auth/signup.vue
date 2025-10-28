@@ -38,7 +38,7 @@ async function submit() {
     })
     showSnackbar('Account created! Welcome to Questify.', { variant: 'success' })
     await userStore.fetchSession().catch(() => null)
-    await router.push('/quests')
+    await router.push('/dashboard')
   }
   catch (e) {
     const statusCode = extractStatusCode(e)
