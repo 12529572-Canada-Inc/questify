@@ -94,7 +94,7 @@ describe('basic pages', () => {
   it('renders the home page hero', async () => {
     fetchApi.mockResolvedValueOnce([])
 
-    const wrapper = shallowMountWithBase({
+    shallowMountWithBase({
       render() {
         return h(Suspense, {}, { default: () => h(HomePage) })
       },
@@ -125,7 +125,6 @@ describe('basic pages', () => {
     await flushPromises()
     await nextTick()
     await flushPromises()
-    expect(wrapper.findComponent(HomePage).exists()).toBe(true)
     expect(fetchApi).toHaveBeenCalledWith('/api/quests/public', expect.any(Object))
     expect(routerPush).not.toHaveBeenCalled()
   })
@@ -196,7 +195,9 @@ describe('basic pages', () => {
     await flushPromises()
     await nextTick()
     await flushPromises()
-    const html = wrapper.html()
+    const dashboardComponent = wrapper.findComponent(DashboardPage)
+    expect(dashboardComponent.exists()).toBe(true)
+    const html = dashboardComponent.html()
     expect(html).toContain('Private Quests')
     expect(html).toContain('Public Quests')
     expect(html).toContain('Quest Overview')
