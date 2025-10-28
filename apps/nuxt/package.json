@@ -34,7 +34,7 @@
     "pinia": "^3.0.3",
     "qrcode": "^1.5.4",
     "shared": "workspace:*",
-    "vue": "^3.5.21",
+    "vue": "^3.5.22",
     "vuetify": "^3.10.6"
   },
   "devDependencies": {
