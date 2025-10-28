@@ -111,7 +111,7 @@ const quickLinks = [
     title: 'Public Quests',
     description: 'Explore community quests and track new challenges.',
     icon: 'mdi-earth',
-    to: '/',
+    to: '/quests/public',
     color: 'secondary',
   },
 ]
