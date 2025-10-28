@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
 import type { Quest } from '@prisma/client'
+import { useUserStore } from '~/stores/user'
 
 type PublicQuest = Quest & {
   owner: {
@@ -14,6 +16,17 @@ type PublicQuest = Quest & {
     inProgress: number
     completed: number
   }
+}
+
+const userStore = useUserStore()
+const { loggedIn } = storeToRefs(userStore)
+
+if (!loggedIn.value) {
+  await userStore.fetchSession().catch(() => null)
+}
+
+if (loggedIn.value) {
+  await navigateTo('/dashboard', { replace: true })
 }
 
 const publicQuests = ref<PublicQuest[]>([])
@@ -40,20 +53,23 @@ async function fetchPublicQuests() {
   }
 }
 
-onMounted(() => {
-  fetchPublicQuests()
-})
-
-function handleSortChange() {
-  fetchPublicQuests()
+if (!loggedIn.value) {
+  onMounted(() => {
+    fetchPublicQuests()
+  })
 }
+
+// function handleSortChange() {
+//   fetchPublicQuests()
+// }
 </script>
 
 <template>
   <div class="home-page">
     <HomeHeroCard />
 
-    <v-container class="public-quests-section mt-8">
+    <!-- TODO: create a page for public quests -->
+    <!-- <v-container class="public-quests-section mt-8">
       <div class="d-flex align-center justify-space-between mb-4">
         <h2 class="text-h4 font-weight-bold">
           Discover Public Quests
@@ -179,7 +195,7 @@ function handleSortChange() {
           </v-card>
         </v-col>
       </v-row>
-    </v-container>
+    </v-container> -->
   </div>
 </template>
 

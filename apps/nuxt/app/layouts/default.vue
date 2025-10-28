@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useMediaQuery } from '@vueuse/core'
 import { useSnackbar } from '~/composables/useSnackbar'
@@ -30,6 +31,7 @@ if (!loggedIn.value) {
 
 const shareDialogOpen = ref(false)
 const loginShareUrl = computed(() => new URL('/auth/login', requestUrl.origin).toString())
+const homeRoute = computed(() => (loggedIn.value ? '/dashboard' : '/'))
 
 watch(isMobile, (value) => {
   if (!value) {
@@ -140,7 +142,7 @@ async function logout() {
     >
       <v-app-bar-title class="app-bar-title">
         <NuxtLink
-          to="/"
+          :to="homeRoute"
           class="app-title-link"
           aria-label="Go to Questify home"
         >
