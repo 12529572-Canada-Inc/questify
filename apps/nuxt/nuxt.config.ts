@@ -136,15 +136,20 @@ export default defineNuxtConfig({
     'vite:extendConfig'(config) {
       // Disable vite-plugin-checker in test or CI contexts
       if (process.env.NODE_ENV === 'test' || process.env.VITEST || process.env.CI) {
-        config.plugins = (config.plugins || []).filter(
-          plugin => !(plugin && typeof plugin === 'object' && 'name' in plugin && String(plugin.name).includes('vite:checker')),
-        )
+        if (config.plugins && Array.isArray(config.plugins)) {
+          const filtered = config.plugins.filter(
+            plugin => !(plugin && typeof plugin === 'object' && 'name' in plugin && String(plugin.name).includes('vite:checker')),
+          )
+          config.plugins.length = 0
+          config.plugins.push(...filtered)
+        }
       }
 
       // Externalize node:crypto to prevent client-side bundling
       if (config.ssr) {
-        config.ssr = config.ssr || {}
-        config.ssr.noExternal = config.ssr.noExternal || []
+        if (!config.ssr.noExternal) {
+          config.ssr.noExternal = []
+        }
         // Don't externalize shared - let it be bundled normally for server
       }
     },
