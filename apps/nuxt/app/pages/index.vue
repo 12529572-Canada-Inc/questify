@@ -59,16 +59,17 @@ if (!loggedIn.value) {
   })
 }
 
-function handleSortChange() {
-  fetchPublicQuests()
-}
+// function handleSortChange() {
+//   fetchPublicQuests()
+// }
 </script>
 
 <template>
   <div class="home-page">
     <HomeHeroCard />
 
-    <v-container class="public-quests-section mt-8">
+    <!-- TODO: create a page for public quests -->
+    <!-- <v-container class="public-quests-section mt-8">
       <div class="d-flex align-center justify-space-between mb-4">
         <h2 class="text-h4 font-weight-bold">
           Discover Public Quests
@@ -194,7 +195,7 @@ function handleSortChange() {
           </v-card>
         </v-col>
       </v-row>
-    </v-container>
+    </v-container> -->
   </div>
 </template>
 
