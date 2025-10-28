@@ -1,6 +1,6 @@
 import '../support/mocks/vueuse'
 
-import { ref, h, Suspense, type ComponentPublicInstance, type Ref } from 'vue'
+import { ref, h, Suspense, nextTick, type ComponentPublicInstance, type Ref } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
@@ -117,8 +117,10 @@ describe('basic pages', () => {
       },
     })
 
-    await Promise.resolve()
-    expect(wrapper.text()).toContain('Hero')
+    await flushPromises()
+    await nextTick()
+    expect(wrapper.find('.hero-stub').exists()).toBe(true)
+    expect(routerPush).not.toHaveBeenCalled()
   })
 
   it('redirects the root page to the dashboard when logged in', async () => {
@@ -185,6 +187,7 @@ describe('basic pages', () => {
     })
 
     await flushPromises()
+    await nextTick()
     expect(wrapper.text()).toContain('Private Quests')
     expect(wrapper.text()).toContain('Public Quests')
     expect(wrapper.text()).toContain('Quest Overview')
