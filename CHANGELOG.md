@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ensured Prisma schema + generated client include `modelType` fields and tightened queue payloads so builds/linting succeed across workspaces.
 - Fixed test failures for async components (home, dashboard, quests pages) by properly wrapping them in Suspense boundaries and adding comprehensive async handling with `flushPromises()` and `nextTick()`.
 - Resolved TypeScript build errors: removed invalid `.value` access on boolean `pending` in quests/[id].vue and fixed read-only property mutations in nuxt.config.ts by using in-place array manipulation.
-- Fixed TypeScript lint errors in OAuth handlers (facebook.get.ts, google.get.ts, oauth.ts) by adding `@ts-expect-error` directives for internal nuxt-auth-utils paths and Nuxt auto-imports that lack proper type declarations.
+- Fixed TypeScript and module resolution errors in OAuth handlers (facebook.get.ts, google.get.ts) by removing explicit imports and relying on nuxt-auth-utils auto-imported OAuth event handler functions (`defineOAuthGoogleEventHandler`, `defineOAuthFacebookEventHandler`), which are automatically available in server routes.
 - Fixed settings page test by adding proper stubs for VListItem named slots (#prepend, #append) and VListItemTitle/VListItemSubtitle components to ensure buttons render correctly during testing.
 - Fixed OAuth refresh token preservation: created `mapTokensForUpdate()` function that only updates refresh tokens when providers supply new ones, preventing loss of stored tokens on subsequent logins (Google and other providers typically omit refresh tokens after the initial authorization).
 

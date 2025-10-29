@@ -4,9 +4,6 @@ import type { OAuthProvider } from 'shared'
 import { SUPPORTED_OAUTH_PROVIDERS } from 'shared'
 import { attachSessionWithAccess } from './access-control'
 
-// @ts-expect-error - Nuxt auto-import
-import { setCookie } from '#imports'
-
 const prisma = new PrismaClient()
 
 export interface NormalizedOAuthProfile {
@@ -206,6 +203,7 @@ function deriveExpiry(tokens: OAuthTokenPayload) {
 }
 
 function setOAuthResultCookie(event: H3Event, provider: OAuthProvider, action: OAuthSuccessAction) {
+  // @ts-expect-error - H3Event type mismatch between imported type and auto-import function
   setCookie(event, 'oauth_result', JSON.stringify({ provider, action }), {
     path: '/',
     maxAge: 60,
