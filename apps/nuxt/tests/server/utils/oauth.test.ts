@@ -35,15 +35,14 @@ vi.mock('../../../server/utils/access-control', () => ({
   attachSessionWithAccess: attachSessionMock,
 }))
 
-vi.mock('h3', async () => {
-  const actual = await vi.importActual<typeof import('h3')>('h3')
-  return {
-    ...actual,
-    setCookie: setCookieMock,
-  }
-})
+vi.mock('#imports', () => ({
+  setCookie: setCookieMock,
+}))
 
-const originalGetUserSession = globalThis.getUserSession
+type GetUserSessionFn = (event: H3Event) => Promise<{ user?: SessionUser } | null>
+
+const globalWithSession = globalThis as typeof globalThis & { getUserSession?: GetUserSessionFn }
+const originalGetUserSession = globalWithSession.getUserSession
 
 describe('handleOAuthSuccess', () => {
   const event = {} as H3Event
@@ -60,17 +59,15 @@ describe('handleOAuthSuccess', () => {
     getUserSessionMock.mockReset()
 
     getUserSessionMock.mockResolvedValue(null)
-    // @ts-expect-error augment global for tests
-    globalThis.getUserSession = getUserSessionMock
+    globalWithSession.getUserSession = getUserSessionMock
   })
 
   afterEach(() => {
     if (originalGetUserSession) {
-      globalThis.getUserSession = originalGetUserSession
+      globalWithSession.getUserSession = originalGetUserSession
     }
     else {
-      // @ts-expect-error cleanup test stub
-      delete globalThis.getUserSession
+      delete globalWithSession.getUserSession
     }
   })
 

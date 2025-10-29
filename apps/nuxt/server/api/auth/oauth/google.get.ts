@@ -1,6 +1,6 @@
 import type { H3Event } from 'h3'
-import { sendRedirect } from 'h3'
-import { defineOAuthGoogleEventHandler } from 'nuxt-auth-utils'
+import { defineOAuthGoogleEventHandler } from 'nuxt-auth-utils/dist/runtime/server/lib/oauth/google.js'
+import { sendRedirect } from '#imports'
 import type { OAuthSuccessResult } from '../../../utils/oauth'
 import { handleOAuthSuccess } from '../../../utils/oauth'
 

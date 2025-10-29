@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import type { H3Event } from 'h3'
-import { setCookie } from 'h3'
+import { setCookie } from '#imports'
 import type { OAuthProvider } from 'shared'
 import { SUPPORTED_OAUTH_PROVIDERS } from 'shared'
 import { attachSessionWithAccess } from './access-control'
@@ -41,11 +41,11 @@ export async function handleOAuthSuccess(
   tokens: OAuthTokenPayload,
 ): Promise<OAuthSuccessResult> {
   if (!SUPPORTED_OAUTH_PROVIDERS.includes(provider)) {
-    throw createError({ statusCode: 400, statusMessage: 'Unsupported provider' })
+    throw createError({ status: 400, statusText: 'Unsupported provider' })
   }
 
   if (!profile.id) {
-    throw createError({ statusCode: 500, statusMessage: 'Missing provider id' })
+    throw createError({ status: 500, statusText: 'Missing provider id' })
   }
 
   const session = await getUserSession(event)
@@ -68,8 +68,8 @@ export async function handleOAuthSuccess(
   if (existingAccount) {
     if (sessionUser && existingAccount.userId !== sessionUser.id) {
       throw createError({
-        statusCode: 409,
-        statusMessage: 'This OAuth account is already linked to a different Questify user.',
+        status: 409,
+        statusText: 'This OAuth account is already linked to a different Questify user.',
       })
     }
 
@@ -103,8 +103,8 @@ export async function handleOAuthSuccess(
   if (!user) {
     if (!profile.email) {
       throw createError({
-        statusCode: 400,
-        statusMessage: `Unable to create account: ${provider} did not supply an email address.`,
+        status: 400,
+        statusText: `Unable to create account: ${provider} did not supply an email address.`,
       })
     }
 
