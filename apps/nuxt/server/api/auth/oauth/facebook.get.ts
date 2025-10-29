@@ -1,4 +1,6 @@
 import type { H3Event } from 'h3'
+// @ts-expect-error - nuxt-auth-utils internal path lacks type exports
+import { defineOAuthFacebookEventHandler } from 'nuxt-auth-utils/runtime/server/lib/oauth/facebook'
 import type { OAuthSuccessResult } from '../../../utils/oauth'
 import { handleOAuthSuccess } from '../../../utils/oauth'
 
