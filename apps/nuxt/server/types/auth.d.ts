@@ -3,6 +3,7 @@ declare module 'nuxt-auth-utils' {
     id: string
     email: string
     name: string | null
+    providers?: string[]
   }
   interface UserSession {
     user: User

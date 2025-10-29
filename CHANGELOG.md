@@ -14,9 +14,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Worker now routes jobs to provider-specific APIs (with automatic fallback) using the shared model catalog that can be overridden via `AI_MODEL_CONFIG_JSON` / `AI_MODEL_CONFIG_PATH` and new `ANTHROPIC_*` / `DEEPSEEK_*` keys.
 - Quest owners can now archive or permanently delete quests from list/detail views via a confirmation dialog; new `/api/quests/:id/archive` and DELETE `/api/quests/:id` endpoints enforce ownership, log actions, filter archived data, and update the Prisma schema with a `QuestStatus` enum + `deletedAt` column to keep analytics clean.
 - Introduced an authenticated dashboard at `/dashboard` with quest/task metrics, quick links to private and public quests, and login/signup redirects that land users on the new overview. (#82)
+- Integrated OAuth authentication with support for Google and Facebook providers:
+  - Users can link/reconnect OAuth accounts from the settings page with real-time connection status.
+  - OAuth handlers support account creation, sign-in, and linking existing Questify accounts to social providers.
+  - Popup-based OAuth flow with automatic session refresh and flash message feedback for success/error states.
+  - Backend stores OAuth tokens with automatic refresh and expiry tracking in the database.
 
 ### 🛠 Fixes
 - Ensured Prisma schema + generated client include `modelType` fields and tightened queue payloads so builds/linting succeed across workspaces.
+- Fixed test failures for async components (home, dashboard, quests pages) by properly wrapping them in Suspense boundaries and adding comprehensive async handling with `flushPromises()` and `nextTick()`.
+- Resolved TypeScript build errors: removed invalid `.value` access on boolean `pending` in quests/[id].vue and fixed read-only property mutations in nuxt.config.ts by using in-place array manipulation.
+- Fixed TypeScript lint errors in OAuth handlers (facebook.get.ts, google.get.ts, oauth.ts) by adding `@ts-expect-error` directives for internal nuxt-auth-utils paths and Nuxt auto-imports that lack proper type declarations.
+- Fixed settings page test by adding proper stubs for VListItem named slots (#prepend, #append) and VListItemTitle/VListItemSubtitle components to ensure buttons render correctly during testing.
+- Fixed OAuth refresh token preservation: created `mapTokensForUpdate()` function that only updates refresh tokens when providers supply new ones, preventing loss of stored tokens on subsequent logins (Google and other providers typically omit refresh tokens after the initial authorization).
 
 ---
 

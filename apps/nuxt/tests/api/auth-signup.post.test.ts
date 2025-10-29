@@ -76,6 +76,7 @@ beforeEach(() => {
   accessControlMocks.attachSessionWithAccess.mockResolvedValue({
     roles: ['SuperAdmin'],
     privileges: ['user:read'],
+    providers: [],
   })
 
   Reflect.set(globalWithMocks, 'readBody', vi.fn(async () => ({
@@ -116,11 +117,15 @@ describe('API /api/auth/signup (POST)', () => {
       },
     })
     expect(accessControlMocks.ensureSuperAdmin).toHaveBeenCalledWith(expect.anything())
-    expect(accessControlMocks.attachSessionWithAccess).toHaveBeenCalledWith(expect.anything(), {
-      id: 'user-1',
-      email: 'new@example.com',
-      name: 'New User',
-    })
+    expect(accessControlMocks.attachSessionWithAccess).toHaveBeenCalledWith(
+      expect.anything(),
+      {
+        id: 'user-1',
+        email: 'new@example.com',
+        name: 'New User',
+      },
+      { includeProviders: true },
+    )
     expect(response).toEqual({
       success: true,
       user: {
@@ -129,6 +134,7 @@ describe('API /api/auth/signup (POST)', () => {
         name: 'New User',
         roles: ['SuperAdmin'],
         privileges: ['user:read'],
+        providers: [],
       },
     })
   })

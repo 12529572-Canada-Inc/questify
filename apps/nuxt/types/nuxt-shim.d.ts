@@ -42,6 +42,7 @@ declare global {
     name?: string
     roles?: string[]
     privileges?: string[]
+    providers?: string[]
   }
 
   interface UserSession {

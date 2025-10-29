@@ -76,6 +76,12 @@ const mobileMenuItems = computed<MobileMenuItem[]>(() => {
 
   if (loggedIn.value) {
     items.push({
+      key: 'settings',
+      label: 'Settings',
+      icon: 'mdi-account-cog',
+      to: '/settings',
+    })
+    items.push({
       key: 'logout',
       label: 'Logout',
       icon: 'mdi-logout',
@@ -217,6 +223,14 @@ async function logout() {
 
         <div class="app-bar-auth">
           <template v-if="loggedIn">
+            <v-btn
+              class="app-bar-auth__btn"
+              variant="text"
+              density="comfortable"
+              to="/settings"
+            >
+              Settings
+            </v-btn>
             <v-btn
               class="app-bar-auth__btn"
               variant="text"

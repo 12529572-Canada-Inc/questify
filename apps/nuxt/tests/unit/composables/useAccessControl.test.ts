@@ -19,6 +19,7 @@ describe('useAccessControl', () => {
       loggedIn: ref(true),
       fetch: vi.fn(),
       clear: vi.fn(),
+      openInPopup: vi.fn(),
     }))
 
     const userStore = useUserStore()

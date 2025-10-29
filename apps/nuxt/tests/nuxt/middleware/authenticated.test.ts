@@ -19,6 +19,7 @@ describe.skip('authenticated middleware', () => {
     vi.stubGlobal('useUserSession', () => ({
       loggedIn: ref(false),
       fetch,
+      openInPopup: vi.fn(),
     }))
     vi.stubGlobal('navigateTo', navigateTo)
 
@@ -35,6 +36,7 @@ describe.skip('authenticated middleware', () => {
     vi.stubGlobal('useUserSession', () => ({
       loggedIn: ref(false),
       fetch,
+      openInPopup: vi.fn(),
     }))
     vi.stubGlobal('navigateTo', navigateTo)
 
@@ -51,6 +53,7 @@ describe.skip('authenticated middleware', () => {
     vi.stubGlobal('useUserSession', () => ({
       loggedIn: ref(true),
       fetch,
+      openInPopup: vi.fn(),
     }))
     vi.stubGlobal('navigateTo', navigateTo)
 

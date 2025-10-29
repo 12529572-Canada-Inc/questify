@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
     id: user.id,
     email: user.email,
     name: user.name || null,
-  })
+  }, { includeProviders: true })
 
   return {
     success: true,
@@ -41,6 +41,7 @@ export default defineEventHandler(async (event) => {
       name: user.name,
       roles: profile.roles,
       privileges: profile.privileges,
+      providers: profile.providers,
     },
   }
 })
