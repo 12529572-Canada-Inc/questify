@@ -1,10 +1,8 @@
 import type { H3Event } from 'h3'
-// @ts-expect-error - nuxt-auth-utils internal path lacks type exports
-import { defineOAuthGoogleEventHandler } from 'nuxt-auth-utils/runtime/server/lib/oauth/google'
 import type { OAuthSuccessResult } from '../../../utils/oauth'
 import { handleOAuthSuccess } from '../../../utils/oauth'
 
-// defineOAuthGoogleEventHandler is auto-imported by nuxt-auth-utils
+// defineOAuthGoogleEventHandler, sendRedirect, and getUserSession are auto-imported by Nuxt
 
 export default defineOAuthGoogleEventHandler({
   config: {

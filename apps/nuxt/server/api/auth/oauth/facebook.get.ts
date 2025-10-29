@@ -1,10 +1,6 @@
 import type { H3Event } from 'h3'
-// @ts-expect-error - nuxt-auth-utils internal path lacks type exports
-import { defineOAuthFacebookEventHandler } from 'nuxt-auth-utils/runtime/server/lib/oauth/facebook'
 import type { OAuthSuccessResult } from '../../../utils/oauth'
 import { handleOAuthSuccess } from '../../../utils/oauth'
-
-// defineOAuthFacebookEventHandler is auto-imported by nuxt-auth-utils
 
 export default defineOAuthFacebookEventHandler({
   config: {
@@ -13,7 +9,7 @@ export default defineOAuthFacebookEventHandler({
   },
   async onSuccess(event, { user, tokens }) {
     const normalized = {
-      id: String(user.id),
+      id: user.id,
       email: typeof user.email === 'string' ? user.email : undefined,
       name: typeof user.name === 'string' ? user.name : undefined,
     }
