@@ -139,9 +139,9 @@ export async function attachSessionWithAccess(
   const profile = await getUserAccessProfile(user.id)
   const providers = options.includeProviders
     ? await prisma.oAuthAccount.findMany({
-      where: { userId: user.id },
-      select: { provider: true },
-    }).then(accounts => accounts.map(account => account.provider))
+        where: { userId: user.id },
+        select: { provider: true },
+      }).then(accounts => accounts.map(account => account.provider))
     : undefined
 
   await setUserSession(event, {

@@ -105,13 +105,13 @@ describe('default layout', () => {
     // Set up logged out state BEFORE creating stores
     const sessionUser = ref(null)
     const loggedInRef = ref(false)
-  vi.stubGlobal('useUserSession', () => ({
-    user: sessionUser,
-    loggedIn: loggedInRef,
-    clear: clearSession,
-    fetch: fetchSession,
-    openInPopup: vi.fn(),
-  }))
+    vi.stubGlobal('useUserSession', () => ({
+      user: sessionUser,
+      loggedIn: loggedInRef,
+      clear: clearSession,
+      fetch: fetchSession,
+      openInPopup: vi.fn(),
+    }))
 
     // Recreate pinia to pick up the new stub
     setActivePinia(createPinia())
