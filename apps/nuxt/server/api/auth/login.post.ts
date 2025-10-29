@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
   const { email, password } = body
 
   const user = await prisma.user.findUnique({ where: { email } })
-  if (!user) {
+  if (!user || !user.password) {
     throw createError({ status: 401, statusText: 'Invalid credentials' })
   }
 
@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
     id: user.id,
     email: user.email,
     name: user.name || null,
-  })
+  }, { includeProviders: true })
 
   return {
     success: true,
@@ -41,6 +41,7 @@ export default defineEventHandler(async (event) => {
       name: user.name,
       roles: profile.roles,
       privileges: profile.privileges,
+      providers: profile.providers,
     },
   }
 })

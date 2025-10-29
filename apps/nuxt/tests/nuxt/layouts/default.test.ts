@@ -47,6 +47,7 @@ describe.skip('default layout', () => {
     vi.stubGlobal('useUserSession', () => ({
       clear,
       loggedIn: ref(false),
+      openInPopup: vi.fn(),
     }))
 
     const wrapper = mountLayout()
@@ -60,6 +61,7 @@ describe.skip('default layout', () => {
     vi.stubGlobal('useUserSession', () => ({
       clear,
       loggedIn: ref(true),
+      openInPopup: vi.fn(),
     }))
 
     const wrapper = mountLayout()
@@ -70,6 +72,7 @@ describe.skip('default layout', () => {
     vi.stubGlobal('useUserSession', () => ({
       clear,
       loggedIn: ref(true),
+      openInPopup: vi.fn(),
     }))
 
     const wrapper = mountLayout()

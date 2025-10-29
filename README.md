@@ -40,6 +40,7 @@ pnpm dev:worker               # runs the queue worker with hot reload
   - `DEEPSEEK_API_KEY` + `DEEPSEEK_BASE_URL` (defaults to `https://api.deepseek.com/v1`) enable DeepSeek chat/coder models.
 - Configure the model catalog via `AI_MODEL_CONFIG_JSON` (inline JSON) or `AI_MODEL_CONFIG_PATH` (JSON file). When unset, Questify falls back to the built-in mix of OpenAI, Anthropic, and DeepSeek models.
 - Redis credentials map to `runtimeConfig.redis` (Nuxt) and `packages/shared/src/config/redis.ts` (worker).
+- OAuth sign-in providers use the `NUXT_OAUTH_<PROVIDER>_CLIENT_ID` / `NUXT_OAUTH_<PROVIDER>_CLIENT_SECRET` pattern (e.g., Google, Facebook). Configure them in your `.env` to enable the social login buttons.
 
 ## Development Workflow
 

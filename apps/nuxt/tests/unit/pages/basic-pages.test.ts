@@ -48,6 +48,7 @@ beforeEach(() => {
     loggedIn: sessionLoggedIn,
     fetch: fetchSession,
     clear: vi.fn(),
+    openInPopup: vi.fn(),
   }))
   const userStore = useUserStore()
   userStore.setUser(sessionUser.value as SessionUser | null)
@@ -58,6 +59,9 @@ beforeEach(() => {
 
   vi.stubGlobal('useRouter', () => ({
     push: routerPush,
+  }))
+  vi.stubGlobal('useRoute', () => ({
+    query: {},
   }))
   vi.stubGlobal('useQuest', vi.fn(async () => ({
     data: ref(createQuest()),

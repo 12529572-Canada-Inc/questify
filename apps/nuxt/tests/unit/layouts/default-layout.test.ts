@@ -39,6 +39,7 @@ beforeEach(() => {
     loggedIn: ref(true),
     clear: clearSession,
     fetch: fetchSession,
+    openInPopup: vi.fn(),
   }))
 
   const userStore = useUserStore()
@@ -90,8 +91,9 @@ describe('default layout', () => {
     await flushPromises()
 
     // Find and click the logout button
-    const logoutButton = wrapper.find('.app-bar-auth__btn')
-    await logoutButton.trigger('click')
+    const logoutButton = wrapper.findAll('.app-bar-auth__btn').find(btn => btn.text().includes('Logout'))
+    expect(logoutButton).toBeDefined()
+    await logoutButton!.trigger('click')
     await flushPromises()
 
     expect(fetchApi).toHaveBeenCalledWith('/api/auth/logout', { method: 'POST' })
@@ -103,12 +105,13 @@ describe('default layout', () => {
     // Set up logged out state BEFORE creating stores
     const sessionUser = ref(null)
     const loggedInRef = ref(false)
-    vi.stubGlobal('useUserSession', () => ({
-      user: sessionUser,
-      loggedIn: loggedInRef,
-      clear: clearSession,
-      fetch: fetchSession,
-    }))
+  vi.stubGlobal('useUserSession', () => ({
+    user: sessionUser,
+    loggedIn: loggedInRef,
+    clear: clearSession,
+    fetch: fetchSession,
+    openInPopup: vi.fn(),
+  }))
 
     // Recreate pinia to pick up the new stub
     setActivePinia(createPinia())

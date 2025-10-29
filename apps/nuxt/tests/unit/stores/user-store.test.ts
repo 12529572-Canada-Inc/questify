@@ -12,6 +12,7 @@ const fetchMock = vi.fn(async () => {
     name: 'Quest Hero',
     roles: ['Admin'],
     privileges: ['user:read'],
+    providers: ['google'],
   }
   loggedIn.value = true
 })
@@ -32,6 +33,7 @@ beforeEach(() => {
     loggedIn,
     fetch: fetchMock,
     clear: clearMock,
+    openInPopup: vi.fn(),
   }))
 })
 
@@ -50,6 +52,7 @@ describe('useUserStore', () => {
     expect(store.user?.id).toBe('user-1')
     expect(store.loggedIn).toBe(true)
     expect(store.roles).toEqual(['Admin'])
+    expect(store.providers).toEqual(['google'])
     expect(result?.roles).toEqual(['Admin'])
   })
 
@@ -62,6 +65,7 @@ describe('useUserStore', () => {
     expect(clearMock).toHaveBeenCalled()
     expect(store.user).toBeNull()
     expect(store.loggedIn).toBe(false)
+    expect(store.providers).toEqual([])
   })
 
   it('reacts to external session updates', async () => {
@@ -73,6 +77,7 @@ describe('useUserStore', () => {
       name: 'Updated User',
       roles: ['Support'],
       privileges: [],
+      providers: ['facebook'],
     }
     loggedIn.value = true
 
@@ -81,5 +86,6 @@ describe('useUserStore', () => {
     expect(store.user?.id).toBe('user-99')
     expect(store.loggedIn).toBe(true)
     expect(store.roles).toEqual(['Support'])
+    expect(store.providers).toEqual(['facebook'])
   })
 })

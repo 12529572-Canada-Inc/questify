@@ -16,17 +16,18 @@ enum QuestStatus {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  name      String?
-  quests    Quest[]
+  id             String          @id @default(cuid())
+  email          String          @unique
+  password       String?
+  name           String?
+  quests         Quest[]
   investigations TaskInvestigation[]
-  roles     UserRole[]
-  assignedRoles UserRole[] @relation("UserRoleAssignedBy")
-  auditEntries AdminAuditLog[] @relation("AuditActor")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  roles          UserRole[]
+  assignedRoles  UserRole[]      @relation("UserRoleAssignedBy")
+  auditEntries   AdminAuditLog[] @relation("AuditActor")
+  accounts       OAuthAccount[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 }
 
 model Quest {
@@ -135,4 +136,20 @@ model AdminAuditLog {
 
   @@index([createdAt])
   @@index([targetType, targetId])
+}
+
+model OAuthAccount {
+  id                 String   @id @default(cuid())
+  provider           String
+  providerAccountId  String
+  userId             String
+  accessToken        String?
+  refreshToken       String?
+  expiresAt          DateTime?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
 }

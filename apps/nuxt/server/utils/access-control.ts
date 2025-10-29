@@ -8,6 +8,10 @@ export interface UserAccessProfile {
   privileges: PrivilegeKey[]
 }
 
+export interface AttachSessionOptions {
+  includeProviders?: boolean
+}
+
 /**
  * Access-control helpers shared across Nitro API handlers. They hydrate the
  * current session with role + privilege information and provide guard helpers
@@ -130,8 +134,15 @@ export async function requireAnyPrivilege(
 export async function attachSessionWithAccess(
   event: SessionEvent,
   user: { id: string, email?: string | null, name?: string | null },
+  options: AttachSessionOptions = {},
 ) {
   const profile = await getUserAccessProfile(user.id)
+  const providers = options.includeProviders
+    ? await prisma.oAuthAccount.findMany({
+      where: { userId: user.id },
+      select: { provider: true },
+    }).then(accounts => accounts.map(account => account.provider))
+    : undefined
 
   await setUserSession(event, {
     user: {
@@ -140,8 +151,12 @@ export async function attachSessionWithAccess(
       name: user.name ?? undefined,
       roles: profile.roles,
       privileges: profile.privileges,
+      providers,
     },
   })
 
-  return profile
+  return {
+    ...profile,
+    providers,
+  }
 }

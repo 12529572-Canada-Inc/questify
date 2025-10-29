@@ -23,6 +23,7 @@ beforeEach(() => {
     loggedIn: sessionLoggedIn,
     fetch: fetchMock,
     clear: vi.fn(),
+    openInPopup: vi.fn(),
   }))
 
   useUserStore().setUser(null)

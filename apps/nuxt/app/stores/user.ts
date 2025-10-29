@@ -15,6 +15,7 @@ export const useUserStore = defineStore('user', () => {
   const loggedIn = computed<boolean>(() => session.loggedIn.value ?? Boolean(user.value))
   const roles = computed<string[]>(() => user.value?.roles ?? [])
   const privileges = computed<string[]>(() => user.value?.privileges ?? [])
+  const providers = computed<string[]>(() => user.value?.providers ?? [])
 
   async function fetchSession() {
     status.value = 'loading'
@@ -47,6 +48,7 @@ export const useUserStore = defineStore('user', () => {
     loggedIn,
     roles,
     privileges,
+    providers,
     status,
     error,
     fetchSession,
