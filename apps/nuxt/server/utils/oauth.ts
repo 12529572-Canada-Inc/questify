@@ -1,9 +1,11 @@
 import { PrismaClient } from '@prisma/client'
 import type { H3Event } from 'h3'
-import { setCookie } from '#imports'
 import type { OAuthProvider } from 'shared'
 import { SUPPORTED_OAUTH_PROVIDERS } from 'shared'
 import { attachSessionWithAccess } from './access-control'
+
+// @ts-expect-error - Nuxt auto-import
+import { setCookie } from '#imports'
 
 const prisma = new PrismaClient()
 

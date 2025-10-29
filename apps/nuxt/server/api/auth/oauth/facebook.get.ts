@@ -1,8 +1,11 @@
 import type { H3Event } from 'h3'
-import { defineOAuthFacebookEventHandler } from 'nuxt-auth-utils/dist/runtime/server/lib/oauth/facebook.js'
-import { sendRedirect } from '#imports'
 import type { OAuthSuccessResult } from '../../../utils/oauth'
 import { handleOAuthSuccess } from '../../../utils/oauth'
+
+// @ts-expect-error - nuxt-auth-utils internal path without proper types
+import { defineOAuthFacebookEventHandler } from 'nuxt-auth-utils/dist/runtime/server/lib/oauth/facebook.js'
+// @ts-expect-error - Nuxt auto-import
+import { sendRedirect } from '#imports'
 
 export default defineOAuthFacebookEventHandler({
   config: {
