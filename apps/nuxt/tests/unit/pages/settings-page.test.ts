@@ -65,7 +65,11 @@ describe('SettingsPage', () => {
           VCardTitle: { template: '<div><slot /></div>' },
           VCardSubtitle: { template: '<div><slot /></div>' },
           VList: { template: '<div><slot /></div>' },
-          VListItem: { template: '<div class="list-item"><slot /></div>' },
+          VListItem: {
+            template: '<div class="list-item"><slot name="prepend" /><slot /><slot name="append" /></div>',
+          },
+          VListItemTitle: { template: '<div><slot /></div>' },
+          VListItemSubtitle: { template: '<div><slot /></div>' },
           VAvatar: { template: '<div class="avatar"><slot /></div>' },
           VIcon: { template: '<span><slot /></span>' },
           VChip: { template: '<span class="chip"><slot /></span>' },
