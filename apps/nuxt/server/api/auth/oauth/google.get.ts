@@ -10,7 +10,7 @@ export default defineOAuthGoogleEventHandler({
   },
   async onSuccess(event, { user, tokens }) {
     const normalized = {
-      id: String(user.sub ?? user.id),
+      id: user.sub ?? user.id,
       email: typeof user.email === 'string' ? user.email : undefined,
       name: typeof user.name === 'string' ? user.name : undefined,
       avatarUrl: typeof user.picture === 'string' ? user.picture : undefined,
