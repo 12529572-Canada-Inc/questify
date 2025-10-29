@@ -77,7 +77,7 @@ export async function handleOAuthSuccess(
 
     await prisma.oAuthAccount.update({
       where: { id: existingAccount.id },
-      data: mapTokensToAccount(tokens),
+      data: mapTokensForUpdate(tokens),
     })
 
     // Refresh session to include the latest provider list
@@ -166,6 +166,30 @@ function mapTokensToAccount(tokens: OAuthTokenPayload) {
     refreshToken: tokens.refresh_token ?? null,
     expiresAt,
   }
+}
+
+/**
+ * Maps OAuth tokens for updating an existing account.
+ * Only includes refresh token if a new one is provided to avoid
+ * overwriting stored tokens when providers omit them on subsequent logins.
+ */
+function mapTokensForUpdate(tokens: OAuthTokenPayload) {
+  const expiresAt = deriveExpiry(tokens)
+  const data: {
+    accessToken: string | null
+    refreshToken?: string | null
+    expiresAt: Date | null
+  } = {
+    accessToken: tokens.access_token ?? null,
+    expiresAt,
+  }
+
+  // Only update refresh token if provider supplied a new one
+  if (tokens.refresh_token !== undefined) {
+    data.refreshToken = tokens.refresh_token
+  }
+
+  return data
 }
 
 function deriveExpiry(tokens: OAuthTokenPayload) {
