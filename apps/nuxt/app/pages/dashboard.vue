@@ -142,7 +142,7 @@ async function handleRefresh() {
         <v-card-text class="d-flex flex-column flex-md-row align-center justify-space-between gap-6">
           <div class="dashboard__welcome-left">
             <h1 class="text-h5 text-md-h4 font-weight-bold mb-2">
-              Welcome back,
+              Hello,
               <br>
               {{ welcomeName }}
             </h1>
