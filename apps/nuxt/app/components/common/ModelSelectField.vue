@@ -14,11 +14,8 @@ const items = computed(() => props.models.map(item => ({
   raw: item,
 })))
 
-function toModel(value: unknown): AiModelOption | null {
-  if (value && typeof value === 'object') {
-    return value as AiModelOption
-  }
-  return null
+function getModelByValue(value: string): AiModelOption | undefined {
+  return props.models.find(m => m.id === value)
 }
 </script>
 
@@ -38,19 +35,20 @@ function toModel(value: unknown): AiModelOption | null {
       :menu-props="{ maxHeight: 420 }"
     >
       <template #selection="{ item }">
-        <span>{{ toModel(item.raw)?.label ?? item.title }}</span>
+        <span>{{ getModelByValue((item as any).value)?.label ?? (item as any).title }}</span>
         <span class="text-caption text-medium-emphasis ml-2">
-          {{ toModel(item.raw)?.providerLabel ?? '' }}
+          {{ getModelByValue((item as any).value)?.providerLabel }}
         </span>
       </template>
-      <template #item="{ item, props: itemProps }">
-        <v-list-item
-          v-bind="itemProps"
-          :title="toModel(item.raw)?.label ?? item.title"
-          :subtitle="toModel(item.raw)?.providerLabel ?? ''"
-        >
+      <template #item="{ item }">
+        <v-list-item :value="(item as any).value">
+          <v-list-item-title>{{ getModelByValue((item as any).value)?.label ?? (item as any).title }}</v-list-item-title>
+          <v-list-item-subtitle>{{ getModelByValue((item as any).value)?.providerLabel }}</v-list-item-subtitle>
           <template #append>
-            <v-tooltip :text="toModel(item.raw)?.description ?? ''">
+            <v-tooltip
+              :text="getModelByValue((item as any).value)?.description ?? 'No description'"
+              location="left"
+            >
               <template #activator="{ props: tooltipProps }">
                 <v-btn
                   v-bind="tooltipProps"
