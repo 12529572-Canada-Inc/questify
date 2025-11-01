@@ -19,7 +19,7 @@ const linking = ref<OAuthProvider | null>(null)
 
 const { providers } = storeToRefs(userStore)
 
-const providerCatalog: Record<OAuthProvider, { label: string, description: string, icon: string }> = {
+const providerCatalog: Record<OAuthProvider, { label: string, icon: string }> = {
   google: {
     label: 'Google',
     icon: 'mdi-google',
@@ -133,9 +133,6 @@ function startLink(provider: OAuthProvider) {
               <v-list-item-title class="text-subtitle-1 font-weight-medium">
                 {{ providerCatalog[provider].label }}
               </v-list-item-title>
-              <v-list-item-subtitle class="text-body-2">
-                {{ providerCatalog[provider].description }}
-              </v-list-item-subtitle>
               <template #append>
                 <v-chip
                   v-if="isLinked(provider)"
