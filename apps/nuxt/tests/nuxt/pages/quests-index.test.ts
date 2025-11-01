@@ -8,6 +8,7 @@ import { useUserStore } from '~/stores/user'
 import { createQuest } from '../../unit/support/sample-data'
 
 const navigateToMock = vi.hoisted(() => vi.fn())
+const showSnackbarMock = vi.hoisted(() => vi.fn())
 
 vi.mock('#app', async () => {
   const actual = await vi.importActual<any>('#app')
@@ -24,6 +25,12 @@ vi.mock('#app/composables/router', async () => {
     navigateTo: navigateToMock,
   }
 })
+
+vi.mock('~/composables/useSnackbar', () => ({
+  useSnackbar: () => ({
+    showSnackbar: showSnackbarMock,
+  }),
+}))
 
 const buttonStub = {
   props: ['to'],
@@ -75,6 +82,7 @@ describe('quests index page', () => {
 
   afterEach(() => {
     navigateToMock.mockReset()
+    showSnackbarMock.mockReset()
     vi.clearAllMocks()
   })
 
@@ -102,6 +110,7 @@ describe('quests index page', () => {
     expect(page.exists()).toBe(true)
     expect(page.text()).toContain('Quests')
     expect(page.text()).toContain('Document testing strategy')
+    expect(showSnackbarMock).not.toHaveBeenCalled()
 
     const createButton = wrapper.findAll('button').find(button => button.text().trim() === 'Create Quest')
     expect(createButton?.attributes('data-to')).toBe('/quests/new')
@@ -128,13 +137,19 @@ describe('quests index page', () => {
     await flushPromises()
 
     expect(navigateToMock).toHaveBeenCalledWith('/quests/new', { replace: true })
+    expect(showSnackbarMock).toHaveBeenCalledWith(
+      'You need to create your first quest before the list is available.',
+      { variant: 'info' },
+    )
   })
 
   it('toggles archived quests via the switch control', async () => {
     const questStore = useQuestStore()
     const userStore = useUserStore()
     userStore.setUser({ id: 'user-1', name: 'Owner', email: 'owner@example.com' } as never)
-    const fetchSpy = vi.spyOn(questStore, 'fetchQuests').mockResolvedValue([] as never)
+    const existingQuest = createQuest({ id: 'quest-99', title: 'Existing quest' })
+    questStore.setQuests([existingQuest] as never)
+    const fetchSpy = vi.spyOn(questStore, 'fetchQuests').mockResolvedValue([existingQuest] as never)
 
     const wrapper = mount({
       render() {
@@ -156,5 +171,6 @@ describe('quests index page', () => {
     await flushPromises()
 
     expect(fetchSpy).toHaveBeenCalledWith(expect.objectContaining({ includeArchived: true, force: true }))
+    expect(showSnackbarMock).not.toHaveBeenCalled()
   })
 })

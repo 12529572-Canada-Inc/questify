@@ -3,11 +3,13 @@ import type { Quest } from '@prisma/client'
 import { computed, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useQuestLifecycle } from '~/composables/useQuestLifecycle'
+import { useSnackbar } from '~/composables/useSnackbar'
 import { useQuestStore } from '~/stores/quest'
 import { useUserStore } from '~/stores/user'
 
 const questStore = useQuestStore()
 const userStore = useUserStore()
+const { showSnackbar } = useSnackbar()
 
 const { quests, hasQuests } = storeToRefs(questStore)
 const { user } = storeToRefs(userStore)
@@ -29,6 +31,9 @@ catch (error) {
 }
 
 if (!initialFetchFailed && !hasQuests.value) {
+  showSnackbar('You need to create your first quest!', {
+    variant: 'info',
+  })
   await navigateTo('/quests/new', { replace: true })
 }
 
