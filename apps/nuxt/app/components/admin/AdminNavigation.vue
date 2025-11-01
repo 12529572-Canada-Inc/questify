@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useAccessControl } from '~/composables/useAccessControl'
 
+import { computed } from 'vue'
+
 const route = useRoute()
 const { canManageRoles, canManageUsers, canViewSystemSettings } = useAccessControl()
 
@@ -24,67 +26,62 @@ const links = computed<NavLink[]>(() => {
   return items.filter(item => item.visible !== false)
 })
 
-function isActive(path: string) {
-  if (route.path === path) {
-    return true
-  }
+const activeTab = computed<string | null>(() => {
+  const match = links.value.find((link) => {
+    if (route.path === link.to) {
+      return true
+    }
+    if (link.to !== '/admin' && route.path.startsWith(link.to)) {
+      return true
+    }
+    return false
+  })
 
-  if (path !== '/admin' && route.path.startsWith(path)) {
-    return true
-  }
-
-  return false
-}
+  return match?.to ?? links.value[0]?.to ?? null
+})
 </script>
 
 <template>
-  <div class="admin-nav">
-    <v-btn
+  <v-tabs
+    class="admin-nav"
+    :model-value="activeTab"
+    density="comfortable"
+    bg-color="transparent"
+    align-tabs="start"
+    slider-color="primary"
+    show-arrows
+  >
+    <v-tab
       v-for="link in links"
       :key="link.to"
+      :value="link.to"
       :to="link.to"
-      variant="text"
-      class="admin-nav__item"
-      :class="{ 'admin-nav__item--active': isActive(link.to) }"
+      :prepend-icon="link.icon"
+      :ripple="false"
     >
-      <v-icon
-        :icon="link.icon"
-        size="20"
-        class="admin-nav__icon"
-      />
-      <span class="admin-nav__label">
-        {{ link.label }}
-      </span>
-    </v-btn>
-  </div>
+      {{ link.label }}
+    </v-tab>
+  </v-tabs>
 </template>
 
 <style scoped>
 .admin-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid rgba(var(--v-border-color, var(--v-theme-outline)), 0.3);
 }
 
-.admin-nav__item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+.admin-nav :deep(.v-tabs__wrapper) {
+  box-shadow: none;
+}
+
+.admin-nav :deep(.v-tab) {
   text-transform: none;
   letter-spacing: normal;
   font-weight: 500;
-  color: rgba(var(--v-theme-on-surface), 0.7);
+  min-height: 48px;
 }
 
-.admin-nav__item--active {
-  color: rgb(var(--v-theme-primary));
-}
-
-.admin-nav__icon {
-  flex: 0 0 auto;
-}
-
-.admin-nav__label {
-  white-space: nowrap;
+.admin-nav :deep(.v-tab .v-tab__prepend) {
+  margin-right: 6px;
 }
 </style>
