@@ -40,8 +40,12 @@ function getModelByValue(value: string): AiModelOption | undefined {
           {{ getModelByValue((item as any).value)?.providerLabel }}
         </span>
       </template>
-      <template #item="{ item }">
-        <v-list-item :value="(item as any).value">
+      <template #item="{ item, props: itemProps }">
+        <v-list-item
+          v-bind="itemProps"
+          :title="undefined"
+          :subtitle="undefined"
+        >
           <v-list-item-title>{{ getModelByValue((item as any).value)?.label ?? (item as any).title }}</v-list-item-title>
           <v-list-item-subtitle>{{ getModelByValue((item as any).value)?.providerLabel }}</v-list-item-subtitle>
           <template #append>
