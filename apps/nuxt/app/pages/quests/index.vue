@@ -130,6 +130,7 @@ const dialogQuestTitle = computed(() => lifecycleTarget.value?.title ?? 'this qu
     />
 
     <v-btn
+      v-if="$vuetify.display.smAndDown"
       color="primary"
       class="fab"
       aria-label="Create quest"
