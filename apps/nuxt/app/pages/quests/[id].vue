@@ -200,6 +200,23 @@ async function handleDeleteQuest() {
 
 <template>
   <v-container class="py-6">
+    <v-row class="quest-actions-row">
+      <v-col cols="12">
+        <v-sheet
+          class="quest-page-actions"
+          elevation="2"
+          rounded="lg"
+        >
+          <QuestActionButtons
+            :is-owner="isOwner"
+            :quest-status="questData?.status ?? null"
+            @complete-quest="completeQuest"
+            @reopen-quest="reopenQuest"
+            @request-delete="requestQuestDeletion"
+          />
+        </v-sheet>
+      </v-col>
+    </v-row>
     <v-row>
       <v-col cols="12">
         <template v-if="questData">
@@ -244,16 +261,6 @@ async function handleDeleteQuest() {
                 :error="investigationDialogError"
                 @cancel="closeInvestigationDialog"
                 @submit="submitInvestigation"
-              />
-            </template>
-
-            <template #actions>
-              <QuestActionButtons
-                :is-owner="isOwner"
-                :quest-status="questData.status"
-                @complete-quest="completeQuest"
-                @reopen-quest="reopenQuest"
-                @request-delete="requestQuestDeletion"
               />
             </template>
           </QuestDetailsCard>
@@ -304,5 +311,28 @@ async function handleDeleteQuest() {
 .quest-error-banner strong {
   font-weight: 600;
   margin-right: 4px;
+}
+
+.quest-actions-row {
+  margin-bottom: 16px;
+}
+
+.quest-page-actions {
+  position: sticky;
+  top: 88px;
+  z-index: 6;
+  padding: 12px 16px;
+  background: rgba(var(--v-theme-surface), 0.95);
+  border: 1px solid rgba(var(--v-theme-outline-variant, var(--v-theme-outline)), 0.2);
+  backdrop-filter: blur(6px);
+}
+
+.quest-page-actions :deep(.v-row) {
+  margin: 0;
+}
+
+.quest-page-actions :deep(.v-col) {
+  padding-top: 4px;
+  padding-bottom: 4px;
 }
 </style>
