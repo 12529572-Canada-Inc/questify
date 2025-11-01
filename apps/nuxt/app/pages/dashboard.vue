@@ -376,7 +376,6 @@ async function handleRefresh() {
 }
 
 .dashboard__welcome {
-  background: linear-gradient(135deg, rgba(43, 97, 177, 0.1), rgba(76, 201, 240, 0.1));
   border: 1px solid rgba(43, 97, 177, 0.16);
 }
 
