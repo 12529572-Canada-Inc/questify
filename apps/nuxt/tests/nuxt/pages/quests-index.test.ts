@@ -1,29 +1,29 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { h, Suspense } from 'vue'
+import { type Component, h, Suspense } from 'vue'
 import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
-
-vi.mock('#app', async () => {
-  const actual = await vi.importActual<typeof import('#app')>('#app')
-  return {
-    ...actual,
-    navigateTo: vi.fn(),
-  }
-})
-
-vi.mock('#app/composables/router', async () => {
-  const actual = await vi.importActual<typeof import('#app/composables/router')>('#app/composables/router')
-  return {
-    ...actual,
-    navigateTo: vi.fn(),
-  }
-})
-
-import { navigateTo } from '#app/composables/router'
 import QuestsIndexPage from '~/pages/quests/index.vue'
 import { useQuestStore } from '~/stores/quest'
 import { useUserStore } from '~/stores/user'
 import { createQuest } from '../../unit/support/sample-data'
+
+const navigateToMock = vi.hoisted(() => vi.fn())
+
+vi.mock('#app', async () => {
+  const actual = await vi.importActual<any>('#app')
+  return {
+    ...actual,
+    navigateTo: navigateToMock,
+  }
+})
+
+vi.mock('#app/composables/router', async () => {
+  const actual = await vi.importActual<any>('#app/composables/router')
+  return {
+    ...actual,
+    navigateTo: navigateToMock,
+  }
+})
 
 const buttonStub = {
   props: ['to'],
@@ -44,16 +44,14 @@ const questListStub = {
 const questDeleteDialogStub = { template: '<div class="quest-delete-dialog" />' }
 
 function createGlobalOptions(overrides: {
-  questList?: Record<string, unknown>
-  questDeleteDialog?: Record<string, unknown>
+  questList?: Component
+  questDeleteDialog?: Component
 } = {}) {
   return {
-    config: {
-      globalProperties: {
-        $vuetify: {
-          display: {
-            smAndDown: false,
-          },
+    mocks: {
+      $vuetify: {
+        display: {
+          smAndDown: false,
         },
       },
     },
@@ -76,8 +74,8 @@ describe('quests index page', () => {
   })
 
   afterEach(() => {
-    vi.mocked(navigateTo).mockReset()
-    vi.restoreAllMocks()
+    navigateToMock.mockReset()
+    vi.clearAllMocks()
   })
 
   it('renders quests returned from the data provider', async () => {
@@ -113,7 +111,6 @@ describe('quests index page', () => {
     const questStore = useQuestStore()
     const userStore = useUserStore()
     userStore.setUser({ id: 'user-1', name: 'Owner', email: 'owner@example.com' } as never)
-    const navigateToMock = vi.mocked(navigateTo)
     navigateToMock.mockResolvedValue(undefined as never)
     vi.spyOn(questStore, 'fetchQuests').mockImplementation(async () => {
       questStore.setQuests([] as never)
