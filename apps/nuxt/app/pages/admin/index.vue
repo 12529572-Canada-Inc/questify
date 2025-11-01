@@ -59,115 +59,118 @@ async function refreshOverview() {
 
 <template>
   <v-container class="py-6">
-    <div class="d-flex flex-column gap-4">
-      <AdminNavigation />
-
-      <v-alert
-        v-if="errorMessage"
-        type="error"
-        variant="tonal"
-        class="mb-2"
+    <AdminNavigation>
+      <v-tabs-window-item
+        value="/admin"
+        class="d-flex flex-column gap-4"
       >
-        {{ errorMessage }}
-      </v-alert>
+        <v-alert
+          v-if="errorMessage"
+          type="error"
+          variant="tonal"
+          class="mb-2"
+        >
+          {{ errorMessage }}
+        </v-alert>
 
-      <v-card>
-        <v-card-title class="d-flex align-center justify-space-between">
-          <span class="text-h6">
-            Administration Overview
-          </span>
-          <v-btn
-            variant="text"
-            prepend-icon="mdi-refresh"
-            :loading="pending"
-            @click="refreshOverview"
-          >
-            Refresh
-          </v-btn>
-        </v-card-title>
-        <v-card-text>
-          <v-row>
-            <v-col
-              cols="12"
-              md="4"
+        <v-card>
+          <v-card-title class="d-flex align-center justify-space-between">
+            <span class="text-h6">
+              Administration Overview
+            </span>
+            <v-btn
+              variant="text"
+              prepend-icon="mdi-refresh"
+              :loading="pending"
+              @click="refreshOverview"
             >
-              <div class="admin-metric">
-                <v-icon
-                  icon="mdi-account-cog"
-                  size="26"
-                  class="admin-metric__icon"
-                />
-                <div class="admin-metric__content">
-                  <span class="admin-metric__label">Roles</span>
-                  <strong class="admin-metric__value">
-                    {{ metrics.roles }}
-                  </strong>
+              Refresh
+            </v-btn>
+          </v-card-title>
+          <v-card-text>
+            <v-row>
+              <v-col
+                cols="12"
+                md="4"
+              >
+                <div class="admin-metric">
+                  <v-icon
+                    icon="mdi-account-cog"
+                    size="26"
+                    class="admin-metric__icon"
+                  />
+                  <div class="admin-metric__content">
+                    <span class="admin-metric__label">Roles</span>
+                    <strong class="admin-metric__value">
+                      {{ metrics.roles }}
+                    </strong>
+                  </div>
                 </div>
-              </div>
-            </v-col>
-            <v-col
-              cols="12"
-              md="4"
-            >
-              <div class="admin-metric">
-                <v-icon
-                  icon="mdi-account-group"
-                  size="26"
-                  class="admin-metric__icon"
-                />
-                <div class="admin-metric__content">
-                  <span class="admin-metric__label">Users</span>
-                  <strong class="admin-metric__value">
-                    {{ metrics.users }}
-                  </strong>
+              </v-col>
+              <v-col
+                cols="12"
+                md="4"
+              >
+                <div class="admin-metric">
+                  <v-icon
+                    icon="mdi-account-group"
+                    size="26"
+                    class="admin-metric__icon"
+                  />
+                  <div class="admin-metric__content">
+                    <span class="admin-metric__label">Users</span>
+                    <strong class="admin-metric__value">
+                      {{ metrics.users }}
+                    </strong>
+                  </div>
                 </div>
-              </div>
-            </v-col>
-            <v-col
-              cols="12"
-              md="4"
-            >
-              <div class="admin-metric">
-                <v-icon
-                  icon="mdi-shield-key-outline"
-                  size="26"
-                  class="admin-metric__icon"
-                />
-                <div class="admin-metric__content">
-                  <span class="admin-metric__label">Privileges</span>
-                  <strong class="admin-metric__value">
-                    {{ metrics.privileges }}
-                  </strong>
+              </v-col>
+              <v-col
+                cols="12"
+                md="4"
+              >
+                <div class="admin-metric">
+                  <v-icon
+                    icon="mdi-shield-key-outline"
+                    size="26"
+                    class="admin-metric__icon"
+                  />
+                  <div class="admin-metric__content">
+                    <span class="admin-metric__label">Privileges</span>
+                    <strong class="admin-metric__value">
+                      {{ metrics.privileges }}
+                    </strong>
+                  </div>
                 </div>
-              </div>
-            </v-col>
-          </v-row>
-        </v-card-text>
-      </v-card>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
 
-      <v-card>
-        <v-card-title class="text-h6">
-          Getting Started
-        </v-card-title>
-        <v-card-text class="d-flex flex-column gap-3">
-          <p class="text-body-1 mb-0">
-            Use the navigation above to manage global settings for Questify. Roles control what actions administrators can take,
-            while user assignments determine who holds those responsibilities.
-          </p>
-          <ul class="admin-overview-list">
-            <li>
-              Review <strong>Roles</strong> to confirm that built-in roles meet your needs, or create custom roles for specialized scenarios.
-            </li>
-            <li>
-              Visit <strong>Users</strong> to assign roles to team members or revoke privileges when access should be limited.
-            </li>
-            <li>
-              Inspect <strong>Privileges</strong> to understand the capabilities bundled with each role.
-            </li>
-          </ul>
-        </v-card-text>
-      </v-card>
-    </div>
+        <v-card>
+          <v-card-title class="text-h6">
+            Getting Started
+          </v-card-title>
+          <v-card-text class="d-flex flex-column gap-3">
+            <p class="text-body-1 mb-0">
+              Use the navigation above to manage global settings for Questify. Roles control what actions administrators can take,
+              while user assignments determine who holds those responsibilities.
+            </p>
+            <ul class="admin-overview-list">
+              <li>
+                Review <strong>Roles</strong> to confirm that built-in roles meet your needs, or create custom roles for specialized scenarios.
+              </li>
+              <li>
+                Visit <strong>Users</strong> to assign roles to team members or revoke privileges when access should be limited.
+              </li>
+              <li>
+                Inspect <strong>Privileges</strong> to understand the capabilities bundled with each role.
+              </li>
+            </ul>
+          </v-card-text>
+        </v-card>
+      </v-tabs-window-item>
+    </AdminNavigation>
   </v-container>
 </template>
 

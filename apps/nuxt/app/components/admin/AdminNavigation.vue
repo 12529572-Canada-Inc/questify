@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { useAccessControl } from '~/composables/useAccessControl'
-
 import { computed } from 'vue'
+import { useAccessControl } from '~/composables/useAccessControl'
 
 const route = useRoute()
 const { canManageRoles, canManageUsers, canViewSystemSettings } = useAccessControl()
@@ -42,46 +41,59 @@ const activeTab = computed<string | null>(() => {
 </script>
 
 <template>
-  <v-tabs
-    class="admin-nav"
-    :model-value="activeTab"
-    density="comfortable"
-    bg-color="transparent"
-    align-tabs="start"
-    slider-color="primary"
-    show-arrows
-  >
-    <v-tab
-      v-for="link in links"
-      :key="link.to"
-      :value="link.to"
-      :to="link.to"
-      :prepend-icon="link.icon"
-      :ripple="false"
+  <div class="admin-nav">
+    <v-tabs
+      class="admin-nav__tabs"
+      :model-value="activeTab"
+      density="comfortable"
+      bg-color="transparent"
+      align-tabs="start"
+      slider-color="primary"
+      show-arrows
     >
-      {{ link.label }}
-    </v-tab>
-  </v-tabs>
+      <v-tab
+        v-for="link in links"
+        :key="link.to"
+        :value="link.to"
+        :to="link.to"
+        :prepend-icon="link.icon"
+        :ripple="false"
+      >
+        {{ link.label }}
+      </v-tab>
+    </v-tabs>
+
+    <v-tabs-window
+      class="admin-nav__window"
+      :model-value="activeTab"
+    >
+      <slot />
+    </v-tabs-window>
+  </div>
 </template>
 
 <style scoped>
-.admin-nav {
+.admin-nav__tabs {
   margin-bottom: 12px;
   border-bottom: 1px solid rgba(var(--v-border-color, var(--v-theme-outline)), 0.3);
 }
 
-.admin-nav :deep(.v-tabs__wrapper) {
+.admin-nav__tabs :deep(.v-tabs__wrapper) {
   box-shadow: none;
 }
 
-.admin-nav :deep(.v-tab) {
+.admin-nav__tabs :deep(.v-tab) {
   text-transform: none;
   letter-spacing: normal;
   font-weight: 500;
   min-height: 48px;
 }
 
-.admin-nav :deep(.v-tab .v-tab__prepend) {
+.admin-nav__tabs :deep(.v-tab .v-tab__prepend) {
   margin-right: 6px;
+}
+
+.admin-nav__window {
+  margin-top: 12px;
 }
 </style>

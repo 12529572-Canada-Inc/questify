@@ -151,239 +151,242 @@ const hasRoles = computed(() => roles.value.length > 0)
 
 <template>
   <v-container class="py-6">
-    <div class="d-flex flex-column gap-4">
-      <AdminNavigation />
-
-      <v-card>
-        <v-card-title class="d-flex justify-space-between align-center">
-          <span class="text-h6">Roles</span>
-          <v-btn
-            color="primary"
-            prepend-icon="mdi-plus"
-            @click="openCreateDialog"
-          >
-            New Role
-          </v-btn>
-        </v-card-title>
-        <v-divider />
-        <v-card-text>
-          <div
-            v-if="pending"
-            class="py-8 d-flex justify-center"
-          >
-            <v-progress-circular
-              indeterminate
+    <AdminNavigation>
+      <v-tabs-window-item
+        value="/admin/roles"
+        class="d-flex flex-column gap-4"
+      >
+        <v-card>
+          <v-card-title class="d-flex justify-space-between align-center">
+            <span class="text-h6">Roles</span>
+            <v-btn
               color="primary"
-            />
-          </div>
-          <div v-else>
+              prepend-icon="mdi-plus"
+              @click="openCreateDialog"
+            >
+              New Role
+            </v-btn>
+          </v-card-title>
+          <v-divider />
+          <v-card-text>
             <div
-              v-if="!hasRoles"
-              class="py-8 text-medium-emphasis text-center"
+              v-if="pending"
+              class="py-8 d-flex justify-center"
             >
-              No roles are defined yet. Create your first role to begin assigning administrative privileges.
+              <v-progress-circular
+                indeterminate
+                color="primary"
+              />
             </div>
-            <v-table
-              v-else
-              class="admin-roles-table"
-            >
-              <thead>
-                <tr>
-                  <th class="text-left">
-                    Name
-                  </th>
-                  <th class="text-left">
-                    Description
-                  </th>
-                  <th class="text-left">
-                    Privileges
-                  </th>
-                  <th class="text-left">
-                    Assigned
-                  </th>
-                  <th class="text-left">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="role in roles"
-                  :key="role.id"
-                >
-                  <td>
-                    <div class="d-flex align-center gap-2">
-                      <span>{{ role.name }}</span>
-                      <v-chip
-                        v-if="role.system"
-                        size="small"
-                        color="primary"
-                        variant="tonal"
-                      >
-                        System
-                      </v-chip>
-                    </div>
-                  </td>
-                  <td class="text-medium-emphasis">
-                    {{ role.description || '—' }}
-                  </td>
-                  <td>
-                    <div class="d-flex flex-wrap gap-1">
-                      <v-chip
-                        v-for="privilege in role.privileges"
-                        :key="privilege.key"
-                        size="small"
-                        variant="tonal"
-                        color="secondary"
-                      >
-                        {{ privilege.label }}
-                      </v-chip>
-                    </div>
-                  </td>
-                  <td>
-                    {{ role.userCount }}
-                  </td>
-                  <td>
-                    <div class="d-flex gap-1">
-                      <v-btn
-                        size="small"
-                        variant="text"
-                        icon="mdi-pencil"
-                        @click="openEditDialog(role)"
-                      />
-                      <v-btn
-                        v-if="!role.system"
-                        size="small"
-                        variant="text"
-                        icon="mdi-delete"
-                        color="error"
-                        @click="handleDeleteRole(role)"
-                      />
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </v-table>
-          </div>
-        </v-card-text>
-      </v-card>
-    </div>
+            <div v-else>
+              <div
+                v-if="!hasRoles"
+                class="py-8 text-medium-emphasis text-center"
+              >
+                No roles are defined yet. Create your first role to begin assigning administrative privileges.
+              </div>
+              <v-table
+                v-else
+                class="admin-roles-table"
+              >
+                <thead>
+                  <tr>
+                    <th class="text-left">
+                      Name
+                    </th>
+                    <th class="text-left">
+                      Description
+                    </th>
+                    <th class="text-left">
+                      Privileges
+                    </th>
+                    <th class="text-left">
+                      Assigned
+                    </th>
+                    <th class="text-left">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="role in roles"
+                    :key="role.id"
+                  >
+                    <td>
+                      <div class="d-flex align-center gap-2">
+                        <span>{{ role.name }}</span>
+                        <v-chip
+                          v-if="role.system"
+                          size="small"
+                          color="primary"
+                          variant="tonal"
+                        >
+                          System
+                        </v-chip>
+                      </div>
+                    </td>
+                    <td class="text-medium-emphasis">
+                      {{ role.description || '—' }}
+                    </td>
+                    <td>
+                      <div class="d-flex flex-wrap gap-1">
+                        <v-chip
+                          v-for="privilege in role.privileges"
+                          :key="privilege.key"
+                          size="small"
+                          variant="tonal"
+                          color="secondary"
+                        >
+                          {{ privilege.label }}
+                        </v-chip>
+                      </div>
+                    </td>
+                    <td>
+                      {{ role.userCount }}
+                    </td>
+                    <td>
+                      <div class="d-flex gap-1">
+                        <v-btn
+                          size="small"
+                          variant="text"
+                          icon="mdi-pencil"
+                          @click="openEditDialog(role)"
+                        />
+                        <v-btn
+                          v-if="!role.system"
+                          size="small"
+                          variant="text"
+                          icon="mdi-delete"
+                          color="error"
+                          @click="handleDeleteRole(role)"
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </v-table>
+            </div>
+          </v-card-text>
+        </v-card>
 
-    <v-dialog
-      v-model="createDialogOpen"
-      max-width="540"
-    >
-      <v-card>
-        <v-card-title class="text-h6">
-          Create Role
-        </v-card-title>
-        <v-card-text>
-          <v-text-field
-            v-model="form.name"
-            label="Name"
-            :disabled="formLoading"
-            required
-          />
-          <v-textarea
-            v-model="form.description"
-            label="Description"
-            :disabled="formLoading"
-            rows="3"
-            auto-grow
-          />
-          <v-select
-            v-model="form.privileges"
-            :items="privilegeOptions"
-            label="Privileges"
-            multiple
-            chips
-            :disabled="formLoading"
-          />
-          <p
-            v-if="formError"
-            class="text-error text-body-2 mt-2"
-          >
-            {{ formError }}
-          </p>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
-            variant="text"
-            :disabled="formLoading"
-            @click="createDialogOpen = false"
-          >
-            Cancel
-          </v-btn>
-          <v-btn
-            color="primary"
-            :loading="formLoading"
-            :disabled="!form.name.trim()"
-            @click="handleCreateRole"
-          >
-            Create
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+        <v-dialog
+          v-model="createDialogOpen"
+          max-width="540"
+        >
+          <v-card>
+            <v-card-title class="text-h6">
+              Create Role
+            </v-card-title>
+            <v-card-text>
+              <v-text-field
+                v-model="form.name"
+                label="Name"
+                :disabled="formLoading"
+                required
+              />
+              <v-textarea
+                v-model="form.description"
+                label="Description"
+                :disabled="formLoading"
+                rows="3"
+                auto-grow
+              />
+              <v-select
+                v-model="form.privileges"
+                :items="privilegeOptions"
+                label="Privileges"
+                multiple
+                chips
+                :disabled="formLoading"
+              />
+              <p
+                v-if="formError"
+                class="text-error text-body-2 mt-2"
+              >
+                {{ formError }}
+              </p>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer />
+              <v-btn
+                variant="text"
+                :disabled="formLoading"
+                @click="createDialogOpen = false"
+              >
+                Cancel
+              </v-btn>
+              <v-btn
+                color="primary"
+                :loading="formLoading"
+                :disabled="!form.name.trim()"
+                @click="handleCreateRole"
+              >
+                Create
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
 
-    <v-dialog
-      v-model="editDialogOpen"
-      max-width="540"
-    >
-      <v-card>
-        <v-card-title class="text-h6">
-          Edit Role
-        </v-card-title>
-        <v-card-text>
-          <v-text-field
-            v-model="form.name"
-            label="Name"
-            :disabled="formLoading"
-            required
-          />
-          <v-textarea
-            v-model="form.description"
-            label="Description"
-            :disabled="formLoading"
-            rows="3"
-            auto-grow
-          />
-          <v-select
-            v-model="form.privileges"
-            :items="privilegeOptions"
-            label="Privileges"
-            multiple
-            chips
-            :disabled="formLoading"
-          />
-          <p
-            v-if="formError"
-            class="text-error text-body-2 mt-2"
-          >
-            {{ formError }}
-          </p>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
-            variant="text"
-            :disabled="formLoading"
-            @click="editDialogOpen = false"
-          >
-            Cancel
-          </v-btn>
-          <v-btn
-            color="primary"
-            :loading="formLoading"
-            :disabled="!form.id || !form.name.trim()"
-            @click="handleUpdateRole"
-          >
-            Save
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+        <v-dialog
+          v-model="editDialogOpen"
+          max-width="540"
+        >
+          <v-card>
+            <v-card-title class="text-h6">
+              Edit Role
+            </v-card-title>
+            <v-card-text>
+              <v-text-field
+                v-model="form.name"
+                label="Name"
+                :disabled="formLoading"
+                required
+              />
+              <v-textarea
+                v-model="form.description"
+                label="Description"
+                :disabled="formLoading"
+                rows="3"
+                auto-grow
+              />
+              <v-select
+                v-model="form.privileges"
+                :items="privilegeOptions"
+                label="Privileges"
+                multiple
+                chips
+                :disabled="formLoading"
+              />
+              <p
+                v-if="formError"
+                class="text-error text-body-2 mt-2"
+              >
+                {{ formError }}
+              </p>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer />
+              <v-btn
+                variant="text"
+                :disabled="formLoading"
+                @click="editDialogOpen = false"
+              >
+                Cancel
+              </v-btn>
+              <v-btn
+                color="primary"
+                :loading="formLoading"
+                :disabled="!form.id || !form.name.trim()"
+                @click="handleUpdateRole"
+              >
+                Save
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-tabs-window-item>
+    </AdminNavigation>
   </v-container>
 </template>
 
