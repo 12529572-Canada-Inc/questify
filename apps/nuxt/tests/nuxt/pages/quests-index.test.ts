@@ -11,7 +11,7 @@ const navigateToMock = vi.hoisted(() => vi.fn())
 const showSnackbarMock = vi.hoisted(() => vi.fn())
 
 vi.mock('#app', async () => {
-  const actual = await vi.importActual<any>('#app')
+  const actual = await vi.importActual<unknown>('#app')
   return {
     ...actual,
     navigateTo: navigateToMock,
@@ -19,7 +19,7 @@ vi.mock('#app', async () => {
 })
 
 vi.mock('#app/composables/router', async () => {
-  const actual = await vi.importActual<any>('#app/composables/router')
+  const actual = await vi.importActual<unknown>('#app/composables/router')
   return {
     ...actual,
     navigateTo: navigateToMock,
