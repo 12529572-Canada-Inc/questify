@@ -45,11 +45,6 @@ const activeTab = computed<string | null>(() => {
     <v-tabs
       class="admin-nav__tabs"
       :model-value="activeTab"
-      density="comfortable"
-      bg-color="transparent"
-      align-tabs="start"
-      slider-color="primary"
-      show-arrows
     >
       <v-tab
         v-for="link in links"
@@ -74,8 +69,8 @@ const activeTab = computed<string | null>(() => {
 
 <style scoped>
 .admin-nav__tabs {
-  margin-bottom: 12px;
-  border-bottom: 1px solid rgba(var(--v-border-color, var(--v-theme-outline)), 0.3);
+  /* TODO: refactor using theme variables */
+  color: white;
 }
 
 .admin-nav__tabs :deep(.v-tabs__wrapper) {
