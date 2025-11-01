@@ -9,7 +9,7 @@ import { useUserStore } from '~/stores/user'
 const questStore = useQuestStore()
 const userStore = useUserStore()
 
-const { quests } = storeToRefs(questStore)
+const { quests, hasQuests } = storeToRefs(questStore)
 const { user } = storeToRefs(userStore)
 
 if (!user.value) {
@@ -18,9 +18,19 @@ if (!user.value) {
 
 const showArchived = ref(false)
 
-await questStore.fetchQuests({ includeArchived: showArchived.value }).catch((error) => {
+let initialFetchFailed = false
+
+try {
+  await questStore.fetchQuests({ includeArchived: showArchived.value })
+}
+catch (error) {
+  initialFetchFailed = true
   console.error('Failed to load quests:', error)
-})
+}
+
+if (!initialFetchFailed && !hasQuests.value) {
+  await navigateTo('/quests/new', { replace: true })
+}
 
 watch(showArchived, async (value) => {
   try {
