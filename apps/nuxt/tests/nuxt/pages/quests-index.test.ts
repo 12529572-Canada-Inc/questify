@@ -137,10 +137,9 @@ describe('quests index page', () => {
     await flushPromises()
 
     expect(navigateToMock).toHaveBeenCalledWith('/quests/new', { replace: true })
-    expect(showSnackbarMock).toHaveBeenCalledWith(
-      'You need to create your first quest before the list is available.',
-      { variant: 'info' },
-    )
+    expect(showSnackbarMock).toHaveBeenCalledWith('You need to create your first quest!', {
+      variant: 'info',
+    })
   })
 
   it('toggles archived quests via the switch control', async () => {
