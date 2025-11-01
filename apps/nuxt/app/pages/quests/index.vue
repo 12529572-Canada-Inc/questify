@@ -3,15 +3,17 @@ import type { Quest } from '@prisma/client'
 import { computed, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useQuestLifecycle } from '~/composables/useQuestLifecycle'
-import { useSnackbar } from '~/composables/useSnackbar'
 import { useQuestStore } from '~/stores/quest'
 import { useUserStore } from '~/stores/user'
 
 const questStore = useQuestStore()
 const userStore = useUserStore()
-const { showSnackbar } = useSnackbar()
 
-const { quests, hasQuests } = storeToRefs(questStore)
+definePageMeta({
+  middleware: ['quests-owner'],
+})
+
+const { quests } = storeToRefs(questStore)
 const { user } = storeToRefs(userStore)
 
 if (!user.value) {
@@ -20,21 +22,11 @@ if (!user.value) {
 
 const showArchived = ref(false)
 
-let initialFetchFailed = false
-
 try {
   await questStore.fetchQuests({ includeArchived: showArchived.value })
 }
 catch (error) {
-  initialFetchFailed = true
   console.error('Failed to load quests:', error)
-}
-
-if (!initialFetchFailed && !hasQuests.value) {
-  showSnackbar('You need to create your first quest!', {
-    variant: 'info',
-  })
-  await navigateTo('/quests/new', { replace: true })
 }
 
 watch(showArchived, async (value) => {

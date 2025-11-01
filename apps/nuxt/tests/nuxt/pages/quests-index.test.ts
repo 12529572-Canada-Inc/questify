@@ -7,31 +7,6 @@ import { useQuestStore } from '~/stores/quest'
 import { useUserStore } from '~/stores/user'
 import { createQuest } from '../../unit/support/sample-data'
 
-const navigateToMock = vi.hoisted<ReturnType<typeof vi.fn>>(() => vi.fn())
-const showSnackbarMock = vi.hoisted<ReturnType<typeof vi.fn>>(() => vi.fn())
-
-vi.mock('#app', async () => {
-  const actual = await vi.importActual<Record<string, unknown>>('#app')
-  return {
-    ...actual,
-    navigateTo: navigateToMock,
-  }
-})
-
-vi.mock('#app/composables/router', async () => {
-  const actual = await vi.importActual<Record<string, unknown>>('#app/composables/router')
-  return {
-    ...actual,
-    navigateTo: navigateToMock,
-  }
-})
-
-vi.mock('~/composables/useSnackbar', () => ({
-  useSnackbar: () => ({
-    showSnackbar: showSnackbarMock,
-  }),
-}))
-
 const buttonStub = {
   props: ['to'],
   template: '<button :data-to="to"><slot /></button>',
@@ -81,9 +56,7 @@ describe('quests index page', () => {
   })
 
   afterEach(() => {
-    navigateToMock.mockReset()
-    showSnackbarMock.mockReset()
-    vi.clearAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('renders quests returned from the data provider', async () => {
@@ -110,36 +83,9 @@ describe('quests index page', () => {
     expect(page.exists()).toBe(true)
     expect(page.text()).toContain('Quests')
     expect(page.text()).toContain('Document testing strategy')
-    expect(showSnackbarMock).not.toHaveBeenCalled()
 
     const createButton = wrapper.findAll('button').find(button => button.text().trim() === 'Create Quest')
     expect(createButton?.attributes('data-to')).toBe('/quests/new')
-  })
-
-  it('redirects to the quest creation page when no quests are available', async () => {
-    const questStore = useQuestStore()
-    const userStore = useUserStore()
-    userStore.setUser({ id: 'user-1', name: 'Owner', email: 'owner@example.com' } as never)
-    navigateToMock.mockResolvedValue(undefined as never)
-    vi.spyOn(questStore, 'fetchQuests').mockImplementation(async () => {
-      questStore.setQuests([] as never)
-      return [] as never
-    })
-
-    mount({
-      render() {
-        return h(Suspense, {}, { default: () => h(QuestsIndexPage) })
-      },
-    }, {
-      global: createGlobalOptions(),
-    })
-
-    await flushPromises()
-
-    expect(navigateToMock).toHaveBeenCalledWith('/quests/new', { replace: true })
-    expect(showSnackbarMock).toHaveBeenCalledWith('You need to create your first quest!', {
-      variant: 'info',
-    })
   })
 
   it('toggles archived quests via the switch control', async () => {
@@ -170,6 +116,5 @@ describe('quests index page', () => {
     await flushPromises()
 
     expect(fetchSpy).toHaveBeenCalledWith(expect.objectContaining({ includeArchived: true, force: true }))
-    expect(showSnackbarMock).not.toHaveBeenCalled()
   })
 })
