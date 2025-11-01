@@ -7,11 +7,11 @@ import { useQuestStore } from '~/stores/quest'
 import { useUserStore } from '~/stores/user'
 import { createQuest } from '../../unit/support/sample-data'
 
-const navigateToMock = vi.hoisted(() => vi.fn())
-const showSnackbarMock = vi.hoisted(() => vi.fn())
+const navigateToMock = vi.hoisted<ReturnType<typeof vi.fn>>(() => vi.fn())
+const showSnackbarMock = vi.hoisted<ReturnType<typeof vi.fn>>(() => vi.fn())
 
 vi.mock('#app', async () => {
-  const actual = await vi.importActual<unknown>('#app')
+  const actual = await vi.importActual<Record<string, unknown>>('#app')
   return {
     ...actual,
     navigateTo: navigateToMock,
@@ -19,7 +19,7 @@ vi.mock('#app', async () => {
 })
 
 vi.mock('#app/composables/router', async () => {
-  const actual = await vi.importActual<unknown>('#app/composables/router')
+  const actual = await vi.importActual<Record<string, unknown>>('#app/composables/router')
   return {
     ...actual,
     navigateTo: navigateToMock,
