@@ -19,15 +19,13 @@ const linking = ref<OAuthProvider | null>(null)
 
 const { providers } = storeToRefs(userStore)
 
-const providerCatalog: Record<OAuthProvider, { label: string, description: string, icon: string }> = {
+const providerCatalog: Record<OAuthProvider, { label: string, icon: string }> = {
   google: {
     label: 'Google',
-    description: 'Use your Google account to sign in to Questify.',
     icon: 'mdi-google',
   },
   facebook: {
     label: 'Facebook',
-    description: 'Connect your Facebook account for quicker login.',
     icon: 'mdi-facebook',
   },
 }
@@ -115,7 +113,7 @@ function startLink(provider: OAuthProvider) {
             Account Connections
           </v-card-title>
           <v-card-subtitle class="mb-6">
-            Link your Questify account with social providers for faster sign-ins and recovery options.
+            Link your Questify account with social providers.
           </v-card-subtitle>
 
           <v-list density="comfortable">
@@ -135,9 +133,6 @@ function startLink(provider: OAuthProvider) {
               <v-list-item-title class="text-subtitle-1 font-weight-medium">
                 {{ providerCatalog[provider].label }}
               </v-list-item-title>
-              <v-list-item-subtitle class="text-body-2">
-                {{ providerCatalog[provider].description }}
-              </v-list-item-subtitle>
               <template #append>
                 <v-chip
                   v-if="isLinked(provider)"

@@ -9,6 +9,10 @@ import { useUserStore } from '~/stores/user'
 const questStore = useQuestStore()
 const userStore = useUserStore()
 
+definePageMeta({
+  middleware: ['quests-owner'],
+})
+
 const { quests } = storeToRefs(questStore)
 const { user } = storeToRefs(userStore)
 
@@ -18,9 +22,12 @@ if (!user.value) {
 
 const showArchived = ref(false)
 
-await questStore.fetchQuests({ includeArchived: showArchived.value }).catch((error) => {
+try {
+  await questStore.fetchQuests({ includeArchived: showArchived.value })
+}
+catch (error) {
   console.error('Failed to load quests:', error)
-})
+}
 
 watch(showArchived, async (value) => {
   try {
@@ -130,6 +137,7 @@ const dialogQuestTitle = computed(() => lifecycleTarget.value?.title ?? 'this qu
     />
 
     <v-btn
+      v-if="$vuetify.display.smAndDown"
       color="primary"
       class="fab"
       aria-label="Create quest"

@@ -19,13 +19,6 @@
         <v-btn
           block
           color="primary"
-          to="/quests"
-        >
-          View Quests
-        </v-btn>
-        <v-btn
-          block
-          color="success"
           to="/quests/new"
         >
           Create Quest

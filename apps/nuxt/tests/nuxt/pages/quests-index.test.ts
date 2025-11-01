@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { h, Suspense } from 'vue'
+import { type Component, h, Suspense } from 'vue'
 import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import QuestsIndexPage from '~/pages/quests/index.vue'
@@ -18,13 +18,44 @@ const switchStub = {
   template: '<label><input type="checkbox" :checked="modelValue" @change="$emit(\'update:modelValue\', $event.target.checked)" /></label>',
 }
 
+const questListStub = {
+  props: ['quests', 'currentUserId'],
+  template: '<ul><li v-for="quest in quests" :key="quest.id">{{ quest.title }}</li></ul>',
+}
+
+const questDeleteDialogStub = { template: '<div class="quest-delete-dialog" />' }
+
+function createGlobalOptions(overrides: {
+  questList?: Component
+  questDeleteDialog?: Component
+} = {}) {
+  return {
+    mocks: {
+      $vuetify: {
+        display: {
+          smAndDown: false,
+        },
+      },
+    },
+    stubs: {
+      NuxtLink: { props: ['to'], template: '<a :href="to"><slot /></a>' },
+      VContainer: { template: '<div><slot /></div>' },
+      VRow: { template: '<div><slot /></div>' },
+      VCol: { template: '<div><slot /></div>' },
+      VBtn: buttonStub,
+      VSwitch: switchStub,
+      QuestList: overrides.questList ?? questListStub,
+      QuestDeleteDialog: overrides.questDeleteDialog ?? questDeleteDialogStub,
+    },
+  }
+}
+
 describe('quests index page', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
   })
 
   afterEach(() => {
-    vi.unstubAllGlobals()
     vi.restoreAllMocks()
   })
 
@@ -43,21 +74,7 @@ describe('quests index page', () => {
         return h(Suspense, {}, { default: () => h(QuestsIndexPage) })
       },
     }, {
-      global: {
-        stubs: {
-          NuxtLink: { props: ['to'], template: '<a :href="to"><slot /></a>' },
-          VContainer: { template: '<div><slot /></div>' },
-          VRow: { template: '<div><slot /></div>' },
-          VCol: { template: '<div><slot /></div>' },
-          VBtn: buttonStub,
-          VSwitch: switchStub,
-          QuestList: {
-            props: ['quests', 'currentUserId'],
-            template: '<ul><li v-for="quest in quests" :key="quest.id">{{ quest.title }}</li></ul>',
-          },
-          QuestDeleteDialog: { template: '<div class="quest-delete-dialog" />' },
-        },
-      },
+      global: createGlobalOptions(),
     })
 
     await flushPromises()
@@ -75,25 +92,19 @@ describe('quests index page', () => {
     const questStore = useQuestStore()
     const userStore = useUserStore()
     userStore.setUser({ id: 'user-1', name: 'Owner', email: 'owner@example.com' } as never)
-    const fetchSpy = vi.spyOn(questStore, 'fetchQuests').mockResolvedValue([] as never)
+    const existingQuest = createQuest({ id: 'quest-99', title: 'Existing quest' })
+    questStore.setQuests([existingQuest] as never)
+    const fetchSpy = vi.spyOn(questStore, 'fetchQuests').mockResolvedValue([existingQuest] as never)
 
     const wrapper = mount({
       render() {
         return h(Suspense, {}, { default: () => h(QuestsIndexPage) })
       },
     }, {
-      global: {
-        stubs: {
-          NuxtLink: { props: ['to'], template: '<a :href="to"><slot /></a>' },
-          VContainer: { template: '<div><slot /></div>' },
-          VRow: { template: '<div><slot /></div>' },
-          VCol: { template: '<div><slot /></div>' },
-          VBtn: buttonStub,
-          VSwitch: switchStub,
-          QuestList: { props: ['quests', 'currentUserId'], template: '<div class="quest-list" />' },
-          QuestDeleteDialog: { template: '<div />' },
-        },
-      },
+      global: createGlobalOptions({
+        questList: { props: ['quests', 'currentUserId'], template: '<div class="quest-list" />' },
+        questDeleteDialog: { template: '<div />' },
+      }),
     })
 
     await flushPromises()
