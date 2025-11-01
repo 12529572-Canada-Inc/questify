@@ -13,7 +13,7 @@ import { useQuestLifecycle } from '~/composables/useQuestLifecycle'
 import QuestDetailsCard from '~/components/quests/QuestDetailsCard.vue'
 import QuestTaskEditDialog from '~/components/quests/QuestTaskEditDialog.vue'
 import QuestInvestigationDialog from '~/components/quests/QuestInvestigationDialog.vue'
-import QuestActionButtons from '~/components/quests/QuestActionButtons.vue'
+import QuestFloatingActions from '~/components/quests/QuestFloatingActions.vue'
 import QuestDeleteDialog from '~/components/quests/QuestDeleteDialog.vue'
 import type { QuestTaskTab, TaskWithInvestigations } from '~/types/quest-tasks'
 import { useUserStore } from '~/stores/user'
@@ -200,23 +200,13 @@ async function handleDeleteQuest() {
 
 <template>
   <v-container class="py-6">
-    <v-row class="quest-actions-row">
-      <v-col cols="12">
-        <v-sheet
-          class="quest-page-actions"
-          elevation="2"
-          rounded="lg"
-        >
-          <QuestActionButtons
-            :is-owner="isOwner"
-            :quest-status="questData?.status ?? null"
-            @complete-quest="completeQuest"
-            @reopen-quest="reopenQuest"
-            @request-delete="requestQuestDeletion"
-          />
-        </v-sheet>
-      </v-col>
-    </v-row>
+    <QuestFloatingActions
+      :is-owner="isOwner"
+      :quest-status="questData?.status ?? null"
+      @complete="completeQuest"
+      @reopen="reopenQuest"
+      @delete="requestQuestDeletion"
+    />
     <v-row>
       <v-col cols="12">
         <template v-if="questData">
