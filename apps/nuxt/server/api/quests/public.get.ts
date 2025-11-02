@@ -1,4 +1,5 @@
-import { PrismaClient, QuestStatus, Prisma } from '@prisma/client'
+import type { Prisma } from '@prisma/client'
+import { PrismaClient, QuestStatus } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
