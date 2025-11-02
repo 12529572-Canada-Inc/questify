@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🚀 Features
 - Added a public quests discovery page at `/quests/public` with search, status filters, sorting, and pagination backed by a new `/api/quests/public` endpoint, making shared quests browseable without authentication.
+- Added groundwork for the universal in-app help system: global support FAB, dialog scaffold, and session-cached conversation store to prepare AI chat and GitHub issue submission flows. (#92)
 
 ### 🛡️ Security
 - Removed owner email addresses from the public quests API payload to prevent exposing contact information to anonymous visitors.
