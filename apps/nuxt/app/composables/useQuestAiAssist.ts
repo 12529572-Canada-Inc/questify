@@ -1,4 +1,5 @@
 import { computed, reactive, watch, type ComputedRef, type Ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import type { AiModelOption } from 'shared/ai-models'
 import { useSnackbar } from './useSnackbar'
 import { resolveApiError } from '~/utils/error'
@@ -40,6 +41,7 @@ export function useQuestAiAssist(options: {
 }) {
   const { fields, modelType, modelOptions } = options
   const uiStore = useUiStore()
+  const { aiAssistEnabled } = storeToRefs(uiStore)
   const { showSnackbar } = useSnackbar()
 
   const state = reactive({
@@ -51,7 +53,7 @@ export function useQuestAiAssist(options: {
     lastModelId: null as string | null,
   })
 
-  const isEnabled = uiStore.aiAssistEnabled
+  const isEnabled = aiAssistEnabled
 
   const activeFieldLabel = computed(() => (state.activeField ? FIELD_LABELS[state.activeField] : ''))
 
