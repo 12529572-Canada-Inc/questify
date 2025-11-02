@@ -3,7 +3,7 @@ import handler from '../../server/api/quests/assist.post'
 
 type RequireUserSessionMock = (event?: unknown) => Promise<{ user: { id: string } }>
 type ReadBodyMock = (event: unknown) => Promise<unknown>
-type CreateErrorMock = (input: { statusCode?: number, statusMessage?: string }) => Error
+type CreateErrorMock = (input: { status?: number, statusText?: string }) => Error
 type UseRuntimeConfigMock = () => { features?: { aiAssist?: boolean } }
 
 type GlobalWithMocks = typeof globalThis & {
@@ -13,8 +13,8 @@ type GlobalWithMocks = typeof globalThis & {
   useRuntimeConfig?: UseRuntimeConfigMock
 }
 
-const runAiModelMock = vi.fn()
-const recordUsageMock = vi.fn()
+const runAiModelMock = vi.hoisted(() => vi.fn())
+const recordUsageMock = vi.hoisted(() => vi.fn())
 
 vi.mock('../../server/utils/ai-runner', () => ({
   runAiModel: runAiModelMock,
@@ -47,9 +47,9 @@ beforeEach(() => {
     modelType: 'gpt-4o-mini',
   })))
 
-  Reflect.set(globalThis as GlobalWithMocks, 'createError', ({ statusCode, statusMessage }) => {
-    const error = new Error(statusMessage ?? 'Error') as Error & { statusCode?: number }
-    error.statusCode = statusCode
+  Reflect.set(globalThis as GlobalWithMocks, 'createError', ({ status, statusText }) => {
+    const error = new Error(statusText ?? 'Error') as Error & { status?: number }
+    error.status = status
     return error
   })
 
@@ -78,7 +78,7 @@ describe('API /api/quests/assist (POST)', () => {
       features: { aiAssist: false },
     }))
 
-    await expect(handler({} as never)).rejects.toMatchObject({ statusCode: 404 })
+    await expect(handler({} as never)).rejects.toMatchObject({ status: 404 })
     expect(runAiModelMock).not.toHaveBeenCalled()
   })
 
@@ -117,13 +117,13 @@ describe('API /api/quests/assist (POST)', () => {
       content: 'not json',
     })
 
-    await expect(handler({} as never)).rejects.toMatchObject({ statusCode: 502 })
+    await expect(handler({} as never)).rejects.toMatchObject({ status: 502 })
   })
 
   it('validates the requested field', async () => {
     (globalThis as GlobalWithMocks).readBody = vi.fn(async () => ({ field: 'summary' }))
 
-    await expect(handler({} as never)).rejects.toMatchObject({ statusCode: 400 })
+    await expect(handler({} as never)).rejects.toMatchObject({ status: 400 })
     expect(runAiModelMock).not.toHaveBeenCalled()
   })
 })
