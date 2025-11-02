@@ -1,9 +1,21 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+
+const { parseJsonFromModelMock } = vi.hoisted(() => ({
+  parseJsonFromModelMock: vi.fn(),
+}));
+
+vi.mock('shared/server', async () => {
+  const actual = await vi.importActual<typeof import('shared/server')>('shared/server');
+  return {
+    ...actual,
+    parseJsonFromModel: parseJsonFromModelMock,
+  };
+});
+
 import * as shared from 'shared/server';
 
 const workerInstance = {};
 const WorkerMock = vi.fn(() => workerInstance);
-const parseJsonFromModelMock = vi.fn();
 const taskCreateMock = vi.fn();
 const questUpdateMock = vi.fn();
 const taskInvestigationFindUniqueMock = vi.fn();
@@ -40,8 +52,6 @@ const QUEST_STATUS = {
 } as const;
 
 const originalFetch = globalThis.fetch;
-const parseJsonSpy = vi.spyOn(shared, 'parseJsonFromModel');
-
 beforeAll(() => {
   if (!globalThis.fetch) {
     globalThis.fetch = vi.fn(async () => ({
@@ -59,7 +69,6 @@ afterAll(() => {
   else {
     Reflect.deleteProperty(globalThis as typeof globalThis & { fetch?: typeof fetch }, 'fetch');
   }
-  parseJsonSpy.mockRestore();
 });
 
 vi.mock('bullmq', () => ({
@@ -105,7 +114,8 @@ describe('worker entrypoint', () => {
       redisTls: false,
       databaseUrl: 'postgres://example',
     });
-    parseJsonSpy.mockImplementation(parseJsonFromModelMock);
+    (shared as typeof shared & { parseJsonFromModel: typeof originalParseJsonFromModel }).parseJsonFromModel =
+      parseJsonFromModelMock as unknown as typeof originalParseJsonFromModel;
   });
 
   it('uses fallback redis configuration when URL parsing fails', async () => {
