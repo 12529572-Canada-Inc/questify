@@ -1,15 +1,18 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { SUPPORTED_OAUTH_PROVIDERS, type OAuthProvider } from 'shared'
 import { useOAuthFlash } from '~/composables/useOAuthFlash'
 import { useSnackbar } from '~/composables/useSnackbar'
 import { useUserStore } from '~/stores/user'
+import { useUiStore } from '~/stores/ui'
 
 definePageMeta({
   middleware: ['auth'],
 })
 
 const userStore = useUserStore()
+const uiStore = useUiStore()
 const route = useRoute()
 const session = useUserSession()
 const { showSnackbar } = useSnackbar()
@@ -18,6 +21,16 @@ const { consumeOAuthFlash } = useOAuthFlash()
 const linking = ref<OAuthProvider | null>(null)
 
 const { providers } = storeToRefs(userStore)
+const { aiAssistEnabled } = storeToRefs(uiStore)
+
+const aiAssistFeatureEnabled = uiStore.aiAssistFeatureEnabled
+const aiAssistPreference = computed({
+  get: () => aiAssistEnabled.value,
+  set: (value: boolean) => {
+    uiStore.setAiAssistEnabled(Boolean(value))
+    showSnackbar(value ? 'AI assistance enabled.' : 'AI assistance turned off.', { variant: 'success' })
+  },
+})
 
 const providerCatalog: Record<OAuthProvider, { label: string, icon: string }> = {
   google: {
@@ -155,6 +168,50 @@ function startLink(provider: OAuthProvider) {
             </v-list-item>
           </v-list>
         </v-card>
+        <v-card class="pa-6 mt-6">
+          <v-card-title class="text-h5 mb-2">
+            Quest AI Assistance
+          </v-card-title>
+          <v-card-subtitle class="mb-4">
+            Control whether the “Improve with AI” helpers appear while creating quests.
+          </v-card-subtitle>
+
+          <v-row
+            align="center"
+            class="settings-ai-toggle"
+          >
+            <v-col cols="8">
+              <p class="text-body-2 mb-2">
+                When enabled, Questify can suggest better titles, goals, context, and constraints using your selected AI model.
+              </p>
+              <p class="text-body-2 text-medium-emphasis mb-0">
+                Suggestions never overwrite your text until you accept them.
+              </p>
+            </v-col>
+            <v-col
+              cols="4"
+              class="text-right"
+            >
+              <v-switch
+                v-model="aiAssistPreference"
+                color="primary"
+                inset
+                :disabled="!aiAssistFeatureEnabled"
+                aria-label="Toggle quest AI assistance"
+              />
+            </v-col>
+          </v-row>
+
+          <v-alert
+            v-if="!aiAssistFeatureEnabled"
+            type="info"
+            variant="tonal"
+            border="start"
+            class="mt-4"
+          >
+            AI assistance has been disabled by your administrator or environment settings.
+          </v-alert>
+        </v-card>
       </v-col>
     </v-row>
   </v-container>
@@ -163,5 +220,9 @@ function startLink(provider: OAuthProvider) {
 <style scoped>
 .settings-provider-item + .settings-provider-item {
   border-top: 1px solid rgba(var(--v-theme-on-surface), 0.08);
+}
+
+.settings-ai-toggle {
+  gap: 12px;
 }
 </style>

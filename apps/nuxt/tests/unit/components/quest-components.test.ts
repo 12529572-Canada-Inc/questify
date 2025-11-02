@@ -70,6 +70,7 @@ const vuetifyStubFlags = {
   VProgressCircular: true,
   VSpacer: true,
   ModelSelectField: true,
+  QuestAiSuggestionDialog: true,
 }
 
 const originalUseRuntimeConfig = (globalThis as typeof globalThis & { useRuntimeConfig?: () => unknown }).useRuntimeConfig
@@ -79,6 +80,7 @@ beforeAll(() => {
     public: {
       aiModels: defaultAiModels,
       aiModelDefaultId: 'gpt-4o-mini',
+      features: { aiAssist: true },
     },
   })))
 })

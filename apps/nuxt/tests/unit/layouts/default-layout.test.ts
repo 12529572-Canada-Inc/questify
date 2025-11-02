@@ -9,6 +9,8 @@ import { useQuestStore } from '~/stores/quest'
 import { useUiStore } from '~/stores/ui'
 import { createQuest } from '../support/sample-data'
 
+const originalUseRuntimeConfig = (globalThis as typeof globalThis & { useRuntimeConfig?: () => unknown }).useRuntimeConfig
+
 const routerPush = vi.fn()
 const fetchSession = vi.fn().mockResolvedValue(undefined)
 const fetchApi = vi.fn().mockResolvedValue(undefined)
@@ -25,6 +27,9 @@ vi.mock('@vueuse/core', () => ({
 }))
 
 beforeEach(() => {
+  Reflect.set(globalThis, 'useRuntimeConfig', vi.fn(() => ({
+    public: { features: { aiAssist: true } },
+  })))
   setActivePinia(createPinia())
 
   routerPush.mockReset()
@@ -68,6 +73,12 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  if (originalUseRuntimeConfig) {
+    Reflect.set(globalThis, 'useRuntimeConfig', originalUseRuntimeConfig)
+  }
+  else {
+    Reflect.deleteProperty(globalThis, 'useRuntimeConfig')
+  }
   vi.unstubAllGlobals()
 })
 

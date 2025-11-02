@@ -8,6 +8,7 @@ import { useUserStore } from '~/stores/user'
 const consumeFlashMock = vi.fn()
 const fetchSessionMock = vi.fn().mockResolvedValue(undefined)
 const openInPopupMock = vi.fn()
+const originalUseRuntimeConfig = (globalThis as typeof globalThis & { useRuntimeConfig?: () => unknown }).useRuntimeConfig
 
 vi.mock('~/composables/useOAuthFlash', () => ({
   useOAuthFlash: () => ({
@@ -27,6 +28,10 @@ describe('SettingsPage', () => {
     consumeFlashMock.mockReset()
     fetchSessionMock.mockReset()
     openInPopupMock.mockReset()
+
+    Reflect.set(globalThis, 'useRuntimeConfig', vi.fn(() => ({
+      public: { features: { aiAssist: true } },
+    })))
 
     vi.stubGlobal('definePageMeta', vi.fn())
     vi.stubGlobal('useRoute', () => ({
@@ -51,6 +56,12 @@ describe('SettingsPage', () => {
   })
 
   afterEach(() => {
+    if (originalUseRuntimeConfig) {
+      Reflect.set(globalThis, 'useRuntimeConfig', originalUseRuntimeConfig)
+    }
+    else {
+      Reflect.deleteProperty(globalThis, 'useRuntimeConfig')
+    }
     vi.unstubAllGlobals()
   })
 
@@ -74,6 +85,8 @@ describe('SettingsPage', () => {
           VIcon: { template: '<span><slot /></span>' },
           VChip: { template: '<span class="chip"><slot /></span>' },
           VBtn: { props: ['loading'], template: '<button @click="$emit(\'click\')"><slot /></button>' },
+          VSwitch: { props: ['modelValue'], template: '<label class="switch"><input type="checkbox" :checked="modelValue" @change="$emit(\'update:modelValue\', $event.target.checked)" /></label>' },
+          VAlert: { template: '<div class="alert"><slot /></div>' },
         },
       },
     })

@@ -40,6 +40,7 @@ const QUEST_STATUS = {
 } as const;
 
 const originalFetch = globalThis.fetch;
+const parseJsonSpy = vi.spyOn(shared, 'parseJsonFromModel');
 
 beforeAll(() => {
   if (!globalThis.fetch) {
@@ -58,13 +59,11 @@ afterAll(() => {
   else {
     Reflect.deleteProperty(globalThis as typeof globalThis & { fetch?: typeof fetch }, 'fetch');
   }
+  parseJsonSpy.mockRestore();
 });
 
 vi.mock('bullmq', () => ({
   Worker: WorkerMock,
-}));
-vi.mock('../src/helpers.js', () => ({
-  parseJsonFromModel: parseJsonFromModelMock,
 }));
 vi.mock('@prisma/client', () => ({
   PrismaClient: PrismaClientMock,
@@ -106,6 +105,7 @@ describe('worker entrypoint', () => {
       redisTls: false,
       databaseUrl: 'postgres://example',
     });
+    parseJsonSpy.mockImplementation(parseJsonFromModelMock);
   });
 
   it('uses fallback redis configuration when URL parsing fails', async () => {

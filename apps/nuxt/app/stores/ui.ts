@@ -5,14 +5,26 @@ import { useTheme } from 'vuetify'
 type ThemeMode = 'light' | 'dark'
 
 const THEME_COOKIE_KEY = 'questify-theme'
+const AI_ASSIST_COOKIE_KEY = 'questify-ai-assist'
 
 export const useUiStore = defineStore('ui', () => {
   const cookie = useCookie<ThemeMode | null>(THEME_COOKIE_KEY)
   const themeMode = ref<ThemeMode>(cookie.value ?? 'light')
+  const runtimeConfig = useRuntimeConfig()
+  const aiAssistFeatureEnabled = Boolean(runtimeConfig.public?.features?.aiAssist)
+  const aiAssistCookie = useCookie<'on' | 'off'>(AI_ASSIST_COOKIE_KEY, {
+    default: () => (aiAssistFeatureEnabled ? 'on' : 'off'),
+  })
+  const aiAssistPreference = ref<'on' | 'off'>(
+    aiAssistFeatureEnabled
+      ? (aiAssistCookie.value ?? 'on')
+      : 'off',
+  )
 
   let cachedTheme: ReturnType<typeof useTheme> | null = null
 
   const isDarkMode = computed(() => themeMode.value === 'dark')
+  const aiAssistEnabled = computed(() => aiAssistFeatureEnabled && aiAssistPreference.value === 'on')
 
   function resolveThemeInstance() {
     if (cachedTheme) {
@@ -64,16 +76,42 @@ export const useUiStore = defineStore('ui', () => {
     setTheme(isDarkMode.value ? 'light' : 'dark')
   }
 
+  function setAiAssistEnabled(enabled: boolean) {
+    if (!aiAssistFeatureEnabled) return
+    aiAssistPreference.value = enabled ? 'on' : 'off'
+  }
+
+  function toggleAiAssist() {
+    if (!aiAssistFeatureEnabled) return
+    setAiAssistEnabled(!aiAssistEnabled.value)
+  }
+
   watch(themeMode, (mode) => {
     cookie.value = mode
     applyVuetifyTheme(mode)
   }, { immediate: true })
+
+  watch(aiAssistPreference, (value) => {
+    if (!aiAssistFeatureEnabled) {
+      aiAssistCookie.value = 'off'
+      return
+    }
+    aiAssistCookie.value = value
+  }, { immediate: true })
+
+  if (!aiAssistFeatureEnabled) {
+    aiAssistCookie.value = 'off'
+  }
 
   return {
     themeMode,
     isDarkMode,
     setTheme,
     toggleTheme,
+    aiAssistEnabled,
+    aiAssistFeatureEnabled,
+    setAiAssistEnabled,
+    toggleAiAssist,
   }
 })
 

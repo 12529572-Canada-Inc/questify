@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useQuestForm } from '~/composables/useQuestForm'
+import { useQuestAiAssist } from '~/composables/useQuestAiAssist'
 
 const props = withDefaults(defineProps<{ showBackButton?: boolean }>(), {
   showBackButton: true,
@@ -21,6 +22,29 @@ const {
   submit,
   toggleOptionalFields,
 } = useQuestForm()
+
+const {
+  isEnabled: aiAssistEnabled,
+  dialogOpen: aiDialogOpen,
+  activeFieldLabel: aiActiveFieldLabel,
+  suggestions: aiSuggestions,
+  loading: aiLoading,
+  error: aiError,
+  modelLabel: aiModelLabel,
+  requestAssistance: requestAiAssistance,
+  regenerateSuggestions: regenerateAiSuggestions,
+  applySuggestion: applyAiSuggestion,
+  closeDialog: closeAiDialog,
+} = useQuestAiAssist({
+  fields: {
+    title,
+    goal,
+    context,
+    constraints,
+  },
+  modelType,
+  modelOptions,
+})
 </script>
 
 <template>
@@ -34,6 +58,19 @@ const {
       :rules="rules.title"
       required
     />
+    <div
+      v-if="aiAssistEnabled"
+      class="quest-form__ai-action mb-2"
+    >
+      <v-btn
+        variant="text"
+        size="small"
+        prepend-icon="mdi-sparkle"
+        @click="requestAiAssistance('title')"
+      >
+        Improve with AI
+      </v-btn>
+    </div>
 
     <ModelSelectField
       v-model="modelType"
@@ -63,6 +100,19 @@ const {
           rows="3"
           class="mb-4"
         />
+        <div
+          v-if="aiAssistEnabled"
+          class="quest-form__ai-action mb-4"
+        >
+          <v-btn
+            variant="text"
+            size="small"
+            prepend-icon="mdi-sparkle"
+            @click="requestAiAssistance('goal')"
+          >
+            Improve with AI
+          </v-btn>
+        </div>
 
         <v-textarea
           v-model="context"
@@ -73,6 +123,19 @@ const {
           rows="3"
           class="mb-4"
         />
+        <div
+          v-if="aiAssistEnabled"
+          class="quest-form__ai-action mb-4"
+        >
+          <v-btn
+            variant="text"
+            size="small"
+            prepend-icon="mdi-sparkle"
+            @click="requestAiAssistance('context')"
+          >
+            Improve with AI
+          </v-btn>
+        </div>
 
         <v-textarea
           v-model="constraints"
@@ -83,6 +146,19 @@ const {
           rows="3"
           class="mb-4"
         />
+        <div
+          v-if="aiAssistEnabled"
+          class="quest-form__ai-action mb-4"
+        >
+          <v-btn
+            variant="text"
+            size="small"
+            prepend-icon="mdi-sparkle"
+            @click="requestAiAssistance('constraints')"
+          >
+            Improve with AI
+          </v-btn>
+        </div>
 
         <v-btn
           type="button"
@@ -143,6 +219,19 @@ const {
     >
       {{ error }}
     </p>
+
+    <QuestAiSuggestionDialog
+      v-if="aiAssistEnabled"
+      v-model:open="aiDialogOpen"
+      :field-label="aiActiveFieldLabel"
+      :suggestions="aiSuggestions"
+      :loading="aiLoading"
+      :error="aiError"
+      :model-label="aiModelLabel"
+      @select="applyAiSuggestion"
+      @regenerate="regenerateAiSuggestions"
+      @close="closeAiDialog"
+    />
   </v-form>
 </template>
 
@@ -150,5 +239,10 @@ const {
 .quest-form__error {
   font-size: 0.95rem;
   color: rgb(var(--v-theme-error));
+}
+
+.quest-form__ai-action {
+  display: flex;
+  justify-content: flex-end;
 }
 </style>
