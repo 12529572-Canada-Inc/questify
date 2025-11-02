@@ -1,4 +1,10 @@
-import { vi } from 'vitest'
+import { vi, afterEach, beforeEach, describe, expect, it } from 'vitest'
+
+import { computed, ref } from 'vue'
+import { createPinia, setActivePinia } from 'pinia'
+import { defaultAiModels } from 'shared/ai-models'
+import { useQuestAiAssist } from '~/composables/useQuestAiAssist'
+import { useUiStore } from '~/stores/ui'
 
 const showSnackbarMock = vi.fn()
 
@@ -7,13 +13,6 @@ vi.mock('~/composables/useSnackbar', () => ({
     showSnackbar: showSnackbarMock,
   }),
 }))
-
-import { computed, ref } from 'vue'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { createPinia, setActivePinia } from 'pinia'
-import { defaultAiModels } from 'shared/ai-models'
-import { useQuestAiAssist } from '~/composables/useQuestAiAssist'
-import { useUiStore } from '~/stores/ui'
 
 const originalUseRuntimeConfig = (globalThis as typeof globalThis & { useRuntimeConfig?: () => unknown }).useRuntimeConfig
 const originalFetch = (globalThis as typeof globalThis & { $fetch?: typeof $fetch }).$fetch

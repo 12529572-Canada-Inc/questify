@@ -19,9 +19,9 @@ type Suggestion = {
   rationale?: string | null
 }
 
-type ParsedSuggestionPayload =
-  | Suggestion[]
-  | { suggestions?: Suggestion[] }
+type ParsedSuggestionPayload
+  = | Suggestion[]
+    | { suggestions?: Suggestion[] }
 
 const FIELD_METADATA: Record<AiAssistField, { label: string, guidance: string }> = {
   title: {

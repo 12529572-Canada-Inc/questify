@@ -11,9 +11,9 @@ const anthropicApiVersion = process.env.ANTHROPIC_API_VERSION || '2023-06-01'
 const openaiClient = openaiApiKey ? new OpenAI({ apiKey: openaiApiKey }) : null
 const deepseekClient = deepseekApiKey
   ? new OpenAI({
-    apiKey: deepseekApiKey,
-    baseURL: deepseekBaseUrl,
-  })
+      apiKey: deepseekApiKey,
+      baseURL: deepseekBaseUrl,
+    })
   : null
 
 type RunModelResult = {
@@ -98,4 +98,3 @@ export async function runAiModel(prompt: string, requestedModelId?: string | nul
     throw error
   }
 }
-

@@ -4,4 +4,3 @@ export type AiSuggestion = {
   text: string
   rationale?: string | null
 }
-

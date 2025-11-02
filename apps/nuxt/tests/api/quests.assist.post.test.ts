@@ -125,4 +125,3 @@ describe('API /api/quests/assist (POST)', () => {
     expect(runAiModelMock).not.toHaveBeenCalled()
   })
 })
-
