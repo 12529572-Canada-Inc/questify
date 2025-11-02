@@ -184,6 +184,31 @@ vi.mock('~/composables/useQuestForm', () => {
   }
 })
 
+vi.mock('~/composables/useQuestAiAssist', () => {
+  const dialogOpen = ref(false)
+  const suggestions = ref([])
+  const loading = ref(false)
+  const error = ref<string | null>(null)
+
+  return {
+    useQuestAiAssist: () => ({
+      isEnabled: computed(() => true),
+      dialogOpen,
+      activeFieldLabel: computed(() => 'Title'),
+      suggestions: computed(() => suggestions.value),
+      loading: computed(() => loading.value),
+      error: computed(() => error.value),
+      modelLabel: computed(() => 'GPT-4o mini'),
+      requestAssistance: vi.fn(),
+      regenerateSuggestions: vi.fn(),
+      applySuggestion: vi.fn(),
+      closeDialog: vi.fn(() => {
+        dialogOpen.value = false
+      }),
+    }),
+  }
+})
+
 const sampleQuest = createQuest()
 const sampleTask = createTask()
 const sampleSection = createTaskSection()
