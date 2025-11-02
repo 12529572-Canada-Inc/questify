@@ -13,9 +13,8 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:open', value: boolean): void
-  (e: 'close'): void
+  (e: 'close' | 'regenerate'): void
   (e: 'select', suggestion: AiSuggestion): void
-  (e: 'regenerate'): void
 }>()
 
 const hasSuggestions = computed(() => props.suggestions.length > 0)

@@ -1,4 +1,4 @@
-import { computed, reactive, ref, watch, type ComputedRef, type Ref } from 'vue'
+import { computed, reactive, watch, type ComputedRef, type Ref } from 'vue'
 import type { AiModelOption } from 'shared/ai-models'
 import { useSnackbar } from './useSnackbar'
 import { resolveApiError } from '~/utils/error'
