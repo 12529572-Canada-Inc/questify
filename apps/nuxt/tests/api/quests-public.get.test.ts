@@ -47,7 +47,6 @@ const sampleQuest = {
   owner: {
     id: 'user-1',
     name: 'Ada Lovelace',
-    email: 'ada@example.com',
   },
   tasks: [
     { id: 'task-1', status: 'todo' },
@@ -96,7 +95,6 @@ describe('API /api/quests/public (GET)', () => {
           select: {
             id: true,
             name: true,
-            email: true,
           },
         },
         tasks: {
@@ -124,7 +122,6 @@ describe('API /api/quests/public (GET)', () => {
           owner: {
             id: 'user-1',
             name: 'Ada Lovelace',
-            email: 'ada@example.com',
           },
           taskCounts: {
             total: 2,

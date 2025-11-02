@@ -12,7 +12,6 @@ export type PublicQuestTaskCounts = {
 export type PublicQuestOwner = {
   id: string
   name: string | null
-  email: string | null
 }
 
 export type PublicQuestSummary = Pick<

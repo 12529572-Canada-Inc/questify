@@ -138,7 +138,6 @@ const handler = defineEventHandler(async (event) => {
           select: {
             id: true,
             name: true,
-            email: true,
           },
         },
         tasks: {
