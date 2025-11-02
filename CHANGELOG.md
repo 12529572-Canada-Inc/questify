@@ -9,9 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### 🚀 Features
-- Added groundwork for the universal in-app help system: global support FAB, dialog scaffold, and session-cached conversation store to prepare AI chat and GitHub issue submission flows. (#92)
-
 ---
 
 ## [1.11.0] - 2025-11-01
