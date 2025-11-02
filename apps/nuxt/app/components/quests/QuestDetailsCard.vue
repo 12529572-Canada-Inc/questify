@@ -150,10 +150,6 @@ const questModel = computed(() => findModelById(props.quest.modelType))
       />
       <slot name="after-tasks" />
     </v-card-text>
-
-    <v-card-actions>
-      <slot name="actions" />
-    </v-card-actions>
   </v-card>
 </template>
 

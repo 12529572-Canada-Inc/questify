@@ -9,6 +9,10 @@ import { useUserStore } from '~/stores/user'
 const questStore = useQuestStore()
 const userStore = useUserStore()
 
+definePageMeta({
+  middleware: ['quests-owner'],
+})
+
 const { quests } = storeToRefs(questStore)
 const { user } = storeToRefs(userStore)
 
@@ -18,9 +22,12 @@ if (!user.value) {
 
 const showArchived = ref(false)
 
-await questStore.fetchQuests({ includeArchived: showArchived.value }).catch((error) => {
+try {
+  await questStore.fetchQuests({ includeArchived: showArchived.value })
+}
+catch (error) {
   console.error('Failed to load quests:', error)
-})
+}
 
 watch(showArchived, async (value) => {
   try {
@@ -117,7 +124,8 @@ const dialogQuestTitle = computed(() => lifecycleTarget.value?.title ?? 'this qu
         <v-switch
           v-model="showArchived"
           inset
-          color="primary"
+          class="switch--archived-quests"
+          color="secondary"
           label="Show Archived Quests"
         />
       </v-col>
@@ -130,6 +138,7 @@ const dialogQuestTitle = computed(() => lifecycleTarget.value?.title ?? 'this qu
     />
 
     <v-btn
+      v-if="$vuetify.display.smAndDown"
       color="primary"
       class="fab"
       aria-label="Create quest"
@@ -158,6 +167,11 @@ const dialogQuestTitle = computed(() => lifecycleTarget.value?.title ?? 'this qu
   width: 56px;
   height: 56px;
   z-index: 1000;
+}
+
+.switch--archived-quests {
+  /* TODO: refactor using theme variables */
+  color: white;
 }
 
 .quests-header {

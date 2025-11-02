@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useAccessControl } from '~/composables/useAccessControl'
 
 const route = useRoute()
@@ -24,67 +25,70 @@ const links = computed<NavLink[]>(() => {
   return items.filter(item => item.visible !== false)
 })
 
-function isActive(path: string) {
-  if (route.path === path) {
-    return true
-  }
+const activeTab = computed<string | null>(() => {
+  const match = links.value.find((link) => {
+    if (route.path === link.to) {
+      return true
+    }
+    if (link.to !== '/admin' && route.path.startsWith(link.to)) {
+      return true
+    }
+    return false
+  })
 
-  if (path !== '/admin' && route.path.startsWith(path)) {
-    return true
-  }
-
-  return false
-}
+  return match?.to ?? links.value[0]?.to ?? null
+})
 </script>
 
 <template>
   <div class="admin-nav">
-    <v-btn
-      v-for="link in links"
-      :key="link.to"
-      :to="link.to"
-      variant="text"
-      class="admin-nav__item"
-      :class="{ 'admin-nav__item--active': isActive(link.to) }"
+    <v-tabs
+      class="admin-nav__tabs"
+      :model-value="activeTab"
     >
-      <v-icon
-        :icon="link.icon"
-        size="20"
-        class="admin-nav__icon"
-      />
-      <span class="admin-nav__label">
+      <v-tab
+        v-for="link in links"
+        :key="link.to"
+        :value="link.to"
+        :to="link.to"
+        :prepend-icon="link.icon"
+        :ripple="false"
+      >
         {{ link.label }}
-      </span>
-    </v-btn>
+      </v-tab>
+    </v-tabs>
+
+    <v-tabs-window
+      class="admin-nav__window"
+      :model-value="activeTab"
+    >
+      <slot />
+    </v-tabs-window>
   </div>
 </template>
 
 <style scoped>
-.admin-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+.admin-nav__tabs {
+  /* TODO: refactor using theme variables */
+  color: white;
 }
 
-.admin-nav__item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+.admin-nav__tabs :deep(.v-tabs__wrapper) {
+  box-shadow: none;
+}
+
+.admin-nav__tabs :deep(.v-tab) {
   text-transform: none;
   letter-spacing: normal;
   font-weight: 500;
-  color: rgba(var(--v-theme-on-surface), 0.7);
+  min-height: 48px;
 }
 
-.admin-nav__item--active {
-  color: rgb(var(--v-theme-primary));
+.admin-nav__tabs :deep(.v-tab .v-tab__prepend) {
+  margin-right: 6px;
 }
 
-.admin-nav__icon {
-  flex: 0 0 auto;
-}
-
-.admin-nav__label {
-  white-space: nowrap;
+.admin-nav__window {
+  margin-top: 12px;
 }
 </style>

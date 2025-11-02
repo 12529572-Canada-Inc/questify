@@ -142,7 +142,9 @@ async function handleRefresh() {
         <v-card-text class="d-flex flex-column flex-md-row align-center justify-space-between gap-6">
           <div class="dashboard__welcome-left">
             <h1 class="text-h5 text-md-h4 font-weight-bold mb-2">
-              Welcome back, {{ welcomeName }}
+              Hello,
+              <br>
+              {{ welcomeName }}
             </h1>
             <p class="text-body-1 text-medium-emphasis mb-0">
               Here is the latest snapshot of your quest progress.
@@ -374,7 +376,6 @@ async function handleRefresh() {
 }
 
 .dashboard__welcome {
-  background: linear-gradient(135deg, rgba(43, 97, 177, 0.1), rgba(76, 201, 240, 0.1));
   border: 1px solid rgba(43, 97, 177, 0.16);
 }
 

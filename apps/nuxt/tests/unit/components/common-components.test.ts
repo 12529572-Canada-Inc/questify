@@ -137,14 +137,17 @@ describe('common components', () => {
           VCard: { template: '<div><slot /></div>' },
           VCardTitle: { template: '<div><slot /></div>' },
           VCardText: { template: '<div><slot /></div>' },
-          VBtn: { template: '<button><slot /></button>' },
+          VBtn: { props: ['to'], template: '<button :data-to="to"><slot /></button>' },
           VIcon: { template: '<span><slot /></span>' },
           VCardActions: { template: '<div><slot /></div>' },
         },
       },
     })
     expect(wrapper.text()).toContain('Welcome to Questify')
-    expect(wrapper.text()).toContain('View Quests')
     expect(wrapper.text()).toContain('Create Quest')
+    const buttons = wrapper.findAll('button')
+    expect(buttons).toHaveLength(2)
+    expect(buttons[0]?.attributes('data-to')).toBe('/quests')
+    expect(buttons[1]?.attributes('data-to')).toBe('/quests/new')
   })
 })

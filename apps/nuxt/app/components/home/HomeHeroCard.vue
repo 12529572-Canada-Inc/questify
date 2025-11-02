@@ -15,17 +15,18 @@
         </p>
       </v-card-text>
 
-      <v-card-actions class="flex-column">
+      <v-card-actions class="flex-column gap-2">
         <v-btn
           block
-          color="primary"
+          color="secondary"
+          variant="tonal"
           to="/quests"
         >
           View Quests
         </v-btn>
         <v-btn
           block
-          color="success"
+          color="primary"
           to="/quests/new"
         >
           Create Quest
