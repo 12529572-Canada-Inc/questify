@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### 🚀 Features
+- Refactored Admin navigation to use Vuetify `v-tabs` and `v-tabs-window`, keeping sections aligned with route-driven tab panels.
+- Added `QuestFloatingActions` so quest back/complete/delete controls stay pinned near the top of the detail view while scrolling.
 - Added a configurable AI model selector for quests and task investigations, exposing OpenAI/Anthropic/DeepSeek options in the UI with tooltips and persisting the chosen model per record.
 - Worker now routes jobs to provider-specific APIs (with automatic fallback) using the shared model catalog that can be overridden via `AI_MODEL_CONFIG_JSON` / `AI_MODEL_CONFIG_PATH` and new `ANTHROPIC_*` / `DEEPSEEK_*` keys.
 - Quest owners can now archive or permanently delete quests from list/detail views via a confirmation dialog; new `/api/quests/:id/archive` and DELETE `/api/quests/:id` endpoints enforce ownership, log actions, filter archived data, and update the Prisma schema with a `QuestStatus` enum + `deletedAt` column to keep analytics clean.
@@ -21,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Backend stores OAuth tokens with automatic refresh and expiry tracking in the database.
 
 ### 🛠 Fixes
+- Quest owner middleware now awaits client-side fetches, surfaces the “create your first quest” snackbar, and redirects via `navigateTo`, with updated integration tests.
+- Restored model selector tooltips by using the `text` prop and pointer-enabled activator button.
 - Ensured Prisma schema + generated client include `modelType` fields and tightened queue payloads so builds/linting succeed across workspaces.
 - Fixed test failures for async components (home, dashboard, quests pages) by properly wrapping them in Suspense boundaries and adding comprehensive async handling with `flushPromises()` and `nextTick()`.
 - Resolved TypeScript build errors: removed invalid `.value` access on boolean `pending` in quests/[id].vue and fixed read-only property mutations in nuxt.config.ts by using in-place array manipulation.
