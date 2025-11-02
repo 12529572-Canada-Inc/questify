@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [1.11.0] - 2025-11-01
+
 ### 🚀 Features
 - Refactored Admin navigation to use Vuetify `v-tabs` and `v-tabs-window`, keeping sections aligned with route-driven tab panels.
 - Added `QuestFloatingActions` so quest back/complete/delete controls stay pinned near the top of the detail view while scrolling.
