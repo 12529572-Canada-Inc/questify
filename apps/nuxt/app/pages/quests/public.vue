@@ -274,7 +274,6 @@ const errorMessage = computed(() => {
       >
         <v-btn
           color="primary"
-          variant="tonal"
           class="w-100 w-md-auto"
           :to="`/auth/signup`"
         >
