@@ -73,18 +73,16 @@ const completionLabel = computed(() => {
 <template>
   <v-card
     class="public-quest-card"
-    variant="tonal"
   >
     <v-card-item>
       <template #prepend>
         <v-avatar
           color="secondary"
-          variant="tonal"
         >
           <v-icon icon="mdi-compass-outline" />
         </v-avatar>
       </template>
-      <v-card-title class="text-wrap text-white">
+      <v-card-title class="text-wrap">
         {{ quest.title }}
       </v-card-title>
       <v-card-subtitle class="d-flex align-center gap-2 flex-wrap">
@@ -92,7 +90,6 @@ const completionLabel = computed(() => {
           size="small"
           class="text-uppercase font-weight-medium"
           :color="statusColor"
-          variant="tonal"
         >
           {{ statusLabel }}
         </v-chip>

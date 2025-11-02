@@ -263,7 +263,7 @@ const errorMessage = computed(() => {
         <h1 class="text-h4 font-weight-bold text-white mb-2">
           Public Quests
         </h1>
-        <p class="text-body-1 text-medium-emphasis mb-0">
+        <p class="result-summary">
           {{ resultSummary }}
         </p>
       </v-col>
@@ -283,7 +283,6 @@ const errorMessage = computed(() => {
     </v-row>
 
     <v-card
-      variant="tonal"
       class="mb-6"
     >
       <v-card-text>
@@ -441,5 +440,11 @@ const errorMessage = computed(() => {
   border-radius: 16px;
   background: rgba(var(--v-theme-surface-variant), 0.25);
   border: 1px dashed rgba(var(--v-theme-outline), 0.25);
+}
+
+.result-summary {
+  font-size: 1rem;
+  /* TODO: Update color to match design */
+  color: white;
 }
 </style>
