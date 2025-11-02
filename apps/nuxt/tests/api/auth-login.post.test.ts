@@ -66,6 +66,7 @@ beforeEach(() => {
   accessControlMocks.attachSessionWithAccess.mockResolvedValue({
     roles: ['Admin'],
     privileges: ['user:read'],
+    providers: ['google'],
   })
 
   Reflect.set(globalWithMocks, 'readBody', vi.fn(async () => ({
@@ -97,11 +98,15 @@ describe('API /api/auth/login (POST)', () => {
 
     expect(prismaMocks.userFindUnique).toHaveBeenCalledWith({ where: { email: 'person@example.com' } })
     expect(sharedMocks.verifyPassword).toHaveBeenCalledWith('password123', 'hashed')
-    expect(accessControlMocks.attachSessionWithAccess).toHaveBeenCalledWith(expect.anything(), {
-      id: 'user-1',
-      email: 'person@example.com',
-      name: 'Person Example',
-    })
+    expect(accessControlMocks.attachSessionWithAccess).toHaveBeenCalledWith(
+      expect.anything(),
+      {
+        id: 'user-1',
+        email: 'person@example.com',
+        name: 'Person Example',
+      },
+      { includeProviders: true },
+    )
     expect(response).toEqual({
       success: true,
       user: {
@@ -110,6 +115,7 @@ describe('API /api/auth/login (POST)', () => {
         name: 'Person Example',
         roles: ['Admin'],
         privileges: ['user:read'],
+        providers: ['google'],
       },
     })
   })

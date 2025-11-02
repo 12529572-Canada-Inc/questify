@@ -1,0 +1,167 @@
+<script setup lang="ts">
+import { storeToRefs } from 'pinia'
+import { SUPPORTED_OAUTH_PROVIDERS, type OAuthProvider } from 'shared'
+import { useOAuthFlash } from '~/composables/useOAuthFlash'
+import { useSnackbar } from '~/composables/useSnackbar'
+import { useUserStore } from '~/stores/user'
+
+definePageMeta({
+  middleware: ['auth'],
+})
+
+const userStore = useUserStore()
+const route = useRoute()
+const session = useUserSession()
+const { showSnackbar } = useSnackbar()
+const { consumeOAuthFlash } = useOAuthFlash()
+
+const linking = ref<OAuthProvider | null>(null)
+
+const { providers } = storeToRefs(userStore)
+
+const providerCatalog: Record<OAuthProvider, { label: string, icon: string }> = {
+  google: {
+    label: 'Google',
+    icon: 'mdi-google',
+  },
+  facebook: {
+    label: 'Facebook',
+    icon: 'mdi-facebook',
+  },
+}
+
+onMounted(async () => {
+  await userStore.fetchSession().catch(() => null)
+
+  const flash = consumeOAuthFlash()
+  if (flash) {
+    const label = providerCatalog[flash.provider]?.label ?? flash.provider
+    if (flash.action === 'linked') {
+      showSnackbar(`${label} account linked successfully.`, { variant: 'success' })
+    }
+    else if (flash.action === 'created') {
+      showSnackbar(`Signed up with ${label}.`, { variant: 'success' })
+    }
+    else {
+      showSnackbar(`Signed in with ${label}.`, { variant: 'success' })
+    }
+  }
+})
+
+if (import.meta.client) {
+  watch(providers, () => {
+    if (linking.value && providers.value.includes(linking.value)) {
+      linking.value = null
+    }
+    const flash = consumeOAuthFlash()
+    if (!flash) {
+      return
+    }
+    const label = providerCatalog[flash.provider]?.label ?? flash.provider
+    if (flash.action === 'linked') {
+      showSnackbar(`${label} account linked successfully.`, { variant: 'success' })
+    }
+  }, { deep: false })
+
+  watch(() => route.query.oauthError, (value) => {
+    if (typeof value !== 'string') {
+      return
+    }
+
+    const label = providerCatalog[value as OAuthProvider]?.label ?? value
+    showSnackbar(`We couldn’t connect your ${label} account. Please try again.`, { variant: 'error' })
+  }, { immediate: true })
+}
+
+function isLinked(provider: OAuthProvider) {
+  return providers.value.includes(provider)
+}
+
+function buttonLabel(provider: OAuthProvider) {
+  return isLinked(provider) ? 'Reconnect' : 'Connect'
+}
+
+function buttonVariant(provider: OAuthProvider) {
+  return isLinked(provider) ? 'tonal' : 'elevated'
+}
+
+function startLink(provider: OAuthProvider) {
+  linking.value = provider
+  try {
+    session.openInPopup(`/api/auth/${provider}?origin=settings`)
+  }
+  finally {
+    setTimeout(() => {
+      if (linking.value === provider) {
+        linking.value = null
+      }
+    }, 700)
+  }
+}
+</script>
+
+<template>
+  <v-container class="settings-page py-12">
+    <v-row justify="center">
+      <v-col
+        cols="12"
+        md="8"
+        lg="6"
+      >
+        <v-card class="pa-6">
+          <v-card-title class="text-h5 mb-2">
+            Account Connections
+          </v-card-title>
+          <v-card-subtitle class="mb-6">
+            Link your Questify account with social providers.
+          </v-card-subtitle>
+
+          <v-list density="comfortable">
+            <v-list-item
+              v-for="provider in SUPPORTED_OAUTH_PROVIDERS"
+              :key="provider"
+              class="settings-provider-item"
+            >
+              <template #prepend>
+                <v-avatar
+                  color="primary"
+                  variant="tonal"
+                >
+                  <v-icon :icon="providerCatalog[provider].icon" />
+                </v-avatar>
+              </template>
+              <v-list-item-title class="text-subtitle-1 font-weight-medium">
+                {{ providerCatalog[provider].label }}
+              </v-list-item-title>
+              <template #append>
+                <v-chip
+                  v-if="isLinked(provider)"
+                  class="mr-3"
+                  color="success"
+                  variant="tonal"
+                  density="comfortable"
+                >
+                  Connected
+                </v-chip>
+                <v-btn
+                  color="primary"
+                  :variant="buttonVariant(provider)"
+                  :loading="linking === provider"
+                  @click="startLink(provider)"
+                >
+                  {{ buttonLabel(provider) }}
+                </v-btn>
+              </template>
+            </v-list-item>
+          </v-list>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
+
+<style scoped>
+.settings-provider-item + .settings-provider-item {
+  border-top: 1px solid rgba(var(--v-theme-on-surface), 0.08);
+}
+</style>

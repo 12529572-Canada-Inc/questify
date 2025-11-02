@@ -40,6 +40,9 @@ pnpm dev:worker               # runs the queue worker with hot reload
   - `DEEPSEEK_API_KEY` + `DEEPSEEK_BASE_URL` (defaults to `https://api.deepseek.com/v1`) enable DeepSeek chat/coder models.
 - Configure the model catalog via `AI_MODEL_CONFIG_JSON` (inline JSON) or `AI_MODEL_CONFIG_PATH` (JSON file). When unset, Questify falls back to the built-in mix of OpenAI, Anthropic, and DeepSeek models.
 - Redis credentials map to `runtimeConfig.redis` (Nuxt) and `packages/shared/src/config/redis.ts` (worker).
+- OAuth sign-in providers use the `NUXT_OAUTH_<PROVIDER>_CLIENT_ID` / `NUXT_OAUTH_<PROVIDER>_CLIENT_SECRET` pattern (e.g., Google, Facebook). Configure them in your `.env` to enable the social login buttons.
+  - **Google OAuth callback URL**: `http://localhost:3000/api/auth/oauth/google` (local) or `https://yourdomain.com/api/auth/oauth/google` (production)
+  - **Facebook OAuth callback URL**: `http://localhost:3000/api/auth/oauth/facebook` (local) or `https://yourdomain.com/api/auth/oauth/facebook` (production)
 
 ## Development Workflow
 
@@ -48,6 +51,12 @@ pnpm dev:worker               # runs the queue worker with hot reload
 - Build all workspaces: `pnpm build`
 - Linting + formatting: `pnpm lint` and `pnpm format`
 - Database operations: `pnpm prisma:migrate`, `pnpm prisma:deploy`, `pnpm prisma:generate`, `pnpm prisma:seed`
+
+## Dashboard View
+
+- Authenticated users land on `/dashboard`, a Vuetify-driven overview replacing the legacy hero card home after login.
+- Metrics load from `/api/users/me/metrics` to surface quest totals, task completion rate, and last active timestamps.
+- Quick actions link directly to private quest management (`/quests`) and community public quests (`/`), keeping navigation snappy on desktop and mobile.
 
 ## State Management
 

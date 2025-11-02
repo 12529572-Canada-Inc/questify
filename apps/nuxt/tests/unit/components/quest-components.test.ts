@@ -580,7 +580,7 @@ describe('quest components', () => {
     vm.toggleInvestigationExpansion?.('inv-1')
   })
 
-  it('renders QuestDetailsCard with tabs and slots', () => {
+  it('renders QuestDetailsCard with tabs', () => {
     const wrapper = shallowMountWithBase(QuestDetailsCard, {
       props: {
         quest: sampleQuest,
@@ -599,12 +599,9 @@ describe('quest components', () => {
         highlightedTaskId: null,
         investigationError: null,
       },
-      slots: {
-        actions: '<button>Actions Slot</button>',
-      },
     })
 
     expect(wrapper.text()).toContain('Launch Quest')
-    expect(wrapper.text()).toContain('Actions Slot')
+    expect(wrapper.text()).toContain('Share quest')
   })
 })
