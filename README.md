@@ -39,6 +39,7 @@ pnpm dev:worker               # runs the queue worker with hot reload
   - `ANTHROPIC_API_KEY` unlocks Claude models (defaults to API version `2023-06-01`, override via `ANTHROPIC_API_VERSION`).
   - `DEEPSEEK_API_KEY` + `DEEPSEEK_BASE_URL` (defaults to `https://api.deepseek.com/v1`) enable DeepSeek chat/coder models.
 - Configure the model catalog via `AI_MODEL_CONFIG_JSON` (inline JSON) or `AI_MODEL_CONFIG_PATH` (JSON file). When unset, Questify falls back to the built-in mix of OpenAI, Anthropic, and DeepSeek models.
+- Set `NUXT_FEATURE_AI_ASSIST=true` to expose "Improve with AI" suggestions on the quest creation form (requires at least one provider API key). Users can toggle the helper per account from **Settings → Quest AI Assistance**.
 - Redis credentials map to `runtimeConfig.redis` (Nuxt) and `packages/shared/src/config/redis.ts` (worker).
 - OAuth sign-in providers use the `NUXT_OAUTH_<PROVIDER>_CLIENT_ID` / `NUXT_OAUTH_<PROVIDER>_CLIENT_SECRET` pattern (e.g., Google, Facebook). Configure them in your `.env` to enable the social login buttons.
   - **Google OAuth callback URL**: `http://localhost:3000/api/auth/oauth/google` (local) or `https://yourdomain.com/api/auth/oauth/google` (production)
@@ -58,12 +59,18 @@ pnpm dev:worker               # runs the queue worker with hot reload
 - Metrics load from `/api/users/me/metrics` to surface quest totals, task completion rate, and last active timestamps.
 - Quick actions link directly to private quest management (`/quests`) and community public quests (`/`), keeping navigation snappy on desktop and mobile.
 
+## Quest AI Assistance
+
+- Feature-flagged via `NUXT_FEATURE_AI_ASSIST`, the quest form surfaces "Improve with AI" buttons beside each field to request suggestions without overwriting existing text.
+- Suggestions are generated using the model selected on the form and routed through the shared AI runner that supports OpenAI, Anthropic, and DeepSeek providers.
+- Individual users can enable or disable the helper in-app from **Settings → Quest AI Assistance**, with usage tracked through lightweight telemetry.
+
 ## State Management
 
 - Global state now uses [Pinia](https://pinia.vuejs.org/) through the `@pinia/nuxt` module with stores in `apps/nuxt/stores/`.
 - `useUserStore()` wraps the session plugin to expose a typed `user`, role/privilege helpers, and `fetchSession()`/`clearSession()` actions.
 - `useQuestStore()` caches quest listings, exposes mutation helpers (`setQuests`, `upsertQuest`), and refreshes after quest creation.
-- `useUiStore()` controls UI preferences such as dark/light mode and persists selections via cookies while synchronising Vuetify theme state.
+- `useUiStore()` controls UI preferences such as dark/light mode and AI assistance, persisting selections via cookies while synchronising Vuetify theme state.
 - Store unit tests live under `apps/nuxt/tests/unit/stores/` so behaviour stays covered as modules evolve.
 
 ## Testing
