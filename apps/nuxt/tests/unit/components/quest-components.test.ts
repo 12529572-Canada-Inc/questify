@@ -24,6 +24,7 @@ import QuestTaskListItem from '../../../app/components/quests/QuestTaskListItem.
 import QuestTaskListItemCompact from '../../../app/components/quests/QuestTaskListItemCompact.vue'
 import QuestTaskSection from '../../../app/components/quests/QuestTaskSection.vue'
 import QuestTasksTabs from '../../../app/components/quests/QuestTasksTabs.vue'
+import PublicQuestCard from '../../../app/components/quests/PublicQuestCard.vue'
 import { shallowMountWithBase, mountWithBase } from '../support/mount-options'
 import { createInvestigation, createQuest, createTask, createTaskSection } from '../support/sample-data'
 
@@ -42,6 +43,10 @@ const vuetifyStubFlags = {
   VTextarea: true,
   VForm: true,
   VChip: true,
+  VCardItem: true,
+  VCardSubtitle: true,
+  VAvatar: true,
+  VProgressLinear: true,
   VAlert: true,
   VTabs: true,
   VTab: true,
@@ -603,5 +608,57 @@ describe('quest components', () => {
 
     expect(wrapper.text()).toContain('Launch Quest')
     expect(wrapper.text()).toContain('Share quest')
+  })
+
+  it('renders PublicQuestCard with quest details', () => {
+    const quest = {
+      ...createQuest({
+        title: 'Defend the Realm',
+        goal: 'Protect the kingdom from looming threats.',
+        status: 'active',
+        isPublic: true,
+        owner: { id: 'knight-1', name: 'Sir Lancelot', email: 'lancelot@example.com' },
+      }),
+      taskCounts: {
+        total: 4,
+        todo: 1,
+        inProgress: 2,
+        completed: 1,
+      },
+    }
+
+    const wrapper = mountWithBase(PublicQuestCard, {
+      props: { quest },
+    })
+
+    expect(wrapper.text()).toContain('Defend the Realm')
+    expect(wrapper.text()).toContain('Sir Lancelot')
+    expect(wrapper.text()).toContain('Protect the kingdom from looming threats.')
+    expect(wrapper.text()).toContain('1 of 4 tasks completed')
+  })
+
+  it('falls back to defaults when public quest metadata is missing', () => {
+    const quest = {
+      ...createQuest({
+        goal: '',
+        context: '',
+        constraints: '',
+        status: 'draft',
+        owner: { id: 'user-2', name: null, email: null },
+      }),
+      taskCounts: {
+        total: 0,
+        todo: 0,
+        inProgress: 0,
+        completed: 0,
+      },
+    }
+
+    const wrapper = mountWithBase(PublicQuestCard, {
+      props: { quest },
+    })
+    expect(wrapper.text()).toContain('Anonymous Adventurer')
+    expect(wrapper.text()).toContain('No goal has been shared yet.')
+    expect(wrapper.text()).toContain('No tasks yet')
   })
 })
