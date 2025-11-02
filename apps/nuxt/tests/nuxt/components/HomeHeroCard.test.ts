@@ -27,13 +27,15 @@ describe('HomeHeroCard', () => {
     expect(wrapper.text()).toContain('Create and track your quests powered by AI.')
   })
 
-  it('renders the create quest button with the expected destination', () => {
+  it('renders navigation buttons with the expected destinations', () => {
     const wrapper = mountHomeHeroCard()
     const buttons = wrapper.findAll('button')
 
-    expect(buttons).toHaveLength(1)
+    expect(buttons).toHaveLength(2)
 
-    const [createQuest] = buttons
+    const [viewQuests, createQuest] = buttons
+    expect(viewQuests?.text()).toBe('View Quests')
+    expect(viewQuests?.attributes('data-to')).toBe('/quests')
     expect(createQuest?.text()).toBe('Create Quest')
     expect(createQuest?.attributes('data-to')).toBe('/quests/new')
   })
