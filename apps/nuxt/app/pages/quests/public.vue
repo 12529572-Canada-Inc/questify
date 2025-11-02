@@ -264,7 +264,7 @@ const errorMessage = computed(() => {
           Public Quests
         </h1>
         <p class="text-body-1 text-medium-emphasis mb-0">
-          Discover quests shared by the Questify community!
+          {{ resultSummary }}
         </p>
       </v-col>
       <v-col
