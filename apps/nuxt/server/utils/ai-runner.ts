@@ -8,8 +8,10 @@ const deepseekBaseUrl = process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.c
 const anthropicApiKey = process.env.ANTHROPIC_API_KEY || ''
 const anthropicApiVersion = process.env.ANTHROPIC_API_VERSION || '2023-06-01'
 
-const openaiClient: any = openaiApiKey ? new OpenAI({ apiKey: openaiApiKey }) : null
-const deepseekClient: any = deepseekApiKey
+type OpenAiClient = InstanceType<typeof OpenAI>
+
+const openaiClient: OpenAiClient | null = openaiApiKey ? new OpenAI({ apiKey: openaiApiKey }) : null
+const deepseekClient: OpenAiClient | null = deepseekApiKey
   ? new OpenAI({
       apiKey: deepseekApiKey,
       baseURL: deepseekBaseUrl,
@@ -32,7 +34,7 @@ function resolveModelOption(requested?: string | null): AiModelOption {
   return resolved
 }
 
-async function callOpenAi(client: any, model: AiModelOption, prompt: string) {
+async function callOpenAi(client: OpenAiClient | null, model: AiModelOption, prompt: string) {
   if (!client) {
     throw new Error(`Missing API client for provider ${model.provider}`)
   }
