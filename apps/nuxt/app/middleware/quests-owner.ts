@@ -3,6 +3,8 @@ import { useQuestStore } from '~/stores/quest'
 import { useUserStore } from '~/stores/user'
 import { useSnackbar } from '~/composables/useSnackbar'
 
+declare const navigateTo: (path: string, options?: { replace?: boolean }) => Promise<unknown> | unknown
+
 export default defineNuxtRouteMiddleware(async () => {
   if (typeof window === 'undefined') {
     return
@@ -31,6 +33,6 @@ export default defineNuxtRouteMiddleware(async () => {
 
   if (!hasQuests.value) {
     showSnackbar('You need to create your first quest!', { variant: 'info' })
-    return navigateTo('/quests/new', { replace: true })
+    await navigateTo('/quests/new', { replace: true })
   }
 })

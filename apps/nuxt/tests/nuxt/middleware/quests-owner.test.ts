@@ -5,9 +5,10 @@ import questsOwnerMiddleware from '~/middleware/quests-owner'
 const hasQuestsRef = ref(false)
 const loadedRef = ref(false)
 const loggedInRef = ref(true)
-const fetchQuestsMock = vi.fn()
-const fetchSessionMock = vi.fn()
-const showSnackbarMock = vi.fn()
+
+const fetchQuestsMock = vi.hoisted(() => vi.fn())
+const fetchSessionMock = vi.hoisted(() => vi.fn())
+const showSnackbarMock = vi.hoisted(() => vi.fn())
 
 vi.mock('~/stores/quest', () => ({
   __esModule: true,
@@ -31,6 +32,8 @@ vi.mock('~/composables/useSnackbar', () => ({
   useSnackbar: () => ({ showSnackbar: showSnackbarMock }),
 }))
 
+const originalWindow = globalThis.window
+
 const createTo = (path: string) => ({ path } as Parameters<typeof questsOwnerMiddleware>[0])
 const createFrom = (path: string) => ({ path } as Parameters<typeof questsOwnerMiddleware>[1])
 
@@ -42,10 +45,19 @@ describe('quests owner middleware', () => {
     fetchQuestsMock.mockReset()
     fetchSessionMock.mockReset()
     showSnackbarMock.mockReset()
+    if (!originalWindow) {
+      vi.stubGlobal('window', { history: { scrollRestoration: 'auto' } })
+    }
   })
 
   afterEach(() => {
     vi.restoreAllMocks()
+    if (!originalWindow) {
+      vi.unstubAllGlobals()
+    }
+    if (originalWindow) {
+      vi.stubGlobal('window', originalWindow)
+    }
   })
 
   it('allows navigation when quests already exist', async () => {
