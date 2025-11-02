@@ -126,13 +126,13 @@ function createDefaultResponse(): PublicQuestsResponse {
 const { data: responseData, pending, error, refresh } = await useAsyncData<PublicQuestsResponse>(
   'public-quests',
   () => $fetch<PublicQuestsResponse>('/api/quests/public', {
-      params: {
-        page: currentPage.value,
-        sort: selectedSort.value,
-        ...(debouncedSearch.value ? { search: debouncedSearch.value } : {}),
-        ...(statusQuery.value ? { status: statusQuery.value } : {}),
-      },
-    }),
+    params: {
+      page: currentPage.value,
+      sort: selectedSort.value,
+      ...(debouncedSearch.value ? { search: debouncedSearch.value } : {}),
+      ...(statusQuery.value ? { status: statusQuery.value } : {}),
+    },
+  }),
   {
     default: () => createDefaultResponse(),
     watch: [
@@ -208,7 +208,7 @@ if (import.meta.client) {
 
     if (!isShallowEqualRecord(currentQuery, nextQuery)) {
       router.replace({ path: route.path, query: nextQuery }).catch((err) => {
-        if (process.dev) {
+        if (import.meta.dev) {
           console.error('Failed to update public quests query params:', err)
         }
       })
@@ -264,7 +264,7 @@ const errorMessage = computed(() => {
           Public Quests
         </h1>
         <p class="text-body-1 text-medium-emphasis mb-0">
-          Discover quests shared by the Questify community. {{ resultSummary }}
+          Discover quests shared by the Questify community!
         </p>
       </v-col>
       <v-col
