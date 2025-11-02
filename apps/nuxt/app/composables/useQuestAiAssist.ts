@@ -51,7 +51,7 @@ export function useQuestAiAssist(options: {
     lastModelId: null as string | null,
   })
 
-  const isEnabled = computed(() => uiStore.aiAssistEnabled)
+  const isEnabled = uiStore.aiAssistEnabled
 
   const activeFieldLabel = computed(() => (state.activeField ? FIELD_LABELS[state.activeField] : ''))
 
