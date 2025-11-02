@@ -62,7 +62,13 @@ function isShallowEqualRecord(a: Record<string, string>, b: Record<string, strin
   }
 
   return aEntries.every(([key, value], index) => {
-    const [otherKey, otherValue] = bEntries[index]
+    const otherEntry = bEntries[index]
+
+    if (!otherEntry) {
+      return false
+    }
+
+    const [otherKey, otherValue] = otherEntry
     return key === otherKey && value === otherValue
   })
 }
@@ -100,52 +106,48 @@ watchDebounced(searchTerm, (value) => {
   currentPage.value = 1
 }, { debounce: 400, maxWait: 800 })
 
-const { data: response, pending, error, refresh } = await useAsyncData<PublicQuestsResponse>(
-  'public-quests',
-  () => $fetch('/api/quests/public', {
-    params: {
-      page: currentPage.value,
-      sort: selectedSort.value,
-      ...(debouncedSearch.value ? { search: debouncedSearch.value } : {}),
-      ...(statusQuery.value ? { status: statusQuery.value } : {}),
+function createDefaultResponse(): PublicQuestsResponse {
+  return {
+    data: [],
+    meta: {
+      page: 1,
+      pageSize: 0,
+      total: 0,
+      totalPages: 1,
+      sort: 'newest',
+      search: null,
+      status: null,
+      hasNextPage: false,
+      hasPreviousPage: false,
     },
-  }),
-  {
-    default: () => ({
-      data: [],
-      meta: {
-        page: 1,
-        pageSize: 0,
-        total: 0,
-        totalPages: 1,
-        sort: 'newest',
-        search: null,
-        status: null,
-        hasNextPage: false,
-        hasPreviousPage: false,
+  }
+}
+
+const { data: responseData, pending, error, refresh } = await useAsyncData<PublicQuestsResponse>(
+  'public-quests',
+  () => $fetch<PublicQuestsResponse>('/api/quests/public', {
+      params: {
+        page: currentPage.value,
+        sort: selectedSort.value,
+        ...(debouncedSearch.value ? { search: debouncedSearch.value } : {}),
+        ...(statusQuery.value ? { status: statusQuery.value } : {}),
       },
     }),
+  {
+    default: () => createDefaultResponse(),
     watch: [
-      () => currentPage.value,
-      () => selectedSort.value,
-      () => debouncedSearch.value,
-      () => statusQuery.value,
+      currentPage,
+      selectedSort,
+      debouncedSearch,
+      statusQuery,
     ],
   },
 )
 
-const quests = computed(() => response.value?.data ?? [])
-const meta = computed(() => response.value?.meta ?? {
-  page: 1,
-  pageSize: 0,
-  total: 0,
-  totalPages: 1,
-  sort: selectedSort.value,
-  search: debouncedSearch.value || null,
-  status: selectedStatuses.value.length ? [...selectedStatuses.value] : null,
-  hasNextPage: false,
-  hasPreviousPage: false,
-})
+const response = computed<PublicQuestsResponse>(() => responseData.value ?? createDefaultResponse())
+
+const quests = computed(() => response.value.data)
+const meta = computed(() => response.value.meta)
 
 const totalPages = computed(() => Math.max(1, meta.value.totalPages || 1))
 
