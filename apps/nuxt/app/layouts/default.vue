@@ -312,7 +312,6 @@ async function logout() {
       :share-url="loginShareUrl"
       description="Invite someone to Questify. The link opens the login page where they can sign in or create an account."
     />
-    <SupportAssistant />
   </v-main>
 </template>
 
