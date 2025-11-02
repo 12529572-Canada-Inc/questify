@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { loadModelConfig } from '../src/model-config'
 
 describe('loadModelConfig', () => {
@@ -23,8 +23,15 @@ describe('loadModelConfig', () => {
   })
 
   it('falls back to defaults when overrides are invalid', () => {
-    const config = loadModelConfig({ jsonOverride: 'not json', fileOverride: 'missing.json' })
-    expect(config.models.length).toBeGreaterThan(0)
-    expect(config.source).toBe('default')
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    try {
+      const config = loadModelConfig({ jsonOverride: 'not json', fileOverride: 'missing.json' })
+      expect(config.models.length).toBeGreaterThan(0)
+      expect(config.source).toBe('default')
+    }
+    finally {
+      warnSpy.mockRestore()
+    }
   })
 })
