@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 🚀 Features
+- Added a public quests discovery page at `/quests/public` with search, status filters, sorting, and pagination backed by a new `/api/quests/public` endpoint, making shared quests browseable without authentication.
+
+### 🛡️ Security
+- Removed owner email addresses from the public quests API payload to prevent exposing contact information to anonymous visitors.
+
 ---
 
 ## [1.11.0] - 2025-11-01
