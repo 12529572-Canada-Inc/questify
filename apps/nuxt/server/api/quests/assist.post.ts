@@ -105,7 +105,7 @@ const handler = defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const featureEnabled = Boolean(config.features?.aiAssist)
   if (!featureEnabled) {
-    throw createError({ statusCode: 404, statusMessage: 'AI assistance is disabled.' })
+    throw createError({ status: 404, statusText: 'AI assistance is disabled.' })
   }
 
   await requireUserSession(event)
@@ -113,7 +113,7 @@ const handler = defineEventHandler(async (event) => {
   const body = (await readBody<AiAssistRequestBody>(event)) || {}
   const field = body.field?.toLowerCase() as AiAssistField | undefined
   if (!field || !(field in FIELD_METADATA)) {
-    throw createError({ statusCode: 400, statusMessage: 'Unsupported field for AI assistance.' })
+    throw createError({ status: 400, statusText: 'Unsupported field for AI assistance.' })
   }
 
   const sanitized: Required<Record<AiAssistField, string | null>> = {
@@ -146,8 +146,8 @@ const handler = defineEventHandler(async (event) => {
   catch (error) {
     console.error('AI assistance error:', error)
     throw createError({
-      statusCode: 502,
-      statusMessage: 'Failed to generate AI suggestions. Please try again shortly.',
+      status: 502,
+      statusText: 'Failed to generate AI suggestions. Please try again shortly.',
     })
   }
 })

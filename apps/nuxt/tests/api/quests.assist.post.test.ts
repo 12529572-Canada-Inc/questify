@@ -96,7 +96,9 @@ describe('API /api/quests/assist (POST)', () => {
     const response = await handler({} as never)
 
     expect(runAiModelMock).toHaveBeenCalledTimes(1)
-    expect(runAiModelMock.mock.calls[0][0]).toContain('Quest snapshot:')
+    const firstPrompt = runAiModelMock.mock.calls[0]?.[0]
+    expect(firstPrompt).toBeDefined()
+    expect(firstPrompt).toContain('Quest snapshot:')
     expect(response).toEqual({
       success: true,
       field: 'title',

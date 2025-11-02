@@ -8,8 +8,8 @@ const deepseekBaseUrl = process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.c
 const anthropicApiKey = process.env.ANTHROPIC_API_KEY || ''
 const anthropicApiVersion = process.env.ANTHROPIC_API_VERSION || '2023-06-01'
 
-const openaiClient = openaiApiKey ? new OpenAI({ apiKey: openaiApiKey }) : null
-const deepseekClient = deepseekApiKey
+const openaiClient: any = openaiApiKey ? new OpenAI({ apiKey: openaiApiKey }) : null
+const deepseekClient: any = deepseekApiKey
   ? new OpenAI({
       apiKey: deepseekApiKey,
       baseURL: deepseekBaseUrl,
@@ -25,10 +25,14 @@ function resolveModelOption(requested?: string | null): AiModelOption {
   const defaultModelId = getDefaultModelId()
   const normalizedId = normalizeModelType(requested, defaultModelId)
   const options = getAiModelOptions()
-  return findModelOption(options, normalizedId) ?? options[0]
+  const resolved = findModelOption(options, normalizedId) ?? options[0]
+  if (!resolved) {
+    throw new Error('No AI models configured. Provide at least one AI model in runtime config.')
+  }
+  return resolved
 }
 
-async function callOpenAi(client: OpenAI | null, model: AiModelOption, prompt: string) {
+async function callOpenAi(client: any, model: AiModelOption, prompt: string) {
   if (!client) {
     throw new Error(`Missing API client for provider ${model.provider}`)
   }
