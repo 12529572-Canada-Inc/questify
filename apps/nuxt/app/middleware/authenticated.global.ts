@@ -22,6 +22,10 @@ const authenticatedMiddleware: MiddlewareFn = async (to) => {
     return
   }
 
+  if (to.path === '/quests/public' || to.path.startsWith('/quests/public/')) {
+    return
+  }
+
   if (to.path.startsWith('/quests') && !loggedIn.value) {
     return navigateTo('/auth/login')
   }
