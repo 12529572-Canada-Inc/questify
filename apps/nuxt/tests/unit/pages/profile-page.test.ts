@@ -123,8 +123,9 @@ describe('ProfilePage', () => {
     await nameInputWrapper.setValue('Updated User')
     await flushPromises()
 
-    const saveBtn = wrapper.get('[data-testid="profile-save-button"] button, [data-testid="profile-save-button"]')
-    await saveBtn.trigger('click')
+    const form = wrapper.find('form')
+    await form.trigger('submit')
+    await flushPromises()
 
     expect(updateSpy).toHaveBeenCalledWith({ name: 'Updated User' })
   })
@@ -176,7 +177,7 @@ const vuetifyStubs = {
   },
   VForm: {
     emits: ['submit'],
-    template: '<form @submit.prevent="$emit(\'submit\')"><slot /></form>',
+    template: '<form @submit.prevent="$emit(\'submit\', $event)"><slot /></form>',
   },
   VDivider: { template: '<hr />' },
   VImg: { template: '<img />' },
