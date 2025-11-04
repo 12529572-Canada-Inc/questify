@@ -15,11 +15,19 @@ enum QuestStatus {
   archived
 }
 
+enum ThemePreference {
+  light
+  dark
+  auto
+}
+
 model User {
   id             String          @id @default(cuid())
   email          String          @unique
   password       String?
   name           String?
+  avatarUrl      String?
+  themePreference ThemePreference @default(light)
   quests         Quest[]
   investigations TaskInvestigation[]
   roles          UserRole[]

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { ref } from 'vue'
+import { h, ref } from 'vue'
 import { createPinia, setActivePinia } from 'pinia'
 import { flushPromises } from '@vue/test-utils'
 import DefaultLayout from '../../../app/layouts/default.vue'
@@ -84,6 +84,24 @@ afterEach(() => {
 
 describe('default layout', () => {
   it('logs out and clears the session', async () => {
+    const buttonStub = {
+      inheritAttrs: false,
+      emits: ['click'],
+      setup(_, { slots, attrs, emit }) {
+        return () => h('button', {
+          type: 'button',
+          ...attrs,
+          onClick: (event: MouseEvent) => {
+            const handler = attrs.onClick
+            if (typeof handler === 'function') {
+              handler(event)
+            }
+            emit('click', event)
+          },
+        }, slots.default?.())
+      },
+    }
+
     const SuspenseWrapper = {
       components: { DefaultLayout },
       template: '<Suspense><DefaultLayout><div class="slot-marker">Content</div></DefaultLayout></Suspense>',
@@ -92,6 +110,7 @@ describe('default layout', () => {
     const wrapper = mountWithBase(SuspenseWrapper, {
       global: {
         stubs: {
+          VBtn: buttonStub,
           ShareDialog: { template: '<div class="share-dialog-stub"></div>' },
           VImg: { template: '<img />' },
         },
@@ -101,10 +120,12 @@ describe('default layout', () => {
     // Wait for async setup to complete
     await flushPromises()
 
-    // Find and click the logout button
-    const logoutButton = wrapper.findAll('.app-bar-auth__btn').find(btn => btn.text().includes('Logout'))
-    expect(logoutButton).toBeDefined()
-    await logoutButton!.trigger('click')
+    const profileActivator = wrapper.get('button[aria-label="Open profile menu"]')
+    await profileActivator.trigger('click')
+
+    const logoutItem = wrapper.findAll('.v-menu-stub__content div').find(div => div.text().includes('Logout'))
+    expect(logoutItem).toBeDefined()
+    await logoutItem!.trigger('click')
     await flushPromises()
 
     expect(fetchApi).toHaveBeenCalledWith('/api/auth/logout', { method: 'POST' })

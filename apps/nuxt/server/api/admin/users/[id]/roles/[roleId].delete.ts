@@ -90,6 +90,8 @@ export default defineEventHandler(async (event) => {
       id: targetUser.id,
       email: targetUser.email,
       name: targetUser.name,
+      avatarUrl: targetUser.avatarUrl,
+      themePreference: targetUser.themePreference,
     })
   }
 

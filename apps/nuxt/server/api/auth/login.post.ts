@@ -31,6 +31,8 @@ export default defineEventHandler(async (event) => {
     id: user.id,
     email: user.email,
     name: user.name || null,
+    avatarUrl: user.avatarUrl || null,
+    themePreference: user.themePreference || null,
   }, { includeProviders: true })
 
   return {
@@ -39,6 +41,8 @@ export default defineEventHandler(async (event) => {
       id: user.id,
       email: user.email,
       name: user.name,
+      avatarUrl: profile.avatarUrl ?? user.avatarUrl ?? null,
+      themePreference: profile.themePreference ?? user.themePreference ?? null,
       roles: profile.roles,
       privileges: profile.privileges,
       providers: profile.providers,

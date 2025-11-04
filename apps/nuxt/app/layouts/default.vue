@@ -5,11 +5,9 @@ import { useMediaQuery } from '@vueuse/core'
 import { useSnackbar } from '~/composables/useSnackbar'
 import { useAccessControl } from '~/composables/useAccessControl'
 import { useUserStore } from '~/stores/user'
-import { useUiStore } from '~/stores/ui'
 import { useQuestStore } from '~/stores/quest'
 
 const userStore = useUserStore()
-const uiStore = useUiStore()
 const questStore = useQuestStore()
 
 const router = useRouter()
@@ -17,9 +15,8 @@ const requestUrl = useRequestURL()
 const { showSnackbar } = useSnackbar()
 const { isAdmin } = useAccessControl()
 
-const { loggedIn } = storeToRefs(userStore)
-const { isDarkMode } = storeToRefs(uiStore)
-const { toggleTheme } = uiStore
+const { loggedIn, avatarUrl, user } = storeToRefs(userStore)
+const profileMenuOpen = ref(false)
 const MOBILE_MENU_BREAKPOINT = 768
 
 const isMobile = useMediaQuery(`(max-width: ${MOBILE_MENU_BREAKPOINT - 1}px)`)
@@ -47,6 +44,15 @@ type MobileMenuItem = {
   to?: string
 }
 
+const profileInitials = computed(() => {
+  const name = user.value?.name?.trim()
+  if (name) {
+    return name.split(/\s+/).map(part => part[0]?.toUpperCase() ?? '').join('').slice(0, 2) || 'U'
+  }
+  const email = user.value?.email ?? ''
+  return email ? email.charAt(0).toUpperCase() : 'U'
+})
+
 const mobileMenuItems = computed<MobileMenuItem[]>(() => {
   const items: MobileMenuItem[] = [
     {
@@ -56,12 +62,6 @@ const mobileMenuItems = computed<MobileMenuItem[]>(() => {
       action: () => {
         shareDialogOpen.value = true
       },
-    },
-    {
-      key: 'theme',
-      label: `${isDarkMode.value ? 'Switch to Light' : 'Switch to Dark'}`,
-      icon: isDarkMode.value ? 'mdi-weather-sunny' : 'mdi-weather-night',
-      action: () => toggleTheme(),
     },
   ]
 
@@ -76,10 +76,10 @@ const mobileMenuItems = computed<MobileMenuItem[]>(() => {
 
   if (loggedIn.value) {
     items.push({
-      key: 'settings',
-      label: 'Settings',
-      icon: 'mdi-account-cog',
-      to: '/settings',
+      key: 'profile',
+      label: 'Profile',
+      icon: 'mdi-account-circle',
+      to: '/profile',
     })
     items.push({
       key: 'logout',
@@ -122,6 +122,7 @@ async function handleMenuItemClick(item: MobileMenuItem) {
 
 async function logout() {
   try {
+    profileMenuOpen.value = false
     await $fetch('/api/auth/logout', {
       method: 'POST',
     })
@@ -187,23 +188,6 @@ async function logout() {
           </span>
         </v-btn>
         <v-btn
-          class="app-bar-theme-btn"
-          variant="text"
-          color="primary"
-          density="comfortable"
-          aria-label="Toggle theme"
-          @click="toggleTheme"
-        >
-          <v-icon
-            :icon="isDarkMode ? 'mdi-weather-sunny' : 'mdi-weather-night'"
-            size="20"
-            class="app-bar-theme-icon"
-          />
-          <span class="app-bar-theme-label">
-            {{ isDarkMode ? 'Light' : 'Dark' }} Mode
-          </span>
-        </v-btn>
-        <v-btn
           v-if="isAdmin"
           class="app-bar-admin-btn"
           variant="text"
@@ -223,22 +207,60 @@ async function logout() {
 
         <div class="app-bar-auth">
           <template v-if="loggedIn">
-            <v-btn
-              class="app-bar-auth__btn"
-              variant="text"
-              density="comfortable"
-              to="/settings"
+            <v-menu
+              v-model="profileMenuOpen"
+              location="bottom end"
+              :close-on-content-click="true"
+              transition="scale-transition"
             >
-              Settings
-            </v-btn>
-            <v-btn
-              class="app-bar-auth__btn"
-              variant="text"
-              density="comfortable"
-              @click="logout"
-            >
-              Logout
-            </v-btn>
+              <template #activator="{ props }">
+                <v-btn
+                  class="app-bar-profile-btn"
+                  variant="text"
+                  density="comfortable"
+                  aria-label="Open profile menu"
+                  v-bind="props"
+                >
+                  <v-avatar size="36">
+                    <template v-if="avatarUrl">
+                      <v-img
+                        :src="avatarUrl"
+                        alt="Profile avatar"
+                        cover
+                      />
+                    </template>
+                    <template v-else>
+                      <span class="app-bar-profile-initials">
+                        {{ profileInitials }}
+                      </span>
+                    </template>
+                  </v-avatar>
+                </v-btn>
+              </template>
+              <v-list
+                density="comfortable"
+                nav
+                class="app-bar-profile-menu"
+              >
+                <v-list-item
+                  prepend-icon="mdi-account-circle"
+                  title="Profile"
+                  to="/profile"
+                />
+                <v-list-item
+                  v-if="isAdmin"
+                  prepend-icon="mdi-shield-crown"
+                  title="Administration"
+                  to="/admin"
+                />
+                <v-divider />
+                <v-list-item
+                  prepend-icon="mdi-logout"
+                  title="Logout"
+                  @click="logout"
+                />
+              </v-list>
+            </v-menu>
           </template>
           <template v-else>
             <v-btn
@@ -402,18 +424,6 @@ async function logout() {
   flex: 0 0 auto;
 }
 
-.app-bar-theme-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-width: 0;
-  padding-inline: 10px 14px;
-}
-
-.app-bar-theme-icon {
-  flex: 0 0 auto;
-}
-
 .app-bar-admin-btn {
   display: inline-flex;
   align-items: center;
@@ -435,6 +445,21 @@ async function logout() {
 
 .app-bar-auth__btn {
   min-width: 0;
+}
+
+.app-bar-profile-btn {
+  min-width: 0;
+  padding: 4px;
+}
+
+.app-bar-profile-initials {
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+}
+
+.app-bar-profile-menu {
+  min-width: 200px;
 }
 
 @media (max-width: 767px) {

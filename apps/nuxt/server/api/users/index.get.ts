@@ -7,7 +7,7 @@ const handler = defineEventHandler(async (event) => {
   await requirePrivilege(event, 'user:read')
 
   const users = await prisma.user.findMany({
-    select: { id: true, email: true, name: true },
+    select: { id: true, email: true, name: true, avatarUrl: true, themePreference: true },
   })
   return users
 })

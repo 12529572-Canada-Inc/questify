@@ -1,0 +1,7 @@
+export const THEME_PREFERENCES = ['light', 'dark', 'auto'] as const
+
+export type ThemePreference = typeof THEME_PREFERENCES[number]
+
+export function isThemePreference(value: unknown): value is ThemePreference {
+  return typeof value === 'string' && THEME_PREFERENCES.includes(value as ThemePreference)
+}

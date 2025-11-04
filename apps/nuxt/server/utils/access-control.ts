@@ -133,7 +133,13 @@ export async function requireAnyPrivilege(
 
 export async function attachSessionWithAccess(
   event: SessionEvent,
-  user: { id: string, email?: string | null, name?: string | null },
+  user: {
+    id: string
+    email?: string | null
+    name?: string | null
+    avatarUrl?: string | null
+    themePreference?: string | null
+  },
   options: AttachSessionOptions = {},
 ) {
   const profile = await getUserAccessProfile(user.id)
@@ -144,11 +150,28 @@ export async function attachSessionWithAccess(
       }).then(accounts => accounts.map(account => account.provider))
     : undefined
 
+  let avatarUrl = user.avatarUrl ?? undefined
+  let themePreference = user.themePreference ?? undefined
+
+  if (!avatarUrl || !themePreference) {
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { avatarUrl: true, themePreference: true },
+    })
+
+    if (dbUser) {
+      avatarUrl = avatarUrl ?? dbUser.avatarUrl ?? undefined
+      themePreference = themePreference ?? dbUser.themePreference ?? undefined
+    }
+  }
+
   await setUserSession(event, {
     user: {
       id: user.id,
       email: user.email ?? undefined,
       name: user.name ?? undefined,
+      avatarUrl,
+      themePreference,
       roles: profile.roles,
       privileges: profile.privileges,
       providers,
@@ -158,5 +181,7 @@ export async function attachSessionWithAccess(
   return {
     ...profile,
     providers,
+    avatarUrl,
+    themePreference,
   }
 }

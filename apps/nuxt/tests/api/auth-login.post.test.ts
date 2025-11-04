@@ -61,12 +61,16 @@ beforeEach(() => {
     email: 'person@example.com',
     name: 'Person Example',
     password: 'hashed',
+    avatarUrl: null,
+    themePreference: 'light',
   })
   sharedMocks.verifyPassword.mockReturnValue(true)
   accessControlMocks.attachSessionWithAccess.mockResolvedValue({
     roles: ['Admin'],
     privileges: ['user:read'],
     providers: ['google'],
+    avatarUrl: 'https://example.com/avatar.png',
+    themePreference: 'dark',
   })
 
   Reflect.set(globalWithMocks, 'readBody', vi.fn(async () => ({
@@ -104,6 +108,8 @@ describe('API /api/auth/login (POST)', () => {
         id: 'user-1',
         email: 'person@example.com',
         name: 'Person Example',
+        avatarUrl: null,
+        themePreference: 'light',
       },
       { includeProviders: true },
     )
@@ -113,6 +119,8 @@ describe('API /api/auth/login (POST)', () => {
         id: 'user-1',
         email: 'person@example.com',
         name: 'Person Example',
+        avatarUrl: 'https://example.com/avatar.png',
+        themePreference: 'dark',
         roles: ['Admin'],
         privileges: ['user:read'],
         providers: ['google'],
@@ -124,12 +132,14 @@ describe('API /api/auth/login (POST)', () => {
     prismaMocks.userFindUnique.mockResolvedValueOnce(null)
     await expect(handler({} as never)).rejects.toMatchObject({ statusCode: 401 })
 
-    prismaMocks.userFindUnique.mockResolvedValueOnce({
-      id: 'user-1',
-      email: 'person@example.com',
-      name: 'Person Example',
-      password: 'hashed',
-    })
+  prismaMocks.userFindUnique.mockResolvedValueOnce({
+    id: 'user-1',
+    email: 'person@example.com',
+    name: 'Person Example',
+    password: 'hashed',
+    avatarUrl: null,
+    themePreference: 'light',
+  })
     sharedMocks.verifyPassword.mockReturnValueOnce(false)
 
     await expect(handler({} as never)).rejects.toMatchObject({ statusCode: 401 })
