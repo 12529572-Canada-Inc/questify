@@ -187,24 +187,6 @@ async function logout() {
             Share App
           </span>
         </v-btn>
-        <v-btn
-          v-if="isAdmin"
-          class="app-bar-admin-btn"
-          variant="text"
-          color="primary"
-          density="comfortable"
-          to="/admin"
-        >
-          <v-icon
-            icon="mdi-shield-crown"
-            size="20"
-            class="app-bar-admin-icon"
-          />
-          <span class="app-bar-admin-label">
-            Administration
-          </span>
-        </v-btn>
-
         <div class="app-bar-auth">
           <template v-if="loggedIn">
             <v-menu
@@ -421,18 +403,6 @@ async function logout() {
 }
 
 .app-bar-share-icon {
-  flex: 0 0 auto;
-}
-
-.app-bar-admin-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-width: 0;
-  padding-inline: 10px 14px;
-}
-
-.app-bar-admin-icon {
   flex: 0 0 auto;
 }
 
