@@ -41,7 +41,8 @@ const formErrors = reactive<{ name?: string, email?: string, avatarUrl?: string 
 const linking = ref<OAuthProvider | null>(null)
 const avatarInput = ref<HTMLInputElement | null>(null)
 
-const hasAvatar = computed(() => Boolean(form.avatarUrl))
+// TODO: re-enable if we want to show whether an avatar is set
+// const hasAvatar = computed(() => Boolean(form.avatarUrl))
 const avatarIsUpload = computed(() => form.avatarUrl.startsWith('data:image/'))
 const avatarPreview = computed(() => form.avatarUrl || sessionAvatar.value || '')
 
@@ -462,7 +463,11 @@ function readFileAsDataUrl(file: File) {
               @change="onAvatarSelected"
             >
 
-            <v-row class="profile-details" align="stretch" no-gutters>
+            <v-row
+              class="profile-details"
+              align="stretch"
+              no-gutters
+            >
               <v-col
                 cols="12"
                 md="4"
@@ -481,7 +486,11 @@ function readFileAsDataUrl(file: File) {
                       />
                     </template>
                     <template v-else>
-                      <v-icon icon="mdi-account-circle" size="104" color="primary" />
+                      <v-icon
+                        icon="mdi-account-circle"
+                        size="104"
+                        color="primary"
+                      />
                     </template>
                   </v-avatar>
                   <v-btn
@@ -504,7 +513,10 @@ function readFileAsDataUrl(file: File) {
                   </p>
                 </div>
               </v-col>
-              <v-col cols="12" md="8">
+              <v-col
+                cols="12"
+                md="8"
+              >
                 <v-text-field
                   v-model="form.name"
                   label="Display Name"
@@ -529,10 +541,10 @@ function readFileAsDataUrl(file: File) {
                   :error-messages="formErrors.avatarUrl"
                   prepend-inner-icon="mdi-link-variant"
                   append-inner-icon="mdi-check"
+                  data-testid="profile-avatar-url-input"
                   @click:append-inner="applyRemoteAvatar"
                   @keydown.enter.prevent="applyRemoteAvatar"
                   @blur="applyRemoteAvatar"
-                  data-testid="profile-avatar-url-input"
                 />
                 <p
                   v-if="avatarIsUpload"
@@ -588,7 +600,10 @@ function readFileAsDataUrl(file: File) {
                   >
                     <template #label>
                       <div class="theme-option">
-                        <v-icon :icon="option.icon" class="mr-3" />
+                        <v-icon
+                          :icon="option.icon"
+                          class="mr-3"
+                        />
                         <div>
                           <div class="text-subtitle-1">
                             {{ option.label }}
@@ -617,7 +632,10 @@ function readFileAsDataUrl(file: File) {
                   Control whether the “Improve with AI” helpers appear while creating quests.
                 </v-card-subtitle>
 
-                <v-row align="center" class="profile-ai-toggle">
+                <v-row
+                  align="center"
+                  class="profile-ai-toggle"
+                >
                   <v-col cols="8">
                     <p class="text-body-2 mb-2">
                       When enabled, Questify can suggest better titles, goals, context, and constraints using your selected AI model.
@@ -626,7 +644,10 @@ function readFileAsDataUrl(file: File) {
                       Suggestions never overwrite your text until you accept them.
                     </p>
                   </v-col>
-                  <v-col cols="4" class="text-right">
+                  <v-col
+                    cols="4"
+                    class="text-right"
+                  >
                     <v-switch
                       v-model="aiAssistPreference"
                       color="primary"
@@ -690,8 +711,8 @@ function readFileAsDataUrl(file: File) {
                   color="primary"
                   :variant="buttonVariant(provider)"
                   :loading="linking === provider"
-                  @click="startLink(provider)"
                   :data-testid="`profile-provider-btn-${provider}`"
+                  @click="startLink(provider)"
                 >
                   {{ buttonLabel(provider) }}
                 </v-btn>

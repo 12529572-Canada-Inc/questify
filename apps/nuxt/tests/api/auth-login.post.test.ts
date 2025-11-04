@@ -132,14 +132,14 @@ describe('API /api/auth/login (POST)', () => {
     prismaMocks.userFindUnique.mockResolvedValueOnce(null)
     await expect(handler({} as never)).rejects.toMatchObject({ statusCode: 401 })
 
-  prismaMocks.userFindUnique.mockResolvedValueOnce({
-    id: 'user-1',
-    email: 'person@example.com',
-    name: 'Person Example',
-    password: 'hashed',
-    avatarUrl: null,
-    themePreference: 'light',
-  })
+    prismaMocks.userFindUnique.mockResolvedValueOnce({
+      id: 'user-1',
+      email: 'person@example.com',
+      name: 'Person Example',
+      password: 'hashed',
+      avatarUrl: null,
+      themePreference: 'light',
+    })
     sharedMocks.verifyPassword.mockReturnValueOnce(false)
 
     await expect(handler({} as never)).rejects.toMatchObject({ statusCode: 401 })
