@@ -145,6 +145,23 @@ const handler = defineEventHandler(async (event) => {
   }
   catch (error) {
     console.error('AI assistance error:', error)
+
+    if (error instanceof Error) {
+      if (error.message.includes('Missing API client for provider')) {
+        throw createError({
+          status: 503,
+          statusText: 'AI assistance is not configured for the selected model. Add the provider API key or choose a different model.',
+        })
+      }
+
+      if (error.message.includes('No AI models configured')) {
+        throw createError({
+          status: 503,
+          statusText: 'AI assistance is not available. Configure at least one AI model.',
+        })
+      }
+    }
+
     throw createError({
       status: 502,
       statusText: 'Failed to generate AI suggestions. Please try again shortly.',
