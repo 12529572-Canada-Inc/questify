@@ -149,7 +149,7 @@ const vuetifyStubs = {
   VBtn: {
     inheritAttrs: false,
     emits: ['click'],
-    template: '<button type="button" v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>',
+    template: '<button :type="$attrs.type || \'button\'" v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>',
   },
   VSwitch: {
     inheritAttrs: false,
