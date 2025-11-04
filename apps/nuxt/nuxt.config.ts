@@ -4,6 +4,7 @@ import path from 'path'
 import { loadModelConfig } from '../../packages/shared/src/model-config'
 
 const aiModelConfig = loadModelConfig()
+const aiAssistEnabled = process.env.NUXT_FEATURE_AI_ASSIST === 'true'
 
 // 🧠 Nuxt 4 Configuration — Questify
 export default defineNuxtConfig({
@@ -60,6 +61,9 @@ export default defineNuxtConfig({
   runtimeConfig: {
     aiModels: aiModelConfig.models,
     aiModelDefaultId: aiModelConfig.defaultModelId,
+    features: {
+      aiAssist: aiAssistEnabled,
+    },
     // 🔒 Server-only (not exposed to client)
     redis: {
       host: process.env.REDIS_HOST || 'localhost',
@@ -76,6 +80,9 @@ export default defineNuxtConfig({
       questifyVersion: '4.1.3',
       aiModels: aiModelConfig.models,
       aiModelDefaultId: aiModelConfig.defaultModelId,
+      features: {
+        aiAssist: aiAssistEnabled,
+      },
     },
   },
 

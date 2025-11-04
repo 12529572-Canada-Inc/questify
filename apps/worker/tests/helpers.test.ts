@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { parseJsonFromModel } from '../src/helpers.js';
+import { parseJsonFromModel } from 'shared/server';
 
 describe('parseJsonFromModel', () => {
   it('returns an empty array when the response is empty', () => {

@@ -70,6 +70,7 @@ const vuetifyStubFlags = {
   VProgressCircular: true,
   VSpacer: true,
   ModelSelectField: true,
+  QuestAiSuggestionDialog: true,
 }
 
 const originalUseRuntimeConfig = (globalThis as typeof globalThis & { useRuntimeConfig?: () => unknown }).useRuntimeConfig
@@ -79,6 +80,7 @@ beforeAll(() => {
     public: {
       aiModels: defaultAiModels,
       aiModelDefaultId: 'gpt-4o-mini',
+      features: { aiAssist: true },
     },
   })))
 })
@@ -178,6 +180,31 @@ vi.mock('~/composables/useQuestForm', () => {
       isSubmitDisabled: ref(false),
       submit: vi.fn(),
       toggleOptionalFields: vi.fn(() => { showOptionalFields.value = !showOptionalFields.value }),
+    }),
+  }
+})
+
+vi.mock('~/composables/useQuestAiAssist', () => {
+  const dialogOpen = ref(false)
+  const suggestions = ref([])
+  const loading = ref(false)
+  const error = ref<string | null>(null)
+
+  return {
+    useQuestAiAssist: () => ({
+      isEnabled: computed(() => true),
+      dialogOpen,
+      activeFieldLabel: computed(() => 'Title'),
+      suggestions: computed(() => suggestions.value),
+      loading: computed(() => loading.value),
+      error: computed(() => error.value),
+      modelLabel: computed(() => 'GPT-4o mini'),
+      requestAssistance: vi.fn(),
+      regenerateSuggestions: vi.fn(),
+      applySuggestion: vi.fn(),
+      closeDialog: vi.fn(() => {
+        dialogOpen.value = false
+      }),
     }),
   }
 })
