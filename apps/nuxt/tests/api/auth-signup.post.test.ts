@@ -70,6 +70,8 @@ beforeEach(() => {
     id: 'user-1',
     email: 'new@example.com',
     name: 'New User',
+    avatarUrl: null,
+    themePreference: 'light',
   })
   sharedMocks.hashPassword.mockReturnValue('hashed-password')
   accessControlMocks.ensureSuperAdmin.mockResolvedValue(undefined)
@@ -77,6 +79,8 @@ beforeEach(() => {
     roles: ['SuperAdmin'],
     privileges: ['user:read'],
     providers: [],
+    avatarUrl: null,
+    themePreference: 'light',
   })
 
   Reflect.set(globalWithMocks, 'readBody', vi.fn(async () => ({
@@ -114,6 +118,7 @@ describe('API /api/auth/signup (POST)', () => {
         email: 'new@example.com',
         password: 'hashed-password',
         name: 'New User',
+        themePreference: 'light',
       },
     })
     expect(accessControlMocks.ensureSuperAdmin).toHaveBeenCalledWith(expect.anything())
@@ -123,6 +128,8 @@ describe('API /api/auth/signup (POST)', () => {
         id: 'user-1',
         email: 'new@example.com',
         name: 'New User',
+        avatarUrl: null,
+        themePreference: 'light',
       },
       { includeProviders: true },
     )
@@ -132,6 +139,8 @@ describe('API /api/auth/signup (POST)', () => {
         id: 'user-1',
         email: 'new@example.com',
         name: 'New User',
+        avatarUrl: null,
+        themePreference: 'light',
         roles: ['SuperAdmin'],
         privileges: ['user:read'],
         providers: [],

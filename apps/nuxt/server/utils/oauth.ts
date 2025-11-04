@@ -30,6 +30,7 @@ export interface OAuthSuccessResult {
     id: string
     email: string
     name: string | null
+    avatarUrl: string | null
   }
 }
 
@@ -77,18 +78,34 @@ export async function handleOAuthSuccess(
       data: mapTokensForUpdate(tokens),
     })
 
+    let linkedUser = existingAccount.user
+
+    if (profile.avatarUrl && profile.avatarUrl !== linkedUser.avatarUrl) {
+      linkedUser = await prisma.user.update({
+        where: { id: linkedUser.id },
+        data: { avatarUrl: profile.avatarUrl },
+      })
+    }
+
     // Refresh session to include the latest provider list
     const action: OAuthSuccessAction = sessionUser ? 'linked' : 'signed-in'
-    await attachSessionWithAccess(event, existingAccount.user, { includeProviders: true })
+    await attachSessionWithAccess(event, {
+      id: linkedUser.id,
+      email: linkedUser.email,
+      name: linkedUser.name,
+      avatarUrl: linkedUser.avatarUrl,
+      themePreference: linkedUser.themePreference,
+    }, { includeProviders: true })
     setOAuthResultCookie(event, provider, action)
 
     return {
       action,
       provider,
       user: {
-        id: existingAccount.user.id,
-        email: existingAccount.user.email,
-        name: existingAccount.user.name ?? null,
+        id: linkedUser.id,
+        email: linkedUser.email,
+        name: linkedUser.name ?? null,
+        avatarUrl: linkedUser.avatarUrl ?? null,
       },
     }
   }
@@ -111,14 +128,30 @@ export async function handleOAuthSuccess(
       data: {
         email: profile.email.toLowerCase(),
         name: profile.name ?? null,
+        avatarUrl: profile.avatarUrl ?? null,
       },
     })
   }
-  else if (!user.name && profile.name) {
-    user = await prisma.user.update({
-      where: { id: user.id },
-      data: { name: profile.name },
-    })
+  else {
+    const updates: {
+      name?: string
+      avatarUrl?: string | null
+    } = {}
+
+    if (!user.name && profile.name) {
+      updates.name = profile.name
+    }
+
+    if (profile.avatarUrl && profile.avatarUrl !== user.avatarUrl) {
+      updates.avatarUrl = profile.avatarUrl
+    }
+
+    if (Object.keys(updates).length > 0) {
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: updates,
+      })
+    }
   }
 
   await prisma.oAuthAccount.create({
@@ -131,7 +164,13 @@ export async function handleOAuthSuccess(
   })
 
   const action: OAuthSuccessAction = sessionUser ? 'linked' : 'created'
-  await attachSessionWithAccess(event, user, { includeProviders: true })
+  await attachSessionWithAccess(event, {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    avatarUrl: user.avatarUrl,
+    themePreference: user.themePreference,
+  }, { includeProviders: true })
   setOAuthResultCookie(event, provider, action)
 
   return {
@@ -141,6 +180,7 @@ export async function handleOAuthSuccess(
       id: user.id,
       email: user.email,
       name: user.name ?? null,
+      avatarUrl: user.avatarUrl ?? null,
     },
   }
 }

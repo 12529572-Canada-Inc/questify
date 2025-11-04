@@ -40,6 +40,8 @@ declare global {
     id: string
     email?: string
     name?: string
+    avatarUrl?: string
+    themePreference?: 'light' | 'dark' | 'auto'
     roles?: string[]
     privileges?: string[]
     providers?: string[]

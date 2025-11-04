@@ -6,6 +6,8 @@ import type { Ref } from 'vue'
 import { vi } from 'vitest'
 import { splitTextIntoSegments } from './app/utils/text-with-links'
 
+type SessionUser = { id: string, [key: string]: unknown }
+
 declare global {
   // Add custom properties to globalThis for type safety
   var defineEventHandler: ((fn: unknown) => unknown) | undefined
@@ -17,6 +19,15 @@ declare global {
   var useState: (<T>(key: string, init?: () => T) => Ref<T>) | undefined
   var useCookie: (<T>(key: string, options?: unknown) => Ref<T>) | undefined
   var __resetNuxtState: (() => void) | undefined
+  var useRuntimeConfig: (() => { public: { features: { aiAssist: boolean } } }) | undefined
+  var definePageMeta: ((meta: unknown) => void) | undefined
+  var useUserSession: (() => {
+    user: Ref<SessionUser | null>
+    loggedIn: Ref<boolean>
+    fetch: ReturnType<typeof vi.fn>
+    clear: ReturnType<typeof vi.fn>
+    openInPopup: ReturnType<typeof vi.fn>
+  }) | undefined
 }
 
 config({ path: '.env.test' })
@@ -89,6 +100,35 @@ if (!globalThis.createError) {
 
 if (!globalThis.getUserSession) {
   globalThis.getUserSession = async () => ({ user: { id: 'test-user' } })
+}
+
+if (!globalThis.useRuntimeConfig) {
+  globalThis.useRuntimeConfig = () => ({
+    public: { features: { aiAssist: true } },
+  })
+}
+
+if (!globalThis.definePageMeta) {
+  globalThis.definePageMeta = () => {}
+}
+
+if (!globalThis.useUserSession) {
+  const defaultUser = ref<SessionUser | null>(null)
+  const defaultLoggedIn = ref(false)
+  const fetch = vi.fn(async () => ({}))
+  const clear = vi.fn(async () => {
+    defaultUser.value = null
+    defaultLoggedIn.value = false
+  })
+  const openInPopup = vi.fn()
+
+  globalThis.useUserSession = () => ({
+    user: defaultUser,
+    loggedIn: defaultLoggedIn,
+    fetch,
+    clear,
+    openInPopup,
+  })
 }
 
 const cookieStore = new Map<string, Ref>()

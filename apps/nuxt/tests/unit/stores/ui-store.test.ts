@@ -2,6 +2,7 @@ import { nextTick } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 import { useUiStore } from '~/stores/ui'
+import type { ThemePreference } from 'shared'
 
 type ThemeMode = 'light' | 'dark'
 
@@ -14,11 +15,16 @@ vi.mock('vuetify', () => ({
 }))
 
 beforeEach(() => {
+  vi.useFakeTimers()
+  const morning = new Date()
+  morning.setHours(10, 0, 0, 0)
+  vi.setSystemTime(morning)
+
   Reflect.set(globalThis, 'useRuntimeConfig', vi.fn(() => ({
     public: { features: { aiAssist: true } },
   })))
 
-  const themeCookie = useCookie<ThemeMode | null>('questify-theme')
+  const themeCookie = useCookie<ThemePreference | null>('questify-theme')
   themeCookie.value = 'light'
   const aiCookie = useCookie<'on' | 'off'>('questify-ai-assist')
   aiCookie.value = 'on'
@@ -30,6 +36,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  vi.useRealTimers()
   if (originalUseRuntimeConfig) {
     Reflect.set(globalThis, 'useRuntimeConfig', originalUseRuntimeConfig)
   }
@@ -41,34 +48,73 @@ afterEach(() => {
 
 describe('useUiStore', () => {
   it('initialises with cookie preference', () => {
-    const themeCookie = useCookie<ThemeMode | null>('questify-theme')
+    const themeCookie = useCookie<ThemePreference | null>('questify-theme')
     themeCookie.value = 'dark'
     const store = useUiStore()
 
+    expect(store.themePreference).toBe('dark')
     expect(store.themeMode).toBe('dark')
     expect(mockTheme.global.name.value).toBe('dark')
   })
 
-  it('sets theme mode and updates cookie', async () => {
-    const themeCookie = useCookie<ThemeMode | null>('questify-theme')
+  it('applies auto theme preference based on time of day', () => {
+    const themeCookie = useCookie<ThemePreference | null>('questify-theme')
+    themeCookie.value = 'auto'
+
+    const night = new Date()
+    night.setHours(22, 0, 0, 0)
+    vi.setSystemTime(night)
+
+    const store = useUiStore()
+    expect(store.themePreference).toBe('auto')
+    expect(store.themeMode).toBe('dark')
+    expect(mockTheme.global.name.value).toBe('dark')
+  })
+
+  it('updates theme preference and cookie', async () => {
+    const themeCookie = useCookie<ThemePreference | null>('questify-theme')
     const store = useUiStore()
 
-    store.setTheme('dark')
+    store.setThemePreference('dark')
     await nextTick()
 
-    expect(store.isDarkMode).toBe(true)
+    expect(store.themePreference).toBe('dark')
     expect(themeCookie.value).toBe('dark')
     expect(mockTheme.global.name.value).toBe('dark')
   })
 
-  it('toggles between light and dark themes', () => {
+  it('cycles auto theme when time changes', async () => {
     const store = useUiStore()
 
-    store.toggleTheme()
+    store.setThemePreference('auto')
+    await nextTick()
+    expect(store.themeMode).toBe('light')
+
+    const evening = new Date()
+    evening.setHours(21, 0, 0, 0)
+    vi.setSystemTime(evening)
+    vi.advanceTimersByTime(5 * 60 * 1000)
+    await nextTick()
+
     expect(store.themeMode).toBe('dark')
+    const morning = new Date()
+    morning.setHours(9, 0, 0, 0)
+    vi.setSystemTime(morning)
+    vi.advanceTimersByTime(5 * 60 * 1000)
+    await nextTick()
+
+    expect(store.themeMode).toBe('light')
+  })
+
+  it('toggleTheme exits auto mode and flips preference', () => {
+    const store = useUiStore()
+    store.setThemePreference('auto')
 
     store.toggleTheme()
-    expect(store.themeMode).toBe('light')
+    expect(store.themePreference).toBe('dark')
+
+    store.toggleTheme()
+    expect(store.themePreference).toBe('light')
   })
 
   it('re-applies theme once Vuetify context becomes available', async () => {
@@ -77,7 +123,7 @@ describe('useUiStore', () => {
     })
     const store = useUiStore()
 
-    store.setTheme('dark')
+    store.setThemePreference('dark')
     await nextTick()
 
     expect(store.isDarkMode).toBe(true)

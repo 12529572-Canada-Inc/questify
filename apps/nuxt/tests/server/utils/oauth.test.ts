@@ -78,12 +78,15 @@ describe('handleOAuthSuccess', () => {
       id: 'user-1',
       email: 'person@example.com',
       name: 'Person Example',
+      avatarUrl: 'https://example.com/avatar.png',
+      themePreference: 'light',
     })
 
     const result = await handleOAuthSuccess(event, 'google', {
       id: 'google-1',
       email: 'person@example.com',
       name: 'Person Example',
+      avatarUrl: 'https://example.com/avatar.png',
     }, {
       access_token: 'at',
       refresh_token: 'rt',
@@ -94,6 +97,7 @@ describe('handleOAuthSuccess', () => {
       data: {
         email: 'person@example.com',
         name: 'Person Example',
+        avatarUrl: 'https://example.com/avatar.png',
       },
     })
     expect(prismaMocks.accountCreate).toHaveBeenCalledWith(expect.objectContaining({
@@ -105,7 +109,15 @@ describe('handleOAuthSuccess', () => {
         refreshToken: 'rt',
       }),
     }))
-    expect(attachSessionMock).toHaveBeenCalledWith(event, expect.objectContaining({ id: 'user-1' }), expect.objectContaining({ includeProviders: true }))
+    expect(attachSessionMock).toHaveBeenCalledWith(
+      event,
+      expect.objectContaining({
+        id: 'user-1',
+        avatarUrl: 'https://example.com/avatar.png',
+        themePreference: 'light',
+      }),
+      expect.objectContaining({ includeProviders: true }),
+    )
     expect(setCookieMock).toHaveBeenCalledWith(event, 'oauth_result', expect.stringContaining('"action":"created"'), expect.any(Object))
     expect(result).toMatchObject({
       action: 'created',
@@ -113,6 +125,7 @@ describe('handleOAuthSuccess', () => {
       user: {
         id: 'user-1',
         email: 'person@example.com',
+        avatarUrl: 'https://example.com/avatar.png',
       },
     })
   })
@@ -124,13 +137,21 @@ describe('handleOAuthSuccess', () => {
       id: 'user-42',
       email: 'member@example.com',
       name: 'Member',
+      avatarUrl: null,
+      themePreference: 'light',
     })
 
     const result = await handleOAuthSuccess(event, 'facebook', {
       id: 'fb-1',
       email: 'member@example.com',
       name: 'Member',
+      avatarUrl: 'https://example.com/member.png',
     }, {})
+
+    expect(prismaMocks.userUpdate).toHaveBeenCalledWith({
+      where: { id: 'user-42' },
+      data: { avatarUrl: 'https://example.com/member.png' },
+    })
 
     expect(prismaMocks.accountCreate).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({
@@ -141,6 +162,7 @@ describe('handleOAuthSuccess', () => {
     }))
     expect(result.action).toBe('linked')
     expect(setCookieMock).toHaveBeenCalledWith(event, 'oauth_result', expect.stringContaining('"action":"linked"'), expect.any(Object))
+    expect(result.user.avatarUrl).toBe('https://example.com/member.png')
   })
 
   it('reuses an existing OAuth account', async () => {
@@ -153,6 +175,8 @@ describe('handleOAuthSuccess', () => {
         id: 'user-55',
         email: 'existing@example.com',
         name: 'Existing',
+        avatarUrl: 'https://example.com/existing.png',
+        themePreference: 'dark',
       },
     })
 
@@ -164,5 +188,6 @@ describe('handleOAuthSuccess', () => {
     })
     expect(result.action).toBe('signed-in')
     expect(setCookieMock).toHaveBeenCalledWith(event, 'oauth_result', expect.stringContaining('"action":"signed-in"'), expect.any(Object))
+    expect(result.user.avatarUrl).toBe('https://example.com/existing.png')
   })
 })
