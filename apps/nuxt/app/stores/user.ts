@@ -1,6 +1,7 @@
 import { computed, ref, watch } from 'vue'
 import { acceptHMRUpdate, defineStore } from 'pinia'
-import { ThemePreference, isThemePreference } from 'shared'
+import type { ThemePreference } from 'shared'
+import { isThemePreference } from 'shared'
 import { useUiStore } from '~/stores/ui'
 
 export const useUserStore = defineStore('user', () => {

@@ -1,7 +1,8 @@
 import { computed, ref, watch } from 'vue'
 import { acceptHMRUpdate, defineStore } from 'pinia'
 import { useTheme } from 'vuetify'
-import { ThemePreference, isThemePreference } from 'shared'
+import type { ThemePreference } from 'shared'
+import { isThemePreference } from 'shared'
 
 type ThemeMode = 'light' | 'dark'
 
@@ -25,7 +26,7 @@ export const useUiStore = defineStore('ui', () => {
   )
 
   let cachedTheme: ReturnType<typeof useTheme> | null = null
-  let autoThemeInterval: ReturnType<typeof setInterval> | null = null
+  let autoThemeInterval: ReturnType<typeof globalThis.setInterval> | null = null
 
   const isDarkMode = computed(() => themeMode.value === 'dark')
   const aiAssistEnabled = computed(() => aiAssistFeatureEnabled && aiAssistPreference.value === 'on')
@@ -84,7 +85,7 @@ export const useUiStore = defineStore('ui', () => {
       return
     }
 
-    autoThemeInterval = window.setInterval(updateAutoTheme, AUTO_THEME_INTERVAL_MS)
+    autoThemeInterval = globalThis.setInterval(updateAutoTheme, AUTO_THEME_INTERVAL_MS)
   }
 
   function stopAutoMonitoring() {

@@ -1,6 +1,7 @@
 import { Prisma, PrismaClient } from '@prisma/client'
 import type { H3Event } from 'h3'
-import { ThemePreference, isThemePreference } from 'shared'
+import type { ThemePreference } from 'shared'
+import { isThemePreference } from 'shared'
 import { attachSessionWithAccess, getUserAccessProfile } from '../../../utils/access-control'
 
 const prisma = new PrismaClient()

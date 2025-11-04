@@ -234,11 +234,14 @@ function triggerAvatarSelect() {
 
 async function onAvatarSelected(event: Event) {
   const input = event.target as HTMLInputElement | null
-  if (!input?.files?.length) {
+  if (!input) {
     return
   }
 
-  const file = input.files[0]
+  const file = input.files?.[0]
+  if (!file) {
+    return
+  }
 
   if (!file.type.startsWith('image/')) {
     formErrors.avatarUrl = 'Please choose an image file.'
