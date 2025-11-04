@@ -19,7 +19,7 @@ declare global {
   var useState: (<T>(key: string, init?: () => T) => Ref<T>) | undefined
   var useCookie: (<T>(key: string, options?: unknown) => Ref<T>) | undefined
   var __resetNuxtState: (() => void) | undefined
-  var useRuntimeConfig: (() => any) | undefined
+  var useRuntimeConfig: (() => { public: { features: { aiAssist: boolean } } }) | undefined
   var definePageMeta: ((meta: unknown) => void) | undefined
   var useUserSession: (() => {
     user: Ref<SessionUser | null>
