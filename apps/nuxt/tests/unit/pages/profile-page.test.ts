@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
+import { flushPromises } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import ProfilePage from '../../../app/pages/profile.vue'
 import { mountWithBase } from '../support/mount-options'
@@ -120,6 +121,7 @@ describe('ProfilePage', () => {
 
     const nameInputWrapper = wrapper.get('[data-testid="profile-name-input"] input')
     await nameInputWrapper.setValue('Updated User')
+    await flushPromises()
 
     const saveBtn = wrapper.get('[data-testid="profile-save-button"] button, [data-testid="profile-save-button"]')
     await saveBtn.trigger('click')

@@ -228,6 +228,7 @@ async function logout() {
                   prepend-icon="mdi-account-circle"
                   title="Profile"
                   to="/profile"
+                  data-testid="app-bar-profile-menu-profile"
                 />
                 <v-list-item
                   v-if="isAdmin"
@@ -239,6 +240,7 @@ async function logout() {
                 <v-list-item
                   prepend-icon="mdi-logout"
                   title="Logout"
+                  data-testid="app-bar-profile-menu-logout"
                   @click="logout"
                 />
               </v-list>

@@ -123,9 +123,8 @@ describe('default layout', () => {
     const profileActivator = wrapper.get('button[aria-label="Open profile menu"]')
     await profileActivator.trigger('click')
 
-    const logoutItem = wrapper.findAll('.v-menu-stub__content div').find(div => div.text().includes('Logout'))
-    expect(logoutItem).toBeDefined()
-    await logoutItem!.trigger('click')
+    const logoutItem = wrapper.get('[data-testid="app-bar-profile-menu-logout"]')
+    await logoutItem.trigger('click')
     await flushPromises()
 
     expect(fetchApi).toHaveBeenCalledWith('/api/auth/logout', { method: 'POST' })

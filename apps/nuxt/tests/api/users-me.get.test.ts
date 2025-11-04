@@ -49,9 +49,7 @@ beforeEach(() => {
   vi.stubGlobal('requireUserSession', vi.fn(async () => ({
     user: {
       id: 'user-1',
-      providers: [],
-      roles: [],
-      privileges: [],
+      providers: undefined,
     },
   })))
 })

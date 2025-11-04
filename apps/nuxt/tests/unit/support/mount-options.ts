@@ -62,7 +62,12 @@ const baseGlobal = {
     VIcon: { template: '<span><slot /></span>' },
     VBtnGroup: simpleDivStub,
     VList: simpleDivStub,
-    VListItem: simpleDivStub,
+    VListItem: {
+      inheritAttrs: false,
+      setup(_, { attrs, slots }) {
+        return () => h('div', { ...attrs }, slots.default?.())
+      },
+    },
     VListItemTitle: simpleDivStub,
     VListItemSubtitle: simpleDivStub,
     VAvatar: simpleDivStub,
