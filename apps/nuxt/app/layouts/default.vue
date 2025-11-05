@@ -53,15 +53,18 @@ const profileInitials = computed(() => {
   return email ? email.charAt(0).toUpperCase() : 'U'
 })
 
+function openShareDialog() {
+  shareDialogOpen.value = true
+  profileMenuOpen.value = false
+}
+
 const mobileMenuItems = computed<MobileMenuItem[]>(() => {
   const items: MobileMenuItem[] = [
     {
       key: 'share',
       label: 'Share App',
       icon: 'mdi-share-variant',
-      action: () => {
-        shareDialogOpen.value = true
-      },
+      action: openShareDialog,
     },
   ]
 
@@ -170,23 +173,6 @@ async function logout() {
         class="app-bar-actions"
         :class="{ 'app-bar-actions--hidden': isMobile }"
       >
-        <v-btn
-          class="app-bar-share-btn"
-          variant="text"
-          color="primary"
-          aria-label="Share Questify"
-          density="comfortable"
-          @click="shareDialogOpen = true"
-        >
-          <v-icon
-            icon="mdi-share-variant"
-            size="20"
-            class="app-bar-share-icon"
-          />
-          <span class="app-bar-share-label">
-            Share App
-          </span>
-        </v-btn>
         <div class="app-bar-auth">
           <template v-if="loggedIn">
             <v-menu
@@ -224,6 +210,12 @@ async function logout() {
                 nav
                 class="app-bar-profile-menu"
               >
+                <v-list-item
+                  prepend-icon="mdi-share-variant"
+                  title="Share"
+                  data-testid="app-bar-profile-menu-share"
+                  @click="openShareDialog"
+                />
                 <v-list-item
                   prepend-icon="mdi-account-circle"
                   title="Profile"
@@ -281,8 +273,9 @@ async function logout() {
             <v-btn
               class="app-bar-menu-btn"
               icon
-              variant="text"
+              variant="tonal"
               color="primary"
+              density="comfortable"
               aria-label="Open navigation menu"
               v-bind="activatorProps"
               :aria-expanded="mobileMenuOpen"
@@ -388,24 +381,18 @@ async function logout() {
 }
 
 .app-bar-menu-btn {
-  width: 48px;
-  height: 48px;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
 }
 
 .app-bar-menu-list {
   min-width: 220px;
-}
-
-.app-bar-share-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-width: 0;
-  padding-inline: 10px 14px;
-}
-
-.app-bar-share-icon {
-  flex: 0 0 auto;
 }
 
 .app-bar-auth {
@@ -476,14 +463,6 @@ async function logout() {
 }
 
 @media (max-width: 420px) {
-  .app-bar-share-label {
-    display: none;
-  }
-
-  .app-bar-share-btn {
-    padding-inline: 10px;
-  }
-
   .app-bar-actions {
     gap: 6px;
   }
