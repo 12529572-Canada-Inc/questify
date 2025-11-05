@@ -224,13 +224,15 @@ async function logout() {
                 nav
                 class="app-bar-profile-menu"
               >
-                <template v-for="item in desktopMenuItems">
+                <template
+                  v-for="item in desktopMenuItems"
+                  :key="item.key"
+                >
                   <v-divider
                     v-if="item.dividerBefore"
                     :key="`${item.key}-divider`"
                   />
                   <v-list-item
-                    :key="item.key"
                     :prepend-icon="item.icon"
                     :title="item.label"
                     :data-testid="item.dataTestId"
