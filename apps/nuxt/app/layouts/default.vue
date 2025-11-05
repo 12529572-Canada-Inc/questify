@@ -36,12 +36,14 @@ watch(isMobile, (value) => {
   }
 })
 
-type MobileMenuItem = {
+type MenuItem = {
   key: string
   label: string
   icon: string
   action?: () => Promise<void> | void
   to?: string
+  dataTestId?: string
+  dividerBefore?: boolean
 }
 
 const profileInitials = computed(() => {
@@ -58,13 +60,14 @@ function openShareDialog() {
   profileMenuOpen.value = false
 }
 
-const mobileMenuItems = computed<MobileMenuItem[]>(() => {
-  const items: MobileMenuItem[] = [
+const menuItems = computed<MenuItem[]>(() => {
+  const items: MenuItem[] = [
     {
       key: 'share',
       label: 'Share App',
       icon: 'mdi-share-variant',
       action: openShareDialog,
+      dataTestId: 'app-bar-profile-menu-share',
     },
   ]
 
@@ -83,12 +86,15 @@ const mobileMenuItems = computed<MobileMenuItem[]>(() => {
       label: 'Profile',
       icon: 'mdi-account-circle',
       to: '/profile',
+      dataTestId: 'app-bar-profile-menu-profile',
     })
     items.push({
       key: 'logout',
       label: 'Logout',
       icon: 'mdi-logout',
       action: () => logout(),
+      dataTestId: 'app-bar-profile-menu-logout',
+      dividerBefore: true,
     })
   }
   else {
@@ -111,7 +117,15 @@ const mobileMenuItems = computed<MobileMenuItem[]>(() => {
   return items
 })
 
-async function handleMenuItemClick(item: MobileMenuItem) {
+const desktopMenuItems = computed(() =>
+  menuItems.value.filter(item => !['login', 'signup'].includes(item.key)),
+)
+
+const desktopGuestItems = computed(() =>
+  menuItems.value.filter(item => ['login', 'signup'].includes(item.key)),
+)
+
+async function handleMenuItemClick(item: MenuItem) {
   mobileMenuOpen.value = false
 
   if (item.action) {
@@ -210,50 +224,32 @@ async function logout() {
                 nav
                 class="app-bar-profile-menu"
               >
-                <v-list-item
-                  prepend-icon="mdi-share-variant"
-                  title="Share"
-                  data-testid="app-bar-profile-menu-share"
-                  @click="openShareDialog"
-                />
-                <v-list-item
-                  prepend-icon="mdi-account-circle"
-                  title="Profile"
-                  to="/profile"
-                  data-testid="app-bar-profile-menu-profile"
-                />
-                <v-list-item
-                  v-if="isAdmin"
-                  prepend-icon="mdi-shield-crown"
-                  title="Administration"
-                  to="/admin"
-                />
-                <v-divider />
-                <v-list-item
-                  prepend-icon="mdi-logout"
-                  title="Logout"
-                  data-testid="app-bar-profile-menu-logout"
-                  @click="logout"
-                />
+                <template v-for="item in desktopMenuItems">
+                  <v-divider
+                    v-if="item.dividerBefore"
+                    :key="`${item.key}-divider`"
+                  />
+                  <v-list-item
+                    :key="item.key"
+                    :prepend-icon="item.icon"
+                    :title="item.label"
+                    :data-testid="item.dataTestId"
+                    @click="handleMenuItemClick(item)"
+                  />
+                </template>
               </v-list>
             </v-menu>
           </template>
           <template v-else>
             <v-btn
+              v-for="item in desktopGuestItems"
+              :key="item.key"
               class="app-bar-auth__btn"
               variant="text"
               density="comfortable"
-              to="/auth/login"
+              @click="handleMenuItemClick(item)"
             >
-              Login
-            </v-btn>
-            <v-btn
-              class="app-bar-auth__btn"
-              variant="text"
-              density="comfortable"
-              to="/auth/signup"
-            >
-              Signup
+              {{ item.label }}
             </v-btn>
           </template>
         </div>
@@ -292,7 +288,7 @@ async function logout() {
             role="menu"
           >
             <v-list-item
-              v-for="item in mobileMenuItems"
+              v-for="item in menuItems"
               :key="item.key"
               :prepend-icon="item.icon"
               :title="item.label"
