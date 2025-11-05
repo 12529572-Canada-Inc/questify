@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useMediaQuery } from '@vueuse/core'
 import { useSnackbar } from '~/composables/useSnackbar'
 import { useAccessControl } from '~/composables/useAccessControl'
 import { useUserStore } from '~/stores/user'
 import { useQuestStore } from '~/stores/quest'
+import type { AppBarMenuItem } from '~/types/app-bar'
 
 const userStore = useUserStore()
 const questStore = useQuestStore()
@@ -16,11 +17,9 @@ const { showSnackbar } = useSnackbar()
 const { isAdmin } = useAccessControl()
 
 const { loggedIn, avatarUrl, user } = storeToRefs(userStore)
-const profileMenuOpen = ref(false)
 const MOBILE_MENU_BREAKPOINT = 768
 
 const isMobile = useMediaQuery(`(max-width: ${MOBILE_MENU_BREAKPOINT - 1}px)`)
-const mobileMenuOpen = ref(false)
 
 if (!loggedIn.value) {
   await userStore.fetchSession().catch(() => null)
@@ -29,22 +28,6 @@ if (!loggedIn.value) {
 const shareDialogOpen = ref(false)
 const loginShareUrl = computed(() => new URL('/auth/login', requestUrl.origin).toString())
 const homeRoute = computed(() => (loggedIn.value ? '/dashboard' : '/'))
-
-watch(isMobile, (value) => {
-  if (!value) {
-    mobileMenuOpen.value = false
-  }
-})
-
-type MenuItem = {
-  key: string
-  label: string
-  icon: string
-  action?: () => Promise<void> | void
-  to?: string
-  dataTestId?: string
-  dividerBefore?: boolean
-}
 
 const profileInitials = computed(() => {
   const name = user.value?.name?.trim()
@@ -57,11 +40,10 @@ const profileInitials = computed(() => {
 
 function openShareDialog() {
   shareDialogOpen.value = true
-  profileMenuOpen.value = false
 }
 
-const menuItems = computed<MenuItem[]>(() => {
-  const items: MenuItem[] = [
+const menuItems = computed<AppBarMenuItem[]>(() => {
+  const items: AppBarMenuItem[] = [
     {
       key: 'share',
       label: 'Share App',
@@ -117,29 +99,16 @@ const menuItems = computed<MenuItem[]>(() => {
   return items
 })
 
-const desktopMenuItems = computed(() =>
+const desktopMenuItems = computed<AppBarMenuItem[]>(() =>
   menuItems.value.filter(item => !['login', 'signup'].includes(item.key)),
 )
 
-const desktopGuestItems = computed(() =>
+const desktopGuestItems = computed<AppBarMenuItem[]>(() =>
   menuItems.value.filter(item => ['login', 'signup'].includes(item.key)),
 )
 
-async function handleMenuItemClick(item: MenuItem) {
-  mobileMenuOpen.value = false
-
-  if (item.action) {
-    await item.action()
-  }
-
-  if (item.to) {
-    await router.push(item.to)
-  }
-}
-
 async function logout() {
   try {
-    profileMenuOpen.value = false
     await $fetch('/api/auth/logout', {
       method: 'POST',
     })
@@ -183,124 +152,15 @@ async function logout() {
           </span>
         </NuxtLink>
       </v-app-bar-title>
-      <div
-        class="app-bar-actions"
-        :class="{ 'app-bar-actions--hidden': isMobile }"
-      >
-        <div class="app-bar-auth">
-          <template v-if="loggedIn">
-            <v-menu
-              v-model="profileMenuOpen"
-              location="bottom end"
-              :close-on-content-click="true"
-              transition="scale-transition"
-            >
-              <template #activator="{ props }">
-                <v-btn
-                  class="app-bar-profile-btn"
-                  variant="text"
-                  density="comfortable"
-                  aria-label="Open profile menu"
-                  v-bind="props"
-                >
-                  <v-avatar size="36">
-                    <template v-if="avatarUrl">
-                      <v-img
-                        :src="avatarUrl"
-                        alt="Profile avatar"
-                        cover
-                      />
-                    </template>
-                    <template v-else>
-                      <span class="app-bar-profile-initials">
-                        {{ profileInitials }}
-                      </span>
-                    </template>
-                  </v-avatar>
-                </v-btn>
-              </template>
-              <v-list
-                density="comfortable"
-                nav
-                class="app-bar-profile-menu"
-              >
-                <template
-                  v-for="item in desktopMenuItems"
-                  :key="item.key"
-                >
-                  <v-divider
-                    v-if="item.dividerBefore"
-                    :key="`${item.key}-divider`"
-                  />
-                  <v-list-item
-                    :prepend-icon="item.icon"
-                    :title="item.label"
-                    :data-testid="item.dataTestId"
-                    @click="handleMenuItemClick(item)"
-                  />
-                </template>
-              </v-list>
-            </v-menu>
-          </template>
-          <template v-else>
-            <v-btn
-              v-for="item in desktopGuestItems"
-              :key="item.key"
-              class="app-bar-auth__btn"
-              variant="text"
-              density="comfortable"
-              @click="handleMenuItemClick(item)"
-            >
-              {{ item.label }}
-            </v-btn>
-          </template>
-        </div>
-      </div>
-      <div
-        class="app-bar-mobile-actions"
-        :class="{ 'app-bar-mobile-actions--visible': isMobile }"
-      >
-        <v-menu
-          v-model="mobileMenuOpen"
-          class="app-bar-mobile-menu"
-          max-width="280"
-          :close-on-content-click="false"
-          transition="scale-transition"
-        >
-          <template #activator="{ props: activatorProps }">
-            <v-btn
-              class="app-bar-menu-btn"
-              icon
-              variant="tonal"
-              color="primary"
-              density="comfortable"
-              aria-label="Open navigation menu"
-              v-bind="activatorProps"
-              :aria-expanded="mobileMenuOpen"
-              aria-haspopup="menu"
-              data-testid="app-bar-menu-button"
-            >
-              <v-icon icon="mdi-menu" />
-            </v-btn>
-          </template>
-          <v-list
-            class="app-bar-menu-list"
-            density="comfortable"
-            nav
-            role="menu"
-          >
-            <v-list-item
-              v-for="item in menuItems"
-              :key="item.key"
-              :prepend-icon="item.icon"
-              :title="item.label"
-              :data-testid="`app-bar-menu-item-${item.key}`"
-              role="menuitem"
-              @click="handleMenuItemClick(item)"
-            />
-          </v-list>
-        </v-menu>
-      </div>
+      <AppBarMenu
+        :is-mobile="isMobile"
+        :logged-in="loggedIn"
+        :avatar-url="avatarUrl"
+        :profile-initials="profileInitials"
+        :menu-items="menuItems"
+        :desktop-menu-items="desktopMenuItems"
+        :desktop-guest-items="desktopGuestItems"
+      />
     </v-app-bar>
     <slot />
     <ShareDialog
@@ -356,79 +216,6 @@ async function logout() {
   padding: 0;
 }
 
-.app-bar-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-left: auto;
-  min-width: 0;
-}
-
-.app-bar-mobile-actions {
-  display: none;
-  align-items: center;
-  margin-left: auto;
-}
-
-.app-bar-actions--hidden {
-  display: none;
-}
-
-.app-bar-mobile-actions--visible {
-  display: flex;
-}
-
-.app-bar-menu-btn {
-  width: 42px;
-  height: 42px;
-  border-radius: 14px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
-}
-
-.app-bar-menu-list {
-  min-width: 220px;
-}
-
-.app-bar-auth {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-}
-
-.app-bar-auth__btn {
-  min-width: 0;
-}
-
-.app-bar-profile-btn {
-  min-width: 0;
-  padding: 4px;
-}
-
-.app-bar-profile-initials {
-  font-weight: 600;
-  font-size: 0.9rem;
-  letter-spacing: 0.02em;
-}
-
-.app-bar-profile-menu {
-  min-width: 200px;
-}
-
-@media (max-width: 767px) {
-  .app-bar-actions {
-    display: none;
-  }
-
-  .app-bar-mobile-actions {
-    display: flex;
-  }
-}
-
 @media (max-width: 600px) {
   .app-title-logo {
     width: 2rem;
@@ -441,28 +228,6 @@ async function logout() {
 
   .app-bar :deep(.v-toolbar__content) {
     align-items: stretch;
-  }
-
-  .app-bar-actions {
-    width: 100%;
-    justify-content: space-between;
-    gap: 10px;
-  }
-
-  .app-bar-auth {
-    flex: 1 1 auto;
-    justify-content: flex-end;
-    gap: 6px;
-  }
-
-  .app-bar-auth__btn {
-    flex: 1 1 0;
-  }
-}
-
-@media (max-width: 420px) {
-  .app-bar-actions {
-    gap: 6px;
   }
 }
 </style>
