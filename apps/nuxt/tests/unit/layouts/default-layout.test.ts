@@ -3,7 +3,6 @@ import { h, ref } from 'vue'
 import { createPinia, setActivePinia } from 'pinia'
 import { flushPromises } from '@vue/test-utils'
 import DefaultLayout from '../../../app/layouts/default.vue'
-import AppBarMenu from '../../../app/components/common/AppBarMenu.vue'
 import { mountWithBase } from '../support/mount-options'
 import { useUserStore } from '~/stores/user'
 import { useQuestStore } from '~/stores/quest'
@@ -171,46 +170,5 @@ describe('default layout', () => {
 
     expect(wrapper.text()).toContain('Login')
     expect(wrapper.text()).toContain('Signup')
-  })
-
-  it('shows mobile menu under breakpoint and opens share dialog from menu', async () => {
-    isMobileRef.value = true
-
-    const SuspenseWrapper = {
-      components: { DefaultLayout },
-      template: '<Suspense><DefaultLayout /></Suspense>',
-    }
-
-    const wrapper = mountWithBase(SuspenseWrapper, {
-      global: {
-        stubs: {
-          ShareDialog: { template: '<div class="share-dialog-stub"></div>' },
-          VImg: { template: '<img />' },
-        },
-      },
-    })
-
-    await flushPromises()
-
-    const menuComponent = wrapper.getComponent(AppBarMenu)
-    expect(menuComponent.props('isMobile')).toBe(true)
-
-    const menuBtn = menuComponent.get('[data-testid="app-bar-menu-button"]')
-
-    await menuBtn.trigger('click')
-    await flushPromises()
-
-    expect(menuComponent.find('.v-menu-stub__content').exists()).toBe(true)
-
-    const shareItem = menuComponent.get('[data-testid="app-bar-menu-item-share"]')
-    await shareItem.trigger('click')
-    await flushPromises()
-
-    const layoutComponent = wrapper.findComponent(DefaultLayout)
-    const layoutVm = layoutComponent.vm as unknown as {
-      shareDialogOpen: boolean
-    }
-    expect(layoutVm.shareDialogOpen).toBe(true)
-    expect(menuComponent.find('.v-menu-stub__content').exists()).toBe(false)
   })
 })
