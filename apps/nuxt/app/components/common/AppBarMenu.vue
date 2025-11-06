@@ -3,7 +3,6 @@ import { ref, watch } from 'vue'
 import type { AppBarMenuItem } from '~/types/app-bar'
 
 const props = defineProps<{
-  isMobile: boolean
   loggedIn: boolean
   avatarUrl?: string | null
   profileInitials: string
@@ -15,16 +14,6 @@ const props = defineProps<{
 const profileMenuOpen = ref(false)
 const menuOpen = ref(false)
 const router = useRouter()
-
-watch(
-  () => props.isMobile,
-  (value) => {
-    menuOpen.value = false
-    if (value) {
-      profileMenuOpen.value = false
-    }
-  },
-)
 
 watch(
   () => props.loggedIn,
@@ -50,120 +39,76 @@ async function onMenuItemSelect(item: AppBarMenuItem) {
 
 <template>
   <div class="app-bar-controls">
-    <template v-if="isMobile">
-      <v-menu
-        v-model="menuOpen"
-        class="app-bar-controls__menu"
-        max-width="280"
-        :close-on-content-click="false"
-        transition="scale-transition"
-      >
-        <template #activator="{ props: activatorProps }">
-          <v-btn
-            class="app-bar-menu-btn"
-            icon
-            variant="tonal"
-            color="primary"
-            density="comfortable"
-            aria-label="Open navigation menu"
-            v-bind="activatorProps"
-            :aria-expanded="menuOpen"
-            aria-haspopup="menu"
-            data-testid="app-bar-menu-button"
-          >
-            <v-icon icon="mdi-menu" />
-          </v-btn>
-        </template>
-        <v-list
-          class="app-bar-menu-list"
-          density="comfortable"
-          nav
-          role="menu"
+    <div class="app-bar-auth">
+      <template v-if="loggedIn">
+        <v-menu
+          v-model="profileMenuOpen"
+          location="bottom end"
+          :close-on-content-click="true"
+          transition="scale-transition"
         >
-          <v-list-item
-            v-for="item in menuItems"
-            :key="item.key"
-            :prepend-icon="item.icon"
-            :title="item.label"
-            :data-testid="`app-bar-menu-item-${item.key}`"
-            role="menuitem"
-            @click="onMenuItemSelect(item)"
-          />
-        </v-list>
-      </v-menu>
-    </template>
-    <template v-else>
-      <div class="app-bar-auth">
-        <template v-if="loggedIn">
-          <v-menu
-            v-model="profileMenuOpen"
-            location="bottom end"
-            :close-on-content-click="true"
-            transition="scale-transition"
-          >
-            <template #activator="{ props: activatorProps }">
-              <v-btn
-                class="app-bar-profile-btn"
-                variant="flat"
-                color="primary"
-                size="36"
-                v-bind="activatorProps"
-              >
-                <template v-if="avatarUrl">
-                  <v-avatar>
-                    <v-img
-                      :src="avatarUrl"
-                      alt="Profile avatar"
-                      cover
-                    />
-                  </v-avatar>
-                </template>
-                <template v-else>
-                  <span
-                    class="app-bar-profile-initials"
-                  >
-                    {{ profileInitials }}
-                  </span>
-                </template>
-              </v-btn>
-            </template>
-            <v-list
-              density="comfortable"
-              nav
-              class="app-bar-profile-menu"
+          <template #activator="{ props: activatorProps }">
+            <v-btn
+              class="app-bar-profile-btn"
+              variant="flat"
+              color="primary"
+              size="36"
+              v-bind="activatorProps"
             >
-              <template
-                v-for="item in desktopMenuItems"
-                :key="item.key"
-              >
-                <v-divider
-                  v-if="item.dividerBefore"
-                  :key="`${item.key}-divider`"
-                />
-                <v-list-item
-                  :prepend-icon="item.icon"
-                  :title="item.label"
-                  :data-testid="item.dataTestId"
-                  @click="onMenuItemSelect(item)"
-                />
+              <template v-if="avatarUrl">
+                <v-avatar>
+                  <v-img
+                    :src="avatarUrl"
+                    alt="Profile avatar"
+                    cover
+                  />
+                </v-avatar>
               </template>
-            </v-list>
-          </v-menu>
-        </template>
-        <template v-else>
-          <v-btn
-            v-for="item in desktopGuestItems"
-            :key="item.key"
-            class="app-bar-auth__btn"
-            variant="text"
+              <template v-else>
+                <span
+                  class="app-bar-profile-initials"
+                >
+                  {{ profileInitials }}
+                </span>
+              </template>
+            </v-btn>
+          </template>
+          <v-list
             density="comfortable"
-            @click="onMenuItemSelect(item)"
+            nav
+            class="app-bar-profile-menu"
           >
-            {{ item.label }}
-          </v-btn>
-        </template>
-      </div>
-    </template>
+            <template
+              v-for="item in desktopMenuItems"
+              :key="item.key"
+            >
+              <v-divider
+                v-if="item.dividerBefore"
+                :key="`${item.key}-divider`"
+              />
+              <v-list-item
+                :prepend-icon="item.icon"
+                :title="item.label"
+                :data-testid="item.dataTestId"
+                @click="onMenuItemSelect(item)"
+              />
+            </template>
+          </v-list>
+        </v-menu>
+      </template>
+      <template v-else>
+        <v-btn
+          v-for="item in desktopGuestItems"
+          :key="item.key"
+          class="app-bar-auth__btn"
+          variant="text"
+          density="comfortable"
+          @click="onMenuItemSelect(item)"
+        >
+          {{ item.label }}
+        </v-btn>
+      </template>
+    </div>
   </div>
 </template>
 

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useMediaQuery } from '@vueuse/core'
 import { useSnackbar } from '~/composables/useSnackbar'
 import { useAccessControl } from '~/composables/useAccessControl'
 import { useUserStore } from '~/stores/user'
@@ -17,9 +16,6 @@ const { showSnackbar } = useSnackbar()
 const { isAdmin } = useAccessControl()
 
 const { loggedIn, avatarUrl, user } = storeToRefs(userStore)
-const MOBILE_MENU_BREAKPOINT = 768
-
-const isMobile = useMediaQuery(`(max-width: ${MOBILE_MENU_BREAKPOINT - 1}px)`)
 
 if (!loggedIn.value) {
   await userStore.fetchSession().catch(() => null)
@@ -153,7 +149,6 @@ async function logout() {
         </NuxtLink>
       </v-app-bar-title>
       <AppBarMenu
-        :is-mobile="isMobile"
         :logged-in="loggedIn"
         :avatar-url="avatarUrl"
         :profile-initials="profileInitials"
