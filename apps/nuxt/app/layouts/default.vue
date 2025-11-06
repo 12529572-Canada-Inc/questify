@@ -95,11 +95,11 @@ const menuItems = computed<AppBarMenuItem[]>(() => {
   return items
 })
 
-const desktopMenuItems = computed<AppBarMenuItem[]>(() =>
+const userMenuItems = computed<AppBarMenuItem[]>(() =>
   menuItems.value.filter(item => !['login', 'signup'].includes(item.key)),
 )
 
-const desktopGuestItems = computed<AppBarMenuItem[]>(() =>
+const guestMenuItems = computed<AppBarMenuItem[]>(() =>
   menuItems.value.filter(item => ['login', 'signup'].includes(item.key)),
 )
 
@@ -152,9 +152,8 @@ async function logout() {
         :logged-in="loggedIn"
         :avatar-url="avatarUrl"
         :profile-initials="profileInitials"
-        :menu-items="menuItems"
-        :desktop-menu-items="desktopMenuItems"
-        :desktop-guest-items="desktopGuestItems"
+        :user-menu-items="userMenuItems"
+        :guest-menu-items="guestMenuItems"
       />
     </v-app-bar>
     <slot />

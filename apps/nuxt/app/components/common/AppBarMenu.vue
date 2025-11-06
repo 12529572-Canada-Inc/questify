@@ -6,9 +6,8 @@ const props = defineProps<{
   loggedIn: boolean
   avatarUrl?: string | null
   profileInitials: string
-  menuItems: AppBarMenuItem[]
-  desktopMenuItems: AppBarMenuItem[]
-  desktopGuestItems: AppBarMenuItem[]
+  userMenuItems: AppBarMenuItem[]
+  guestMenuItems: AppBarMenuItem[]
 }>()
 
 const profileMenuOpen = ref(false)
@@ -79,7 +78,7 @@ async function onMenuItemSelect(item: AppBarMenuItem) {
             class="app-bar-profile-menu"
           >
             <template
-              v-for="item in desktopMenuItems"
+              v-for="item in userMenuItems"
               :key="item.key"
             >
               <v-divider
@@ -98,7 +97,7 @@ async function onMenuItemSelect(item: AppBarMenuItem) {
       </template>
       <template v-else>
         <v-btn
-          v-for="item in desktopGuestItems"
+          v-for="item in guestMenuItems"
           :key="item.key"
           class="app-bar-auth__btn"
           variant="text"
