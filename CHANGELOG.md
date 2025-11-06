@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.12.1] - 2025-11-06
+
+### 🛠 Fixes
+- Added missed changes from 1.12.0 version, including updates to the header menu for mobile responsiveness general improvements.
+
+---
+
 ## [1.12.0] - 2025-11-06
 
 ### 🚀 Features
