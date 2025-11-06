@@ -3,6 +3,7 @@ import { h, ref } from 'vue'
 import { createPinia, setActivePinia } from 'pinia'
 import { flushPromises } from '@vue/test-utils'
 import DefaultLayout from '../../../app/layouts/default.vue'
+import AppBarMenu from '../../../app/components/common/AppBarMenu.vue'
 import { mountWithBase } from '../support/mount-options'
 import { useUserStore } from '~/stores/user'
 import { useQuestStore } from '~/stores/quest'
@@ -191,27 +192,25 @@ describe('default layout', () => {
 
     await flushPromises()
 
-    const desktopActions = wrapper.get('.app-bar-actions')
-    expect(desktopActions.classes()).toContain('app-bar-actions--hidden')
+    const menuComponent = wrapper.getComponent(AppBarMenu)
+    expect(menuComponent.props('isMobile')).toBe(true)
 
-    const mobileActions = wrapper.get('.app-bar-mobile-actions')
-    expect(mobileActions.classes()).toContain('app-bar-mobile-actions--visible')
-    const menuBtn = wrapper.find('[data-testid="app-bar-menu-button"]')
-    expect(menuBtn.exists()).toBe(true)
+    const menuBtn = menuComponent.get('[data-testid="app-bar-menu-button"]')
 
     await menuBtn.trigger('click')
     await flushPromises()
 
-    const shareItem = wrapper.get('[data-testid="app-bar-menu-item-share"]')
+    expect(menuComponent.find('.v-menu-stub__content').exists()).toBe(true)
+
+    const shareItem = menuComponent.get('[data-testid="app-bar-menu-item-share"]')
     await shareItem.trigger('click')
     await flushPromises()
 
     const layoutComponent = wrapper.findComponent(DefaultLayout)
     const layoutVm = layoutComponent.vm as unknown as {
       shareDialogOpen: boolean
-      mobileMenuOpen: boolean
     }
     expect(layoutVm.shareDialogOpen).toBe(true)
-    expect(layoutVm.mobileMenuOpen).toBe(false)
+    expect(menuComponent.find('.v-menu-stub__content').exists()).toBe(false)
   })
 })

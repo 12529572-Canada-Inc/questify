@@ -6,6 +6,7 @@ import { useAccessControl } from '~/composables/useAccessControl'
 import { useUserStore } from '~/stores/user'
 import { useQuestStore } from '~/stores/quest'
 import type { AppBarMenuItem } from '~/types/app-bar'
+import AppBarMenu from '~/components/common/AppBarMenu.vue'
 
 const userStore = useUserStore()
 const questStore = useQuestStore()
