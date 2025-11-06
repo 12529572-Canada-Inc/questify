@@ -120,7 +120,7 @@ describe('default layout', () => {
     // Wait for async setup to complete
     await flushPromises()
 
-    const profileActivator = wrapper.get('button[aria-label="Open profile menu"]')
+    const profileActivator = wrapper.get('.app-bar-profile-btn')
     await profileActivator.trigger('click')
 
     const logoutItem = wrapper.get('[data-testid="app-bar-profile-menu-logout"]')
