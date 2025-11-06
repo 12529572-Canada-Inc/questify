@@ -49,7 +49,7 @@ test.describe('Mobile responsiveness', () => {
     })
     expect(formHasOverflow).toBeFalsy()
 
-    const submitButton = page.getByRole('button', { name: /^Login$/ })
+    const submitButton = page.locator('form button[type="submit"]').filter({ hasText: /^Login$/ }).first()
     await expect(submitButton).toBeVisible()
 
     const buttonFits = await submitButton.evaluate((element) => {
