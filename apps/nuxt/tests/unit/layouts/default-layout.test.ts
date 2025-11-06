@@ -16,14 +16,9 @@ const fetchSession = vi.fn().mockResolvedValue(undefined)
 const fetchApi = vi.fn().mockResolvedValue(undefined)
 const clearSession = vi.fn()
 const mockTheme = { global: { name: { value: 'light' as 'light' | 'dark' } } }
-const isMobileRef = ref(false)
 
 vi.mock('vuetify', () => ({
   useTheme: () => mockTheme,
-}))
-
-vi.mock('@vueuse/core', () => ({
-  useMediaQuery: () => isMobileRef,
 }))
 
 beforeEach(() => {
@@ -36,7 +31,6 @@ beforeEach(() => {
   clearSession.mockReset()
   fetchSession.mockReset()
   fetchApi.mockReset()
-  isMobileRef.value = false
 
   const sessionUser = ref({ id: 'user-1' })
   vi.stubGlobal('useUserSession', () => ({

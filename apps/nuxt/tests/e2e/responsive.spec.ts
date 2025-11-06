@@ -59,24 +59,23 @@ test.describe('Mobile responsiveness', () => {
     expect(buttonFits).toBeTruthy()
   })
 
-  test('header menu collapses actions and keeps controls accessible', async ({ page }) => {
+  test('header actions remain usable on mobile', async ({ page }) => {
     await page.goto('/')
 
-    const menuButton = page.getByTestId('app-bar-menu-button')
-    await menuButton.waitFor({ state: 'visible' })
+    const headerLoginButton = page.locator('header').getByRole('button', { name: 'Login' })
+    await expect(headerLoginButton).toBeVisible()
 
-    await menuButton.click()
-    const shareItem = page.getByTestId('app-bar-menu-item-share')
-    await expect(shareItem).toBeVisible()
+    const headerSignupButton = page.locator('header').getByRole('button', { name: 'Signup' })
+    await expect(headerSignupButton).toBeVisible()
 
-    await shareItem.click()
-
-    const shareDialog = page.getByTestId('share-dialog-card')
-    await expect(shareDialog).toBeVisible()
-
-    await expect(page.getByTestId('app-bar-menu-item-share')).toBeHidden()
-
-    await page.getByTestId('share-dialog-close').click()
-    await expect(shareDialog).toBeHidden()
+    const buttonsFit = await Promise.all(
+      [headerLoginButton, headerSignupButton].map(async (button) => {
+        return await button.evaluate((element) => {
+          const rect = element.getBoundingClientRect()
+          return rect.right <= window.innerWidth + 1
+        })
+      }),
+    )
+    expect(buttonsFit.every(Boolean)).toBeTruthy()
   })
 })
