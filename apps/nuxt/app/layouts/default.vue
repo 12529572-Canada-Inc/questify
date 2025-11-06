@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useMediaQuery } from '@vueuse/core'
 import { useSnackbar } from '~/composables/useSnackbar'
 import { useAccessControl } from '~/composables/useAccessControl'
 import { useUserStore } from '~/stores/user'
 import { useQuestStore } from '~/stores/quest'
+import type { AppBarMenuItem } from '~/types/app-bar'
+import AppBarMenu from '~/components/common/AppBarMenu.vue'
 
 const userStore = useUserStore()
 const questStore = useQuestStore()
@@ -16,11 +17,6 @@ const { showSnackbar } = useSnackbar()
 const { isAdmin } = useAccessControl()
 
 const { loggedIn, avatarUrl, user } = storeToRefs(userStore)
-const profileMenuOpen = ref(false)
-const MOBILE_MENU_BREAKPOINT = 768
-
-const isMobile = useMediaQuery(`(max-width: ${MOBILE_MENU_BREAKPOINT - 1}px)`)
-const mobileMenuOpen = ref(false)
 
 if (!loggedIn.value) {
   await userStore.fetchSession().catch(() => null)
@@ -29,20 +25,6 @@ if (!loggedIn.value) {
 const shareDialogOpen = ref(false)
 const loginShareUrl = computed(() => new URL('/auth/login', requestUrl.origin).toString())
 const homeRoute = computed(() => (loggedIn.value ? '/dashboard' : '/'))
-
-watch(isMobile, (value) => {
-  if (!value) {
-    mobileMenuOpen.value = false
-  }
-})
-
-type MobileMenuItem = {
-  key: string
-  label: string
-  icon: string
-  action?: () => Promise<void> | void
-  to?: string
-}
 
 const profileInitials = computed(() => {
   const name = user.value?.name?.trim()
@@ -53,15 +35,18 @@ const profileInitials = computed(() => {
   return email ? email.charAt(0).toUpperCase() : 'U'
 })
 
-const mobileMenuItems = computed<MobileMenuItem[]>(() => {
-  const items: MobileMenuItem[] = [
+function openShareDialog() {
+  shareDialogOpen.value = true
+}
+
+const menuItems = computed<AppBarMenuItem[]>(() => {
+  const items: AppBarMenuItem[] = [
     {
       key: 'share',
       label: 'Share App',
       icon: 'mdi-share-variant',
-      action: () => {
-        shareDialogOpen.value = true
-      },
+      action: openShareDialog,
+      dataTestId: 'app-bar-profile-menu-share',
     },
   ]
 
@@ -80,12 +65,15 @@ const mobileMenuItems = computed<MobileMenuItem[]>(() => {
       label: 'Profile',
       icon: 'mdi-account-circle',
       to: '/profile',
+      dataTestId: 'app-bar-profile-menu-profile',
     })
     items.push({
       key: 'logout',
       label: 'Logout',
       icon: 'mdi-logout',
       action: () => logout(),
+      dataTestId: 'app-bar-profile-menu-logout',
+      dividerBefore: true,
     })
   }
   else {
@@ -108,21 +96,16 @@ const mobileMenuItems = computed<MobileMenuItem[]>(() => {
   return items
 })
 
-async function handleMenuItemClick(item: MobileMenuItem) {
-  mobileMenuOpen.value = false
+const userMenuItems = computed<AppBarMenuItem[]>(() =>
+  menuItems.value.filter(item => !['login', 'signup'].includes(item.key)),
+)
 
-  if (item.action) {
-    await item.action()
-  }
-
-  if (item.to) {
-    await router.push(item.to)
-  }
-}
+const guestMenuItems = computed<AppBarMenuItem[]>(() =>
+  menuItems.value.filter(item => ['login', 'signup'].includes(item.key)),
+)
 
 async function logout() {
   try {
-    profileMenuOpen.value = false
     await $fetch('/api/auth/logout', {
       method: 'POST',
     })
@@ -166,150 +149,13 @@ async function logout() {
           </span>
         </NuxtLink>
       </v-app-bar-title>
-      <div
-        class="app-bar-actions"
-        :class="{ 'app-bar-actions--hidden': isMobile }"
-      >
-        <v-btn
-          class="app-bar-share-btn"
-          variant="text"
-          color="primary"
-          aria-label="Share Questify"
-          density="comfortable"
-          @click="shareDialogOpen = true"
-        >
-          <v-icon
-            icon="mdi-share-variant"
-            size="20"
-            class="app-bar-share-icon"
-          />
-          <span class="app-bar-share-label">
-            Share App
-          </span>
-        </v-btn>
-        <div class="app-bar-auth">
-          <template v-if="loggedIn">
-            <v-menu
-              v-model="profileMenuOpen"
-              location="bottom end"
-              :close-on-content-click="true"
-              transition="scale-transition"
-            >
-              <template #activator="{ props }">
-                <v-btn
-                  class="app-bar-profile-btn"
-                  variant="text"
-                  density="comfortable"
-                  aria-label="Open profile menu"
-                  v-bind="props"
-                >
-                  <v-avatar size="36">
-                    <template v-if="avatarUrl">
-                      <v-img
-                        :src="avatarUrl"
-                        alt="Profile avatar"
-                        cover
-                      />
-                    </template>
-                    <template v-else>
-                      <span class="app-bar-profile-initials">
-                        {{ profileInitials }}
-                      </span>
-                    </template>
-                  </v-avatar>
-                </v-btn>
-              </template>
-              <v-list
-                density="comfortable"
-                nav
-                class="app-bar-profile-menu"
-              >
-                <v-list-item
-                  prepend-icon="mdi-account-circle"
-                  title="Profile"
-                  to="/profile"
-                  data-testid="app-bar-profile-menu-profile"
-                />
-                <v-list-item
-                  v-if="isAdmin"
-                  prepend-icon="mdi-shield-crown"
-                  title="Administration"
-                  to="/admin"
-                />
-                <v-divider />
-                <v-list-item
-                  prepend-icon="mdi-logout"
-                  title="Logout"
-                  data-testid="app-bar-profile-menu-logout"
-                  @click="logout"
-                />
-              </v-list>
-            </v-menu>
-          </template>
-          <template v-else>
-            <v-btn
-              class="app-bar-auth__btn"
-              variant="text"
-              density="comfortable"
-              to="/auth/login"
-            >
-              Login
-            </v-btn>
-            <v-btn
-              class="app-bar-auth__btn"
-              variant="text"
-              density="comfortable"
-              to="/auth/signup"
-            >
-              Signup
-            </v-btn>
-          </template>
-        </div>
-      </div>
-      <div
-        class="app-bar-mobile-actions"
-        :class="{ 'app-bar-mobile-actions--visible': isMobile }"
-      >
-        <v-menu
-          v-model="mobileMenuOpen"
-          class="app-bar-mobile-menu"
-          max-width="280"
-          :close-on-content-click="false"
-          transition="scale-transition"
-        >
-          <template #activator="{ props: activatorProps }">
-            <v-btn
-              class="app-bar-menu-btn"
-              icon
-              variant="text"
-              color="primary"
-              aria-label="Open navigation menu"
-              v-bind="activatorProps"
-              :aria-expanded="mobileMenuOpen"
-              aria-haspopup="menu"
-              data-testid="app-bar-menu-button"
-            >
-              <v-icon icon="mdi-menu" />
-            </v-btn>
-          </template>
-          <v-list
-            class="app-bar-menu-list"
-            density="comfortable"
-            nav
-            role="menu"
-          >
-            <v-list-item
-              v-for="item in mobileMenuItems"
-              :key="item.key"
-              :prepend-icon="item.icon"
-              :title="item.label"
-              :data-testid="`app-bar-menu-item-${item.key}`"
-              role="menuitem"
-              @click="handleMenuItemClick(item)"
-            />
-          </v-list>
-        </v-menu>
-      </div>
+      <AppBarMenu
+        :logged-in="loggedIn"
+        :avatar-url="avatarUrl"
+        :profile-initials="profileInitials"
+        :user-menu-items="userMenuItems"
+        :guest-menu-items="guestMenuItems"
+      />
     </v-app-bar>
     <slot />
     <ShareDialog
@@ -365,85 +211,6 @@ async function logout() {
   padding: 0;
 }
 
-.app-bar-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-left: auto;
-  min-width: 0;
-}
-
-.app-bar-mobile-actions {
-  display: none;
-  align-items: center;
-  margin-left: auto;
-}
-
-.app-bar-actions--hidden {
-  display: none;
-}
-
-.app-bar-mobile-actions--visible {
-  display: flex;
-}
-
-.app-bar-menu-btn {
-  width: 48px;
-  height: 48px;
-}
-
-.app-bar-menu-list {
-  min-width: 220px;
-}
-
-.app-bar-share-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-width: 0;
-  padding-inline: 10px 14px;
-}
-
-.app-bar-share-icon {
-  flex: 0 0 auto;
-}
-
-.app-bar-auth {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-}
-
-.app-bar-auth__btn {
-  min-width: 0;
-}
-
-.app-bar-profile-btn {
-  min-width: 0;
-  padding: 4px;
-}
-
-.app-bar-profile-initials {
-  font-weight: 600;
-  font-size: 0.9rem;
-  letter-spacing: 0.02em;
-}
-
-.app-bar-profile-menu {
-  min-width: 200px;
-}
-
-@media (max-width: 767px) {
-  .app-bar-actions {
-    display: none;
-  }
-
-  .app-bar-mobile-actions {
-    display: flex;
-  }
-}
-
 @media (max-width: 600px) {
   .app-title-logo {
     width: 2rem;
@@ -456,36 +223,6 @@ async function logout() {
 
   .app-bar :deep(.v-toolbar__content) {
     align-items: stretch;
-  }
-
-  .app-bar-actions {
-    width: 100%;
-    justify-content: space-between;
-    gap: 10px;
-  }
-
-  .app-bar-auth {
-    flex: 1 1 auto;
-    justify-content: flex-end;
-    gap: 6px;
-  }
-
-  .app-bar-auth__btn {
-    flex: 1 1 0;
-  }
-}
-
-@media (max-width: 420px) {
-  .app-bar-share-label {
-    display: none;
-  }
-
-  .app-bar-share-btn {
-    padding-inline: 10px;
-  }
-
-  .app-bar-actions {
-    gap: 6px;
   }
 }
 </style>

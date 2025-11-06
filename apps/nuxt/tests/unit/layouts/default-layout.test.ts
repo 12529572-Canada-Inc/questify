@@ -16,14 +16,9 @@ const fetchSession = vi.fn().mockResolvedValue(undefined)
 const fetchApi = vi.fn().mockResolvedValue(undefined)
 const clearSession = vi.fn()
 const mockTheme = { global: { name: { value: 'light' as 'light' | 'dark' } } }
-const isMobileRef = ref(false)
 
 vi.mock('vuetify', () => ({
   useTheme: () => mockTheme,
-}))
-
-vi.mock('@vueuse/core', () => ({
-  useMediaQuery: () => isMobileRef,
 }))
 
 beforeEach(() => {
@@ -36,7 +31,6 @@ beforeEach(() => {
   clearSession.mockReset()
   fetchSession.mockReset()
   fetchApi.mockReset()
-  isMobileRef.value = false
 
   const sessionUser = ref({ id: 'user-1' })
   vi.stubGlobal('useUserSession', () => ({
@@ -120,7 +114,7 @@ describe('default layout', () => {
     // Wait for async setup to complete
     await flushPromises()
 
-    const profileActivator = wrapper.get('button[aria-label="Open profile menu"]')
+    const profileActivator = wrapper.get('.app-bar-profile-btn')
     await profileActivator.trigger('click')
 
     const logoutItem = wrapper.get('[data-testid="app-bar-profile-menu-logout"]')
@@ -170,48 +164,5 @@ describe('default layout', () => {
 
     expect(wrapper.text()).toContain('Login')
     expect(wrapper.text()).toContain('Signup')
-  })
-
-  it('shows mobile menu under breakpoint and opens share dialog from menu', async () => {
-    isMobileRef.value = true
-
-    const SuspenseWrapper = {
-      components: { DefaultLayout },
-      template: '<Suspense><DefaultLayout /></Suspense>',
-    }
-
-    const wrapper = mountWithBase(SuspenseWrapper, {
-      global: {
-        stubs: {
-          ShareDialog: { template: '<div class="share-dialog-stub"></div>' },
-          VImg: { template: '<img />' },
-        },
-      },
-    })
-
-    await flushPromises()
-
-    const desktopActions = wrapper.get('.app-bar-actions')
-    expect(desktopActions.classes()).toContain('app-bar-actions--hidden')
-
-    const mobileActions = wrapper.get('.app-bar-mobile-actions')
-    expect(mobileActions.classes()).toContain('app-bar-mobile-actions--visible')
-    const menuBtn = wrapper.find('[data-testid="app-bar-menu-button"]')
-    expect(menuBtn.exists()).toBe(true)
-
-    await menuBtn.trigger('click')
-    await flushPromises()
-
-    const shareItem = wrapper.get('[data-testid="app-bar-menu-item-share"]')
-    await shareItem.trigger('click')
-    await flushPromises()
-
-    const layoutComponent = wrapper.findComponent(DefaultLayout)
-    const layoutVm = layoutComponent.vm as unknown as {
-      shareDialogOpen: boolean
-      mobileMenuOpen: boolean
-    }
-    expect(layoutVm.shareDialogOpen).toBe(true)
-    expect(layoutVm.mobileMenuOpen).toBe(false)
   })
 })
