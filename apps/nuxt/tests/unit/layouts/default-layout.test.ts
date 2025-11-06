@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { ref } from 'vue'
+import { h, ref } from 'vue'
 import { createPinia, setActivePinia } from 'pinia'
 import { flushPromises } from '@vue/test-utils'
 import DefaultLayout from '../../../app/layouts/default.vue'
@@ -8,6 +8,8 @@ import { useUserStore } from '~/stores/user'
 import { useQuestStore } from '~/stores/quest'
 import { useUiStore } from '~/stores/ui'
 import { createQuest } from '../support/sample-data'
+
+const originalUseRuntimeConfig = (globalThis as typeof globalThis & { useRuntimeConfig?: () => unknown }).useRuntimeConfig
 
 const routerPush = vi.fn()
 const fetchSession = vi.fn().mockResolvedValue(undefined)
@@ -25,6 +27,9 @@ vi.mock('@vueuse/core', () => ({
 }))
 
 beforeEach(() => {
+  Reflect.set(globalThis, 'useRuntimeConfig', vi.fn(() => ({
+    public: { features: { aiAssist: true } },
+  })))
   setActivePinia(createPinia())
 
   routerPush.mockReset()
@@ -68,11 +73,35 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  if (originalUseRuntimeConfig) {
+    Reflect.set(globalThis, 'useRuntimeConfig', originalUseRuntimeConfig)
+  }
+  else {
+    Reflect.deleteProperty(globalThis, 'useRuntimeConfig')
+  }
   vi.unstubAllGlobals()
 })
 
 describe('default layout', () => {
   it('logs out and clears the session', async () => {
+    const buttonStub = {
+      inheritAttrs: false,
+      emits: ['click'],
+      setup(_, { slots, attrs, emit }) {
+        return () => h('button', {
+          type: 'button',
+          ...attrs,
+          onClick: (event: MouseEvent) => {
+            const handler = attrs.onClick
+            if (typeof handler === 'function') {
+              handler(event)
+            }
+            emit('click', event)
+          },
+        }, slots.default?.())
+      },
+    }
+
     const SuspenseWrapper = {
       components: { DefaultLayout },
       template: '<Suspense><DefaultLayout><div class="slot-marker">Content</div></DefaultLayout></Suspense>',
@@ -81,6 +110,7 @@ describe('default layout', () => {
     const wrapper = mountWithBase(SuspenseWrapper, {
       global: {
         stubs: {
+          VBtn: buttonStub,
           ShareDialog: { template: '<div class="share-dialog-stub"></div>' },
           VImg: { template: '<img />' },
         },
@@ -90,10 +120,11 @@ describe('default layout', () => {
     // Wait for async setup to complete
     await flushPromises()
 
-    // Find and click the logout button
-    const logoutButton = wrapper.findAll('.app-bar-auth__btn').find(btn => btn.text().includes('Logout'))
-    expect(logoutButton).toBeDefined()
-    await logoutButton!.trigger('click')
+    const profileActivator = wrapper.get('button[aria-label="Open profile menu"]')
+    await profileActivator.trigger('click')
+
+    const logoutItem = wrapper.get('[data-testid="app-bar-profile-menu-logout"]')
+    await logoutItem.trigger('click')
     await flushPromises()
 
     expect(fetchApi).toHaveBeenCalledWith('/api/auth/logout', { method: 'POST' })

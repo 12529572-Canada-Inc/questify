@@ -21,7 +21,7 @@ export default defineOAuthFacebookEventHandler({
     catch (error) {
       console.error('Facebook OAuth handler error:', error)
       const target = (await getUserSession(event))?.user
-        ? '/settings?oauthError=facebook'
+        ? '/profile?oauthError=facebook'
         : '/auth/login?oauthError=facebook'
       return sendRedirect(event, target)
     }
@@ -34,7 +34,7 @@ export default defineOAuthFacebookEventHandler({
 
 function resolveRedirect(result: OAuthSuccessResult) {
   if (result.action === 'linked') {
-    return `/settings?linked=${result.provider}`
+    return `/profile?linked=${result.provider}`
   }
 
   return '/dashboard'

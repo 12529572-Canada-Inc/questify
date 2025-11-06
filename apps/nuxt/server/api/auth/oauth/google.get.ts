@@ -23,7 +23,7 @@ export default defineOAuthGoogleEventHandler({
     catch (error) {
       console.error('Google OAuth handler error:', error)
       const target = (await getUserSession(event))?.user
-        ? '/settings?oauthError=google'
+        ? '/profile?oauthError=google'
         : '/auth/login?oauthError=google'
       return sendRedirect(event, target)
     }
@@ -36,7 +36,7 @@ export default defineOAuthGoogleEventHandler({
 
 function resolveRedirect(result: OAuthSuccessResult) {
   if (result.action === 'linked') {
-    return `/settings?linked=${result.provider}`
+    return `/profile?linked=${result.provider}`
   }
 
   return '/dashboard'

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { hashPassword, verifyPassword } from '../src/password'
 
 describe('Password hashing and verification', () => {
@@ -22,14 +22,21 @@ describe('Password hashing and verification', () => {
   })
 
   it('rejects invalid or malformed hashes gracefully', () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     const badHashes = [
       '',
       'not-a-hash',
       '$scrypt$n=16384,r=8,p=1$$$', // incomplete structure
       '$bcrypt$stuff' // wrong algorithm
     ]
-    for (const bad of badHashes) {
-      expect(verifyPassword(plain, bad)).toBe(false)
+    try {
+      for (const bad of badHashes) {
+        expect(verifyPassword(plain, bad)).toBe(false)
+      }
+      expect(errorSpy).toHaveBeenCalled()
+    }
+    finally {
+      errorSpy.mockRestore()
     }
   })
 })

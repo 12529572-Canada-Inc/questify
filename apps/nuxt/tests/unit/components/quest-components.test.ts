@@ -24,6 +24,7 @@ import QuestTaskListItem from '../../../app/components/quests/QuestTaskListItem.
 import QuestTaskListItemCompact from '../../../app/components/quests/QuestTaskListItemCompact.vue'
 import QuestTaskSection from '../../../app/components/quests/QuestTaskSection.vue'
 import QuestTasksTabs from '../../../app/components/quests/QuestTasksTabs.vue'
+import PublicQuestCard from '../../../app/components/quests/PublicQuestCard.vue'
 import { shallowMountWithBase, mountWithBase } from '../support/mount-options'
 import { createInvestigation, createQuest, createTask, createTaskSection } from '../support/sample-data'
 
@@ -42,6 +43,10 @@ const vuetifyStubFlags = {
   VTextarea: true,
   VForm: true,
   VChip: true,
+  VCardItem: true,
+  VCardSubtitle: true,
+  VAvatar: true,
+  VProgressLinear: true,
   VAlert: true,
   VTabs: true,
   VTab: true,
@@ -65,6 +70,7 @@ const vuetifyStubFlags = {
   VProgressCircular: true,
   VSpacer: true,
   ModelSelectField: true,
+  QuestAiSuggestionDialog: true,
 }
 
 const originalUseRuntimeConfig = (globalThis as typeof globalThis & { useRuntimeConfig?: () => unknown }).useRuntimeConfig
@@ -74,6 +80,7 @@ beforeAll(() => {
     public: {
       aiModels: defaultAiModels,
       aiModelDefaultId: 'gpt-4o-mini',
+      features: { aiAssist: true },
     },
   })))
 })
@@ -173,6 +180,31 @@ vi.mock('~/composables/useQuestForm', () => {
       isSubmitDisabled: ref(false),
       submit: vi.fn(),
       toggleOptionalFields: vi.fn(() => { showOptionalFields.value = !showOptionalFields.value }),
+    }),
+  }
+})
+
+vi.mock('~/composables/useQuestAiAssist', () => {
+  const dialogOpen = ref(false)
+  const suggestions = ref([])
+  const loading = ref(false)
+  const error = ref<string | null>(null)
+
+  return {
+    useQuestAiAssist: () => ({
+      isEnabled: computed(() => true),
+      dialogOpen,
+      activeFieldLabel: computed(() => 'Title'),
+      suggestions: computed(() => suggestions.value),
+      loading: computed(() => loading.value),
+      error: computed(() => error.value),
+      modelLabel: computed(() => 'GPT-4o mini'),
+      requestAssistance: vi.fn(),
+      regenerateSuggestions: vi.fn(),
+      applySuggestion: vi.fn(),
+      closeDialog: vi.fn(() => {
+        dialogOpen.value = false
+      }),
     }),
   }
 })
@@ -603,5 +635,57 @@ describe('quest components', () => {
 
     expect(wrapper.text()).toContain('Launch Quest')
     expect(wrapper.text()).toContain('Share quest')
+  })
+
+  it('renders PublicQuestCard with quest details', () => {
+    const quest = {
+      ...createQuest({
+        title: 'Defend the Realm',
+        goal: 'Protect the kingdom from looming threats.',
+        status: 'active',
+        isPublic: true,
+        owner: { id: 'knight-1', name: 'Sir Lancelot', email: 'lancelot@example.com' },
+      }),
+      taskCounts: {
+        total: 4,
+        todo: 1,
+        inProgress: 2,
+        completed: 1,
+      },
+    }
+
+    const wrapper = mountWithBase(PublicQuestCard, {
+      props: { quest },
+    })
+
+    expect(wrapper.text()).toContain('Defend the Realm')
+    expect(wrapper.text()).toContain('Sir Lancelot')
+    expect(wrapper.text()).toContain('Protect the kingdom from looming threats.')
+    expect(wrapper.text()).toContain('1 of 4 tasks completed')
+  })
+
+  it('falls back to defaults when public quest metadata is missing', () => {
+    const quest = {
+      ...createQuest({
+        goal: '',
+        context: '',
+        constraints: '',
+        status: 'draft',
+        owner: { id: 'user-2', name: null, email: null },
+      }),
+      taskCounts: {
+        total: 0,
+        todo: 0,
+        inProgress: 0,
+        completed: 0,
+      },
+    }
+
+    const wrapper = mountWithBase(PublicQuestCard, {
+      props: { quest },
+    })
+    expect(wrapper.text()).toContain('Anonymous Adventurer')
+    expect(wrapper.text()).toContain('No goal has been shared yet.')
+    expect(wrapper.text()).toContain('No tasks yet')
   })
 })

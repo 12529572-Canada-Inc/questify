@@ -11,6 +11,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.12.0] - 2025-11-06
+
+### 🚀 Features
+- Added optional AI suggestions to quest creation, including per-field “Improve with AI” buttons, a feature-flagged `/api/quests/assist` endpoint, and provider-aware routing with telemetry.
+- Added a public quests discovery page at `/quests/public` with search, status filters, sorting, and pagination backed by a new `/api/quests/public` endpoint, making shared quests browseable without authentication.
+- Added groundwork for the universal in-app help system: global support FAB, dialog scaffold, and session-cached conversation store to prepare AI chat and GitHub issue submission flows.
+- Introduced a dedicated `/profile` page that replaces the old settings view, letting authenticated users edit name, email, avatar, OAuth connections, and personalize theme preferences (including light/dark/auto) with session-aware persistence and refreshed toolbar avatar navigation.
+
+### 🛡️ Security
+- Removed owner email addresses from the public quests API payload to prevent exposing contact information to anonymous visitors.
+
+---
+
 ## [1.11.0] - 2025-11-01
 
 ### 🚀 Features

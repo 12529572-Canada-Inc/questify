@@ -2,3 +2,4 @@
 export * from "./permissions"
 export * from "./ai-models"
 export * from "./auth"
+export * from "./themes"
