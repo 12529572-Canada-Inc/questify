@@ -104,25 +104,27 @@ async function onMenuItemSelect(item: AppBarMenuItem) {
             <template #activator="{ props: activatorProps }">
               <v-btn
                 class="app-bar-profile-btn"
-                variant="text"
-                density="comfortable"
-                aria-label="Open profile menu"
+                variant="flat"
+                color="primary"
+                size="36"
                 v-bind="activatorProps"
               >
-                <v-avatar size="36">
-                  <template v-if="avatarUrl">
+                <template v-if="avatarUrl">
+                  <v-avatar>
                     <v-img
                       :src="avatarUrl"
                       alt="Profile avatar"
                       cover
                     />
-                  </template>
-                  <template v-else>
-                    <span class="app-bar-profile-initials">
-                      {{ profileInitials }}
-                    </span>
-                  </template>
-                </v-avatar>
+                  </v-avatar>
+                </template>
+                <template v-else>
+                  <span
+                    class="app-bar-profile-initials"
+                  >
+                    {{ profileInitials }}
+                  </span>
+                </template>
               </v-btn>
             </template>
             <v-list
@@ -200,8 +202,10 @@ async function onMenuItemSelect(item: AppBarMenuItem) {
 }
 
 .app-bar-profile-btn {
-  min-width: 0;
-  padding: 4px;
+  border-radius: 50%;
+  min-width: 36px;
+  height: 36px;
+  margin-right: 15px;
 }
 
 .app-bar-profile-initials {
