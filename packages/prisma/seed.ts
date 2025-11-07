@@ -1,9 +1,6 @@
-import { PrismaClient } from '@prisma/client'
-import { hashPassword } from 'shared/server'
+import { hashPassword, prisma } from 'shared/server'
 import fs from 'fs';
 import { ensureSuperAdmin, syncPrivilegesAndRoles } from './utils/accessControl'
-
-const prisma = new PrismaClient()
 
 async function main() {
   console.log("🌱 Seeding database...")

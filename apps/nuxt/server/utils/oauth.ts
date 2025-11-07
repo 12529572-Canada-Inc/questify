@@ -1,10 +1,8 @@
-import { PrismaClient } from '@prisma/client'
 import type { H3Event } from 'h3'
 import type { OAuthProvider } from 'shared'
 import { SUPPORTED_OAUTH_PROVIDERS } from 'shared'
+import { prisma } from 'shared/server'
 import { attachSessionWithAccess } from './access-control'
-
-const prisma = new PrismaClient()
 
 export interface NormalizedOAuthProfile {
   id: string

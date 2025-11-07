@@ -1,7 +1,6 @@
-import { PrismaClient } from '@prisma/client'
+import { prisma } from 'shared/server'
 import { getDefaultModelId, normalizeModelType } from '../../utils/model-options'
-
-const prisma = new PrismaClient()
+import { normalizeOptionalString } from '../../utils/sanitizers'
 
 const handler = defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event) // 👈 forces login
@@ -19,12 +18,6 @@ const handler = defineEventHandler(async (event) => {
     throw createError({ status: 400, statusText: 'Title is required' })
   }
 
-  const sanitizeOptionalField = (value: unknown) => {
-    if (typeof value !== 'string') return null
-    const trimmed = value.trim()
-    return trimmed.length > 0 ? trimmed : null
-  }
-
   // Access the queue from the event context
   // TODO: deretmine potentially better way to access this
   const questQueue = event.context.questQueue as QuestQueue
@@ -34,9 +27,9 @@ const handler = defineEventHandler(async (event) => {
   const quest = await prisma.quest.create({
     data: {
       title: title.trim(),
-      goal: sanitizeOptionalField(goal),
-      context: sanitizeOptionalField(context),
-      constraints: sanitizeOptionalField(constraints),
+      goal: normalizeOptionalString(goal),
+      context: normalizeOptionalString(context),
+      constraints: normalizeOptionalString(constraints),
       ownerId: user.id,
       modelType: selectedModelType,
     },
@@ -45,9 +38,9 @@ const handler = defineEventHandler(async (event) => {
   await questQueue.add('decompose', {
     questId: quest.id,
     title: title.trim(),
-    goal: sanitizeOptionalField(goal),
-    context: sanitizeOptionalField(context),
-    constraints: sanitizeOptionalField(constraints),
+    goal: normalizeOptionalString(goal),
+    context: normalizeOptionalString(context),
+    constraints: normalizeOptionalString(constraints),
     modelType: selectedModelType,
   })
 

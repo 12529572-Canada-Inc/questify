@@ -1,7 +1,6 @@
-import { PrismaClient, QuestStatus } from '@prisma/client'
+import { QuestStatus } from '@prisma/client'
 import type { UserMetrics } from '~/types/metrics'
-
-const prisma = new PrismaClient()
+import { prisma } from 'shared/server'
 
 const handler = defineEventHandler(async (event): Promise<UserMetrics> => {
   const session = await getUserSession(event)

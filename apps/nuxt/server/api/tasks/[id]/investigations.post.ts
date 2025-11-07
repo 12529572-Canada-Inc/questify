@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client'
 import { normalizeModelType } from '../../../utils/model-options'
-
-const prisma = new PrismaClient()
+import { prisma } from 'shared/server'
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event)

@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client'
 import type { PrivilegeKey } from 'shared'
-
-const prisma = new PrismaClient()
+import { prisma } from 'shared/server'
 
 export interface UserAccessProfile {
   roles: string[]

@@ -1,11 +1,9 @@
 import { Worker, type Job } from 'bullmq';
-import { PrismaClient, QuestStatus } from '@prisma/client';
+import { QuestStatus } from '@prisma/client';
 import OpenAI from 'openai';
 import { findModelOption, resolveModelId, type AiModelOption } from 'shared';
-import { loadModelConfig, parseRedisUrl, parseJsonFromModel } from 'shared/server';
+import { loadModelConfig, parseRedisUrl, parseJsonFromModel, prisma } from 'shared/server';
 import { config } from './config.js';
-
-const prisma = new PrismaClient();
 
 const { models: aiModels, defaultModelId } = loadModelConfig();
 if (!aiModels.length) {

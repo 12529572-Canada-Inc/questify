@@ -1,10 +1,9 @@
-import { Prisma, PrismaClient } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 import type { PrivilegeKey } from 'shared'
+import { prisma } from 'shared/server'
 import { requirePrivilege } from '../../../utils/access-control'
 import { recordAuditLog } from '../../../utils/audit'
 import { fetchRole, resolvePrivilegeIds } from './utils'
-
-const prisma = new PrismaClient()
 
 interface CreateRoleBody {
   name?: string

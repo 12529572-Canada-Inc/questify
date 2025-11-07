@@ -1,9 +1,7 @@
-import { PrismaClient } from '@prisma/client'
 import { SUPER_ADMIN_ROLE_NAME } from 'shared'
+import { prisma } from 'shared/server'
 import { requirePrivilege } from '../../../utils/access-control'
 import { recordAuditLog } from '../../../utils/audit'
-
-const prisma = new PrismaClient()
 
 export default defineEventHandler(async (event) => {
   const actor = await requirePrivilege(event, 'role:delete')
