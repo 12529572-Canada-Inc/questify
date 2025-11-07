@@ -10,9 +10,21 @@ const QUEST_GUARD_SELECT = {
   isPublic: true,
 } satisfies Prisma.QuestSelect
 
-export type GuardedQuest = Prisma.QuestGetPayload<{ select: typeof QUEST_GUARD_SELECT }>
+const TASK_GUARD_SELECT = {
+  id: true,
+  quest: {
+    select: {
+      id: true,
+      ownerId: true,
+      modelType: true,
+    },
+  },
+} satisfies Prisma.TaskSelect
 
-interface QuestOwnershipOptions {
+export type GuardedQuest = Prisma.QuestGetPayload<{ select: typeof QUEST_GUARD_SELECT }>
+export type GuardedTask = Prisma.TaskGetPayload<{ select: typeof TASK_GUARD_SELECT }>
+
+interface OwnershipOptions {
   userId?: string
 }
 
@@ -34,7 +46,7 @@ async function resolveUserId(event: H3Event, provided?: string | null) {
 export async function requireQuestOwner(
   event: H3Event,
   questId: string | null | undefined,
-  options: QuestOwnershipOptions = {},
+  options: OwnershipOptions = {},
 ): Promise<GuardedQuest> {
   if (!questId) {
     throw createError({ status: 400, statusText: 'Quest id is required' })
@@ -59,4 +71,34 @@ export async function requireQuestOwner(
   }
 
   return quest
+}
+
+export async function requireTaskOwner(
+  event: H3Event,
+  taskId: string | null | undefined,
+  options: OwnershipOptions = {},
+): Promise<GuardedTask> {
+  if (!taskId) {
+    throw createError({ status: 400, statusText: 'Task id is required' })
+  }
+
+  const userId = await resolveUserId(event, options.userId)
+
+  const task = await prisma.task.findUnique({
+    where: { id: taskId },
+    select: TASK_GUARD_SELECT,
+  })
+
+  if (!task) {
+    throw createError({ status: 404, statusText: 'Task not found' })
+  }
+
+  if (task.quest.ownerId !== userId) {
+    throw createError({
+      status: 403,
+      statusText: 'You do not have permission to modify this task',
+    })
+  }
+
+  return task
 }

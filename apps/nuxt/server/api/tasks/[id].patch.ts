@@ -1,5 +1,6 @@
 import { prisma } from 'shared/server'
 import { sanitizeOptionalTextInput } from '../../utils/sanitizers'
+import { requireTaskOwner } from '../../utils/ownership'
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event)
@@ -9,22 +10,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 400, statusText: 'Task id is required' })
   }
 
-  const taskRecord = await prisma.task.findUnique({
-    where: { id },
-    select: {
-      quest: {
-        select: { ownerId: true },
-      },
-    },
-  })
-
-  if (!taskRecord) {
-    throw createError({ status: 404, statusText: 'Task not found' })
-  }
-
-  if (taskRecord.quest.ownerId !== user.id) {
-    throw createError({ status: 403, statusText: 'You do not have permission to modify this task' })
-  }
+  await requireTaskOwner(event, id, { userId: user.id })
 
   const body = (await readBody<TaskBody>(event)) || {} as TaskBody
 
