@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### ♻️ Refactors
+- All Nitro handlers, utilities, the worker, and Prisma seed script now share a single `PrismaClient` exported from `shared/server`, preventing runaway connection counts during HMR/serverless cold starts and giving us one place to instrument the client.
+- Added quest/task ownership guards plus string sanitizers in the server utils package and wired quests/tasks endpoints to use them, eliminating duplicated authorization/validation code paths.
+- Worker quest decomposition jobs now rebuild task lists inside a single transaction (`deleteMany` + `createMany`) so retries remain idempotent and never leave partially inserted plans.
+
+### 🧩 DX
+- Introduced `useMutationExecutor`, a small composable that wraps `$fetch` mutations with shared `canMutate` checks, refreshes, and snackbar messaging; `useQuestActions` now uses it for every action, trimming lots of repetitive try/catch blocks.
+
+### 🧪 Tests
+- Added Vitest coverage for the new sanitizers and mutation executor to lock down trimming/validation behavior and success/error flows.
+
 ---
 
 ## [1.12.1] - 2025-11-06
