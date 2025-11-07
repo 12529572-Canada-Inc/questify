@@ -1,4 +1,3 @@
-import type { H3Event } from 'h3'
 import type { Prisma } from '@prisma/client'
 import { prisma } from 'shared/server'
 
@@ -24,11 +23,13 @@ const TASK_GUARD_SELECT = {
 export type GuardedQuest = Prisma.QuestGetPayload<{ select: typeof QUEST_GUARD_SELECT }>
 export type GuardedTask = Prisma.TaskGetPayload<{ select: typeof TASK_GUARD_SELECT }>
 
+type NitroEvent = Parameters<typeof requireUserSession>[0]
+
 interface OwnershipOptions {
   userId?: string
 }
 
-async function resolveUserId(event: H3Event, provided?: string | null) {
+async function resolveUserId(event: NitroEvent, provided?: string | null) {
   if (provided) {
     return provided
   }
@@ -44,7 +45,7 @@ async function resolveUserId(event: H3Event, provided?: string | null) {
 }
 
 export async function requireQuestOwner(
-  event: H3Event,
+  event: NitroEvent,
   questId: string | null | undefined,
   options: OwnershipOptions = {},
 ): Promise<GuardedQuest> {
@@ -74,7 +75,7 @@ export async function requireQuestOwner(
 }
 
 export async function requireTaskOwner(
-  event: H3Event,
+  event: NitroEvent,
   taskId: string | null | undefined,
   options: OwnershipOptions = {},
 ): Promise<GuardedTask> {

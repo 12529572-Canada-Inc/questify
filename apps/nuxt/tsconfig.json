@@ -7,6 +7,7 @@
       "@/*": ["./app/*"],
       "shared": ["../../packages/shared/src"],
       "shared/*": ["../../packages/shared/src/*"],
+      "@prisma/client": ["./node_modules/@prisma/client/index.d.ts"],
       "#prisma-utils": ["../../packages/prisma/utils"],
       "#prisma-utils/*": ["../../packages/prisma/utils/*"]
     },

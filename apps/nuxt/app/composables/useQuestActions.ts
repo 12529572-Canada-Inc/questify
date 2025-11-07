@@ -18,6 +18,7 @@ type TaskMutationPayload = {
 export function useQuestActions(options: QuestActionsOptions) {
   const canMutate = () => unref(options.isOwner)
   const { showSnackbar } = useSnackbar()
+  const untypedFetch: (url: string, init?: Record<string, unknown>) => Promise<unknown> = $fetch as unknown as (url: string, init?: Record<string, unknown>) => Promise<unknown>
   const { execute } = useMutationExecutor({
     canMutate,
     refresh: options.refresh,
@@ -25,8 +26,9 @@ export function useQuestActions(options: QuestActionsOptions) {
   })
 
   async function mutateTask(taskId: string, body: TaskMutationPayload, messages: { success: string, error: string }) {
-    await execute(
-      () => $fetch(`/api/tasks/${taskId}`, {
+    const endpoint: string = `/api/tasks/${taskId}`
+    await execute<unknown>(
+      () => untypedFetch(endpoint, {
         method: 'PATCH',
         body,
       }),
@@ -39,8 +41,9 @@ export function useQuestActions(options: QuestActionsOptions) {
     status: 'active' | 'completed',
     messages: { success: string, error: string },
   ) {
-    await execute(
-      () => $fetch(`/api/quests/${questId}`, {
+    const endpoint: string = `/api/quests/${questId}`
+    await execute<unknown>(
+      () => untypedFetch(endpoint, {
         method: 'PATCH',
         body: { status },
       }),
@@ -83,8 +86,9 @@ export function useQuestActions(options: QuestActionsOptions) {
 
   async function investigateTask(taskId: string, payload: { prompt: string, modelType: string }) {
     const trimmedPrompt = payload.prompt.trim()
-    await execute(
-      () => $fetch(`/api/tasks/${taskId}/investigations`, {
+    const endpoint: string = `/api/tasks/${taskId}/investigations`
+    await execute<unknown>(
+      () => untypedFetch(endpoint, {
         method: 'POST',
         body: {
           prompt: trimmedPrompt,
