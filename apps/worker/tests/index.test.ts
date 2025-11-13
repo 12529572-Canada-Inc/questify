@@ -1,5 +1,10 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
+const QUEST_STATUS = {
+  active: 'active',
+  failed: 'failed',
+} as const;
+
 const sharedMocks = vi.hoisted(() => {
   const parseJsonFromModelMock = vi.fn();
   const taskDeleteManyMock = vi.fn();
@@ -35,11 +40,6 @@ const sharedMocks = vi.hoisted(() => {
     prismaMock,
   };
 });
-
-const QUEST_STATUS = {
-  active: 'active',
-  failed: 'failed',
-} as const;
 
 const {
   parseJsonFromModelMock,
