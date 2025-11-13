@@ -36,6 +36,11 @@ const sharedMocks = vi.hoisted(() => {
   };
 });
 
+const QUEST_STATUS = {
+  active: 'active',
+  failed: 'failed',
+} as const;
+
 const {
   parseJsonFromModelMock,
   taskDeleteManyMock,
@@ -58,11 +63,6 @@ vi.mock('shared/server', async () => {
 
 import * as shared from 'shared/server';
 const originalParseJsonFromModel = shared.parseJsonFromModel;
-
-const QUEST_STATUS = {
-  active: 'active',
-  failed: 'failed',
-} as const;
 
 const workerInstance = {};
 const WorkerMock = vi.fn(() => workerInstance);
