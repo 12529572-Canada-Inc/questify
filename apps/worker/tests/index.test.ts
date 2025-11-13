@@ -59,6 +59,11 @@ vi.mock('shared/server', async () => {
 import * as shared from 'shared/server';
 const originalParseJsonFromModel = shared.parseJsonFromModel;
 
+const QUEST_STATUS = {
+  active: 'active',
+  failed: 'failed',
+} as const;
+
 const workerInstance = {};
 const WorkerMock = vi.fn(() => workerInstance);
 const openAiCreateMock = vi.fn();
@@ -78,11 +83,6 @@ const configMock = {
   redisTls: false,
   databaseUrl: 'postgres://example',
 };
-
-const QUEST_STATUS = {
-  active: 'active',
-  failed: 'failed',
-} as const;
 
 const originalFetch = globalThis.fetch;
 beforeAll(() => {
