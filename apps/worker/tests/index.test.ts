@@ -1,11 +1,10 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const QUEST_STATUS = {
-  active: 'active',
-  failed: 'failed',
-} as const;
-
 const sharedMocks = vi.hoisted(() => {
+  const QUEST_STATUS = {
+    active: 'active',
+    failed: 'failed',
+  } as const;
   const parseJsonFromModelMock = vi.fn();
   const taskDeleteManyMock = vi.fn();
   const taskCreateManyMock = vi.fn();
@@ -30,6 +29,7 @@ const sharedMocks = vi.hoisted(() => {
   };
 
   return {
+    QUEST_STATUS,
     parseJsonFromModelMock,
     taskDeleteManyMock,
     taskCreateManyMock,
@@ -42,6 +42,7 @@ const sharedMocks = vi.hoisted(() => {
 });
 
 const {
+  QUEST_STATUS,
   parseJsonFromModelMock,
   taskDeleteManyMock,
   taskCreateManyMock,
@@ -56,8 +57,8 @@ vi.mock('shared/server', async () => {
   const actual = await vi.importActual<typeof import('shared/server')>('shared/server');
   return {
     ...actual,
-    parseJsonFromModel: parseJsonFromModelMock,
-    prisma: prismaMock,
+    parseJsonFromModel: sharedMocks.parseJsonFromModelMock,
+    prisma: sharedMocks.prismaMock,
   };
 });
 
@@ -107,9 +108,13 @@ afterAll(() => {
 vi.mock('bullmq', () => ({
   Worker: WorkerMock,
 }));
-vi.mock('@prisma/client', () => ({
-  QuestStatus: QUEST_STATUS,
-}));
+vi.mock('@prisma/client', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@prisma/client')>();
+  return {
+    ...actual,
+    QuestStatus: sharedMocks.QUEST_STATUS,
+  };
+});
 vi.mock('openai', () => ({
   default: OpenAIMock,
 }));
