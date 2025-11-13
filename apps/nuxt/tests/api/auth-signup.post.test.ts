@@ -31,17 +31,14 @@ const accessControlMocks = vi.hoisted(() => ({
   attachSessionWithAccess: vi.fn(),
 }))
 
-vi.mock('@prisma/client', () => ({
-  PrismaClient: class {
-    user = {
-      findUnique: prismaMocks.userFindUnique,
-      create: prismaMocks.userCreate,
-    }
-  },
-}))
-
 vi.mock('shared/server', () => ({
   hashPassword: sharedMocks.hashPassword,
+  prisma: {
+    user: {
+      findUnique: prismaMocks.userFindUnique,
+      create: prismaMocks.userCreate,
+    },
+  },
 }))
 
 vi.mock('#prisma-utils/accessControl', () => ({
