@@ -18,7 +18,9 @@ type Options = {
 
 /**
  * Derives presentation helpers for quest detail views including status metadata,
- * owner/tooltips, and tab definitions driven by task completion buckets.
+ * owner text, and tab definitions driven by task completion buckets.
+ *
+ * @param options - Reactive quest/task inputs plus callbacks for mark-complete toggles.
  */
 export function useQuestDisplay({
   quest,

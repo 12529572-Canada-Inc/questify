@@ -2,22 +2,20 @@ import type { OAuthProvider } from 'shared'
 
 export type OAuthFlashAction = 'linked' | 'signed-in' | 'created'
 
-/**
- * Handles the cookie-based flash payload emitted by OAuth login/ linking flows
- * and exposes a helper to consume it once per page load.
- */
 interface OAuthFlashPayload {
   provider: OAuthProvider
   action: OAuthFlashAction
 }
 
-/**
- * Consumes any pending OAuth flash data from cookies so UI surfaces a single
- * toast describing the result of the most recent OAuth interaction.
- */
 export function useOAuthFlash() {
   const cookie = useCookie<string | null>('oauth_result')
 
+  /**
+   * Reads and clears the OAuth flash cookie (if any), returning the payload used
+   * to show success/error messaging after an OAuth flow completes.
+   *
+   * @returns the parsed flash payload or `null` when no actionable data exists.
+   */
   function consumeOAuthFlash(): OAuthFlashPayload | null {
     const value = cookie.value
     if (!value) {

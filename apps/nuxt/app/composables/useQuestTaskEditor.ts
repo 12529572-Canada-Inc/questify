@@ -13,6 +13,8 @@ type UpdateTaskFn = (taskId: string, payload: UpdateTaskPayload) => Promise<void
 /**
  * Tracks dialog state and dirty forms for editing quest tasks, surfacing helpers
  * to open a task in edit mode, validate changes, and submit updates with error handling.
+ *
+ * @param updateTask - Mutation handler invoked when saving task edits.
  */
 export function useQuestTaskEditor(updateTask: UpdateTaskFn) {
   const taskEditDialogOpen = ref(false)

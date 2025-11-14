@@ -18,6 +18,10 @@ type TaskMutationPayload = {
 /**
  * Bundles quest- and task-level mutation handlers (complete, reopen, edit, investigate)
  * with consistent permission checks, refresh behavior, and snackbar messaging.
+ *
+ * @param options.questId - Id of the quest being acted upon.
+ * @param options.refresh - Callback invoked after successful mutations to reload data.
+ * @param options.isOwner - Reactive flag indicating whether the viewer owns the quest.
  */
 export function useQuestActions(options: QuestActionsOptions) {
   const canMutate = () => unref(options.isOwner)

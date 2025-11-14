@@ -15,8 +15,11 @@ interface QuestDetailOptions {
 }
 
 /**
- * Normalizes quest context/goal/constraints so UI components can render
- * label/text sections without duplicating trimming and empty checks.
+ * Normalizes quest context/goal/constraint strings so UI components can render
+ * consistent label/text sections without duplicating trimming checks.
+ *
+ * @param quest - Source object (or ref) containing quest detail fields.
+ * @param options.labels - Optional overrides for the section labels.
  */
 export function useQuestDetails(
   quest: MaybeRef<QuestDetailSource>,

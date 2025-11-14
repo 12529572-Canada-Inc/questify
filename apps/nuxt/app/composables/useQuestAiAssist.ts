@@ -37,6 +37,10 @@ function toPayloadValue(value: string) {
 /**
  * Manages the AI assistance dialog: builds prompts, calls the backend, and exposes
  * the resulting suggestions plus helpers to apply, retry, or reset state.
+ *
+ * @param options.fields - Reactive quest form fields (title, goal, context, constraints).
+ * @param options.modelType - Currently selected model id for the quest.
+ * @param options.modelOptions - Available AI models (resolved via `useAiModels`).
  */
 export function useQuestAiAssist(options: {
   fields: Record<AiAssistField, Ref<string>>

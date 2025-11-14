@@ -4,7 +4,9 @@ import type { TaskWithInvestigations } from '~/types/quest-tasks'
 import { useQuestStore } from '~/stores/quest'
 
 /**
- * Fetches a single quest (plus owner/task data) and returns the `useFetch` state keyed by id.
+ * Fetches a single quest (including owner and tasks) and returns the `useFetch` state keyed by id.
+ *
+ * @param id - Quest id to load.
  */
 export function useQuest(id: string) {
   return useFetch<Quest & { tasks: TaskWithInvestigations[], owner: User }>(`/api/quests/${id}`, {
@@ -15,7 +17,9 @@ export function useQuest(id: string) {
 type QuestFetchOptions = { force?: boolean }
 
 /**
- * Ensures the quest store is hydrated and returns reactive refs for list consumers.
+ * Ensures the quest store is hydrated and returns reactive refs for quest listings.
+ *
+ * @param options.force - When true, bypasses the store's cached list and refetches.
  */
 export async function useQuests(options: QuestFetchOptions = {}) {
   const questStore = useQuestStore()

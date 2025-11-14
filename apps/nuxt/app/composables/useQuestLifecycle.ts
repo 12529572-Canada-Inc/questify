@@ -14,6 +14,11 @@ interface QuestLifecycleOptions {
 /**
  * Provides archive/delete handlers for quest owners, handling permission checks,
  * loading state, snackbar messaging, and optional callbacks when the actions complete.
+ *
+  * @param options.questId - Quest id (or ref) targeted by lifecycle actions.
+  * @param options.isOwner - Reactive flag indicating whether current user owns the quest.
+  * @param options.onArchived - Optional callback invoked after archiving succeeds.
+  * @param options.onDeleted - Optional callback invoked after deletion succeeds.
  */
 export function useQuestLifecycle(options: QuestLifecycleOptions) {
   const archiveLoading = ref(false)

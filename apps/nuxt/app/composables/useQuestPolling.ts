@@ -10,6 +10,9 @@ type Options = {
 /**
  * Starts/stops periodic refreshes of quest data when tasks are loading or
  * investigations are pending, avoiding unnecessary polling when idle.
+ *
+ * @param refresh - Callback invoked when the polling timer fires.
+ * @param options - Reactive flags describing when polling should be active.
  */
 export function useQuestPolling(refresh: () => void | Promise<void>, {
   tasksLoading,
