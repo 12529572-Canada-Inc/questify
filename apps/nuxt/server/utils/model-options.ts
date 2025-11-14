@@ -1,5 +1,9 @@
 import { DEFAULT_MODEL_ID, defaultAiModels, findModelOption, resolveModelId, type AiModelOption } from 'shared/ai-models'
 
+/**
+ * Wraps access to AI model configuration to avoid duplicating runtime config parsing.
+ */
+
 function readConfiguredModels(): AiModelOption[] {
   const config = useRuntimeConfig()
   const models = config.aiModels as AiModelOption[] | undefined

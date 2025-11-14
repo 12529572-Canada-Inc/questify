@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client'
 import { canViewQuest } from '../../utils/quest-visibility'
-
-const prisma = new PrismaClient()
+import { prisma } from 'shared/server'
 
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')

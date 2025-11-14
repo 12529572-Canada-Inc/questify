@@ -1,3 +1,6 @@
+/**
+ * Helpers for extracting user-friendly messages and status codes from Nitro/Fetch errors.
+ */
 const HTTP_ERROR_PATTERN = /^\[[A-Z]+\]\s+"[^"]+"\s*:\s*\d+\s*(.*)$/
 
 function normalizeMessage(message: string | undefined, fallback: string) {

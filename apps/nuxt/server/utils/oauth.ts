@@ -1,10 +1,12 @@
-import { PrismaClient } from '@prisma/client'
 import type { H3Event } from 'h3'
 import type { OAuthProvider } from 'shared'
 import { SUPPORTED_OAUTH_PROVIDERS } from 'shared'
+import { prisma } from 'shared/server'
 import { attachSessionWithAccess } from './access-control'
 
-const prisma = new PrismaClient()
+/**
+ * Utilities shared by OAuth callbacks for linking Questify accounts to third-party providers.
+ */
 
 export interface NormalizedOAuthProfile {
   id: string

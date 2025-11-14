@@ -1,7 +1,5 @@
 import type { Prisma } from '@prisma/client'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { prisma } from 'shared/server'
 
 export interface AuditLogInput {
   actorId?: string | null

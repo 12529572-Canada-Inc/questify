@@ -1,33 +1,72 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { parseJsonFromModelMock } = vi.hoisted(() => ({
-  parseJsonFromModelMock: vi.fn(),
-}));
+const sharedMocks = vi.hoisted(() => {
+  const QUEST_STATUS = {
+    active: 'active',
+    failed: 'failed',
+  } as const;
+  const parseJsonFromModelMock = vi.fn();
+  const taskDeleteManyMock = vi.fn();
+  const taskCreateManyMock = vi.fn();
+  const questUpdateMock = vi.fn();
+  const taskInvestigationFindUniqueMock = vi.fn();
+  const taskInvestigationUpdateMock = vi.fn();
+  const transactionMock = vi.fn(async (operations: Promise<unknown>[]) => {
+    await Promise.all(operations);
+  });
+
+  const prismaMock = {
+    task: {
+      deleteMany: taskDeleteManyMock,
+      createMany: taskCreateManyMock,
+    },
+    quest: { update: questUpdateMock },
+    taskInvestigation: {
+      findUnique: taskInvestigationFindUniqueMock,
+      update: taskInvestigationUpdateMock,
+    },
+    $transaction: transactionMock,
+  };
+
+  return {
+    QUEST_STATUS,
+    parseJsonFromModelMock,
+    taskDeleteManyMock,
+    taskCreateManyMock,
+    questUpdateMock,
+    taskInvestigationFindUniqueMock,
+    taskInvestigationUpdateMock,
+    transactionMock,
+    prismaMock,
+  };
+});
+
+const {
+  QUEST_STATUS,
+  parseJsonFromModelMock,
+  taskDeleteManyMock,
+  taskCreateManyMock,
+  questUpdateMock,
+  taskInvestigationFindUniqueMock,
+  taskInvestigationUpdateMock,
+  transactionMock,
+  prismaMock,
+} = sharedMocks;
 
 vi.mock('shared/server', async () => {
   const actual = await vi.importActual<typeof import('shared/server')>('shared/server');
   return {
     ...actual,
-    parseJsonFromModel: parseJsonFromModelMock,
+    parseJsonFromModel: sharedMocks.parseJsonFromModelMock,
+    prisma: sharedMocks.prismaMock,
   };
 });
 
 import * as shared from 'shared/server';
+const originalParseJsonFromModel = shared.parseJsonFromModel;
 
 const workerInstance = {};
 const WorkerMock = vi.fn(() => workerInstance);
-const taskCreateMock = vi.fn();
-const questUpdateMock = vi.fn();
-const taskInvestigationFindUniqueMock = vi.fn();
-const taskInvestigationUpdateMock = vi.fn();
-const PrismaClientMock = vi.fn(() => ({
-  task: { create: taskCreateMock },
-  quest: { update: questUpdateMock },
-  taskInvestigation: {
-    findUnique: taskInvestigationFindUniqueMock,
-    update: taskInvestigationUpdateMock,
-  },
-}));
 const openAiCreateMock = vi.fn();
 const OpenAIMock = vi.fn(() => ({
   chat: { completions: { create: openAiCreateMock } },
@@ -45,11 +84,6 @@ const configMock = {
   redisTls: false,
   databaseUrl: 'postgres://example',
 };
-
-const QUEST_STATUS = {
-  active: 'active',
-  failed: 'failed',
-} as const;
 
 const originalFetch = globalThis.fetch;
 beforeAll(() => {
@@ -74,10 +108,13 @@ afterAll(() => {
 vi.mock('bullmq', () => ({
   Worker: WorkerMock,
 }));
-vi.mock('@prisma/client', () => ({
-  PrismaClient: PrismaClientMock,
-  QuestStatus: QUEST_STATUS,
-}));
+vi.mock('@prisma/client', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@prisma/client')>();
+  return {
+    ...actual,
+    QuestStatus: sharedMocks.QUEST_STATUS,
+  };
+});
 vi.mock('openai', () => ({
   default: OpenAIMock,
 }));
@@ -94,11 +131,18 @@ describe('worker entrypoint', () => {
     vi.resetModules();
     WorkerMock.mockClear();
     parseJsonFromModelMock.mockReset();
-    taskCreateMock.mockReset();
+    taskDeleteManyMock.mockReset();
+    taskDeleteManyMock.mockResolvedValue(undefined);
+    taskCreateManyMock.mockReset();
+    taskCreateManyMock.mockResolvedValue(undefined);
     questUpdateMock.mockReset();
+    questUpdateMock.mockResolvedValue(undefined);
     taskInvestigationFindUniqueMock.mockReset();
     taskInvestigationUpdateMock.mockReset();
-    PrismaClientMock.mockClear();
+    transactionMock.mockReset();
+    transactionMock.mockImplementation(async (operations: Promise<unknown>[]) => {
+      await Promise.all(operations ?? []);
+    });
     openAiCreateMock.mockReset();
     OpenAIMock.mockClear();
     Object.assign(configMock, {
@@ -194,21 +238,22 @@ describe('worker entrypoint', () => {
       ],
     });
     expect(parseJsonFromModelMock).toHaveBeenCalledWith('model-content');
-    expect(taskCreateMock).toHaveBeenNthCalledWith(1, {
-      data: {
-        questId: 'quest-1',
-        title: 'Task 1',
-        details: 'Do something',
-        order: 0,
-      },
-    });
-    expect(taskCreateMock).toHaveBeenNthCalledWith(2, {
-      data: {
-        questId: 'quest-1',
-        title: 'Task 2',
-        details: 'Do another thing',
-        order: 1,
-      },
+    expect(taskDeleteManyMock).toHaveBeenCalledWith({ where: { questId: 'quest-1' } });
+    expect(taskCreateManyMock).toHaveBeenCalledWith({
+      data: [
+        {
+          questId: 'quest-1',
+          title: 'Task 1',
+          details: 'Do something',
+          order: 0,
+        },
+        {
+          questId: 'quest-1',
+          title: 'Task 2',
+          details: 'Do another thing',
+          order: 1,
+        },
+      ],
     });
     expect(questUpdateMock).toHaveBeenCalledWith({
       where: { id: 'quest-1' },
@@ -232,7 +277,8 @@ describe('worker entrypoint', () => {
       data: { questId: 'quest-2' },
     });
 
-    expect(taskCreateMock).not.toHaveBeenCalled();
+    expect(taskCreateManyMock).not.toHaveBeenCalled();
+    expect(taskDeleteManyMock).not.toHaveBeenCalled();
     expect(questUpdateMock).toHaveBeenCalledWith({
       where: { id: 'quest-2' },
       data: { status: QUEST_STATUS.failed },
@@ -263,21 +309,21 @@ describe('worker entrypoint', () => {
       data: { questId: 'quest-3', title: 'Quest Title' },
     });
 
-    expect(taskCreateMock).toHaveBeenNthCalledWith(1, {
-      data: {
-        questId: 'quest-3',
-        title: 'Task 1',
-        details: null,
-        order: 0,
-      },
-    });
-    expect(taskCreateMock).toHaveBeenNthCalledWith(2, {
-      data: {
-        questId: 'quest-3',
-        title: 'Task 2',
-        details: null,
-        order: 1,
-      },
+    expect(taskCreateManyMock).toHaveBeenCalledWith({
+      data: [
+        {
+          questId: 'quest-3',
+          title: 'Task 1',
+          details: null,
+          order: 0,
+        },
+        {
+          questId: 'quest-3',
+          title: 'Task 2',
+          details: null,
+          order: 1,
+        },
+      ],
     });
   });
 

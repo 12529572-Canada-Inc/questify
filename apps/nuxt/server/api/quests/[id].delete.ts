@@ -1,31 +1,13 @@
-import { PrismaClient, QuestStatus } from '@prisma/client'
+import { QuestStatus } from '@prisma/client'
+import { prisma } from 'shared/server'
 import { recordAuditLog } from '../../utils/audit'
-
-const prisma = new PrismaClient()
+import { requireQuestOwner } from '../../utils/ownership'
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event)
   const id = getRouterParam(event, 'id')
 
-  if (!id) {
-    throw createError({ status: 400, statusText: 'Quest id is required' })
-  }
-
-  const quest = await prisma.quest.findUnique({
-    where: { id },
-    select: {
-      ownerId: true,
-      deletedAt: true,
-    },
-  })
-
-  if (!quest || quest.deletedAt) {
-    throw createError({ status: 404, statusText: 'Quest not found' })
-  }
-
-  if (quest.ownerId !== user.id) {
-    throw createError({ status: 403, statusText: 'You do not have permission to delete this quest' })
-  }
+  await requireQuestOwner(event, id, { userId: user.id })
 
   await prisma.$transaction([
     prisma.taskInvestigation.deleteMany({

@@ -24,15 +24,14 @@ const prismaMocks = vi.hoisted(() => ({
   taskInvestigationCreateMock: vi.fn(),
 }))
 
-vi.mock('@prisma/client', () => ({
-  PrismaClient: class {
-    task = {
+vi.mock('shared/server', () => ({
+  prisma: {
+    task: {
       findUnique: prismaMocks.taskFindUniqueMock,
-    }
-
-    taskInvestigation = {
+    },
+    taskInvestigation: {
       create: prismaMocks.taskInvestigationCreateMock,
-    }
+    },
   },
 }))
 
@@ -108,6 +107,7 @@ describe('API /api/tasks/[id]/investigations.post', () => {
         id: true,
         quest: {
           select: {
+            id: true,
             ownerId: true,
             modelType: true,
           },

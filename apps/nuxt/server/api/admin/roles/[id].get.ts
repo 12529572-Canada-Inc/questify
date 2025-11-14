@@ -1,8 +1,6 @@
-import { PrismaClient } from '@prisma/client'
 import { requirePrivilege } from '../../../utils/access-control'
 import { fetchRole } from './utils'
-
-const prisma = new PrismaClient()
+import { prisma } from 'shared/server'
 
 export default defineEventHandler(async (event) => {
   await requirePrivilege(event, 'role:read')

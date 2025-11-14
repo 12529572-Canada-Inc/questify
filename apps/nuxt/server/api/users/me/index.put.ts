@@ -1,10 +1,10 @@
-import { Prisma, PrismaClient } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 import type { H3Event } from 'h3'
 import type { ThemePreference } from 'shared'
 import { isThemePreference } from 'shared'
 import { attachSessionWithAccess, getUserAccessProfile } from '../../../utils/access-control'
+import { prisma } from 'shared/server'
 
-const prisma = new PrismaClient()
 const MAX_AVATAR_LENGTH = 1024 * 1024 // 1MB data-url cap to discourage huge payloads
 
 interface UpdateProfileBody {

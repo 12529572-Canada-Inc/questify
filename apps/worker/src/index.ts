@@ -1,11 +1,9 @@
 import { Worker, type Job } from 'bullmq';
-import { PrismaClient, QuestStatus } from '@prisma/client';
+import { QuestStatus } from '@prisma/client';
 import OpenAI from 'openai';
 import { findModelOption, resolveModelId, type AiModelOption } from 'shared';
-import { loadModelConfig, parseRedisUrl, parseJsonFromModel } from 'shared/server';
+import { loadModelConfig, parseRedisUrl, parseJsonFromModel, prisma } from 'shared/server';
 import { config } from './config.js';
-
-const prisma = new PrismaClient();
 
 const { models: aiModels, defaultModelId } = loadModelConfig();
 if (!aiModels.length) {
@@ -154,32 +152,45 @@ Return the plan as a JSON array where each item has the shape {"title": string, 
     }
 
     const tasks = parseJsonFromModel<GeneratedTask[]>(content);
+    const parsedTasks = Array.isArray(tasks) ? tasks : [];
 
-    console.log('Parsed tasks:', tasks);
+    console.log('Parsed tasks:', parsedTasks);
 
-    for (let i = 0; i < tasks.length; i++) {
-      const taskDefinition = tasks[i] ?? {};
-      const title = typeof taskDefinition.title === 'string'
-        ? taskDefinition.title.trim()
-        : '';
-      const details = typeof taskDefinition.details === 'string'
-        ? taskDefinition.details.trim()
-        : '';
+    const preparedTasks = parsedTasks
+      .map((taskDefinition, index) => {
+        const titleText = typeof taskDefinition?.title === 'string'
+          ? taskDefinition.title.trim()
+          : '';
+        const detailText = typeof taskDefinition?.details === 'string'
+          ? taskDefinition.details.trim()
+          : '';
 
-      await prisma.task.create({
-        data: {
+        return {
           questId,
-          title: title || `Task ${i + 1}`,
-          details: details || null,
-          order: i,
-        },
+          title: titleText || `Task ${index + 1}`,
+          details: detailText || null,
+          order: index,
+        };
+      })
+      .filter(task => task.title.length > 0);
+
+    if (!preparedTasks.length) {
+      preparedTasks.push({
+        questId,
+        title: 'First Task',
+        details: null,
+        order: 0,
       });
     }
 
-    await prisma.quest.update({
-      where: { id: questId },
-      data: { status: QuestStatus.active },
-    });
+    await prisma.$transaction([
+      prisma.task.deleteMany({ where: { questId } }),
+      prisma.task.createMany({ data: preparedTasks }),
+      prisma.quest.update({
+        where: { id: questId },
+        data: { status: QuestStatus.active },
+      }),
+    ]);
   } catch (error) {
     console.error('Error during quest decomposition:', error);
     await prisma.quest.update({

@@ -1,5 +1,9 @@
 import MarkdownIt from 'markdown-it'
 
+/**
+ * Lightweight Markdown renderer configured for quest content with safe links.
+ */
+
 const md = new MarkdownIt({
   html: false,
   linkify: true,
