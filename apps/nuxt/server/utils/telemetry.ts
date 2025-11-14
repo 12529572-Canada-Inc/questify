@@ -1,3 +1,6 @@
+/**
+ * Stores lightweight in-memory telemetry for AI assist usage so diagnostics endpoints can report counts.
+ */
 type AiAssistField = 'title' | 'goal' | 'context' | 'constraints'
 
 type AiAssistMetrics = {

@@ -11,6 +11,10 @@ interface QuestLifecycleOptions {
   onDeleted?: () => Awaitable<void>
 }
 
+/**
+ * Provides archive/delete handlers for quest owners, handling permission checks,
+ * loading state, snackbar messaging, and optional callbacks when the actions complete.
+ */
 export function useQuestLifecycle(options: QuestLifecycleOptions) {
   const archiveLoading = ref(false)
   const deleteLoading = ref(false)

@@ -1,6 +1,11 @@
 import type { Prisma } from '@prisma/client'
 import { prisma } from 'shared/server'
 
+/**
+ * Reusable guards that ensure the authenticated user owns the targeted quest/task
+ * before server handlers perform writes or disclose protected data.
+ */
+
 const QUEST_GUARD_SELECT = {
   id: true,
   ownerId: true,

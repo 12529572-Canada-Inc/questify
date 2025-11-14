@@ -4,6 +4,10 @@ import { SUPPORTED_OAUTH_PROVIDERS } from 'shared'
 import { prisma } from 'shared/server'
 import { attachSessionWithAccess } from './access-control'
 
+/**
+ * Utilities shared by OAuth callbacks for linking Questify accounts to third-party providers.
+ */
+
 export interface NormalizedOAuthProfile {
   id: string
   email?: string | null

@@ -7,6 +7,10 @@ type Options = {
   investigatingTaskIds: ComputedRef<string[]>
 }
 
+/**
+ * Starts/stops periodic refreshes of quest data when tasks are loading or
+ * investigations are pending, avoiding unnecessary polling when idle.
+ */
 export function useQuestPolling(refresh: () => void | Promise<void>, {
   tasksLoading,
   hasPendingInvestigations,

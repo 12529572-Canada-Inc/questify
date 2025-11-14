@@ -77,6 +77,9 @@ function tryDisplayNext(state: SnackbarState) {
   state.visible = true
 }
 
+/**
+ * Provides a global snackbar queue with helpers to enqueue messages and control visibility.
+ */
 export function useSnackbar() {
   const state = useState<SnackbarState>('snackbar-state', () => ({
     queue: [],

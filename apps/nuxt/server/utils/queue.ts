@@ -2,6 +2,10 @@ import { Queue } from 'bullmq'
 import { parseRedisUrl } from 'shared/server'
 import type { NitroApp } from 'nitropack'
 
+/**
+ * Lazily wires BullMQ queues into the Nitro request context so API routes can enqueue jobs.
+ */
+
 type QueueContextKey = 'questQueue' | 'taskQueue'
 
 type QueueOptions = {

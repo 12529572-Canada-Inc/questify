@@ -16,6 +16,10 @@ type Options = {
   markTaskIncomplete: TaskActionHandler
 }
 
+/**
+ * Derives presentation helpers for quest detail views including status metadata,
+ * owner/tooltips, and tab definitions driven by task completion buckets.
+ */
 export function useQuestDisplay({
   quest,
   todoTasks,

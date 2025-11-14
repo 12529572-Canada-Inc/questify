@@ -1,3 +1,6 @@
+/**
+ * Sanitizers shared by Nitro routes for trimming optional string inputs.
+ */
 export function normalizeOptionalString(value: unknown) {
   if (typeof value !== 'string') {
     return null

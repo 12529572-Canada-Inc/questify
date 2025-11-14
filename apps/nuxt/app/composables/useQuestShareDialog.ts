@@ -6,6 +6,10 @@ type ShareDialogContent = {
   url: string
 }
 
+/**
+ * Builds the reactive state used by the quest/task share dialog, supplying
+ * helper methods to open/close the modal with prefilled messaging.
+ */
 export function useQuestShareDialog(questUrlBuilder: () => string, taskUrlBuilder: (taskId: string) => string) {
   const shareDialogState = ref<ShareDialogContent | null>(null)
 

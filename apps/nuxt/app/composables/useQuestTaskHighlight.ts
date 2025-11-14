@@ -9,6 +9,10 @@ type Options = {
   completedTaskIds: ComputedRef<string[]>
 }
 
+/**
+ * Watches the highlighted task id and ensures the correct tab is active when
+ * deep-linking into a quest so the target task is visible once data loads.
+ */
 export function useQuestTaskHighlight({
   taskTab,
   highlightedTaskId,

@@ -34,6 +34,10 @@ function toPayloadValue(value: string) {
   return value?.trim() ?? ''
 }
 
+/**
+ * Manages the AI assistance dialog: builds prompts, calls the backend, and exposes
+ * the resulting suggestions plus helpers to apply, retry, or reset state.
+ */
 export function useQuestAiAssist(options: {
   fields: Record<AiAssistField, Ref<string>>
   modelType: Ref<string>

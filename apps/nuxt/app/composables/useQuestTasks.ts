@@ -6,6 +6,10 @@ type QuestWithTasks = {
   tasks?: TaskWithInvestigations[] | null
 } | null | undefined
 
+/**
+ * Normalizes quest tasks into reactive collections (todo vs completed) and
+ * exposes UI helpers such as the currently active tab and loading flags.
+ */
 export function useQuestTasks(quest: MaybeRef<QuestWithTasks>) {
   const questValue = computed(() => unref(quest) ?? null)
 

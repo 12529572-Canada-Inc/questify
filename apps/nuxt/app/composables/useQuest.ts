@@ -3,6 +3,9 @@ import type { Quest, User } from '@prisma/client'
 import type { TaskWithInvestigations } from '~/types/quest-tasks'
 import { useQuestStore } from '~/stores/quest'
 
+/**
+ * Fetches a single quest (plus owner/task data) and returns the `useFetch` state keyed by id.
+ */
 export function useQuest(id: string) {
   return useFetch<Quest & { tasks: TaskWithInvestigations[], owner: User }>(`/api/quests/${id}`, {
     key: `quest-${id}`,
@@ -11,6 +14,9 @@ export function useQuest(id: string) {
 
 type QuestFetchOptions = { force?: boolean }
 
+/**
+ * Ensures the quest store is hydrated and returns reactive refs for list consumers.
+ */
 export async function useQuests(options: QuestFetchOptions = {}) {
   const questStore = useQuestStore()
   const { quests, loading, error } = storeToRefs(questStore)

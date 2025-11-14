@@ -14,6 +14,10 @@ interface QuestDetailOptions {
   labels?: Partial<Record<QuestDetailKey, string>>
 }
 
+/**
+ * Normalizes quest context/goal/constraints so UI components can render
+ * label/text sections without duplicating trimming and empty checks.
+ */
 export function useQuestDetails(
   quest: MaybeRef<QuestDetailSource>,
   options: QuestDetailOptions = {},

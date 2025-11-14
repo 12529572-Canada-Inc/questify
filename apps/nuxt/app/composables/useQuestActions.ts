@@ -15,6 +15,10 @@ type TaskMutationPayload = {
   extraContent?: string | null
 }
 
+/**
+ * Bundles quest- and task-level mutation handlers (complete, reopen, edit, investigate)
+ * with consistent permission checks, refresh behavior, and snackbar messaging.
+ */
 export function useQuestActions(options: QuestActionsOptions) {
   const canMutate = () => unref(options.isOwner)
   const { showSnackbar } = useSnackbar()
