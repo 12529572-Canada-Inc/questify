@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🧪 Tests
 - Added Vitest coverage for the new sanitizers and mutation executor to lock down trimming/validation behavior and success/error flows.
+- Added a coverage report gate that enforces `reports/coverage-threshold.json`, refreshes the markdown baseline via `pnpm coverage:report -- --write`, and runs automatically in CI to keep thresholds from regressing.
+- Wired each Vitest config (Nuxt, worker, shared) to load `reports/coverage-threshold.json` directly so `pnpm test:coverage` now fails locally/CI the moment statements/branches/functions/lines fall under the enforced guardrails.
 
 ---
 
