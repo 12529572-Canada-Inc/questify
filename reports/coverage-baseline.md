@@ -1,4 +1,4 @@
-# Coverage Report – 2025-11-14
+# Coverage Report – 2025-11-15
 
 Generated with `pnpm test:coverage`.
 
