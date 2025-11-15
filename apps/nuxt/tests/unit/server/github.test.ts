@@ -74,4 +74,25 @@ describe('server/utils/github', () => {
       message: expect.stringContaining('not-json'),
     })
   })
+
+  it('returns parsed issue data when request succeeds', async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      statusText: 'OK',
+      text: async () => JSON.stringify({ number: 99, html_url: 'https://example.com/99', title: 'Bug' }),
+    })
+
+    const result = await createGithubIssue({} as never, {
+      title: 'Bug',
+      body: 'Steps to repro',
+      labels: ['Bug'],
+    })
+
+    expect(fetchMock).toHaveBeenCalledOnce()
+    expect(result).toEqual({
+      number: 99,
+      html_url: 'https://example.com/99',
+      title: 'Bug',
+    })
+  })
 })
