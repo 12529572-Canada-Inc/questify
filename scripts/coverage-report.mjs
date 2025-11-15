@@ -151,9 +151,7 @@ try {
 
 if (existingReport.trim() !== reportContent.trim()) {
     console.error(
-        `Coverage report is out of date. Run 'pnpm coverage:report -- ${WRITE_FLAG}' locally after tests and commit ${rel(
-            REPORT_PATH,
-        )}.`,
+        `Coverage report is out of date. Run 'pnpm coverage:baseline:update' to refresh ${rel(REPORT_PATH)}.`,
     );
     process.exit(1);
 }
