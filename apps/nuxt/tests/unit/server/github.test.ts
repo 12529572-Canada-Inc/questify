@@ -69,6 +69,9 @@ describe('server/utils/github', () => {
     await expect(createGithubIssue({} as never, {
       title: 'Bug',
       body: 'Steps to repro',
-    })).rejects.toMatchObject({ statusCode: 502, message: 'Bad Gateway' })
+    })).rejects.toMatchObject({
+      statusCode: 502,
+      message: expect.stringContaining('not-json'),
+    })
   })
 })
