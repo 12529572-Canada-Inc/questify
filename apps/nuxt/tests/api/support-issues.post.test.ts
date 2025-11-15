@@ -114,4 +114,40 @@ describe('API /api/support/issues (POST)', () => {
     await expect(handler({} as never)).rejects.toMatchObject({ statusCode: 503 })
     expect(fetchMock).not.toHaveBeenCalled()
   })
+
+  it('rejects missing or invalid titles and categories', async () => {
+    const baseBody = { description: 'Missing title', category: 'Bug', route: '/abc' }
+
+    Reflect.set(globalThis as GlobalWithMocks, 'readBody', vi.fn(async () => ({ ...baseBody, title: undefined })))
+    await expect(handler({} as never)).rejects.toMatchObject({ statusCode: 400 })
+
+    Reflect.set(globalThis as GlobalWithMocks, 'readBody', vi.fn(async () => ({ ...baseBody, title: '   ' })))
+    await expect(handler({} as never)).rejects.toMatchObject({ statusCode: 400 })
+
+    Reflect.set(globalThis as GlobalWithMocks, 'readBody', vi.fn(async () => ({ ...baseBody, title: 'Valid', category: 'Other' })))
+    await expect(handler({} as never)).rejects.toMatchObject({ statusCode: 400 })
+  })
+
+  it('fills defaults when optional fields are omitted', async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      text: async () => JSON.stringify({
+        number: 55,
+        html_url: 'https://github.com/12529572-Canada-Inc/questify/issues/55',
+        title: 'Valid',
+      }),
+    })
+
+    Reflect.set(globalThis as GlobalWithMocks, 'readBody', vi.fn(async () => ({
+      title: 'Valid',
+      category: 'Bug',
+    })))
+
+    const result = await handler({} as never)
+
+    const requestBody = JSON.parse((fetchMock.mock.calls[0]?.[1]?.body ?? '{}') as string)
+    expect(requestBody.body).toContain('Page: Unknown')
+    expect(requestBody.body).toContain('_No additional details provided._')
+    expect(result.issue.number).toBe(55)
+  })
 })
