@@ -149,7 +149,16 @@ try {
     throw error;
 }
 
-if (existingReport.trim() !== reportContent.trim()) {
+// Strip out the date line for comparison (first line contains the date)
+const stripDate = (content) => {
+    const lines = content.trim().split('\n');
+    return lines.slice(1).join('\n'); // Skip first line with date
+};
+
+const existingWithoutDate = stripDate(existingReport);
+const newWithoutDate = stripDate(reportContent);
+
+if (existingWithoutDate !== newWithoutDate) {
     console.error(
         `Coverage report is out of date. Run 'pnpm coverage:baseline:update' to refresh ${rel(REPORT_PATH)}.`,
     );
