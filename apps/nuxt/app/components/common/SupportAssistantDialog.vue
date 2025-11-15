@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
-import type { FetchError } from 'ofetch'
 import type { SupportAssistantTab } from '~/stores/support'
 import { useSupportStore } from '~/stores/support'
 
@@ -112,7 +111,11 @@ async function handleSubmitIssue() {
   }
   catch (error) {
     submissionState.value = 'error'
-    const fetchError = error as FetchError<{ statusText?: string, statusMessage?: string, message?: string }>
+    const fetchError = error as {
+      data?: { statusText?: string, statusMessage?: string, message?: string }
+      statusMessage?: string
+      message?: string
+    }
     submissionMessage.value = fetchError?.data?.statusText
       ?? fetchError?.data?.statusMessage
       ?? fetchError?.data?.message

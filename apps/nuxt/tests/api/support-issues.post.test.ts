@@ -84,7 +84,7 @@ describe('API /api/support/issues (POST)', () => {
     const result = await handler({} as never)
 
     expect(fetchMock).toHaveBeenCalledTimes(1)
-    const fetchArgs = fetchMock.mock.calls[0]
+    const fetchArgs = fetchMock.mock.calls[0]!
     expect(fetchArgs[0]).toContain('/repos/12529572-Canada-Inc/questify/issues')
 
     const requestBody = JSON.parse((fetchArgs[1]?.body ?? '{}') as string)

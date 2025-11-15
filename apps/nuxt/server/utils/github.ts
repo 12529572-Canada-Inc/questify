@@ -1,4 +1,4 @@
-import type { H3Event } from 'h3'
+type RuntimeConfigEvent = Parameters<typeof useRuntimeConfig>[0]
 
 type GithubConfig = {
   owner: string
@@ -23,7 +23,7 @@ function normalizeConfigValue(value?: string | null) {
   return typeof value === 'string' ? value.trim() : ''
 }
 
-function resolveGithubConfig(event: H3Event): GithubConfig {
+function resolveGithubConfig(event: RuntimeConfigEvent): GithubConfig {
   const runtimeConfig = useRuntimeConfig(event)
   const github = runtimeConfig.github ?? {}
 
@@ -41,7 +41,7 @@ function resolveGithubConfig(event: H3Event): GithubConfig {
   return { owner, repo, token }
 }
 
-export async function createGithubIssue(event: H3Event, input: GithubIssueInput) {
+export async function createGithubIssue(event: RuntimeConfigEvent, input: GithubIssueInput) {
   const { owner, repo, token } = resolveGithubConfig(event)
   const payload: Record<string, unknown> = {
     title: input.title,
