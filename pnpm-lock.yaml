@@ -12,8 +12,8 @@ importers:
         specifier: 0.96.0
         version: 0.96.0
       '@oxc-minify/binding-linux-x64-gnu':
-        specifier: 0.94.0
-        version: 0.94.0
+        specifier: 0.97.0
+        version: 0.97.0
       '@oxc-parser/binding-darwin-arm64':
         specifier: 0.94.0
         version: 0.94.0
@@ -1183,14 +1183,14 @@ packages:
     cpu: [s390x]
     os: [linux]
 
-  '@oxc-minify/binding-linux-x64-gnu@0.94.0':
-    resolution: {integrity: sha512-Iokd1dfneOcNHBJH8o5cMgDkII8R7dzOFSaMrZiSZkLr+woT3Ed7uLqTKwleNKq52z5+XwmgcvO00c6ywStCpA==}
+  '@oxc-minify/binding-linux-x64-gnu@0.95.0':
+    resolution: {integrity: sha512-3K2lxzk679ml1vXJtO8Nt3xMD2trnDQWBb4Q676Un5g3dbaYf1WgTmEI13ZnCrwE5uBI02DFtFQplkLFqb9dGA==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [x64]
     os: [linux]
 
-  '@oxc-minify/binding-linux-x64-gnu@0.95.0':
-    resolution: {integrity: sha512-3K2lxzk679ml1vXJtO8Nt3xMD2trnDQWBb4Q676Un5g3dbaYf1WgTmEI13ZnCrwE5uBI02DFtFQplkLFqb9dGA==}
+  '@oxc-minify/binding-linux-x64-gnu@0.97.0':
+    resolution: {integrity: sha512-4RMxc/CY+5bWdn/5oYjWKji/q2FVQ6kl9LBeGhbAbS/GlH5T1/uhK8qg7HlYt5Sh3K+z6yxBcgZh+0wF7wnbWg==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [x64]
     os: [linux]
@@ -7741,10 +7741,10 @@ snapshots:
   '@oxc-minify/binding-linux-s390x-gnu@0.95.0':
     optional: true
 
-  '@oxc-minify/binding-linux-x64-gnu@0.94.0': {}
-
   '@oxc-minify/binding-linux-x64-gnu@0.95.0':
     optional: true
+
+  '@oxc-minify/binding-linux-x64-gnu@0.97.0': {}
 
   '@oxc-minify/binding-linux-x64-musl@0.95.0':
     optional: true
