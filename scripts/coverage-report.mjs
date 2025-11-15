@@ -162,6 +162,20 @@ if (existingWithoutDate !== newWithoutDate) {
     console.error(
         `Coverage report is out of date. Run 'pnpm coverage:baseline:update' to refresh ${rel(REPORT_PATH)}.`,
     );
+    console.error('\n=== EXPECTED (from baseline) ===');
+    console.error(existingWithoutDate);
+    console.error('\n=== ACTUAL (from current run) ===');
+    console.error(newWithoutDate);
+    console.error('\n=== DIFF ===');
+    const existingLines = existingWithoutDate.split('\n');
+    const newLines = newWithoutDate.split('\n');
+    for (let i = 0; i < Math.max(existingLines.length, newLines.length); i++) {
+        if (existingLines[i] !== newLines[i]) {
+            console.error(`Line ${i + 1}:`);
+            console.error(`  Expected: ${existingLines[i]}`);
+            console.error(`  Actual:   ${newLines[i]}`);
+        }
+    }
     process.exit(1);
 }
 
