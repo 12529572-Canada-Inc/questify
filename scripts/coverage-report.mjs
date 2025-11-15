@@ -5,7 +5,7 @@ import path from 'node:path';
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const repoRoot = path.resolve(__dirname, '..');
 
-const REPORT_PATH = path.join(repoRoot, 'reports/coverage-baseline-2025-10-19.md');
+const REPORT_PATH = path.join(repoRoot, 'reports/coverage-baseline.md');
 const THRESHOLD_PATH = path.join(repoRoot, 'reports/coverage-threshold.json');
 const METRICS = ['statements', 'branches', 'functions', 'lines'];
 const WORKSPACES = [
