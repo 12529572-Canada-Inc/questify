@@ -72,6 +72,11 @@ export default defineNuxtConfig({
       url: process.env.REDIS_URL || '',
       tls: process.env.REDIS_TLS === 'true',
     },
+    github: {
+      owner: process.env.GITHUB_REPO_OWNER || '',
+      repo: process.env.GITHUB_REPO_NAME || '',
+      token: process.env.GITHUB_TOKEN || '',
+    },
 
     // 🌍 Client-exposed
     public: {

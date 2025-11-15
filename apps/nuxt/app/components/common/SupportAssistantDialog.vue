@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
+import type { FetchError } from 'ofetch'
 import type { SupportAssistantTab } from '~/stores/support'
 import { useSupportStore } from '~/stores/support'
 
@@ -41,15 +42,87 @@ const issueForm = reactive({
 
 const submitting = ref(false)
 const submissionMessage = ref('')
+const submissionState = ref<'idle' | 'success' | 'error'>('idle')
+const submittedIssue = ref<{ number: number, url: string } | null>(null)
+
+const canSubmitIssue = computed(() => issueForm.title.trim().length > 0 && issueForm.category.length > 0)
+
+let suppressFeedbackReset = false
+
+watch(dialogModel, (isOpen) => {
+  if (!isOpen) {
+    clearIssueForm()
+    resetIssueFeedback()
+  }
+})
+
+watch(() => [issueForm.title, issueForm.category, issueForm.description], () => {
+  if (suppressFeedbackReset) {
+    suppressFeedbackReset = false
+    return
+  }
+  if (submissionState.value !== 'idle') {
+    resetIssueFeedback()
+  }
+})
+
+function resetIssueFeedback() {
+  submissionState.value = 'idle'
+  submissionMessage.value = ''
+  submittedIssue.value = null
+}
+
+function clearIssueForm() {
+  suppressFeedbackReset = true
+  issueForm.title = ''
+  issueForm.category = 'Bug'
+  issueForm.description = ''
+}
 
 async function handleSubmitIssue() {
+  if (submitting.value) {
+    return
+  }
+
   submitting.value = true
-  submissionMessage.value = 'Issue submission is coming soon.'
+  resetIssueFeedback()
 
-  // Placeholder while backend integration is implemented.
-  await new Promise(resolve => setTimeout(resolve, 600))
+  try {
+    const response = await $fetch<{
+      success: boolean
+      issue: { number: number, url: string }
+    }>('/api/support/issues', {
+      method: 'POST',
+      body: {
+        ...issueForm,
+        route: route.fullPath || route.path || '/',
+      },
+    })
 
-  submitting.value = false
+    if (response.success) {
+      submissionState.value = 'success'
+      submissionMessage.value = 'Issue submitted successfully.'
+      submittedIssue.value = response.issue
+      clearIssueForm()
+    }
+    else {
+      submissionState.value = 'error'
+      submissionMessage.value = 'Unable to submit issue.'
+    }
+  }
+  catch (error) {
+    submissionState.value = 'error'
+    const fetchError = error as FetchError<{ statusText?: string, statusMessage?: string, message?: string }>
+    submissionMessage.value = fetchError?.data?.statusText
+      ?? fetchError?.data?.statusMessage
+      ?? fetchError?.data?.message
+      ?? fetchError?.statusMessage
+      ?? fetchError?.message
+      ?? 'Unable to submit issue.'
+  }
+  finally {
+    submitting.value = false
+  }
 }
 
 function closeDialog() {
@@ -183,12 +256,26 @@ function closeDialog() {
                 placeholder="Describe the problem, steps to reproduce, or idea."
               />
               <v-alert
-                v-if="submissionMessage"
-                type="warning"
+                v-if="submissionState !== 'idle'"
+                :type="submissionState === 'success' ? 'success' : 'error'"
                 variant="tonal"
                 class="support-assistant-dialog__alert"
               >
-                {{ submissionMessage }}
+                <p class="support-assistant-dialog__alert-message">
+                  {{ submissionMessage }}
+                </p>
+                <v-btn
+                  v-if="submissionState === 'success' && submittedIssue"
+                  class="support-assistant-dialog__alert-link"
+                  variant="text"
+                  color="primary"
+                  size="small"
+                  :href="submittedIssue.url"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  View issue #{{ submittedIssue.number }}
+                </v-btn>
               </v-alert>
               <v-btn
                 type="submit"
@@ -196,6 +283,7 @@ function closeDialog() {
                 block
                 class="support-assistant-dialog__action"
                 :loading="submitting"
+                :disabled="!canSubmitIssue || submitting"
               >
                 Submit to GitHub
               </v-btn>
@@ -245,6 +333,15 @@ function closeDialog() {
 
 .support-assistant-dialog__alert {
   margin: 0;
+}
+
+.support-assistant-dialog__alert-message {
+  margin: 0;
+}
+
+.support-assistant-dialog__alert-link {
+  padding: 0;
+  min-height: auto;
 }
 
 .support-assistant-dialog__lead {
