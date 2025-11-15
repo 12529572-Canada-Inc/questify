@@ -73,7 +73,7 @@ pnpm dev:worker               # runs the queue worker with hot reload
 ## Testing
 
 - Unit/component suites: `pnpm test` runs Vitest across Nuxt, worker, and shared packages.
-- Coverage: `pnpm test:coverage` (Vitest + V8 outputs under each workspace `coverage/` directory)
+- Coverage: `pnpm test:coverage` (Vitest + V8 outputs under each workspace `coverage/` directory). After it finishes, refresh the markdown summary with `pnpm coverage:report -- --write` so `reports/coverage-baseline-2025-10-19.md` matches the latest coverage run; CI will also run `pnpm coverage:report` to enforce the values in `reports/coverage-threshold.json` (bump those numbers when you intentionally raise the floor).
 - End-to-end: `pnpm --filter nuxt test:e2e` executes Playwright specs located in `apps/nuxt/tests/e2e/`.
 - Run a focused test: `pnpm --filter worker exec vitest run src/queues/__tests__/quest.queue.spec.ts`
 

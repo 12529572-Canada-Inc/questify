@@ -109,6 +109,9 @@ jobs:
             - name: 📈 Test coverage
               run: pnpm test:coverage
 
+            - name: 📘 Verify coverage report
+              run: pnpm coverage:report
+
             - name: 🌍 Nuxt E2E tests
               run: pnpm --filter nuxt test:e2e
 
