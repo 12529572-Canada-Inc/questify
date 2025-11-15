@@ -146,7 +146,7 @@ describe('API /api/support/issues (POST)', () => {
     const result = await handler({} as never)
 
     const requestBody = JSON.parse((fetchMock.mock.calls[0]?.[1]?.body ?? '{}') as string)
-    expect(requestBody.body).toContain('Page: Unknown')
+    expect(requestBody.body).toContain('**Page:** Unknown')
     expect(requestBody.body).toContain('_No additional details provided._')
     expect(result.issue.number).toBe(55)
   })
