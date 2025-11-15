@@ -19,6 +19,7 @@ type SupportConversation = {
 }
 
 const STORAGE_KEY = 'questify-support-conversation'
+const MAX_MESSAGES = 20
 
 function createMessageId() {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -61,6 +62,10 @@ export const useSupportStore = defineStore('support', () => {
       createdAt: input.createdAt ?? new Date().toISOString(),
     }
     conversation.value.messages.push(message)
+
+    if (conversation.value.messages.length > MAX_MESSAGES) {
+      conversation.value.messages.splice(0, conversation.value.messages.length - MAX_MESSAGES)
+    }
   }
 
   function resetConversation() {
