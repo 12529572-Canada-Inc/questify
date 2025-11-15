@@ -55,10 +55,10 @@ export async function createGithubIssue(event: RuntimeConfigEvent, input: Github
   const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/issues`, {
     method: 'POST',
     headers: {
-      Accept: 'application/vnd.github+json',
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-      'User-Agent': 'Questify Support Assistant',
+      'accept': 'application/vnd.github+json',
+      'content-type': 'application/json',
+      'authorization': `Bearer ${token}`,
+      'user-agent': 'Questify Support Assistant',
     },
     body: JSON.stringify(payload),
   })
