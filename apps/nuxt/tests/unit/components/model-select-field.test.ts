@@ -1,24 +1,35 @@
 import { describe, expect, it, beforeEach, vi } from 'vitest'
 import { nextTick, h, defineComponent } from 'vue'
+import type { AiModelOption } from 'shared/ai-models'
 import ModelSelectField from '../../../app/components/common/ModelSelectField.vue'
 import { mountWithBase } from '../support/mount-options'
 
-const models = [
+const models: AiModelOption[] = [
   {
     id: 'gpt-4o',
     label: 'GPT-4 Omni',
+    provider: 'openai',
     providerLabel: 'OpenAI',
     description: 'General purpose model',
     tags: ['balanced', 'general'],
+    apiModel: 'gpt-4o',
   },
   {
     id: 'deepseek-reasoner',
     label: 'Deepseek Reasoner',
+    provider: 'deepseek',
     providerLabel: 'Deepseek',
     description: 'Structured reasoning assistant',
     tags: ['reasoning'],
+    apiModel: 'deepseek-reasoner',
   },
-] as const
+]
+
+type SelectItem = {
+  title: string
+  value: string
+  raw: AiModelOption
+}
 
 const VSelectStub = defineComponent({
   name: 'VSelectStub',
@@ -43,13 +54,13 @@ const VSelectStub = defineComponent({
           slots.selection?.({
             item: {
               value: props.modelValue,
-              title: (props.items as any[])?.find(item => item.value === props.modelValue)?.title,
+              title: (props.items as SelectItem[])?.find(item => item.value === props.modelValue)?.title,
             },
           }),
           slots.item?.({
-            item: (props.items as any[])?.[0],
+            item: (props.items as SelectItem[])?.[0],
             props: {
-              onClick: () => emitValue((props.items as any[])?.[0]?.value),
+              onClick: () => emitValue((props.items as SelectItem[])?.[0]?.value),
             },
           }),
         ].filter(Boolean),
@@ -65,7 +76,7 @@ describe('ModelSelectField', () => {
   it('renders initial model metadata and tags', () => {
     const wrapper = mountWithBase(ModelSelectField, {
       props: {
-        models: models as any,
+        models,
       },
       global: {
         stubs: {
@@ -83,7 +94,7 @@ describe('ModelSelectField', () => {
   it('updates selected model when the select emits a value', async () => {
     const wrapper = mountWithBase(ModelSelectField, {
       props: {
-        models: models as any,
+        models,
         modelValue: 'gpt-4o',
       },
       global: {
