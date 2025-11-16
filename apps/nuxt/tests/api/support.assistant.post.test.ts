@@ -168,4 +168,23 @@ describe('API /api/support/assistant (POST)', () => {
     expect(prompt).toContain('HTML snapshot')
     expect(prompt).toContain('Support content')
   })
+
+  it('includes trimmed visible text when provided', async () => {
+    (globalThis as GlobalWithMocks).readBody = vi.fn(async () => ({
+      question: 'Help me with this screen',
+      route: '/quests/abc',
+      conversation: [],
+      visibleText: '   Important content visible to user   ',
+    }))
+
+    runAiModelMock.mockResolvedValue({
+      modelId: 'gpt-4o-mini',
+      content: 'Done',
+    })
+
+    await handler({} as never)
+
+    const prompt = runAiModelMock.mock.calls[0]?.[0]
+    expect(prompt).toContain('Visible text (trimmed): Important content visible to user')
+  })
 })
