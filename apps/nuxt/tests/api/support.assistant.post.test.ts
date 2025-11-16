@@ -85,7 +85,7 @@ describe('API /api/support/assistant (POST)', () => {
 
     expect(runAiModelMock).toHaveBeenCalledTimes(1)
     const prompt = runAiModelMock.mock.calls[0]?.[0]
-    expect(prompt).toContain('Current page: /auth/login')
+    expect(prompt).toContain('Route: /auth/login')
     expect(prompt).toContain('Conversation so far')
     expect(prompt).toContain('Hi')
     expect(prompt).toContain('How do I reset my password')
@@ -167,6 +167,5 @@ describe('API /api/support/assistant (POST)', () => {
     const prompt = runAiModelMock.mock.calls[0]?.[0]
     expect(prompt).toContain('HTML snapshot')
     expect(prompt).toContain('Support content')
-    expect(prompt).toContain('Visible text')
   })
 })

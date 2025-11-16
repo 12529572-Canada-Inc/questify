@@ -1,3 +1,4 @@
+<!-- TODO: Implement or remove this component -->
 <script setup lang="ts">
 type CompactAction = {
   label: string
