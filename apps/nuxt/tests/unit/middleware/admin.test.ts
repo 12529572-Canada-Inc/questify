@@ -8,7 +8,7 @@ const isAdmin = ref(true)
 const userRef = ref<{ id: string } | null>({ id: 'user-1' })
 
 vi.mock('pinia', () => ({
-  storeToRefs: (store: any) => ({
+  storeToRefs: (store: { user: typeof userRef }) => ({
     user: store.user,
   }),
 }))

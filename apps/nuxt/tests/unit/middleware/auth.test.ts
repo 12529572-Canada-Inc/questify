@@ -7,7 +7,7 @@ const fetchSessionMock = vi.fn()
 const loggedInRef = ref(false)
 
 vi.mock('pinia', () => ({
-  storeToRefs: (store: any) => ({
+  storeToRefs: (store: { loggedIn: typeof loggedInRef }) => ({
     loggedIn: store.loggedIn,
   }),
 }))
