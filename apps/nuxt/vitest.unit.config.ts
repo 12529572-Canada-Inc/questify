@@ -1,8 +1,29 @@
 import { defineConfig } from 'vitest/config'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
+import { readFileSync } from 'node:fs'
+
+type CoverageThreshold = {
+  statements?: number
+  branches?: number
+  functions?: number
+  lines?: number
+}
+
+type ThresholdMap = Record<string, CoverageThreshold>
 
 const r = (p: string) => resolve(__dirname, p)
+const thresholdsPath = resolve(__dirname, '../../reports/coverage-threshold.json')
+let nuxtThreshold: CoverageThreshold = {}
+
+try {
+  const raw = readFileSync(thresholdsPath, 'utf8')
+  const parsed: ThresholdMap = JSON.parse(raw)
+  nuxtThreshold = parsed.nuxt ?? {}
+}
+catch {
+  nuxtThreshold = {}
+}
 
 export default defineConfig({
   plugins: [vue()],
@@ -48,6 +69,12 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'json', 'json-summary', 'html'],
       reportsDirectory: './coverage',
+      thresholds: {
+        statements: nuxtThreshold.statements ?? 0,
+        branches: nuxtThreshold.branches ?? 0,
+        functions: nuxtThreshold.functions ?? 0,
+        lines: nuxtThreshold.lines ?? 0,
+      },
       include: [
         'app/composables/useQuest.ts',
         'app/composables/useQuestTasks.ts',

@@ -1,8 +1,12 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { computed, nextTick, reactive, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import type { SupportAssistantTab } from '~/stores/support'
 import { useSupportStore } from '~/stores/support'
+import { useUiStore } from '~/stores/ui'
+import { useSnackbar } from '~/composables/useSnackbar'
+import { resolveApiError } from '~/utils/error'
+import type { SupportAssistantResponse } from '~/types/support'
 
 const props = defineProps<{
   modelValue: boolean
@@ -25,13 +29,33 @@ const selectedTab = computed({
 })
 
 const supportStore = useSupportStore()
+const uiStore = useUiStore()
+const { aiAssistEnabled } = storeToRefs(uiStore)
 const { conversation } = storeToRefs(supportStore)
+const { showSnackbar } = useSnackbar()
 const route = useRoute()
 
 const chatPrompt = computed(() => {
   const path = route.fullPath || route.path || '/'
-  return `Need help with ${path === '/' ? 'this page' : `“${path}”`} ? Ask the assistant below.`
+  return `Need help with ${path === '/' ? 'this page' : `"${path}"`}? Ask the assistant below.`
 })
+
+const chatInput = ref('')
+const chatError = ref('')
+const sending = ref(false)
+const chatContainer = ref<HTMLElement | null>(null)
+
+const hasChatHistory = computed(() => conversation.value.messages.length > 0)
+const chatDisabledReason = computed(() => {
+  if (!uiStore.aiAssistFeatureEnabled) {
+    return 'AI assistant is disabled for this environment.'
+  }
+  if (!aiAssistEnabled.value) {
+    return 'AI assistant is turned off in your preferences.'
+  }
+  return ''
+})
+const canSendQuestion = computed(() => chatInput.value.trim().length > 0 && !sending.value && !chatDisabledReason.value)
 
 const issueForm = reactive({
   title: '',
@@ -41,19 +65,193 @@ const issueForm = reactive({
 
 const submitting = ref(false)
 const submissionMessage = ref('')
+const submissionState = ref<'idle' | 'success' | 'error'>('idle')
+const submittedIssue = ref<{ number: number, url: string } | null>(null)
+
+const canSubmitIssue = computed(() => issueForm.title.trim().length > 0 && issueForm.category.length > 0)
+
+let suppressFeedbackReset = false
+
+watch(dialogModel, (isOpen) => {
+  if (!isOpen) {
+    clearIssueForm()
+    resetIssueFeedback()
+    chatError.value = ''
+  }
+})
+
+watch(() => [issueForm.title, issueForm.category, issueForm.description], () => {
+  if (suppressFeedbackReset) {
+    suppressFeedbackReset = false
+    return
+  }
+  if (submissionState.value !== 'idle') {
+    resetIssueFeedback()
+  }
+})
+
+watch(chatInput, () => {
+  chatError.value = ''
+})
+
+watch(() => conversation.value.messages.length, async () => {
+  await nextTick()
+  const container = chatContainer.value
+  if (container) {
+    container.scrollTop = container.scrollHeight
+  }
+})
+
+function resetIssueFeedback() {
+  submissionState.value = 'idle'
+  submissionMessage.value = ''
+  submittedIssue.value = null
+}
+
+function clearIssueForm() {
+  suppressFeedbackReset = true
+  issueForm.title = ''
+  issueForm.category = 'Bug'
+  issueForm.description = ''
+}
 
 async function handleSubmitIssue() {
+  if (submitting.value) {
+    return
+  }
+
   submitting.value = true
-  submissionMessage.value = 'Issue submission is coming soon.'
+  resetIssueFeedback()
 
-  // Placeholder while backend integration is implemented.
-  await new Promise(resolve => setTimeout(resolve, 600))
+  try {
+    const response = await $fetch<{
+      success: boolean
+      issue: { number: number, url: string }
+    }>('/api/support/issues', {
+      method: 'POST',
+      body: {
+        ...issueForm,
+        route: route.fullPath || route.path || '/',
+      },
+    })
 
-  submitting.value = false
+    if (response.success) {
+      submissionState.value = 'success'
+      submissionMessage.value = 'Issue submitted successfully.'
+      submittedIssue.value = response.issue
+      clearIssueForm()
+    }
+    else {
+      submissionState.value = 'error'
+      submissionMessage.value = 'Unable to submit issue.'
+    }
+  }
+  catch (error) {
+    submissionState.value = 'error'
+    const fetchError = error as {
+      data?: { statusText?: string, statusMessage?: string, message?: string }
+      statusMessage?: string
+      message?: string
+    }
+    submissionMessage.value = fetchError?.data?.statusText
+      ?? fetchError?.data?.statusMessage
+      ?? fetchError?.data?.message
+      ?? fetchError?.statusMessage
+      ?? fetchError?.message
+      ?? 'Unable to submit issue.'
+  }
+  finally {
+    submitting.value = false
+  }
+}
+
+function resetConversation() {
+  supportStore.resetConversation()
+  chatError.value = ''
+}
+
+async function sendQuestion() {
+  if (!canSendQuestion.value) {
+    return
+  }
+
+  const question = chatInput.value.trim()
+  chatInput.value = ''
+  chatError.value = ''
+  const routePath = route.fullPath || route.path || '/'
+
+  supportStore.appendMessage({
+    role: 'user',
+    content: question,
+    route: routePath,
+  })
+
+  sending.value = true
+
+  try {
+    const response = await $fetch<SupportAssistantResponse>('/api/support/assistant', {
+      method: 'POST',
+      body: {
+        question,
+        route: routePath,
+        conversation: conversation.value.messages,
+        htmlSnapshot: buildHtmlSnapshot(),
+        visibleText: buildVisibleText(),
+      },
+    })
+
+    supportStore.appendMessage({
+      id: response.messageId,
+      createdAt: response.createdAt,
+      role: 'assistant',
+      content: response.answer,
+      route: routePath,
+    })
+  }
+  catch (error) {
+    const message = resolveApiError(error, 'Unable to reach the AI assistant right now.')
+    chatError.value = message
+    showSnackbar(message, { variant: 'error' })
+  }
+  finally {
+    sending.value = false
+  }
 }
 
 function closeDialog() {
   dialogModel.value = false
+}
+
+function buildHtmlSnapshot(): string | undefined {
+  if (import.meta.server) {
+    return undefined
+  }
+  const doc = globalThis.document
+  if (!doc?.documentElement?.outerHTML) {
+    return undefined
+  }
+
+  // Sanitize by removing all <script> elements using DOM APIs
+  const wrapper = doc.createElement('div')
+  wrapper.innerHTML = doc.documentElement.outerHTML
+  // Remove all script elements from the wrapper
+  const scripts = wrapper.querySelectorAll('script')
+  scripts.forEach(el => el.remove())
+  const sanitizedHtml = wrapper.innerHTML
+  const collapsed = sanitizedHtml.replace(/\s+/g, ' ').trim()
+  return collapsed.slice(0, 100_000)
+}
+
+function buildVisibleText(): string | undefined {
+  if (import.meta.server) {
+    return undefined
+  }
+  const bodyText = globalThis.document?.body?.innerText
+  if (!bodyText) {
+    return undefined
+  }
+  const normalized = bodyText.replace(/\s+/g, ' ').trim()
+  return normalized ? normalized.slice(0, 10_000) : undefined
 }
 </script>
 
@@ -121,34 +319,113 @@ function closeDialog() {
             <p class="support-assistant-dialog__lead">
               {{ chatPrompt }}
             </p>
+            <v-alert
+              v-if="chatDisabledReason"
+              type="warning"
+              variant="tonal"
+              border="start"
+              class="support-assistant-dialog__alert"
+            >
+              {{ chatDisabledReason }}
+            </v-alert>
             <div
-              v-if="conversation.messages.length === 0"
-              class="support-assistant-dialog__empty"
+              class="support-assistant-dialog__chat"
             >
-              <v-icon
-                icon="mdi-message-processing-outline"
-                size="38"
-                class="support-assistant-dialog__empty-icon"
-              />
-              <p>
-                Start a conversation to get step-by-step help tailored to this page.
-              </p>
+              <div
+                v-if="!hasChatHistory"
+                class="support-assistant-dialog__empty"
+              >
+                <v-icon
+                  icon="mdi-message-processing-outline"
+                  size="38"
+                  class="support-assistant-dialog__empty-icon"
+                />
+                <p>
+                  Start a conversation to get step-by-step help tailored to this page.
+                </p>
+              </div>
+              <div
+                v-else
+                ref="chatContainer"
+                class="support-assistant-dialog__conversation"
+              >
+                <v-slide-y-transition group>
+                  <div
+                    v-for="message in conversation.messages"
+                    :key="message.id"
+                    class="support-assistant-dialog__message"
+                    :class="`support-assistant-dialog__message--${message.role}`"
+                  >
+                    <div class="support-assistant-dialog__message-meta">
+                      {{ message.role === 'assistant' ? 'Assistant' : 'You' }}
+                    </div>
+                    <div class="support-assistant-dialog__message-text">
+                      {{ message.content }}
+                    </div>
+                  </div>
+                </v-slide-y-transition>
+                <div
+                  v-if="sending"
+                  class="support-assistant-dialog__message support-assistant-dialog__message--assistant support-assistant-dialog__message--pending"
+                >
+                  <div class="support-assistant-dialog__message-meta">
+                    Assistant
+                  </div>
+                  <div class="support-assistant-dialog__pending">
+                    <v-progress-circular
+                      color="primary"
+                      indeterminate
+                      size="20"
+                      width="3"
+                    />
+                    <span>Thinking&hellip;</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="support-assistant-dialog__form">
+                <v-alert
+                  v-if="chatError"
+                  type="warning"
+                  variant="tonal"
+                  border="start"
+                  class="support-assistant-dialog__alert"
+                >
+                  {{ chatError }}
+                </v-alert>
+                <v-textarea
+                  v-model="chatInput"
+                  class="support-assistant-dialog__input"
+                  label="Ask a question"
+                  rows="3"
+                  auto-grow
+                  placeholder="How do I create a quest?"
+                  :disabled="sending || Boolean(chatDisabledReason)"
+                />
+                <div class="support-assistant-dialog__actions-row">
+                  <v-btn
+                    color="primary"
+                    block
+                    class="support-assistant-dialog__action"
+                    :loading="sending"
+                    :disabled="!canSendQuestion"
+                    @click="sendQuestion"
+                  >
+                    Send message
+                  </v-btn>
+                  <v-btn
+                    v-if="hasChatHistory"
+                    variant="text"
+                    color="secondary"
+                    class="support-assistant-dialog__reset"
+                    :disabled="sending"
+                    @click="resetConversation"
+                  >
+                    Reset conversation
+                  </v-btn>
+                </div>
+              </div>
             </div>
-            <v-textarea
-              class="support-assistant-dialog__input"
-              label="Ask a question"
-              rows="3"
-              auto-grow
-              placeholder="How do I create a quest?"
-            />
-            <v-btn
-              color="primary"
-              block
-              class="support-assistant-dialog__action"
-              :disabled="true"
-            >
-              Coming soon
-            </v-btn>
           </section>
         </v-window-item>
 
@@ -183,12 +460,26 @@ function closeDialog() {
                 placeholder="Describe the problem, steps to reproduce, or idea."
               />
               <v-alert
-                v-if="submissionMessage"
-                type="warning"
+                v-if="submissionState !== 'idle'"
+                :type="submissionState === 'success' ? 'success' : 'error'"
                 variant="tonal"
                 class="support-assistant-dialog__alert"
               >
-                {{ submissionMessage }}
+                <p class="support-assistant-dialog__alert-message">
+                  {{ submissionMessage }}
+                </p>
+                <v-btn
+                  v-if="submissionState === 'success' && submittedIssue"
+                  class="support-assistant-dialog__alert-link"
+                  variant="text"
+                  color="primary"
+                  size="small"
+                  :href="submittedIssue.url"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  View issue #{{ submittedIssue.number }}
+                </v-btn>
               </v-alert>
               <v-btn
                 type="submit"
@@ -196,6 +487,7 @@ function closeDialog() {
                 block
                 class="support-assistant-dialog__action"
                 :loading="submitting"
+                :disabled="!canSubmitIssue || submitting"
               >
                 Submit to GitHub
               </v-btn>
@@ -247,6 +539,15 @@ function closeDialog() {
   margin: 0;
 }
 
+.support-assistant-dialog__alert-message {
+  margin: 0;
+}
+
+.support-assistant-dialog__alert-link {
+  padding: 0;
+  min-height: auto;
+}
+
 .support-assistant-dialog__lead {
   margin: 0;
   color: rgba(0, 0, 0, 0.74);
@@ -271,18 +572,84 @@ function closeDialog() {
   margin: 0;
 }
 
-.support-assistant-dialog__action {
-  margin-top: 4px;
+.support-assistant-dialog__chat {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.support-assistant-dialog__field {
+.support-assistant-dialog__conversation {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  max-height: 260px;
+  overflow: auto;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 12px;
+}
+
+.support-assistant-dialog__message {
+  max-width: 90%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.support-assistant-dialog__message--assistant {
+  align-self: flex-start;
+}
+
+.support-assistant-dialog__message--user {
+  align-self: flex-end;
+  background: rgba(76, 110, 245, 0.1);
+}
+
+.support-assistant-dialog__message-meta {
+  margin-bottom: 4px;
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.support-assistant-dialog__message-text {
   margin: 0;
+  white-space: pre-wrap;
+}
+
+.support-assistant-dialog__message--pending {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.support-assistant-dialog__pending {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .support-assistant-dialog__form {
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.support-assistant-dialog__actions-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.support-assistant-dialog__reset {
+  align-self: center;
+  min-height: auto;
+  padding: 0;
+}
+
+.support-assistant-dialog__action {
+  margin-top: 4px;
+}
+
+.support-assistant-dialog__field {
+  margin: 0;
 }
 
 @media (max-width: 600px) {

@@ -1,7 +1,5 @@
-import type { Prisma } from '@prisma/client'
-import { PrismaClient, QuestStatus } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { QuestStatus, type Prisma } from '@prisma/client'
+import { prisma } from 'shared/server'
 
 const DEFAULT_PAGE_SIZE = 12
 const MAX_PAGE_SIZE = 50

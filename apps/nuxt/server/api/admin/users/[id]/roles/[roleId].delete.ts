@@ -1,4 +1,3 @@
-import { PrismaClient } from '@prisma/client'
 import { SUPER_ADMIN_ROLE_NAME } from 'shared'
 import {
   attachSessionWithAccess,
@@ -7,8 +6,7 @@ import {
 } from '../../../../../utils/access-control'
 import { recordAuditLog } from '../../../../../utils/audit'
 import { fetchAdminUser } from '../../../users/utils'
-
-const prisma = new PrismaClient()
+import { prisma } from 'shared/server'
 
 // Removes a role assignment, guarding against locking the platform out of SuperAdmin access.
 export default defineEventHandler(async (event) => {

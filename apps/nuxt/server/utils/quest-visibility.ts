@@ -1,5 +1,9 @@
 import { QuestStatus, type Prisma } from '@prisma/client'
 
+/**
+ * Helpers for determining which quests are viewable by a user and building Prisma filters accordingly.
+ */
+
 export type QuestVisibilityTarget = {
   ownerId: string
   isPublic: boolean

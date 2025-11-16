@@ -10,6 +10,12 @@ interface UseQuestFormOptions {
   onSuccess?: (questId: string) => void
 }
 
+/**
+ * Manages state, validation, and submission workflow for the quest creation form,
+ * including AI model selection and optional field toggles.
+ *
+ * @param options.onSuccess - Optional callback invoked with the new quest id after creation.
+ */
 export function useQuestForm(options: UseQuestFormOptions = {}) {
   const router = useRouter()
   const { showSnackbar } = useSnackbar()

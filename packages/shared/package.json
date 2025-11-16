@@ -1,6 +1,6 @@
 {
   "name": "shared",
-  "version": "1.12.1",
+  "version": "1.13.0",
   "private": true,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -23,6 +23,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@prisma/client": "5.22.0",
     "crypto": "^1.0.1",
     "jsonrepair": "^3.6.1"
   },

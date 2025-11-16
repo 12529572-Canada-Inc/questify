@@ -1,6 +1,5 @@
-import { PrismaClient } from '@prisma/client'
 import type { H3Event } from 'h3'
-import { verifyPassword } from 'shared/server'
+import { verifyPassword, prisma } from 'shared/server'
 import { attachSessionWithAccess } from '../../utils/access-control'
 
 /**
@@ -10,8 +9,6 @@ import { attachSessionWithAccess } from '../../utils/access-control'
  * and enriches the session payload with the user's RBAC profile (roles + privileges)
  * so downstream middleware can authorize admin-only routes without re-querying.
  */
-
-const prisma = new PrismaClient()
 
 export default defineEventHandler(async (event) => {
   const body = (await readBody<LoginBody>(event)) || {} as LoginBody

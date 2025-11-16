@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client'
 import { ensureSuperAdmin, syncPrivilegesAndRoles } from '#prisma-utils/accessControl'
-
-const prisma = new PrismaClient()
+import { prisma } from 'shared/server'
 
 /**
  * Nitro plugin executed on server startup. It seeds/updates the RBAC lookup tables

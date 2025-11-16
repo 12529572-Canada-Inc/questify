@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client'
 import { requirePrivilege } from '../../utils/access-control'
-
-const prisma = new PrismaClient()
+import { prisma } from 'shared/server'
 
 const handler = defineEventHandler(async (event) => {
   await requirePrivilege(event, 'user:read')

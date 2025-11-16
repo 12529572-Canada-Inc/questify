@@ -5,6 +5,15 @@ import { useAiModels } from './useAiModels'
 
 type InvestigateTaskFn = (taskId: string, payload: { prompt: string, modelType: string }) => Promise<void>
 
+/**
+ * Centralizes the state, dialogs, and helpers needed to launch AI investigations
+ * for individual tasks, tracking pending jobs and coordinating model selection.
+ *
+ * @param options.investigateTask - Mutation handler for triggering investigations.
+ * @param options.todoTasks - Reactive list of open tasks.
+ * @param options.completedTasks - Reactive list of completed tasks.
+ * @param options.questModelType - Optional quest-level model override.
+ */
 export function useQuestInvestigations(options: {
   investigateTask: InvestigateTaskFn
   todoTasks: MaybeRef<TaskWithInvestigations[]>

@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client'
 import { getUserAccessProfile } from '../../../utils/access-control'
-
-const prisma = new PrismaClient()
+import { prisma } from 'shared/server'
 
 export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event)

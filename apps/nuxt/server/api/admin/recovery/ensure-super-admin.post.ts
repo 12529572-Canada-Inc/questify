@@ -1,9 +1,7 @@
-import { PrismaClient } from '@prisma/client'
 import { SUPER_ADMIN_ROLE_NAME } from 'shared'
+import { prisma } from 'shared/server'
 import { attachSessionWithAccess } from '../../../utils/access-control'
 import { recordAuditLog } from '../../../utils/audit'
-
-const prisma = new PrismaClient()
 
 // Emergency endpoint promoted through the admin UI to restore SuperAdmin access if none remain.
 export default defineEventHandler(async (event) => {

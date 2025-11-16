@@ -1,6 +1,13 @@
 import { computed } from 'vue'
 import { DEFAULT_MODEL_ID, defaultAiModels, findModelOption, type AiModelOption } from 'shared/ai-models'
 
+/**
+ * Exposes the AI models defined in runtime config (or the defaults) along with
+ * helpers for resolving the preferred/default model or looking up a model by id.
+ *
+ * @returns reactive `models`, `defaultModel`, and `findModelById` utilities.
+ */
+
 export function useAiModels() {
   const runtimeConfig = useRuntimeConfig()
 

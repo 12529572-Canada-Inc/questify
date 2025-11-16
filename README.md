@@ -35,6 +35,7 @@ pnpm dev:worker               # runs the queue worker with hot reload
 
 - `.env` in the repository root configures both Nuxt runtime config and worker bindings.
 - **AI Assist prerequisites:** Set `NUXT_FEATURE_AI_ASSIST=true` and provide at least one provider key (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, or `DEEPSEEK_API_KEY` + `DEEPSEEK_BASE_URL` if overriding the default) so the worker and Nuxt API can call the selected model. Optional catalog overrides use `AI_MODEL_CONFIG_JSON` or `AI_MODEL_CONFIG_PATH`. Individual users can toggle assistance in **Settings → Quest AI Assistance**.
+- **Support assistant issue submission:** Provide a GitHub personal access token (`GITHUB_TOKEN`) plus `GITHUB_REPO_OWNER` and `GITHUB_REPO_NAME`. Use the `repo` scope for private repositories or `public_repo` for public ones so the in-app form can create issues.
 - Redis credentials map to `runtimeConfig.redis` (Nuxt) and `packages/shared/src/config/redis.ts` (worker).
 - OAuth sign-in providers use the `NUXT_OAUTH_<PROVIDER>_CLIENT_ID` / `NUXT_OAUTH_<PROVIDER>_CLIENT_SECRET` pattern (e.g., Google, Facebook). Configure them in your `.env` to enable the social login buttons.
 - Redis credentials map to `runtimeConfig.redis` (Nuxt) and `packages/shared/src/config/redis.ts` (worker).
@@ -73,7 +74,7 @@ pnpm dev:worker               # runs the queue worker with hot reload
 ## Testing
 
 - Unit/component suites: `pnpm test` runs Vitest across Nuxt, worker, and shared packages.
-- Coverage: `pnpm test:coverage` (Vitest + V8 outputs under each workspace `coverage/` directory)
+- Coverage: `pnpm test:coverage` (Vitest + V8 outputs under each workspace `coverage/` directory). Guardrails live in `reports/coverage-threshold.json` and are read directly by every Vitest config plus the CI coverage gate, so tests fail locally/CI if statements/branches/functions/lines dip below those numbers. After a legitimate coverage bump, run `pnpm coverage:baseline:update` (alias for `pnpm coverage:report -- --write`) and commit the refreshed `reports/coverage-baseline.md` snapshot.
 - End-to-end: `pnpm --filter nuxt test:e2e` executes Playwright specs located in `apps/nuxt/tests/e2e/`.
 - Run a focused test: `pnpm --filter worker exec vitest run src/queues/__tests__/quest.queue.spec.ts`
 

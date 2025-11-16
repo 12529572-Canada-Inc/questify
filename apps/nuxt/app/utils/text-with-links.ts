@@ -11,6 +11,11 @@ export interface LinkSegment {
 
 export type Segment = TextSegment | LinkSegment
 
+/**
+ * Utilities for parsing arbitrary user text into segments that preserve URLs as
+ * clickable links while keeping surrounding punctuation intact.
+ */
+
 const urlPattern = /https?:\/\/[^\s<>"]+/g
 const trailingCharacters = new Set(['.', ',', '!', '?', ';', ':', '\'', '"', ')', ']', '}'])
 const closingToOpeningMap: Record<string, string> = {

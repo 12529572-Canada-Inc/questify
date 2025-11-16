@@ -1,6 +1,6 @@
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { prisma } from 'shared/server'
+import { sanitizeOptionalTextInput } from '../../utils/sanitizers'
+import { requireTaskOwner } from '../../utils/ownership'
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event)
@@ -10,22 +10,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 400, statusText: 'Task id is required' })
   }
 
-  const taskRecord = await prisma.task.findUnique({
-    where: { id },
-    select: {
-      quest: {
-        select: { ownerId: true },
-      },
-    },
-  })
-
-  if (!taskRecord) {
-    throw createError({ status: 404, statusText: 'Task not found' })
-  }
-
-  if (taskRecord.quest.ownerId !== user.id) {
-    throw createError({ status: 403, statusText: 'You do not have permission to modify this task' })
-  }
+  await requireTaskOwner(event, id, { userId: user.id })
 
   const body = (await readBody<TaskBody>(event)) || {} as TaskBody
 
@@ -60,30 +45,12 @@ export default defineEventHandler(async (event) => {
     updates.title = trimmedTitle
   }
 
-  const sanitizeOptionalText = (value: unknown) => {
-    if (value === undefined) {
-      return undefined
-    }
-
-    if (value === null) {
-      return null
-    }
-
-    if (typeof value !== 'string') {
-      throw createError({ status: 400, statusText: 'Invalid task content' })
-    }
-
-    const trimmed = value.trim()
-
-    return trimmed.length > 0 ? trimmed : null
-  }
-
-  const details = sanitizeOptionalText(body.details)
+  const details = sanitizeOptionalTextInput(body.details, 'task content')
   if (details !== undefined) {
     updates.details = details
   }
 
-  const extraContent = sanitizeOptionalText(body.extraContent)
+  const extraContent = sanitizeOptionalTextInput(body.extraContent, 'task content')
   if (extraContent !== undefined) {
     updates.extraContent = extraContent
   }

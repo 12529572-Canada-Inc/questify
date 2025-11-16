@@ -1,10 +1,7 @@
-import { PrismaClient } from '@prisma/client'
 import type { H3Event } from 'h3'
-import { hashPassword } from 'shared/server'
+import { hashPassword, prisma } from 'shared/server'
 import { ensureSuperAdmin } from '#prisma-utils/accessControl'
 import { attachSessionWithAccess } from '../../utils/access-control'
-
-const prisma = new PrismaClient()
 
 export default defineEventHandler(async (event) => {
   const body = (await readBody<SignupBody>(event)) || {} as SignupBody

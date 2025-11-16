@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 import { SUPER_ADMIN_ROLE_NAME } from 'shared'
 import {
   attachSessionWithAccess,
@@ -7,8 +7,7 @@ import {
 } from '../../../../utils/access-control'
 import { recordAuditLog } from '../../../../utils/audit'
 import { fetchAdminUser } from '../../users/utils'
-
-const prisma = new PrismaClient()
+import { prisma } from 'shared/server'
 
 interface AssignRoleBody {
   roleId?: string

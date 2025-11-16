@@ -2,6 +2,11 @@ import OpenAI from 'openai'
 import { findModelOption, type AiModelOption } from 'shared/ai-models'
 import { getAiModelOptions, getDefaultModelId, normalizeModelType } from './model-options'
 
+/**
+ * Shared helpers for invoking the configured AI providers on the server,
+ * handling model resolution, API client selection, and fallback behavior.
+ */
+
 const openaiApiKey = process.env.OPENAI_API_KEY || ''
 const deepseekApiKey = process.env.DEEPSEEK_API_KEY || ''
 const deepseekBaseUrl = process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com/v1'

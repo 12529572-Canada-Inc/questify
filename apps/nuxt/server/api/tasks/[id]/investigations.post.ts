@@ -1,7 +1,6 @@
-import { PrismaClient } from '@prisma/client'
 import { normalizeModelType } from '../../../utils/model-options'
-
-const prisma = new PrismaClient()
+import { prisma } from 'shared/server'
+import { requireTaskOwner } from '../../../utils/ownership'
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event)
@@ -18,26 +17,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 400, statusText: 'Investigation context is too long' })
   }
 
-  const task = await prisma.task.findUnique({
-    where: { id },
-    select: {
-      id: true,
-      quest: {
-        select: {
-          ownerId: true,
-          modelType: true,
-        },
-      },
-    },
-  })
-
-  if (!task) {
-    throw createError({ status: 404, statusText: 'Task not found' })
-  }
-
-  if (task.quest.ownerId !== user.id) {
-    throw createError({ status: 403, statusText: 'You do not have permission to investigate this task' })
-  }
+  const task = await requireTaskOwner(event, id, { userId: user.id })
 
   const selectedModelType = normalizeModelType(body.modelType, task.quest.modelType)
 

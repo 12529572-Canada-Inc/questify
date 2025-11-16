@@ -4,8 +4,10 @@ import { storeToRefs } from 'pinia'
 import { useUserStore } from '~/stores/user'
 
 /**
- * Client-side RBAC helper that reads the current session payload and exposes
- * convenience booleans for feature gating admin navigation and actions.
+ * Reads the current user session (via `useUserStore`) and exposes convenience
+ * booleans/guards for feature gating admin-only UI and behaviors.
+ *
+ * @returns helpers describing the current user's roles/privileges plus guard utilities.
  */
 
 const ADMIN_PRIVILEGE_KEYS: PrivilegeKey[] = [

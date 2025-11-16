@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client'
+import { prisma } from 'shared/server'
 import { buildQuestVisibilityFilter } from '../../utils/quest-visibility'
-
-const prisma = new PrismaClient()
 
 function parseBoolean(value: unknown) {
   if (typeof value === 'string') {
