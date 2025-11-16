@@ -31,14 +31,12 @@ function handleAction(action: CompactAction) {
   >
     <template #activator="{ props: menuProps }">
       <v-list-item
-        v-bind="menuProps"
         :data-task-id="taskId"
         :class="[
           'py-3',
           'quest-task-compact',
           { 'quest-task-compact--highlighted': highlighted },
         ]"
-        role="button"
         rounded="lg"
       >
         <div class="quest-task-compact__body">
@@ -49,10 +47,17 @@ function handleAction(action: CompactAction) {
             <slot name="subtitle" />
           </div>
         </div>
-        <v-icon
-          icon="mdi-dots-vertical"
-          class="quest-task-compact__icon"
-        />
+        <div class="quest-task-compact__actions">
+          <v-btn
+            v-bind="menuProps"
+            color="primary"
+            variant="tonal"
+            size="small"
+            append-icon="mdi-menu-down"
+          >
+            Actions
+          </v-btn>
+        </div>
       </v-list-item>
     </template>
 
@@ -107,9 +112,9 @@ function handleAction(action: CompactAction) {
   width: 100%;
 }
 
-.quest-task-compact__icon {
-  opacity: 0.6;
-  flex: 0 0 auto;
+.quest-task-compact__actions {
+  display: flex;
+  align-items: flex-start;
 }
 
 .quest-task-compact--highlighted {

@@ -46,7 +46,7 @@ const compactActionItems = computed<CompactAction[]>(() => {
     },
   ]
 
-  const canEdit = !props.hideOwnerActions && props.isOwner && props.task.status !== 'completed'
+  const canEdit = props.isOwner && props.task.status !== 'completed'
   if (canEdit) {
     actions.push({
       label: 'Investigate',
@@ -61,7 +61,7 @@ const compactActionItems = computed<CompactAction[]>(() => {
     })
   }
 
-  if (props.sectionAction && !props.hideOwnerActions) {
+  if (props.sectionAction) {
     actions.push({
       label: props.sectionAction.label,
       icon: props.sectionAction.color === 'success' ? 'mdi-check' : 'mdi-undo',
