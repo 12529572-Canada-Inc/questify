@@ -118,6 +118,7 @@ describe('API /api/quests (POST)', () => {
       context: null,
       constraints: null,
       modelType: 'gpt-4o-mini',
+      images: [],
     })
     expect(response).toEqual({
       success: true,
