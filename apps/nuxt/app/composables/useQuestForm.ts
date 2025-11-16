@@ -8,6 +8,7 @@ import { useAiModels } from './useAiModels'
 
 interface UseQuestFormOptions {
   onSuccess?: (questId: string) => void
+  initialIsPublic?: boolean
 }
 
 /**
@@ -26,6 +27,7 @@ export function useQuestForm(options: UseQuestFormOptions = {}) {
   const goal = ref('')
   const context = ref('')
   const constraints = ref('')
+  const isPublic = ref(Boolean(options.initialIsPublic))
   const showOptionalFields = ref(false)
   const { models: aiModels, defaultModel } = useAiModels()
   const modelType = ref(defaultModel.value?.id ?? 'gpt-4o-mini')
@@ -69,6 +71,7 @@ export function useQuestForm(options: UseQuestFormOptions = {}) {
           context: context.value,
           constraints: constraints.value,
           modelType: modelType.value,
+          isPublic: isPublic.value,
         },
       })
 
@@ -107,6 +110,7 @@ export function useQuestForm(options: UseQuestFormOptions = {}) {
     constraints,
     modelType,
     modelOptions: aiModels,
+    isPublic,
     showOptionalFields,
     valid,
     loading,

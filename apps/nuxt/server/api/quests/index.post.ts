@@ -12,10 +12,15 @@ const handler = defineEventHandler(async (event) => {
     context,
     constraints,
     modelType,
+    isPublic,
   } = body
 
   if (typeof title !== 'string' || title.trim().length === 0) {
     throw createError({ status: 400, statusText: 'Title is required' })
+  }
+
+  if (typeof isPublic !== 'undefined' && typeof isPublic !== 'boolean') {
+    throw createError({ status: 400, statusText: 'isPublic must be a boolean' })
   }
 
   // Access the queue from the event context
@@ -23,6 +28,7 @@ const handler = defineEventHandler(async (event) => {
   const questQueue = event.context.questQueue as QuestQueue
 
   const selectedModelType = normalizeModelType(modelType, getDefaultModelId())
+  const isQuestPublic = Boolean(isPublic)
 
   const quest = await prisma.quest.create({
     data: {
@@ -32,6 +38,7 @@ const handler = defineEventHandler(async (event) => {
       constraints: normalizeOptionalString(constraints),
       ownerId: user.id,
       modelType: selectedModelType,
+      isPublic: isQuestPublic,
     },
   })
 

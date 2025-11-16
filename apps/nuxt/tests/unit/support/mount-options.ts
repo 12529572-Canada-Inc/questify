@@ -98,6 +98,7 @@ const baseGlobal = {
     VSwitch: simpleDivStub,
     VSkeletonLoader: simpleDivStub,
     VExpandTransition: simpleDivStub,
+    VAlert: simpleDivStub,
   },
   mocks: {
     $fetch: vi.fn(),

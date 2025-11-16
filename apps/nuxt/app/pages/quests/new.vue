@@ -1,3 +1,28 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+
+function normalizePublicFlag(value: unknown): boolean {
+  if (Array.isArray(value)) {
+    return value.some(entry => normalizePublicFlag(entry))
+  }
+
+  if (typeof value !== 'string') {
+    return false
+  }
+
+  const normalized = value.trim().toLowerCase()
+
+  return normalized === 'true' || normalized === '1' || normalized === 'public'
+}
+
+const route = useRoute()
+
+const makePublic = computed(() => {
+  const visibilityQuery = route.query.public ?? route.query.visibility
+  return normalizePublicFlag(visibilityQuery)
+})
+</script>
+
 <template>
   <v-container class="fill-height d-flex justify-center align-center">
     <v-row
@@ -18,7 +43,17 @@
             Create a New Quest
           </v-card-title>
 
-          <QuestForm />
+          <v-alert
+            v-if="makePublic"
+            type="success"
+            variant="tonal"
+            border="start"
+            class="mb-6"
+          >
+            This quest will be created as public and visible to everyone. You can change visibility from the quest page later.
+          </v-alert>
+
+          <QuestForm :make-public="makePublic" />
         </v-card>
       </v-col>
     </v-row>
