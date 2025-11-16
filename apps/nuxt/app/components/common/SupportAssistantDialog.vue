@@ -232,14 +232,14 @@ function buildHtmlSnapshot(): string | undefined {
   }
 
   // Sanitize by removing all <script> elements using DOM APIs
-  const wrapper = doc.createElement('div');
-  wrapper.innerHTML = doc.documentElement.outerHTML;
+  const wrapper = doc.createElement('div')
+  wrapper.innerHTML = doc.documentElement.outerHTML
   // Remove all script elements from the wrapper
-  const scripts = wrapper.querySelectorAll('script');
-  scripts.forEach((el) => el.remove());
-  const sanitizedHtml = wrapper.innerHTML;
-  const collapsed = sanitizedHtml.replace(/\s+/g, ' ').trim();
-  return collapsed.slice(0, 100_000);
+  const scripts = wrapper.querySelectorAll('script')
+  scripts.forEach(el => el.remove())
+  const sanitizedHtml = wrapper.innerHTML
+  const collapsed = sanitizedHtml.replace(/\s+/g, ' ').trim()
+  return collapsed.slice(0, 100_000)
 }
 
 function buildVisibleText(): string | undefined {
