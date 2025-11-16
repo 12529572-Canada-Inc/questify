@@ -233,7 +233,9 @@ describe('worker entrypoint', () => {
       messages: [
         {
           role: 'user',
-          content: expect.stringContaining('Quest Title: Quest Title'),
+          content: expect.arrayContaining([
+            expect.objectContaining({ text: expect.stringContaining('Quest Title: Quest Title') }),
+          ]),
         },
       ],
     });
