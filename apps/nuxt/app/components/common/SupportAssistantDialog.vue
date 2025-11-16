@@ -231,9 +231,14 @@ function buildHtmlSnapshot(): string | undefined {
     return undefined
   }
 
-  const withoutScripts = doc.documentElement.outerHTML.replace(/<script[\s\S]*?<\/script>/gi, '')
-  const collapsed = withoutScripts.replace(/\s+/g, ' ').trim()
-  return collapsed.slice(0, 100_000)
+  let html = doc.documentElement.outerHTML;
+  let prev;
+  do {
+    prev = html;
+    html = html.replace(/<script[\s\S]*?<\/script>/gi, '');
+  } while (html !== prev);
+  const collapsed = html.replace(/\s+/g, ' ').trim();
+  return collapsed.slice(0, 100_000);
 }
 
 function buildVisibleText(): string | undefined {
