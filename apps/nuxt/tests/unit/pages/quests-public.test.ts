@@ -78,12 +78,12 @@ describe('quests/public page', () => {
           },
         },
         stubs: {
-          Suspense: false,
-          VBtn: vBtnStub,
+          'Suspense': false,
+          'VBtn': vBtnStub,
           'v-btn': vBtnStub,
         },
         components: {
-          VBtn: vBtnStub,
+          'VBtn': vBtnStub,
           'v-btn': vBtnStub,
         },
       },
@@ -114,12 +114,12 @@ describe('quests/public page', () => {
           },
         },
         stubs: {
-          Suspense: false,
-          VBtn: vBtnStub,
+          'Suspense': false,
+          'VBtn': vBtnStub,
           'v-btn': vBtnStub,
         },
         components: {
-          VBtn: vBtnStub,
+          'VBtn': vBtnStub,
           'v-btn': vBtnStub,
         },
       },
