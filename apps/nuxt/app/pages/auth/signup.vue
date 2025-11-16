@@ -8,6 +8,7 @@ import { useUserStore } from '~/stores/user'
 
 const userStore = useUserStore()
 const router = useRouter()
+const route = useRoute()
 const session = useUserSession()
 const { showSnackbar } = useSnackbar()
 const { consumeOAuthFlash } = useOAuthFlash()
@@ -18,6 +19,7 @@ const name = ref('')
 const email = ref('')
 const password = ref('')
 const activeProvider = ref<OAuthProvider | null>(null)
+const hasNavigatedAfterAuth = ref(false)
 
 const valid = ref(false)
 const loading = ref(false)
@@ -35,9 +37,18 @@ const rules = {
   ],
 }
 
+const redirectPath = computed(() => {
+  const raw = route.query.redirectTo
+  if (typeof raw === 'string' && raw.startsWith('/')) {
+    return raw
+  }
+  return '/dashboard'
+})
+
 if (import.meta.client) {
   watch(loggedIn, (value) => {
-    if (value) {
+    if (value && !hasNavigatedAfterAuth.value) {
+      hasNavigatedAfterAuth.value = true
       const flash = consumeOAuthFlash()
       if (flash) {
         const providerLabel = providerLabels[flash.provider] ?? flash.provider
@@ -51,7 +62,7 @@ if (import.meta.client) {
           showSnackbar(`Welcome back! Signed in with ${providerLabel}.`, { variant: 'success' })
         }
       }
-      router.push('/dashboard')
+      router.push(redirectPath.value)
     }
   }, { immediate: true })
 }
@@ -67,7 +78,8 @@ async function submit() {
     })
     showSnackbar('Account created! Welcome to Questify.', { variant: 'success' })
     await userStore.fetchSession().catch(() => null)
-    await router.push('/dashboard')
+    hasNavigatedAfterAuth.value = true
+    await router.push(redirectPath.value)
   }
   catch (e) {
     const statusCode = extractStatusCode(e)

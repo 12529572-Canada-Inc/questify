@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { storeToRefs } from 'pinia'
 import { watchDebounced } from '@vueuse/core'
 import type { QuestStatus } from '@prisma/client'
 import type { PublicQuestsResponse, PublicQuestSort } from '~/types/public-quests'
@@ -9,6 +10,7 @@ import {
   normalizePublicQuestSort,
   normalizePublicQuestStatuses,
 } from '~/types/public-quests'
+import { useUserStore } from '~/stores/user'
 
 definePageMeta({
   layout: 'default',
@@ -16,6 +18,11 @@ definePageMeta({
 
 const route = useRoute()
 const router = useRouter()
+const userStore = useUserStore()
+const { loggedIn } = storeToRefs(userStore)
+
+const PUBLIC_QUEST_ROUTE = { path: '/quests/new', query: { public: 'true' } as const }
+const PUBLIC_QUEST_REDIRECT = '/quests/new?public=true'
 
 function parsePageParam(value: unknown): number {
   if (Array.isArray(value)) {
@@ -173,6 +180,17 @@ const filtersActive = computed(() => {
   return Boolean(debouncedSearch.value) || selectedStatuses.value.length > 0 || selectedSort.value !== 'newest'
 })
 
+const createQuestLink = computed(() => {
+  if (loggedIn.value) {
+    return PUBLIC_QUEST_ROUTE
+  }
+
+  return {
+    path: '/auth/login',
+    query: { redirectTo: PUBLIC_QUEST_REDIRECT },
+  }
+})
+
 function resetFilters() {
   searchTerm.value = ''
   debouncedSearch.value = ''
@@ -275,7 +293,7 @@ const errorMessage = computed(() => {
         <v-btn
           color="primary"
           class="w-100 w-md-auto"
-          :to="{ path: '/quests/new', query: { public: 'true' } }"
+          :to="createQuestLink"
         >
           Create public quest
         </v-btn>

@@ -284,6 +284,31 @@ describe('basic pages', () => {
     expect(routerPush).toHaveBeenCalledWith('/dashboard')
   })
 
+  it('submits the login form and honors redirectTo query param', async () => {
+    vi.stubGlobal('useRoute', () => ({
+      query: { redirectTo: '/quests/new?public=true' },
+    }))
+
+    const wrapper = shallowMountWithBase(AuthLoginPage, {
+      global: {
+        stubs: {
+          AuthFormCard: { template: '<form @submit="$emit(\'submit\')"><slot /></form>' },
+          VTextField: { props: ['modelValue'], template: '<input />' },
+        },
+        mocks: {
+          $fetch: fetchApi,
+        },
+      },
+    })
+
+    const vm = wrapper.vm as AuthFormVm
+    vm.email = 'person@example.com'
+    vm.password = 'password123'
+    await vm.submit?.()
+    expect(fetchApi).toHaveBeenCalledWith('/api/auth/login', expect.any(Object))
+    expect(routerPush).toHaveBeenCalledWith('/quests/new?public=true')
+  })
+
   it('submits the signup form and navigates to the dashboard', async () => {
     const wrapper = shallowMountWithBase(AuthSignupPage, {
       global: {
@@ -303,5 +328,30 @@ describe('basic pages', () => {
     await vm.submit?.()
     expect(fetchApi).toHaveBeenCalledWith('/api/auth/signup', expect.any(Object))
     expect(routerPush).toHaveBeenCalledWith('/dashboard')
+  })
+
+  it('submits the signup form and honors redirectTo query param', async () => {
+    vi.stubGlobal('useRoute', () => ({
+      query: { redirectTo: '/quests/new?public=true' },
+    }))
+
+    const wrapper = shallowMountWithBase(AuthSignupPage, {
+      global: {
+        stubs: {
+          AuthFormCard: { template: '<form @submit="$emit(\'submit\')"><slot /></form>' },
+          VTextField: { props: ['modelValue'], template: '<input />' },
+        },
+        mocks: {
+          $fetch: fetchApi,
+        },
+      },
+    })
+
+    const vm = wrapper.vm as AuthFormVm
+    vm.email = 'new@example.com'
+    vm.password = 'topsecret'
+    await vm.submit?.()
+    expect(fetchApi).toHaveBeenCalledWith('/api/auth/signup', expect.any(Object))
+    expect(routerPush).toHaveBeenCalledWith('/quests/new?public=true')
   })
 })

@@ -22,11 +22,20 @@ const activeProvider = ref<OAuthProvider | null>(null)
 const valid = ref(false)
 const loading = ref(false)
 const error = ref<string | null>(null)
+const hasNavigatedAfterAuth = ref(false)
 
 const rules = {
   email: [(v: string) => !!v || 'Email is required'],
   password: [(v: string) => !!v || 'Password is required'],
 }
+
+const redirectPath = computed(() => {
+  const raw = route.query.redirectTo
+  if (typeof raw === 'string' && raw.startsWith('/')) {
+    return raw
+  }
+  return '/dashboard'
+})
 
 if (import.meta.client) {
   watch(() => route.query.oauthError, (value) => {
@@ -39,7 +48,8 @@ if (import.meta.client) {
   }, { immediate: true })
 
   watch(loggedIn, (value) => {
-    if (value) {
+    if (value && !hasNavigatedAfterAuth.value) {
+      hasNavigatedAfterAuth.value = true
       const flash = consumeOAuthFlash()
       if (flash) {
         const providerLabel = providerLabels[flash.provider] ?? flash.provider
@@ -53,7 +63,7 @@ if (import.meta.client) {
           showSnackbar(`Welcome back! Signed in with ${providerLabel}.`, { variant: 'success' })
         }
       }
-      router.push('/dashboard')
+      router.push(redirectPath.value)
     }
   }, { immediate: true })
 }
@@ -66,7 +76,8 @@ async function submit() {
     await $fetch('/api/auth/login', { method: 'POST', body: { email: email.value, password: password.value } })
     await userStore.fetchSession()
     showSnackbar('Welcome back! You are logged in.', { variant: 'success' })
-    router.push('/dashboard')
+    hasNavigatedAfterAuth.value = true
+    router.push(redirectPath.value)
   }
   catch (e) {
     const statusCode = extractStatusCode(e)
