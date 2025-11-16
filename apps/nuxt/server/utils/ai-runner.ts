@@ -1,4 +1,5 @@
 import OpenAI from 'openai'
+import type { ChatCompletionUserMessageParam } from 'openai/resources/chat/completions'
 import { findModelOption, type AiModelOption } from 'shared/ai-models'
 import { getAiModelOptions, getDefaultModelId, normalizeModelType } from './model-options'
 
@@ -28,7 +29,7 @@ type RunModelResult = {
   modelId: string
 }
 
-type OpenAiMessageContent = OpenAI.Chat.Completions.ChatCompletionMessageParam['content']
+type OpenAiMessageContent = NonNullable<ChatCompletionUserMessageParam['content']>
 
 function resolveModelOption(requested?: string | null): AiModelOption {
   const defaultModelId = getDefaultModelId()
@@ -47,9 +48,9 @@ function buildOpenAiContent(prompt: string, images: string[]): OpenAiMessageCont
   }
 
   return [
-    { type: 'text', text: prompt },
+    { type: 'text' as const, text: prompt },
     ...images.map(image => ({
-      type: 'image_url',
+      type: 'image_url' as const,
       image_url: { url: image, detail: 'auto' as const },
     })),
   ]
@@ -60,9 +61,11 @@ async function callOpenAi(client: OpenAiClient | null, model: AiModelOption, pro
     throw new Error(`Missing API client for provider ${model.provider}`)
   }
 
-  const response = await client.chat.completions.create({
+  const content = buildOpenAiContent(prompt, images)
+  const createCompletion = client.chat.completions.create as unknown as (args: unknown) => Promise<{ choices: Array<{ message?: { content?: string } }> }>
+  const response = await createCompletion({
     model: model.apiModel,
-    messages: [{ role: 'user', content: buildOpenAiContent(prompt, images) }],
+    messages: [{ role: 'user', content }],
   })
 
   return response.choices[0]?.message?.content ?? ''

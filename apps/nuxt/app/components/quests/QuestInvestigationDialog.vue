@@ -9,7 +9,7 @@ const props = withDefaults(defineProps<{
   submitting: boolean
   error: string | null
   models: AiModelOption[]
-  images: string[]
+  images?: string[]
 }>(), {
   images: () => [],
 })
@@ -83,22 +83,22 @@ function handleSubmit() {
             rows="4"
             maxlength="1000"
             counter
-          hint="This will help generate insights or suggestions related to the task."
-          persistent-hint
+            hint="This will help generate insights or suggestions related to the task."
+            persistent-hint
+          />
+        </div>
+        <ImageAttachmentInput
+          v-model="imagesModel"
+          label="Add investigation images"
+          hint="Upload or take photos that could help with the analysis."
+          :max-images="3"
+          class="mt-2"
+          :disabled="submitting"
         />
-      </div>
-      <ImageAttachmentInput
-        v-model="imagesModel"
-        label="Add investigation images"
-        hint="Upload or take photos that could help with the analysis."
-        :max-images="3"
-        class="mt-2"
-        :disabled="submitting"
-      />
-      <p
-        v-if="error"
-        class="investigation-error"
-      >
+        <p
+          v-if="error"
+          class="investigation-error"
+        >
           {{ error }}
         </p>
       </v-card-text>
