@@ -275,9 +275,9 @@ const errorMessage = computed(() => {
         <v-btn
           color="primary"
           class="w-100 w-md-auto"
-          :to="`/auth/signup`"
+          :to="{ path: '/quests/new', query: { public: 'true' } }"
         >
-          Create your own quest
+          Create public quest
         </v-btn>
       </v-col>
     </v-row>

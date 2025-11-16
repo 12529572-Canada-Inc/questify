@@ -2,8 +2,12 @@
 import { useQuestForm } from '~/composables/useQuestForm'
 import { useQuestAiAssist } from '~/composables/useQuestAiAssist'
 
-const props = withDefaults(defineProps<{ showBackButton?: boolean }>(), {
+const props = withDefaults(defineProps<{
+  showBackButton?: boolean
+  makePublic?: boolean
+}>(), {
   showBackButton: true,
+  makePublic: false,
 })
 
 const {
@@ -21,7 +25,9 @@ const {
   isSubmitDisabled,
   submit,
   toggleOptionalFields,
-} = useQuestForm()
+} = useQuestForm({
+  initialIsPublic: props.makePublic,
+})
 
 const {
   isEnabled: aiAssistEnabled,
