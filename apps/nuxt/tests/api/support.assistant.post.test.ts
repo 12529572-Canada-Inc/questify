@@ -147,4 +147,25 @@ describe('API /api/support/assistant (POST)', () => {
     expect(prompt).toContain('msg-2')
     expect(prompt).toContain('msg-9')
   })
+
+  it('includes html snapshot when provided', async () => {
+    const htmlSnapshot = '<html><body><div>Support content</div></body></html>'
+    ;(globalThis as GlobalWithMocks).readBody = vi.fn(async () => ({
+      question: 'Page help please',
+      route: '/quests',
+      conversation: [],
+      htmlSnapshot,
+    }))
+
+    runAiModelMock.mockResolvedValue({
+      modelId: 'gpt-4o-mini',
+      content: 'All good',
+    })
+
+    await handler({} as never)
+
+    const prompt = runAiModelMock.mock.calls[0]?.[0]
+    expect(prompt).toContain('Current page HTML snapshot')
+    expect(prompt).toContain('Support content')
+  })
 })

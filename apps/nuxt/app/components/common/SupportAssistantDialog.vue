@@ -195,6 +195,7 @@ async function sendQuestion() {
         question,
         route: routePath,
         conversation: conversation.value.messages,
+        htmlSnapshot: buildHtmlSnapshot(),
       },
     })
 
@@ -218,6 +219,20 @@ async function sendQuestion() {
 
 function closeDialog() {
   dialogModel.value = false
+}
+
+function buildHtmlSnapshot(): string | undefined {
+  if (import.meta.server) {
+    return undefined
+  }
+  const doc = globalThis.document
+  if (!doc?.documentElement?.outerHTML) {
+    return undefined
+  }
+
+  const withoutScripts = doc.documentElement.outerHTML.replace(/<script[\s\S]*?<\/script>/gi, '')
+  const collapsed = withoutScripts.replace(/\s+/g, ' ').trim()
+  return collapsed.slice(0, 100_000)
 }
 </script>
 

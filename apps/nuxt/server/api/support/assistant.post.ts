@@ -13,6 +13,7 @@ type SupportAssistantBody = {
   route?: string
   conversation?: SupportChatMessage[]
   modelType?: string | null
+  htmlSnapshot?: string
 }
 
 const MAX_ROUTE_LENGTH = 240
@@ -85,7 +86,7 @@ function sanitizeConversation(value: unknown): SupportChatMessage[] {
   return sanitized.slice(-MAX_HISTORY)
 }
 
-function buildPrompt(question: string, route: string, history: SupportChatMessage[]) {
+function buildPrompt(question: string, route: string, history: SupportChatMessage[], htmlSnapshot?: string) {
   const lines = [
     'You are Questify\'s in-app AI assistant, providing concise, step-by-step guidance.',
     `Current page: ${route || 'Unknown'}. Tailor the answer to this page when possible.`,
@@ -99,6 +100,10 @@ function buildPrompt(question: string, route: string, history: SupportChatMessag
       const speaker = message.role === 'assistant' ? 'Assistant' : 'User'
       lines.push(`${speaker}: ${message.content}`)
     }
+  }
+
+  if (htmlSnapshot) {
+    lines.push('', 'Current page HTML snapshot (truncated):', htmlSnapshot.slice(0, 2000))
   }
 
   lines.push(
@@ -124,7 +129,8 @@ const handler = defineEventHandler(async (event) => {
   const route = sanitizeRoute(body.route)
   const history = sanitizeConversation(body.conversation)
   const requestedModel = typeof body.modelType === 'string' ? body.modelType : null
-  const prompt = buildPrompt(question, route, history)
+  const htmlSnapshot = typeof body.htmlSnapshot === 'string' ? body.htmlSnapshot.slice(0, 100_000) : undefined
+  const prompt = buildPrompt(question, route, history, htmlSnapshot)
 
   try {
     const { content, modelId } = await runAiModel(prompt, requestedModel)
