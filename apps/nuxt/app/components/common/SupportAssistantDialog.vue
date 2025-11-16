@@ -231,14 +231,14 @@ function buildHtmlSnapshot(): string | undefined {
     return undefined
   }
 
-  let html = doc.documentElement.outerHTML;
-  let prev;
+  let html = doc.documentElement.outerHTML
+  let prev
   do {
-    prev = html;
-    html = html.replace(/<script[\s\S]*?<\/script>/gi, '');
-  } while (html !== prev);
-  const collapsed = html.replace(/\s+/g, ' ').trim();
-  return collapsed.slice(0, 100_000);
+    prev = html
+    html = html.replace(/<script[\s\S]*?<\/script>/gi, '')
+  } while (html !== prev)
+  const collapsed = html.replace(/\s+/g, ' ').trim()
+  return collapsed.slice(0, 100_000)
 }
 
 function buildVisibleText(): string | undefined {
