@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [1.13.0] - 2025-11-16
+
 ### 🚀 Features
 - Enabled in-app GitHub issue submission from the support assistant, including server-side GitHub integration, success/error UI feedback, and environment variables for repo/token configuration.
 - Added an AI support chat: `/api/support/assistant` now streams page-aware answers, the Support Assistant dialog renders a two-way conversation with pending state, and chats persist locally with reset controls when AI is disabled or turned off.
