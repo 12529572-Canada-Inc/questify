@@ -42,7 +42,6 @@ async function executeSectionAction(taskId: string) {
     <div class="task-tab-content">
       <template v-if="section.tasks.length">
         <v-list
-          lines="three"
           density="comfortable"
           class="py-0"
         >
