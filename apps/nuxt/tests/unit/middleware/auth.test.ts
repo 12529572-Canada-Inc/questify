@@ -34,7 +34,7 @@ describe('auth middleware', () => {
   it('redirects to login when still unauthenticated after fetch', async () => {
     fetchSessionMock.mockResolvedValue(undefined)
 
-    await authMiddleware()
+    await authMiddleware({} as any, {} as any)
 
     expect(fetchSessionMock).toHaveBeenCalled()
     expect(navigateToMock).toHaveBeenCalledWith('/auth/login')
@@ -46,7 +46,7 @@ describe('auth middleware', () => {
       return undefined
     })
 
-    await authMiddleware()
+    await authMiddleware({} as any, {} as any)
 
     expect(fetchSessionMock).toHaveBeenCalled()
     expect(navigateToMock).not.toHaveBeenCalled()

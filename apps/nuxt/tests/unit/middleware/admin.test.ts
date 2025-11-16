@@ -40,7 +40,7 @@ describe('admin middleware', () => {
   })
 
   it('allows admin user through without redirect', async () => {
-    await adminMiddleware()
+    await adminMiddleware({} as any, {} as any)
 
     expect(fetchSessionMock).not.toHaveBeenCalled()
     expect(navigateToMock).not.toHaveBeenCalled()
@@ -53,7 +53,7 @@ describe('admin middleware', () => {
       return undefined
     })
 
-    await adminMiddleware()
+    await adminMiddleware({} as any, {} as any)
 
     expect(fetchSessionMock).toHaveBeenCalled()
     expect(navigateToMock).not.toHaveBeenCalled()
@@ -62,7 +62,7 @@ describe('admin middleware', () => {
   it('redirects non-admin users to quests', async () => {
     isAdmin.value = false
 
-    await adminMiddleware()
+    await adminMiddleware({} as any, {} as any)
 
     expect(navigateToMock).toHaveBeenCalledWith('/quests')
   })
