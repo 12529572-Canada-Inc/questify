@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🚀 Features
 - Enabled in-app GitHub issue submission from the support assistant, including server-side GitHub integration, success/error UI feedback, and environment variables for repo/token configuration.
+- Added an AI support chat: `/api/support/assistant` now streams page-aware answers, the Support Assistant dialog renders a two-way conversation with pending state, and chats persist locally with reset controls when AI is disabled or turned off.
 
 ### ♻️ Refactors
 - All Nitro handlers, utilities, the worker, and Prisma seed script now share a single `PrismaClient` exported from `shared/server`, preventing runaway connection counts during HMR/serverless cold starts and giving us one place to instrument the client.

@@ -6,7 +6,7 @@ import { useSupportStore } from '~/stores/support'
 import { useUiStore } from '~/stores/ui'
 import { useSnackbar } from '~/composables/useSnackbar'
 import { resolveApiError } from '~/utils/error'
-import type { SupportAssistantResponse } from '~/server/api/support/assistant.post'
+import type { SupportAssistantResponse } from '~/types/support'
 
 const props = defineProps<{
   modelValue: boolean
