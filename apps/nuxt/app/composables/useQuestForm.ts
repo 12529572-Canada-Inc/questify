@@ -31,6 +31,7 @@ export function useQuestForm(options: UseQuestFormOptions = {}) {
   const showOptionalFields = ref(false)
   const { models: aiModels, defaultModel } = useAiModels()
   const modelType = ref(defaultModel.value?.id ?? 'gpt-4o-mini')
+  const images = ref<string[]>([])
 
   watch(defaultModel, (next) => {
     if (next && !modelType.value) {
@@ -72,6 +73,7 @@ export function useQuestForm(options: UseQuestFormOptions = {}) {
           constraints: constraints.value,
           modelType: modelType.value,
           isPublic: isPublic.value,
+          images: images.value,
         },
       })
 
@@ -111,6 +113,7 @@ export function useQuestForm(options: UseQuestFormOptions = {}) {
     modelType,
     modelOptions: aiModels,
     isPublic,
+    images,
     showOptionalFields,
     valid,
     loading,

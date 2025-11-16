@@ -28,6 +28,8 @@ type RunModelResult = {
   modelId: string
 }
 
+type OpenAiMessageContent = OpenAI.Chat.Completions.ChatCompletionMessageParam['content']
+
 function resolveModelOption(requested?: string | null): AiModelOption {
   const defaultModelId = getDefaultModelId()
   const normalizedId = normalizeModelType(requested, defaultModelId)
@@ -39,14 +41,28 @@ function resolveModelOption(requested?: string | null): AiModelOption {
   return resolved
 }
 
-async function callOpenAi(client: OpenAiClient | null, model: AiModelOption, prompt: string) {
+function buildOpenAiContent(prompt: string, images: string[]): OpenAiMessageContent {
+  if (!images.length) {
+    return prompt
+  }
+
+  return [
+    { type: 'text', text: prompt },
+    ...images.map(image => ({
+      type: 'image_url',
+      image_url: { url: image, detail: 'auto' as const },
+    })),
+  ]
+}
+
+async function callOpenAi(client: OpenAiClient | null, model: AiModelOption, prompt: string, images: string[]) {
   if (!client) {
     throw new Error(`Missing API client for provider ${model.provider}`)
   }
 
   const response = await client.chat.completions.create({
     model: model.apiModel,
-    messages: [{ role: 'user', content: prompt }],
+    messages: [{ role: 'user', content: buildOpenAiContent(prompt, images) }],
   })
 
   return response.choices[0]?.message?.content ?? ''
@@ -83,20 +99,32 @@ async function callAnthropic(model: AiModelOption, prompt: string) {
     .trim()
 }
 
-export async function runAiModel(prompt: string, requestedModelId?: string | null, allowFallback = true): Promise<RunModelResult> {
+export async function runAiModel(
+  prompt: string,
+  requestedModelId?: string | null,
+  allowFallback = true,
+  images: string[] = [],
+): Promise<RunModelResult> {
   const model = resolveModelOption(requestedModelId)
   const defaultModelId = getDefaultModelId()
+  const sanitizedImages = Array.isArray(images) ? images.filter(Boolean) : []
 
   try {
     let content = ''
     if (model.provider === 'openai') {
-      content = await callOpenAi(openaiClient, model, prompt)
+      content = await callOpenAi(openaiClient, model, prompt, sanitizedImages)
     }
     else if (model.provider === 'deepseek') {
-      content = await callOpenAi(deepseekClient, model, prompt)
+      const note = sanitizedImages.length
+        ? `${prompt}\n\n(${sanitizedImages.length} image(s) were attached but this model only accepts text prompts.)`
+        : prompt
+      content = await callOpenAi(deepseekClient, model, note, [])
     }
     else {
-      content = await callAnthropic(model, prompt)
+      const note = sanitizedImages.length
+        ? `${prompt}\n\n(${sanitizedImages.length} image(s) attached; image content omitted for this model.)`
+        : prompt
+      content = await callAnthropic(model, note)
     }
 
     return { content, modelId: model.id }
@@ -104,7 +132,7 @@ export async function runAiModel(prompt: string, requestedModelId?: string | nul
   catch (error) {
     if (allowFallback && model.id !== defaultModelId) {
       console.warn(`Model ${model.id} failed (${(error as Error).message}); falling back to ${defaultModelId}`)
-      return runAiModel(prompt, defaultModelId, false)
+      return runAiModel(prompt, defaultModelId, false, sanitizedImages)
     }
     throw error
   }

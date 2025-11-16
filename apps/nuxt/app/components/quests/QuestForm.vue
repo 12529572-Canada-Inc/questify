@@ -24,6 +24,7 @@ const {
   rules,
   isSubmitDisabled,
   submit,
+  images,
   toggleOptionalFields,
 } = useQuestForm({
   initialIsPublic: props.makePublic,
@@ -50,6 +51,7 @@ const {
   },
   modelType,
   modelOptions,
+  images,
 })
 </script>
 
@@ -177,6 +179,13 @@ const {
         </v-btn>
       </div>
     </v-expand-transition>
+
+    <ImageAttachmentInput
+      v-model="images"
+      label="Add supporting images"
+      hint="Upload or take photos to give the Quest Agent more context."
+      class="mt-4 mb-6"
+    />
 
     <v-row
       class="mt-4"

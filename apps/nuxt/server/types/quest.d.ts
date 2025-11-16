@@ -6,6 +6,7 @@ declare interface QuestBody {
   modelType?: string | null
   status?: 'draft' | 'active' | 'completed' | 'failed' | 'archived'
   isPublic?: boolean
+  images?: string[]
 }
 
 declare interface CreateQuestResponse {
@@ -25,5 +26,6 @@ declare interface QuestQueue {
     context?: string | null
     constraints?: string | null
     modelType: string
+    images?: string[]
   }) => Promise<void>
 }

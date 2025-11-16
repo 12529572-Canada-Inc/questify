@@ -1,6 +1,6 @@
 import { prisma } from 'shared/server'
 import { getDefaultModelId, normalizeModelType } from '../../utils/model-options'
-import { normalizeOptionalString } from '../../utils/sanitizers'
+import { normalizeOptionalString, sanitizeImageInputs } from '../../utils/sanitizers'
 
 const handler = defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event) // 👈 forces login
@@ -13,6 +13,7 @@ const handler = defineEventHandler(async (event) => {
     constraints,
     modelType,
     isPublic,
+    images,
   } = body
 
   if (typeof title !== 'string' || title.trim().length === 0) {
@@ -29,6 +30,7 @@ const handler = defineEventHandler(async (event) => {
 
   const selectedModelType = normalizeModelType(modelType, getDefaultModelId())
   const isQuestPublic = Boolean(isPublic)
+  const sanitizedImages = sanitizeImageInputs(images, { fieldLabel: 'quest images' })
 
   const quest = await prisma.quest.create({
     data: {
@@ -49,6 +51,7 @@ const handler = defineEventHandler(async (event) => {
     context: normalizeOptionalString(context),
     constraints: normalizeOptionalString(constraints),
     modelType: selectedModelType,
+    images: sanitizedImages,
   })
 
   return { success: true, quest }

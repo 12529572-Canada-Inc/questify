@@ -92,7 +92,7 @@ export function useQuestActions(options: QuestActionsOptions) {
     )
   }
 
-  async function investigateTask(taskId: string, payload: { prompt: string, modelType: string }) {
+  async function investigateTask(taskId: string, payload: { prompt: string, modelType: string, images?: string[] }) {
     const trimmedPrompt = payload.prompt.trim()
     const endpoint: string = `/api/tasks/${taskId}/investigations`
     await execute<unknown>(
@@ -101,6 +101,7 @@ export function useQuestActions(options: QuestActionsOptions) {
         body: {
           prompt: trimmedPrompt,
           modelType: payload.modelType,
+          images: payload.images ?? [],
         },
       }),
       {

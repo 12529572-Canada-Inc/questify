@@ -4,5 +4,6 @@ declare interface TaskQueue {
     taskId: string
     prompt?: string | null
     modelType: string
+    images?: string[]
   }) => Promise<void>
 }
