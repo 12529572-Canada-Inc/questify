@@ -196,6 +196,7 @@ async function sendQuestion() {
         route: routePath,
         conversation: conversation.value.messages,
         htmlSnapshot: buildHtmlSnapshot(),
+        visibleText: buildVisibleText(),
       },
     })
 
@@ -233,6 +234,18 @@ function buildHtmlSnapshot(): string | undefined {
   const withoutScripts = doc.documentElement.outerHTML.replace(/<script[\s\S]*?<\/script>/gi, '')
   const collapsed = withoutScripts.replace(/\s+/g, ' ').trim()
   return collapsed.slice(0, 100_000)
+}
+
+function buildVisibleText(): string | undefined {
+  if (import.meta.server) {
+    return undefined
+  }
+  const bodyText = globalThis.document?.body?.innerText
+  if (!bodyText) {
+    return undefined
+  }
+  const normalized = bodyText.replace(/\s+/g, ' ').trim()
+  return normalized ? normalized.slice(0, 10_000) : undefined
 }
 </script>
 

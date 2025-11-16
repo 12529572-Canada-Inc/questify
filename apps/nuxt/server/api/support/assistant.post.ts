@@ -14,12 +14,14 @@ type SupportAssistantBody = {
   conversation?: SupportChatMessage[]
   modelType?: string | null
   htmlSnapshot?: string
+  visibleText?: string
 }
 
 const MAX_ROUTE_LENGTH = 240
 const MAX_QUESTION_LENGTH = 800
 const MAX_MESSAGE_LENGTH = 800
 const MAX_HISTORY = 8
+const MAX_VISIBLE_TEXT_LENGTH = 10_000
 
 function createMessageId() {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -86,14 +88,31 @@ function sanitizeConversation(value: unknown): SupportChatMessage[] {
   return sanitized.slice(-MAX_HISTORY)
 }
 
-function buildPrompt(question: string, route: string, history: SupportChatMessage[], htmlSnapshot?: string) {
+function sanitizeVisibleText(value: unknown) {
+  if (typeof value !== 'string') {
+    return null
+  }
+  const trimmed = value.trim().replace(/\s+/g, ' ')
+  if (!trimmed) {
+    return null
+  }
+  return trimmed.slice(0, MAX_VISIBLE_TEXT_LENGTH)
+}
+
+function buildPrompt(question: string, route: string, history: SupportChatMessage[], htmlSnapshot?: string | null, visibleText?: string | null) {
   const lines = [
     'You are Questify\'s in-app AI assistant, providing concise, step-by-step guidance.',
-    `Current page: ${route || 'Unknown'}. Tailor the answer to this page when possible.`,
-    'Keep responses short (under 140 words), and avoid fabricating product behavior.',
-    `Finish with a follow-up question to engage the user.`,
+    'When answering:',
+    '• Keep it under ~140 words and avoid generic platitudes.',
+    '• Ground responses in the provided page context and conversation.',
+    '• If uncertain, say what is missing and ask a clarifying question.',
   ]
 
+  lines.push('', 'Page context:')
+  lines.push(`• Route: ${route || 'Unknown'}`)
+  if (visibleText) {
+    lines.push(`• Visible text (trimmed): ${visibleText}`)
+  }
   if (history.length) {
     lines.push('', 'Conversation so far:')
     for (const message of history) {
@@ -103,13 +122,13 @@ function buildPrompt(question: string, route: string, history: SupportChatMessag
   }
 
   if (htmlSnapshot) {
-    lines.push('', 'Current page HTML snapshot (truncated):', htmlSnapshot.slice(0, 2000))
+    lines.push('', 'HTML snapshot (truncated):', htmlSnapshot.slice(0, 2000))
   }
 
   lines.push(
     '',
     `User question: ${question}`,
-    'Provide a clear answer. If the user asks something out of scope, give a brief safe response and suggest contacting support.',
+    'Provide a clear, page-aware answer with 2-4 actionable steps when relevant. If out of scope, say so briefly and suggest contacting support.',
   )
 
   return lines.join('\n')
@@ -129,8 +148,9 @@ const handler = defineEventHandler(async (event) => {
   const route = sanitizeRoute(body.route)
   const history = sanitizeConversation(body.conversation)
   const requestedModel = typeof body.modelType === 'string' ? body.modelType : null
-  const htmlSnapshot = typeof body.htmlSnapshot === 'string' ? body.htmlSnapshot.slice(0, 100_000) : undefined
-  const prompt = buildPrompt(question, route, history, htmlSnapshot)
+  const htmlSnapshot = typeof body.htmlSnapshot === 'string' ? body.htmlSnapshot.slice(0, 100_000) : null
+  const visibleText = sanitizeVisibleText(body.visibleText)
+  const prompt = buildPrompt(question, route, history, htmlSnapshot, visibleText)
 
   try {
     const { content, modelId } = await runAiModel(prompt, requestedModel)

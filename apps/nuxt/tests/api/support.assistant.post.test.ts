@@ -141,7 +141,7 @@ describe('API /api/support/assistant (POST)', () => {
 
     expect(response.success).toBe(true)
     const prompt = runAiModelMock.mock.calls[0]?.[0]
-    expect(prompt).toContain('Current page: Unknown')
+    expect(prompt).toContain('Route: Unknown')
     expect(prompt).not.toContain('skip-me-0')
     expect(prompt).not.toContain('skip-me-1')
     expect(prompt).toContain('msg-2')
@@ -165,7 +165,8 @@ describe('API /api/support/assistant (POST)', () => {
     await handler({} as never)
 
     const prompt = runAiModelMock.mock.calls[0]?.[0]
-    expect(prompt).toContain('Current page HTML snapshot')
+    expect(prompt).toContain('HTML snapshot')
     expect(prompt).toContain('Support content')
+    expect(prompt).toContain('Visible text')
   })
 })
