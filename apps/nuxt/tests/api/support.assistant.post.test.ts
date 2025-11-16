@@ -113,4 +113,38 @@ describe('API /api/support/assistant (POST)', () => {
 
     await expect(handler({} as never)).rejects.toMatchObject({ status: 502 })
   })
+
+  it('trims history to the latest entries and falls back to unknown route', async () => {
+    (globalThis as GlobalWithMocks).readBody = vi.fn(async () => ({
+      question: 'Help me',
+      route: '   ',
+      conversation: [
+        { role: 'user', content: 'skip-me-0' },
+        { role: 'assistant', content: 'skip-me-1' },
+        { role: 'user', content: 'msg-2' },
+        { role: 'assistant', content: 'msg-3' },
+        { role: 'user', content: 'msg-4' },
+        { role: 'assistant', content: 'msg-5' },
+        { role: 'user', content: 'msg-6' },
+        { role: 'assistant', content: 'msg-7' },
+        { role: 'user', content: 'msg-8' },
+        { role: 'assistant', content: 'msg-9' },
+      ],
+    }))
+
+    runAiModelMock.mockResolvedValue({
+      modelId: 'gpt-4o-mini',
+      content: 'All good',
+    })
+
+    const response = await handler({} as never)
+
+    expect(response.success).toBe(true)
+    const prompt = runAiModelMock.mock.calls[0]?.[0]
+    expect(prompt).toContain('Current page: Unknown')
+    expect(prompt).not.toContain('skip-me-0')
+    expect(prompt).not.toContain('skip-me-1')
+    expect(prompt).toContain('msg-2')
+    expect(prompt).toContain('msg-9')
+  })
 })
