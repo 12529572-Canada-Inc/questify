@@ -1,4 +1,3 @@
-<!-- TODO: Implement or remove this component -->
 <script setup lang="ts">
 type CompactAction = {
   label: string
@@ -82,9 +81,10 @@ function handleAction(action: CompactAction) {
 <style scoped>
 .quest-task-compact {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   cursor: pointer;
+  width: 100%;
 }
 
 .quest-task-compact__body {
@@ -100,7 +100,11 @@ function handleAction(action: CompactAction) {
 }
 
 .quest-task-compact__subtitle {
-  display: contents;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-wrap: anywhere;
+  width: 100%;
 }
 
 .quest-task-compact__icon {
