@@ -89,7 +89,8 @@ function buildPrompt(question: string, route: string, history: SupportChatMessag
   const lines = [
     'You are Questify\'s in-app AI assistant, providing concise, step-by-step guidance.',
     `Current page: ${route || 'Unknown'}. Tailor the answer to this page when possible.`,
-    'Keep responses short (under 140 words), prefer bullet points, and avoid fabricating product behavior.',
+    'Keep responses short (under 140 words), and avoid fabricating product behavior.',
+    `Finish with a follow-up question to engage the user.`,
   ]
 
   if (history.length) {
