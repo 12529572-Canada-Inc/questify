@@ -1,5 +1,6 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { ref } from 'vue'
+import type { RouteLocationNormalized } from 'vue-router'
 import adminMiddleware from '~/middleware/admin'
 
 const navigateToMock = vi.fn()
@@ -40,7 +41,10 @@ describe('admin middleware', () => {
   })
 
   it('allows admin user through without redirect', async () => {
-    await adminMiddleware({} as any, {} as any)
+    const to = { path: '/admin' } as RouteLocationNormalized
+    const from = { path: '/' } as RouteLocationNormalized
+
+    await adminMiddleware(to, from)
 
     expect(fetchSessionMock).not.toHaveBeenCalled()
     expect(navigateToMock).not.toHaveBeenCalled()
@@ -53,7 +57,10 @@ describe('admin middleware', () => {
       return undefined
     })
 
-    await adminMiddleware({} as any, {} as any)
+    const to = { path: '/admin' } as RouteLocationNormalized
+    const from = { path: '/' } as RouteLocationNormalized
+
+    await adminMiddleware(to, from)
 
     expect(fetchSessionMock).toHaveBeenCalled()
     expect(navigateToMock).not.toHaveBeenCalled()
@@ -62,7 +69,10 @@ describe('admin middleware', () => {
   it('redirects non-admin users to quests', async () => {
     isAdmin.value = false
 
-    await adminMiddleware({} as any, {} as any)
+    const to = { path: '/admin' } as RouteLocationNormalized
+    const from = { path: '/' } as RouteLocationNormalized
+
+    await adminMiddleware(to, from)
 
     expect(navigateToMock).toHaveBeenCalledWith('/quests')
   })

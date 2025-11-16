@@ -1,5 +1,6 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { ref } from 'vue'
+import type { RouteLocationNormalized } from 'vue-router'
 import authMiddleware from '~/middleware/auth'
 
 const navigateToMock = vi.fn()
@@ -34,7 +35,10 @@ describe('auth middleware', () => {
   it('redirects to login when still unauthenticated after fetch', async () => {
     fetchSessionMock.mockResolvedValue(undefined)
 
-    await authMiddleware({} as any, {} as any)
+    const to = { path: '/protected' } as RouteLocationNormalized
+    const from = { path: '/' } as RouteLocationNormalized
+
+    await authMiddleware(to, from)
 
     expect(fetchSessionMock).toHaveBeenCalled()
     expect(navigateToMock).toHaveBeenCalledWith('/auth/login')
@@ -46,7 +50,10 @@ describe('auth middleware', () => {
       return undefined
     })
 
-    await authMiddleware({} as any, {} as any)
+    const to = { path: '/protected' } as RouteLocationNormalized
+    const from = { path: '/' } as RouteLocationNormalized
+
+    await authMiddleware(to, from)
 
     expect(fetchSessionMock).toHaveBeenCalled()
     expect(navigateToMock).not.toHaveBeenCalled()
