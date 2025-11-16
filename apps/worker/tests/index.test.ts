@@ -1,5 +1,7 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
+const loadModelConfigMock = vi.hoisted(() => vi.fn());
+
 const sharedMocks = vi.hoisted(() => {
   const QUEST_STATUS = {
     active: 'active',
@@ -14,7 +16,6 @@ const sharedMocks = vi.hoisted(() => {
   const transactionMock = vi.fn(async (operations: Promise<unknown>[]) => {
     await Promise.all(operations);
   });
-
   const prismaMock = {
     task: {
       deleteMany: taskDeleteManyMock,
@@ -57,6 +58,7 @@ vi.mock('shared/server', async () => {
   const actual = await vi.importActual<typeof import('shared/server')>('shared/server');
   return {
     ...actual,
+    loadModelConfig: loadModelConfigMock,
     parseJsonFromModel: sharedMocks.parseJsonFromModelMock,
     prisma: sharedMocks.prismaMock,
   };
@@ -145,11 +147,26 @@ describe('worker entrypoint', () => {
     });
     openAiCreateMock.mockReset();
     OpenAIMock.mockClear();
+    loadModelConfigMock.mockReset();
+    loadModelConfigMock.mockReturnValue({
+      models: [{
+        id: 'gpt-4o-mini',
+        label: 'GPT-4o mini',
+        provider: 'openai',
+        providerLabel: 'OpenAI',
+        description: '',
+        tags: [],
+        apiModel: 'gpt-4o-mini',
+        default: true,
+      }],
+      defaultModelId: 'gpt-4o-mini',
+      source: 'default',
+    });
     Object.assign(configMock, {
-    openaiApiKey: 'test-openai-key',
-    anthropicApiKey: '',
-    anthropicApiVersion: '2023-06-01',
-    deepseekApiKey: '',
+      openaiApiKey: 'test-openai-key',
+      anthropicApiKey: '',
+      anthropicApiVersion: '2023-06-01',
+      deepseekApiKey: '',
     deepseekBaseUrl: 'https://api.deepseek.com/v1',
       redisHost: 'fallback-host',
       redisPort: 6380,
@@ -261,6 +278,129 @@ describe('worker entrypoint', () => {
       where: { id: 'quest-1' },
       data: { status: QUEST_STATUS.active },
     });
+  });
+
+  it('handles quest decomposition with image attachments (OpenAI multimodal)', async () => {
+    parseJsonFromModelMock.mockReturnValue([]);
+    openAiCreateMock.mockResolvedValue({
+      choices: [{ message: { content: '[]' } }],
+    });
+
+    await importWorker();
+    const processor = WorkerMock.mock.calls[0][1];
+    const job = {
+      name: 'decompose',
+      data: {
+        questId: 'quest-2',
+        title: 'Quest With Images',
+        goal: 'Quest Goal',
+        context: 'Quest Context',
+        constraints: 'Quest Constraints',
+        images: ['data:image/png;base64,abc123'],
+      },
+    };
+
+    await processor(job as never);
+
+    expect(openAiCreateMock).toHaveBeenCalledWith(expect.objectContaining({
+      model: 'gpt-4o-mini',
+      messages: [
+        expect.objectContaining({
+          role: 'user',
+          content: expect.arrayContaining([
+            expect.objectContaining({ type: 'image_url' }),
+          ]),
+        }),
+      ],
+    }));
+  });
+
+  it('routes deepseek models through the deepseek client', async () => {
+    loadModelConfigMock.mockReturnValue({
+      models: [{
+        id: 'deepseek-chat',
+        label: 'DeepSeek',
+        provider: 'deepseek',
+        providerLabel: 'DeepSeek',
+        description: '',
+        tags: [],
+        apiModel: 'deepseek-chat',
+        default: true,
+      }],
+      defaultModelId: 'deepseek-chat',
+      source: 'default',
+    });
+    Object.assign(configMock, {
+      openaiApiKey: '',
+      deepseekApiKey: 'deepseek-key',
+    });
+    parseJsonFromModelMock.mockReturnValue([]);
+    openAiCreateMock.mockResolvedValue({
+      choices: [{ message: { content: '[]' } }],
+    });
+
+    await importWorker();
+    const processor = WorkerMock.mock.calls[0][1];
+
+    await processor({
+      name: 'decompose',
+      data: {
+        questId: 'quest-deepseek',
+        title: 'Deepseek Quest',
+        goal: null,
+        context: null,
+        constraints: null,
+        images: ['https://example.com/image.png'],
+      },
+    } as never);
+
+    expect(openAiCreateMock).toHaveBeenCalledTimes(1);
+    expect(openAiCreateMock).toHaveBeenCalledWith(expect.objectContaining({
+      model: 'deepseek-chat',
+    }));
+  });
+
+  it('uses anthropic models when configured', async () => {
+    loadModelConfigMock.mockReturnValue({
+      models: [{
+        id: 'claude-3',
+        label: 'Claude',
+        provider: 'anthropic',
+        providerLabel: 'Anthropic',
+        description: '',
+        tags: [],
+        apiModel: 'claude-3',
+        default: true,
+      }],
+      defaultModelId: 'claude-3',
+      source: 'default',
+    });
+    Object.assign(configMock, {
+      openaiApiKey: '',
+      deepseekApiKey: '',
+      anthropicApiKey: 'anthropic-key',
+    });
+    parseJsonFromModelMock.mockReturnValue([]);
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+    fetchSpy.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ content: [{ text: '[]' }] }),
+      text: async () => '',
+    } as unknown as Response);
+
+    await importWorker();
+    const processor = WorkerMock.mock.calls[0][1];
+
+    await processor({
+      name: 'decompose',
+      data: {
+        questId: 'quest-claude',
+        title: 'Claude Quest',
+        images: ['https://example.com/attached.png'],
+      },
+    } as never);
+
+    expect(fetchSpy).toHaveBeenCalledWith('https://api.anthropic.com/v1/messages', expect.any(Object));
   });
 
   it('marks quests as failed when decomposition throws', async () => {
@@ -490,5 +630,128 @@ describe('worker entrypoint', () => {
     expect(taskInvestigationFindUniqueMock).not.toHaveBeenCalled();
 
     warnSpy.mockRestore();
+  });
+
+  it('marks quests failed when OpenAI client is missing', async () => {
+    Object.assign(configMock, { openaiApiKey: '' });
+    parseJsonFromModelMock.mockReturnValue([]);
+
+    await importWorker();
+    const processor = WorkerMock.mock.calls[0][1];
+
+    await processor({
+      name: 'decompose',
+      data: {
+        questId: 'quest-missing-client',
+        title: 'Quest Without Client',
+      },
+    } as never);
+
+    expect(questUpdateMock).toHaveBeenCalledWith({
+      where: { id: 'quest-missing-client' },
+      data: { status: QUEST_STATUS.failed },
+    });
+  });
+
+  it('falls back to default model when the requested provider is unavailable', async () => {
+    loadModelConfigMock.mockReturnValue({
+      models: [
+        {
+          id: 'gpt-4o-mini',
+          label: 'GPT-4o mini',
+          provider: 'openai',
+          providerLabel: 'OpenAI',
+          description: '',
+          tags: [],
+          apiModel: 'gpt-4o-mini',
+          default: true,
+        },
+        {
+          id: 'deepseek-chat',
+          label: 'DeepSeek',
+          provider: 'deepseek',
+          providerLabel: 'DeepSeek',
+          description: '',
+          tags: [],
+          apiModel: 'deepseek-chat',
+          default: false,
+        },
+      ],
+      defaultModelId: 'gpt-4o-mini',
+      source: 'default',
+    });
+    Object.assign(configMock, {
+      openaiApiKey: 'test-openai-key',
+      deepseekApiKey: '',
+    });
+    parseJsonFromModelMock.mockReturnValue([]);
+    openAiCreateMock.mockResolvedValue({
+      choices: [{ message: { content: '[]' } }],
+    });
+
+    await importWorker();
+    const processor = WorkerMock.mock.calls[0][1];
+
+    await processor({
+      name: 'decompose',
+      data: {
+        questId: 'quest-fallback',
+        title: 'Quest Fallback',
+        modelType: 'deepseek-chat',
+      },
+    } as never);
+
+    expect(openAiCreateMock).toHaveBeenCalledWith(expect.objectContaining({
+      model: 'gpt-4o-mini',
+    }));
+  });
+
+  it('fails fast when no models are configured', async () => {
+    loadModelConfigMock.mockReturnValue({
+      models: [],
+      defaultModelId: 'none',
+      source: 'default',
+    });
+
+    await expect(importWorker()).rejects.toThrow('No AI models configured');
+  });
+
+  it('marks quest failed when anthropic key is missing for anthropic model', async () => {
+    loadModelConfigMock.mockReturnValue({
+      models: [{
+        id: 'claude-3',
+        label: 'Claude',
+        provider: 'anthropic',
+        providerLabel: 'Anthropic',
+        description: '',
+        tags: [],
+        apiModel: 'claude-3',
+        default: true,
+      }],
+      defaultModelId: 'claude-3',
+      source: 'default',
+    });
+    Object.assign(configMock, {
+      openaiApiKey: '',
+      deepseekApiKey: '',
+      anthropicApiKey: '',
+    });
+    parseJsonFromModelMock.mockReturnValue([]);
+
+    await importWorker();
+    const processor = WorkerMock.mock.calls[0][1];
+
+    await processor({
+      name: 'decompose',
+      data: {
+        questId: 'quest-anthropic',
+        title: 'Anthropic Missing Key',
+      },
+    } as never);
+
+    expect(questUpdateMock).toHaveBeenCalledWith({
+      where: { id: 'quest-anthropic' },
+      data: { status: QUEST_STATUS.failed },
+    });
   });
 });
