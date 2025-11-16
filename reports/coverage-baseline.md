@@ -6,6 +6,6 @@ Minimum guardrails live in `reports/coverage-threshold.json`.
 
 | Workspace | Statements | Branches | Functions | Lines |
 |-----------|------------|----------|-----------|-------|
-| Nuxt (`apps/nuxt`) | 57.20% | 71.96% | 52.87% | 57.20% |
+| Nuxt (`apps/nuxt`) | 57.22% | 72.17% | 52.87% | 57.22% |
 | Worker (`apps/worker`) | 79.26% | 79.76% | 83.33% | 79.26% |
 | Shared (`packages/shared`) | 51.75% | 64.51% | 75.00% | 51.75% |
