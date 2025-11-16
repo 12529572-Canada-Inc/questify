@@ -232,7 +232,7 @@ function buildHtmlSnapshot(): string | undefined {
   }
 
   let html = doc.documentElement.outerHTML
-  let prev
+  let prev: string
   do {
     prev = html
     html = html.replace(/<script[\s\S]*?<\/script>/gi, '')
