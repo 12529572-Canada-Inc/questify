@@ -6,7 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
-sfdf
+
+## [Unreleased]
+
+---
+
+## [1.14.2] - 2025-11-17
+
+### 🛠 Fixes
+- Made image attachment size configurable via `NUXT_PUBLIC_IMAGE_MAX_SIZE_BYTES`, defaulting to 2MB and applying the same limit on both client and API validation to avoid oversized uploads.
+
 ---
 
 ## [1.14.1] - 2025-11-17
