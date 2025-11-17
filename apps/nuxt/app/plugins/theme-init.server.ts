@@ -9,7 +9,7 @@ export default defineNuxtPlugin(() => {
   useHead({
     htmlAttrs: {
       'data-theme': themeMode.value,
-      class: `theme--${themeMode.value}`,
+      'class': `theme--${themeMode.value}`,
     },
   })
 })
