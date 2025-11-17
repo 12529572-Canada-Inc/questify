@@ -1,6 +1,9 @@
 import { defineVuetifyConfiguration } from 'vuetify-nuxt-module/custom-configuration'
 
 export default defineVuetifyConfiguration({
+  ssr: {
+    clientWidth: 1280,
+  },
   theme: {
     defaultTheme: 'light',
     themes: {

@@ -167,19 +167,9 @@ export default defineNuxtConfig({
     },
   },
 
-  // 💡 Vuetify customization
-  vuetify: {
-    moduleOptions: {
-      /* module specific options */
-      ssrClientHints: {
-        // Enables client hints for SSR theme detection
-        viewportSize: true,
-        prefersColorScheme: false, // We handle theme preference via our own cookie
-      },
-    },
-    vuetifyOptions: {
-      /* vuetify options */
-      ssr: true, // Enable SSR mode
-    },
-  },
+  // 💡 Vuetify customization (optional)
+  // vuetify: {
+  //   moduleOptions: {},
+  //   vuetifyOptions: {},
+  // },
 } satisfies NuxtConfig)
