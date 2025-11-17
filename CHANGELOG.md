@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Images are persisted on quests and investigations (new Prisma migration) and rendered on quest detail pages and investigation entries for later context.
 
 ### 🛠 Fixes
+- Clamped quest card titles so long names wrap/ellipsize instead of overflowing on the quests page.
 - Restored respect for persisted light/dark/auto profile theme preferences by retrying theme application when Vuetify context isn’t ready, so the UI no longer stays stuck on light mode.
 
 ---
