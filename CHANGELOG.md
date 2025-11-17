@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [1.14.0] - 2025-11-17
+
 ### 🚀 Features
 - Public quests CTA now routes unauthenticated users through login/signup with a `redirectTo` back to the public quest form, ensuring public quests are created with the correct visibility flag on submission.
 - Added image attachments to quest creation, AI assistance, and investigations (UI + server + worker), including validation, multimodal model support, and failing tests updated to cover image payloads.
