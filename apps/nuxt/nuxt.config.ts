@@ -5,7 +5,7 @@ import { loadModelConfig } from '../../packages/shared/src/model-config'
 
 const aiModelConfig = loadModelConfig()
 const aiAssistEnabled = process.env.NUXT_FEATURE_AI_ASSIST === 'true'
-const defaultImageMaxSizeBytes = 200 * 1024 * 1024
+const defaultImageMaxSizeBytes = 200 * 1024 * 1024 // 200MB
 const configuredImageMaxSizeBytes = Number(process.env.NUXT_PUBLIC_IMAGE_MAX_SIZE_BYTES ?? defaultImageMaxSizeBytes)
 const imageMaxSizeBytes = Number.isFinite(configuredImageMaxSizeBytes) && configuredImageMaxSizeBytes > 0
   ? configuredImageMaxSizeBytes
