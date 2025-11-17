@@ -347,6 +347,13 @@ watch(profile, (value) => {
   }
 }, { immediate: true })
 
+// Sync form theme changes to UI store immediately for real-time preview
+watch(() => form.themePreference, (newTheme) => {
+  if (newTheme && newTheme !== uiThemePreference.value) {
+    uiStore.setThemePreference(newTheme)
+  }
+})
+
 watchEffect(() => {
   if (uiThemePreference.value && form.themePreference !== uiThemePreference.value && !isDirty.value) {
     form.themePreference = uiThemePreference.value

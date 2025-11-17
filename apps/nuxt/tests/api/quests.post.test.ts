@@ -48,6 +48,7 @@ beforeEach(() => {
     context: 'Build quickly',
     constraints: null,
     ownerId: 'user-1',
+    isPublic: false,
   })
 
   Reflect.set(globalThis as GlobalWithMocks, 'requireUserSession', vi.fn(async () => ({
@@ -107,6 +108,8 @@ describe('API /api/quests (POST)', () => {
         constraints: null,
         ownerId: 'user-1',
         modelType: 'gpt-4o-mini',
+        isPublic: false,
+        images: [],
       },
     })
     expect(queueAddMock).toHaveBeenCalledWith('decompose', {
@@ -116,6 +119,7 @@ describe('API /api/quests (POST)', () => {
       context: null,
       constraints: null,
       modelType: 'gpt-4o-mini',
+      images: [],
     })
     expect(response).toEqual({
       success: true,
@@ -126,8 +130,63 @@ describe('API /api/quests (POST)', () => {
         context: 'Build quickly',
         constraints: null,
         ownerId: 'user-1',
+        isPublic: false,
       },
     })
+  })
+
+  it('creates a public quest when isPublic is true', async () => {
+    prismaMocks.questCreate.mockResolvedValueOnce({
+      id: 'quest-2',
+      title: 'Public Quest',
+      goal: null,
+      context: null,
+      constraints: null,
+      ownerId: 'user-1',
+      isPublic: true,
+    })
+
+    ;(globalThis as GlobalWithMocks).readBody = vi.fn(async () => ({
+      title: 'Public Quest',
+      isPublic: true,
+    }))
+
+    const event = {
+      context: {
+        questQueue: {
+          add: queueAddMock.mockResolvedValue(undefined),
+        },
+      },
+    } as unknown as Parameters<typeof handler>[0]
+
+    const response = await handler(event)
+
+    expect(prismaMocks.questCreate).toHaveBeenCalledWith({
+      data: {
+        title: 'Public Quest',
+        goal: null,
+        context: null,
+        constraints: null,
+        ownerId: 'user-1',
+        modelType: 'gpt-4o-mini',
+        isPublic: true,
+        images: [],
+      },
+    })
+
+    expect(response.quest.isPublic).toBe(true)
+  })
+
+  it('rejects non-boolean isPublic values', async () => {
+    ;(globalThis as GlobalWithMocks).readBody = vi.fn(async () => ({
+      title: 'Test Quest',
+      isPublic: 'yes',
+    }))
+
+    await expect(handler({ context: { questQueue: { add: queueAddMock } } } as never))
+      .rejects.toMatchObject({ statusCode: 400 })
+    expect(prismaMocks.questCreate).not.toHaveBeenCalled()
+    expect(queueAddMock).not.toHaveBeenCalled()
   })
 
   it('rejects quests without a valid title', async () => {

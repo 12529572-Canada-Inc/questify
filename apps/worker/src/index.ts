@@ -82,19 +82,44 @@ async function runModel(
   prompt: string,
   requestedModelId?: string | null,
   allowFallback = true,
+  images: string[] = [],
 ): Promise<RunModelResult> {
   const model = resolveModel(requestedModelId);
+  const sanitizedImages = Array.isArray(images) ? images.filter(Boolean) : [];
 
   try {
     let content = '';
     if (model.provider === 'openai') {
-      content = await callOpenAiClient(openai, model, prompt);
+      if (!openai) {
+        throw new Error(`Missing API client for provider ${model.provider}`);
+      }
+
+      const response = await openai.chat.completions.create({
+        model: model.apiModel,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'text', text: prompt },
+            ...sanitizedImages.map(image => ({
+              type: 'image_url',
+              image_url: { url: image, detail: 'auto' as const },
+            })),
+          ],
+        }],
+      });
+      content = response?.choices[0].message?.content ?? '';
     }
     else if (model.provider === 'deepseek') {
-      content = await callOpenAiClient(deepseek, model, prompt);
+      const note = sanitizedImages.length
+        ? `${prompt}\n\n(${sanitizedImages.length} image(s) attached but ignored by this model.)`
+        : prompt;
+      content = await callOpenAiClient(deepseek, model, note);
     }
     else {
-      content = await callAnthropicModel(model, prompt);
+      const note = sanitizedImages.length
+        ? `${prompt}\n\n(${sanitizedImages.length} image(s) attached; image content omitted for this model.)`
+        : prompt;
+      content = await callAnthropicModel(model, note);
     }
 
     return { content, modelId: model.id };
@@ -102,7 +127,7 @@ async function runModel(
   catch (error) {
     if (allowFallback && model.id !== defaultModelId) {
       console.warn(`Model ${model.id} failed (${(error as Error).message}); falling back to ${defaultModelId}`);
-      return runModel(prompt, defaultModelId, false);
+      return runModel(prompt, defaultModelId, false, sanitizedImages);
     }
     throw error;
   }
@@ -115,6 +140,7 @@ type DecomposeJobData = {
   context?: string | null
   constraints?: string | null
   modelType?: string | null
+  images?: string[]
 }
 
 async function processQuestJob(job: Job<DecomposeJobData>) {
@@ -124,7 +150,7 @@ async function processQuestJob(job: Job<DecomposeJobData>) {
   }
 
   console.log('Decomposing quest:', job.data);
-  const { questId, title, goal, context, constraints } = job.data;
+  const { questId, title, goal, context, constraints, images } = job.data;
 
   const promptSections = [
     `Quest Title: ${title}`,
@@ -138,12 +164,13 @@ thoughtfully ordered list of actionable sub-tasks. Each task should be specific 
 clarification and collectively lead to the desired outcome.
 
 ${promptSections.join('\n')}
+${images?.length ? `\nThe user attached ${images.length} image(s); incorporate visual details if your model supports images.\n` : ''}
 
 Return the plan as a JSON array where each item has the shape {"title": string, "details": string}.`;
   console.log('Prompt:', prompt);
 
   try {
-    const { content, modelId } = await runModel(prompt, job.data.modelType);
+    const { content, modelId } = await runModel(prompt, job.data.modelType, true, images);
     console.log(`AI (${modelId}) content:`, content);
 
     type GeneratedTask = {
@@ -205,6 +232,7 @@ type InvestigateJobData = {
   taskId: string
   prompt?: string | null
   modelType?: string | null
+  images?: string[]
 }
 
 async function processTaskInvestigation(job: Job<InvestigateJobData>) {
@@ -263,12 +291,15 @@ Analyze the information provided and brainstorm meaningful next steps, insights,
 Return a JSON object with the shape {"summary": string, "details": string}. "summary" should be a short overview of the key findings.
 "details" should contain a thorough analysis including concrete suggestions, risks, and recommended resources.
 
-${promptSections.join('\n')}`;
+${promptSections.join('\n')}
+${job.data.images?.length ? `\nThe user attached ${job.data.images.length} image(s); interpret them if supported by your model.\n` : ''}`;
 
   try {
     const { content, modelId } = await runModel(
       prompt,
       investigation.modelType ?? job.data.modelType,
+      true,
+      job.data.images,
     );
     console.log(`Investigation content (${modelId}):`, content);
 

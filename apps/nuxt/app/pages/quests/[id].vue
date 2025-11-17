@@ -102,6 +102,7 @@ const {
   investigationDialogSubmitting,
   investigationDialogError,
   investigationPrompt,
+  investigationImages,
   investigationModelType,
   investigationModelOptions,
   hasPendingInvestigations,
@@ -246,6 +247,7 @@ async function handleDeleteQuest() {
                 v-model="investigationDialogOpen"
                 v-model:prompt="investigationPrompt"
                 v-model:model-type="investigationModelType"
+                v-model:images="investigationImages"
                 :models="investigationModelOptions"
                 :submitting="investigationDialogSubmitting"
                 :error="investigationDialogError"

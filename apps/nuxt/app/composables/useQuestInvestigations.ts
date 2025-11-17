@@ -3,7 +3,7 @@ import type { TaskWithInvestigations } from '~/types/quest-tasks'
 import { resolveApiError } from '~/utils/error'
 import { useAiModels } from './useAiModels'
 
-type InvestigateTaskFn = (taskId: string, payload: { prompt: string, modelType: string }) => Promise<void>
+type InvestigateTaskFn = (taskId: string, payload: { prompt: string, modelType: string, images?: string[] }) => Promise<void>
 
 /**
  * Centralizes the state, dialogs, and helpers needed to launch AI investigations
@@ -30,6 +30,7 @@ export function useQuestInvestigations(options: {
   const investigationDialogSubmitting = ref(false)
   const investigationDialogError = ref<string | null>(null)
   const investigationPrompt = ref('')
+  const investigationImages = ref<string[]>([])
   const investigationTargetTask = ref<TaskWithInvestigations | null>(null)
   const questModel = computed(() => unref(questModelType) ?? null)
   const investigationModelType = ref(findModelById(questModel.value)?.id ?? findModelById(null)?.id ?? 'gpt-4o-mini')
@@ -47,6 +48,7 @@ export function useQuestInvestigations(options: {
   function openInvestigationDialog(task: TaskWithInvestigations) {
     investigationTargetTask.value = task
     investigationPrompt.value = ''
+    investigationImages.value = []
     investigationDialogError.value = null
     investigationModelType.value = findModelById(questModel.value)?.id ?? findModelById(null)?.id ?? investigationModelType.value
     investigationDialogOpen.value = true
@@ -57,6 +59,7 @@ export function useQuestInvestigations(options: {
     investigationDialogOpen.value = false
     investigationTargetTask.value = null
     investigationPrompt.value = ''
+    investigationImages.value = []
   }
 
   function addInvestigatingTask(taskId: string) {
@@ -78,8 +81,8 @@ export function useQuestInvestigations(options: {
     const taskId = investigationTargetTask.value.id
     const prompt = investigationPrompt.value.trim()
 
-    if (prompt.length === 0) {
-      investigationDialogError.value = 'Please provide some context for the investigation.'
+    if (prompt.length === 0 && investigationImages.value.length === 0) {
+      investigationDialogError.value = 'Add a prompt or at least one image to start the investigation.'
       return
     }
 
@@ -98,10 +101,12 @@ export function useQuestInvestigations(options: {
       await investigateTask(taskId, {
         prompt,
         modelType: investigationModelType.value,
+        images: investigationImages.value,
       })
       investigationDialogOpen.value = false
       investigationTargetTask.value = null
       investigationPrompt.value = ''
+      investigationImages.value = []
     }
     catch (err) {
       const message = resolveApiError(err, 'Unable to complete the investigation. Please try again.')
@@ -153,6 +158,7 @@ export function useQuestInvestigations(options: {
     investigationDialogSubmitting,
     investigationDialogError,
     investigationPrompt,
+    investigationImages,
     investigationTargetTask,
     investigationModelType,
     investigationModelOptions: modelOptions,

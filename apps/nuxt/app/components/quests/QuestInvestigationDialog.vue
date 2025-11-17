@@ -2,18 +2,22 @@
 import { computed } from 'vue'
 import type { AiModelOption } from 'shared/ai-models'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   modelValue: boolean
   prompt: string
   modelType: string
   submitting: boolean
   error: string | null
   models: AiModelOption[]
-}>()
+  images?: string[]
+}>(), {
+  images: () => [],
+})
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
   (e: 'update:prompt' | 'update:modelType', value: string): void
+  (e: 'update:images', value: string[]): void
   (e: 'cancel' | 'submit'): void
 }>()
 
@@ -31,6 +35,15 @@ const modelTypeModel = computed({
   get: () => props.modelType,
   set: value => emit('update:modelType', value),
 })
+
+const imagesModel = computed({
+  get: () => props.images,
+  set: value => emit('update:images', value),
+})
+
+const hasContext = computed(() =>
+  promptModel.value.trim().length > 0 || imagesModel.value.length > 0,
+)
 
 function handleCancel() {
   emit('update:modelValue', false)
@@ -74,6 +87,14 @@ function handleSubmit() {
             persistent-hint
           />
         </div>
+        <ImageAttachmentInput
+          v-model="imagesModel"
+          label="Add investigation images"
+          hint="Upload or take photos that could help with the analysis."
+          :max-images="3"
+          class="mt-2"
+          :disabled="submitting"
+        />
         <p
           v-if="error"
           class="investigation-error"
@@ -93,7 +114,7 @@ function handleSubmit() {
         <v-btn
           color="primary"
           :loading="submitting"
-          :disabled="error !== null || prompt.trim().length === 0"
+          :disabled="error !== null || !hasContext || submitting"
           @click="handleSubmit"
         >
           Investigate

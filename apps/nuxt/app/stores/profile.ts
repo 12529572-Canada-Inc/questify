@@ -64,6 +64,7 @@ export const useProfileStore = defineStore('profile', () => {
         body: payload,
       })
 
+      // Force theme sync when user explicitly saves profile
       applyProfile(result.user)
       saving.value = false
       return result.user

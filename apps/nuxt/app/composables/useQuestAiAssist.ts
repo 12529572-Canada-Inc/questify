@@ -14,6 +14,7 @@ type AssistPayload = {
   constraints: string
   currentValue: string
   modelType: string | null
+  images?: string[]
 }
 
 type QuestAiAssistResponse = {
@@ -41,13 +42,15 @@ function toPayloadValue(value: string) {
  * @param options.fields - Reactive quest form fields (title, goal, context, constraints).
  * @param options.modelType - Currently selected model id for the quest.
  * @param options.modelOptions - Available AI models (resolved via `useAiModels`).
+ * @param options.images - Optional reactive image attachments to include in the request.
  */
 export function useQuestAiAssist(options: {
   fields: Record<AiAssistField, Ref<string>>
   modelType: Ref<string>
   modelOptions: ComputedRef<AiModelOption[]>
+  images?: Ref<string[]>
 }) {
-  const { fields, modelType, modelOptions } = options
+  const { fields, modelType, modelOptions, images } = options
   const uiStore = useUiStore()
   const { aiAssistEnabled } = storeToRefs(uiStore)
   const { showSnackbar } = useSnackbar()
@@ -79,6 +82,7 @@ export function useQuestAiAssist(options: {
       constraints: toPayloadValue(fields.constraints.value),
       currentValue: toPayloadValue(fields[field].value),
       modelType: modelType.value || null,
+      images: images?.value ?? [],
     }
   }
 

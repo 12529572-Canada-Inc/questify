@@ -2,8 +2,12 @@
 import { useQuestForm } from '~/composables/useQuestForm'
 import { useQuestAiAssist } from '~/composables/useQuestAiAssist'
 
-const props = withDefaults(defineProps<{ showBackButton?: boolean }>(), {
+const props = withDefaults(defineProps<{
+  showBackButton?: boolean
+  makePublic?: boolean
+}>(), {
   showBackButton: true,
+  makePublic: false,
 })
 
 const {
@@ -20,8 +24,11 @@ const {
   rules,
   isSubmitDisabled,
   submit,
+  images,
   toggleOptionalFields,
-} = useQuestForm()
+} = useQuestForm({
+  initialIsPublic: props.makePublic,
+})
 
 const {
   isEnabled: aiAssistEnabled,
@@ -44,6 +51,7 @@ const {
   },
   modelType,
   modelOptions,
+  images,
 })
 </script>
 
@@ -171,6 +179,13 @@ const {
         </v-btn>
       </div>
     </v-expand-transition>
+
+    <ImageAttachmentInput
+      v-model="images"
+      label="Add supporting images"
+      hint="Upload or take photos to give the Quest Agent more context."
+      class="mt-4 mb-6"
+    />
 
     <v-row
       class="mt-4"

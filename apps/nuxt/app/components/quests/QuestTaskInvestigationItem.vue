@@ -155,6 +155,27 @@ function onToggle() {
               <MarkdownBlock :content="investigation.details" />
             </v-card-text>
           </v-card>
+          <v-card
+            v-if="investigation.images && investigation.images.length > 0"
+            class="mb-2"
+            variant="text"
+          >
+            <v-card-title class="task-investigation-section__title">
+              Attached images
+            </v-card-title>
+            <v-card-text class="task-investigation-section__body">
+              <div class="task-investigation-images">
+                <v-img
+                  v-for="(image, index) in investigation.images"
+                  :key="index"
+                  :src="image"
+                  aspect-ratio="4/3"
+                  class="task-investigation-image"
+                  cover
+                />
+              </div>
+            </v-card-text>
+          </v-card>
         </template>
         <template v-else>
           <v-card
@@ -245,6 +266,18 @@ function onToggle() {
   padding: 0.5rem 0;
   display: block;
   white-space: pre-line;
+}
+
+.task-investigation-images {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.task-investigation-image {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(var(--v-theme-outline), 0.2);
 }
 
 .task-investigation-toggle {
