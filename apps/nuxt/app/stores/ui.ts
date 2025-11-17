@@ -16,13 +16,18 @@ const AUTO_THEME_INTERVAL_MS = 5 * 60 * 1000
 const MAX_THEME_APPLY_RETRIES = 5
 
 export const useUiStore = defineStore('ui', () => {
-  const themePreferenceCookie = useCookie<ThemePreference | null>(THEME_COOKIE_KEY)
+  const themePreferenceCookie = useCookie<ThemePreference | null>(THEME_COOKIE_KEY, {
+    sameSite: 'lax',
+    path: '/',
+  })
   const themePreference = ref<ThemePreference>(themePreferenceCookie.value ?? 'light')
   const themeMode = ref<ThemeMode>(resolveInitialTheme(themePreference.value))
   const runtimeConfig = useRuntimeConfig()
   const aiAssistFeatureEnabled = Boolean(runtimeConfig.public?.features?.aiAssist)
   const aiAssistCookie = useCookie<'on' | 'off'>(AI_ASSIST_COOKIE_KEY, {
     default: () => (aiAssistFeatureEnabled ? 'on' : 'off'),
+    sameSite: 'lax',
+    path: '/',
   })
   const aiAssistPreference = ref<'on' | 'off'>(
     aiAssistFeatureEnabled
