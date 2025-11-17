@@ -5,10 +5,15 @@ import type { ThemePreference } from 'shared'
 import { isThemePreference } from 'shared'
 
 type ThemeMode = 'light' | 'dark'
+type ThemeInstance = ReturnType<typeof useTheme> | {
+  global?: { change?: (theme: string) => void, name: { value: string } }
+  change?: (theme: string) => void
+}
 
 const THEME_COOKIE_KEY = 'questify-theme'
 const AI_ASSIST_COOKIE_KEY = 'questify-ai-assist'
 const AUTO_THEME_INTERVAL_MS = 5 * 60 * 1000
+const MAX_THEME_APPLY_RETRIES = 5
 
 export const useUiStore = defineStore('ui', () => {
   const themePreferenceCookie = useCookie<ThemePreference | null>(THEME_COOKIE_KEY)
@@ -25,8 +30,11 @@ export const useUiStore = defineStore('ui', () => {
       : 'off',
   )
 
-  let cachedTheme: ReturnType<typeof useTheme> | null = null
+  let cachedTheme: ThemeInstance | null = null
   let autoThemeInterval: ReturnType<typeof globalThis.setInterval> | null = null
+  let pendingThemeApply: ReturnType<typeof globalThis.setTimeout> | null = null
+  let themeApplyRetries = 0
+  let lastThemeAttempt: ThemeMode | null = null
 
   const isDarkMode = computed(() => themeMode.value === 'dark')
   const aiAssistEnabled = computed(() => aiAssistFeatureEnabled && aiAssistPreference.value === 'on')
@@ -42,15 +50,45 @@ export const useUiStore = defineStore('ui', () => {
     }
     catch {
       // Vuetify is only available client-side; swallow errors during SSR/tests.
-      return null
     }
+
+    try {
+      const nuxtApp = globalThis as typeof globalThis & {
+        useNuxtApp?: () => { $vuetify?: { theme?: ThemeInstance } }
+        $vuetify?: { theme?: ThemeInstance }
+      }
+      const vuetifyTheme = nuxtApp.useNuxtApp?.()?.$vuetify?.theme ?? nuxtApp.$vuetify?.theme
+      if (vuetifyTheme?.global?.name) {
+        cachedTheme = vuetifyTheme as ThemeInstance
+        return cachedTheme
+      }
+    }
+    catch {
+      // Nuxt app isn’t ready yet (SSR/tests).
+    }
+
+    return null
   }
 
   function applyVuetifyTheme(mode: ThemeMode) {
+    if (mode !== lastThemeAttempt) {
+      themeApplyRetries = 0
+      lastThemeAttempt = mode
+    }
+
     const theme = resolveThemeInstance()
     if (!theme) {
+      if (import.meta.client && !pendingThemeApply && themeApplyRetries < MAX_THEME_APPLY_RETRIES) {
+        pendingThemeApply = globalThis.setTimeout(() => {
+          pendingThemeApply = null
+          applyVuetifyTheme(mode)
+        }, 0)
+        themeApplyRetries += 1
+      }
       return
     }
+
+    themeApplyRetries = 0
 
     // Use new API if available, fallback to legacy API
     // Check for future Vuetify API methods that aren't in types yet
@@ -65,7 +103,7 @@ export const useUiStore = defineStore('ui', () => {
     else if (typeof themeWithChange.change === 'function') {
       themeWithChange.change(mode)
     }
-    else {
+    else if (theme.global?.name) {
       theme.global.name.value = mode
     }
   }
