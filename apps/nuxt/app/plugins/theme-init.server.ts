@@ -1,17 +1,15 @@
-import { useTheme } from 'vuetify'
-
 export default defineNuxtPlugin(() => {
-  try {
-    const uiStore = useUiStore()
-    const { themeMode } = storeToRefs(uiStore)
-    const theme = useTheme()
+  // Read theme cookie directly during SSR
+  const uiStore = useUiStore()
+  const { themeMode } = storeToRefs(uiStore)
 
-    // Ensure server render uses the preferred theme so CSS vars match on first paint.
-    if (theme?.global?.name && themeMode.value) {
-      theme.global.name.value = themeMode.value
-    }
-  }
-  catch {
-    // Ignore if Vuetify context is unavailable during SSR.
-  }
+  console.log('[SSR] Theme mode:', themeMode.value)
+
+  // Inject theme mode into HTML attributes for CSS styling during SSR
+  useHead({
+    htmlAttrs: {
+      'data-theme': themeMode.value,
+      class: `theme--${themeMode.value}`,
+    },
+  })
 })
