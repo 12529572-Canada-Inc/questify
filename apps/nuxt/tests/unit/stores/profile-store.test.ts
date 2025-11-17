@@ -73,9 +73,8 @@ describe('useProfileStore', () => {
       themePreference: 'dark',
       providers: ['google'],
     }))
-    // syncThemePreferenceFromUser is called with 'dark' and force=false
-    // Since cookie is now null, it should sync
-    expect(syncThemeSpy).toHaveBeenCalledWith('dark', false)
+    // syncThemePreferenceFromUser is called with 'dark'; cookie is null so it should sync
+    expect(syncThemeSpy).toHaveBeenCalledWith('dark')
     expect(uiStore.themePreference).toBe('dark')
   })
 
