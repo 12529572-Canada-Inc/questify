@@ -355,7 +355,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🛠 Fixes
 - Adjusted worker OpenAI chat payload typing for image parts to align with the newer SDK contract, restoring successful builds.
-- Made image attachment size configurable via `NUXT_PUBLIC_IMAGE_MAX_SIZE_BYTES`, defaulting to 2MB and applying the same limit on both client and API validation to avoid oversized uploads.
+- Made image attachment size configurable via `NUXT_PUBLIC_IMAGE_MAX_SIZE_BYTES`, defaulting to 2MB, and added a total payload guard via `NUXT_PUBLIC_IMAGE_TOTAL_MAX_BYTES` (4MB default) so client and API reject requests before exceeding host limits.
 
 ---
 
