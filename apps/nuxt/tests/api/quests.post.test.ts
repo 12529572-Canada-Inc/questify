@@ -100,17 +100,18 @@ describe('API /api/quests (POST)', () => {
 
     const response = await handler(event)
 
-    expect(prismaMocks.questCreate).toHaveBeenCalledWith({
-      data: {
-        title: 'Launch Quest',
-        goal: 'Ship feature',
-        context: null,
-        constraints: null,
-        ownerId: 'user-1',
-        modelType: 'gpt-4o-mini',
-        isPublic: false,
-      },
-    })
+  expect(prismaMocks.questCreate).toHaveBeenCalledWith({
+    data: {
+      title: 'Launch Quest',
+      goal: 'Ship feature',
+      context: null,
+      constraints: null,
+      ownerId: 'user-1',
+      modelType: 'gpt-4o-mini',
+      isPublic: false,
+      images: [],
+    },
+  })
     expect(queueAddMock).toHaveBeenCalledWith('decompose', {
       questId: 'quest-1',
       title: 'Launch Quest',
@@ -169,6 +170,7 @@ describe('API /api/quests (POST)', () => {
         ownerId: 'user-1',
         modelType: 'gpt-4o-mini',
         isPublic: true,
+        images: [],
       },
     })
 

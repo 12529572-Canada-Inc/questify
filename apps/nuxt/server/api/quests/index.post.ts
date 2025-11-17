@@ -41,6 +41,7 @@ const handler = defineEventHandler(async (event) => {
       ownerId: user.id,
       modelType: selectedModelType,
       isPublic: isQuestPublic,
+      images: sanitizedImages,
     },
   })
 

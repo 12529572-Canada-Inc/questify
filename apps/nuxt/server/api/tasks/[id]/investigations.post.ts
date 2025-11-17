@@ -30,6 +30,7 @@ export default defineEventHandler(async (event) => {
       prompt,
       status: 'pending',
       modelType: selectedModelType,
+      images,
     },
   })
 

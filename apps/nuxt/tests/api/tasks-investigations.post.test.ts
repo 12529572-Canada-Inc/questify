@@ -114,15 +114,16 @@ describe('API /api/tasks/[id]/investigations.post', () => {
         },
       },
     })
-    expect(prismaMocks.taskInvestigationCreateMock).toHaveBeenCalledWith({
-      data: {
-        taskId: 'task-1',
-        initiatedById: 'user-1',
-        prompt: 'Explore risks and opportunities',
-        status: 'pending',
-        modelType: 'gpt-4o-mini',
-      },
-    })
+  expect(prismaMocks.taskInvestigationCreateMock).toHaveBeenCalledWith({
+    data: {
+      taskId: 'task-1',
+      initiatedById: 'user-1',
+      prompt: 'Explore risks and opportunities',
+      status: 'pending',
+      modelType: 'gpt-4o-mini',
+      images: [],
+    },
+  })
     expect(addMock).toHaveBeenCalledWith('investigate-task', {
       investigationId: 'inv-1',
       taskId: 'task-1',
