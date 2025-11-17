@@ -5,6 +5,19 @@ import { loadModelConfig } from '../../packages/shared/src/model-config'
 
 const aiModelConfig = loadModelConfig()
 const aiAssistEnabled = process.env.NUXT_FEATURE_AI_ASSIST === 'true'
+const defaultImageMaxSizeBytes = 2 * 1024 * 1024 // 2MB sane ceiling unless overridden
+const defaultImageTotalMaxBytes = 4 * 1024 * 1024 // 4MB request ceiling unless overridden
+
+const configuredImageMaxSizeBytes = Number(process.env.NUXT_PUBLIC_IMAGE_MAX_SIZE_BYTES ?? defaultImageMaxSizeBytes)
+const configuredImageTotalMaxBytes = Number(process.env.NUXT_PUBLIC_IMAGE_TOTAL_MAX_BYTES ?? defaultImageTotalMaxBytes)
+
+const imageMaxSizeBytes = Number.isFinite(configuredImageMaxSizeBytes) && configuredImageMaxSizeBytes > 0
+  ? configuredImageMaxSizeBytes
+  : defaultImageMaxSizeBytes
+
+const imageTotalMaxBytes = Number.isFinite(configuredImageTotalMaxBytes) && configuredImageTotalMaxBytes > 0
+  ? configuredImageTotalMaxBytes
+  : defaultImageTotalMaxBytes
 
 // 🧠 Nuxt 4 Configuration — Questify
 export default defineNuxtConfig({
@@ -85,6 +98,8 @@ export default defineNuxtConfig({
       questifyVersion: '4.1.3',
       aiModels: aiModelConfig.models,
       aiModelDefaultId: aiModelConfig.defaultModelId,
+      imageMaxSizeBytes,
+      imageTotalMaxBytes,
       features: {
         aiAssist: aiAssistEnabled,
       },

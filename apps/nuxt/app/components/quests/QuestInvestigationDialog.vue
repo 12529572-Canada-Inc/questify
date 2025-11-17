@@ -41,6 +41,10 @@ const imagesModel = computed({
   set: value => emit('update:images', value),
 })
 
+const runtimeConfig = useRuntimeConfig()
+const imageMaxSizeBytes = Number(runtimeConfig.public.imageMaxSizeBytes ?? 2 * 1024 * 1024)
+const imageTotalMaxBytes = Number(runtimeConfig.public.imageTotalMaxBytes ?? 4 * 1024 * 1024)
+
 const hasContext = computed(() =>
   promptModel.value.trim().length > 0 || imagesModel.value.length > 0,
 )
@@ -89,6 +93,8 @@ function handleSubmit() {
         </div>
         <ImageAttachmentInput
           v-model="imagesModel"
+          :max-size-bytes="imageMaxSizeBytes"
+          :max-total-bytes="imageTotalMaxBytes"
           label="Add investigation images"
           hint="Upload or take photos that could help with the analysis."
           :max-images="3"

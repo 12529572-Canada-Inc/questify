@@ -8,12 +8,14 @@ const props = withDefaults(defineProps<{
   hint?: string
   maxImages?: number
   maxSizeBytes?: number
+  maxTotalBytes?: number
   disabled?: boolean
 }>(), {
   label: 'Add images',
   hint: 'Upload or snap a photo to share more context.',
   maxImages: 3,
   maxSizeBytes: 2 * 1024 * 1024, // 2MB default ceiling
+  maxTotalBytes: 4 * 1024 * 1024, // 4MB total ceiling
   disabled: false,
 })
 
@@ -23,6 +25,15 @@ const fileInput = ref<HTMLInputElement | null>(null)
 
 const remainingSlots = computed(() => Math.max(props.maxImages - model.value.length, 0))
 const isDisabled = computed(() => busy.value || props.disabled)
+const existingBytes = computed(() =>
+  model.value.reduce((total, image) => {
+    if (image.startsWith('data:image/')) {
+      const base64 = image.split(',')[1] || ''
+      return total + Math.floor(base64.length * 3 / 4)
+    }
+    return total
+  }, 0),
+)
 
 function triggerPicker() {
   if (isDisabled.value) return
@@ -69,6 +80,7 @@ async function handleFilesSelected(event: Event) {
     const available = remainingSlots.value
     const selected = Array.from(files).slice(0, available)
     const nextImages: string[] = []
+    let runningTotal = existingBytes.value
 
     for (const file of selected) {
       if (!file.type.startsWith('image/')) {
@@ -81,7 +93,13 @@ async function handleFilesSelected(event: Event) {
         continue
       }
 
+      if (props.maxTotalBytes && runningTotal + file.size > props.maxTotalBytes) {
+        error.value = `Total images must be under ${Math.round(props.maxTotalBytes / (1024 * 1024))}MB.`
+        continue
+      }
+
       const dataUrl = await readFileAsDataUrl(file)
+      runningTotal += file.size
       nextImages.push(dataUrl)
     }
 
