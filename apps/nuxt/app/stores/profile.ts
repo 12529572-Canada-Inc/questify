@@ -64,7 +64,8 @@ export const useProfileStore = defineStore('profile', () => {
         body: payload,
       })
 
-      applyProfile(result.user)
+      // Force theme sync when user explicitly saves profile
+      applyProfile(result.user, true)
       saving.value = false
       return result.user
     }
@@ -75,7 +76,7 @@ export const useProfileStore = defineStore('profile', () => {
     }
   }
 
-  function applyProfile(data: UserProfile) {
+  function applyProfile(data: UserProfile, forceSyncTheme = false) {
     const themePreference = isThemePreference(data.themePreference) ? data.themePreference : 'light'
 
     profile.value = {
@@ -83,7 +84,8 @@ export const useProfileStore = defineStore('profile', () => {
       themePreference,
     }
 
-    uiStore.syncThemePreferenceFromUser(themePreference)
+    // Force sync when explicitly updating profile (user clicked "Save Changes")
+    uiStore.syncThemePreferenceFromUser(themePreference, forceSyncTheme)
 
     userStore.setUser({
       id: data.id,

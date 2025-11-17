@@ -22,10 +22,6 @@ export const useUiStore = defineStore('ui', () => {
   })
   const themePreference = ref<ThemePreference>(themePreferenceCookie.value ?? 'light')
   const themeMode = ref<ThemeMode>(resolveInitialTheme(themePreference.value))
-
-  if (import.meta.client) {
-    console.log('[UI Store] Initializing. Cookie value:', themePreferenceCookie.value, 'Theme preference:', themePreference.value, 'Theme mode:', themeMode.value)
-  }
   const runtimeConfig = useRuntimeConfig()
   const aiAssistFeatureEnabled = Boolean(runtimeConfig.public?.features?.aiAssist)
   const aiAssistCookie = useCookie<'on' | 'off'>(AI_ASSIST_COOKIE_KEY, {
@@ -99,11 +95,6 @@ export const useUiStore = defineStore('ui', () => {
 
     themeApplyRetries = 0
 
-    // Debug logging
-    if (import.meta.client) {
-      console.log('[Theme] Applying Vuetify theme:', mode, 'Current theme:', theme.global?.name?.value)
-    }
-
     // Use new API if available, fallback to legacy API
     // Check for future Vuetify API methods that aren't in types yet
     const themeWithChange = theme as typeof theme & {
@@ -119,11 +110,6 @@ export const useUiStore = defineStore('ui', () => {
     }
     else if (theme.global?.name) {
       theme.global.name.value = mode
-    }
-
-    // Debug logging after
-    if (import.meta.client) {
-      console.log('[Theme] Applied Vuetify theme. New theme:', theme.global?.name?.value)
     }
   }
 
@@ -171,8 +157,13 @@ export const useUiStore = defineStore('ui', () => {
     setThemePreference(themePreference.value === 'dark' ? 'light' : 'dark')
   }
 
-  function syncThemePreferenceFromUser(preference?: string | null) {
+  function syncThemePreferenceFromUser(preference?: string | null, force = false) {
     if (!preference || !isThemePreference(preference)) {
+      return
+    }
+    // Only sync from user session if we don't have a cookie set yet OR if forced
+    // The cookie is the source of truth for theme preference
+    if (themePreferenceCookie.value && !force) {
       return
     }
     setThemePreference(preference)

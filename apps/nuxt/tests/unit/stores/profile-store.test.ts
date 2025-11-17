@@ -5,6 +5,7 @@ import { useUserStore } from '~/stores/user'
 import { useUiStore } from '~/stores/ui'
 
 const fetchMock = vi.fn()
+const cookieMock = { value: null as string | null }
 const originalUseRuntimeConfig = (globalThis as typeof globalThis & { useRuntimeConfig?: () => unknown }).useRuntimeConfig
 
 const profileResponse = {
@@ -21,10 +22,14 @@ const profileResponse = {
 beforeEach(() => {
   setActivePinia(createPinia())
   fetchMock.mockReset()
+  cookieMock.value = null // Reset cookie to null before each test
 
   Reflect.set(globalThis, 'useRuntimeConfig', vi.fn(() => ({
     public: { features: { aiAssist: true } },
   })))
+
+  // Mock useCookie to return our controllable cookie mock
+  vi.stubGlobal('useCookie', vi.fn(() => cookieMock))
 
   vi.stubGlobal('$fetch', fetchMock)
 })
@@ -43,9 +48,16 @@ describe('useProfileStore', () => {
   it('fetches profile data and syncs user store', async () => {
     fetchMock.mockResolvedValue(profileResponse)
 
+    const uiStore = useUiStore()
+    // Manually set theme to light initially, simulating cookie being set
+    cookieMock.value = 'light'
+    uiStore.setThemePreference('light')
+
+    // Now set cookie to null to allow sync from profile
+    cookieMock.value = null
+
     const profileStore = useProfileStore()
     const userStore = useUserStore()
-    const uiStore = useUiStore()
 
     const setUserSpy = vi.spyOn(userStore, 'setUser')
     const syncThemeSpy = vi.spyOn(uiStore, 'syncThemePreferenceFromUser')
@@ -61,7 +73,9 @@ describe('useProfileStore', () => {
       themePreference: 'dark',
       providers: ['google'],
     }))
-    expect(syncThemeSpy).toHaveBeenCalledWith('dark')
+    // syncThemePreferenceFromUser is called with 'dark' and force=false
+    // Since cookie is now null, it should sync
+    expect(syncThemeSpy).toHaveBeenCalledWith('dark', false)
     expect(uiStore.themePreference).toBe('dark')
   })
 
