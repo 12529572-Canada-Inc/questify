@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.14.1] - 2025-11-17
+
+### 🛠 Fixes
+- Adjusted worker OpenAI chat payload typing for image parts to align with the newer SDK contract, restoring successful builds.
+
+---
+
 ## [1.14.0] - 2025-11-17
 
 ### 🚀 Features
@@ -334,6 +341,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated tests to cover authentication flows and protected endpoints.
 - Improved code comments and documentation for new authentication logic.
 - Bumped dependency versions for security and compatibility.
+
+---
+
+## [1.14.1] - 2025-11-17
+
+### 🛠 Fixes
+- Adjusted worker OpenAI chat payload typing for image parts to align with the newer SDK contract, restoring successful builds.
 
 ---
 
