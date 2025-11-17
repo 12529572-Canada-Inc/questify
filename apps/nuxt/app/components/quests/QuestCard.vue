@@ -37,9 +37,9 @@ function requestDelete() {
 
 <template>
   <v-card>
-    <v-card-title class="d-flex align-start justify-space-between flex-wrap gap-2">
-      <div class="d-flex flex-column gap-1">
-        <span class="text-subtitle-1 font-weight-medium">
+    <v-card-title class="card-header d-flex align-start justify-space-between flex-wrap gap-2">
+      <div class="title-meta d-flex flex-column gap-1">
+        <span class="quest-title text-subtitle-1 font-weight-medium">
           {{ quest.title }}
         </span>
         <v-chip
@@ -53,6 +53,7 @@ function requestDelete() {
       </div>
       <v-btn
         v-if="isOwner"
+        class="delete-btn"
         variant="text"
         color="error"
         prepend-icon="mdi-trash-can-outline"
@@ -71,3 +72,27 @@ function requestDelete() {
     </v-card-actions>
   </v-card>
 </template>
+
+<style scoped>
+.card-header {
+  gap: 10px;
+}
+
+.title-meta {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.quest-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+}
+
+.delete-btn {
+  flex-shrink: 0;
+}
+</style>

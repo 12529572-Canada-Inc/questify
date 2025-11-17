@@ -9,10 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### 🛠 Fixes
+### 🚀 Features
 - Public quests CTA now routes unauthenticated users through login/signup with a `redirectTo` back to the public quest form, ensuring public quests are created with the correct visibility flag on submission.
 - Added image attachments to quest creation, AI assistance, and investigations (UI + server + worker), including validation, multimodal model support, and failing tests updated to cover image payloads.
-- Images are now persisted on quests and investigations (new Prisma migration) and rendered on quest detail pages and investigation entries for later context.
+- Images are persisted on quests and investigations (new Prisma migration) and rendered on quest detail pages and investigation entries for later context.
+
+### 🛠 Fixes
+- Clamped quest card titles so long names wrap/ellipsize instead of overflowing on the quests page.
+- Restored respect for persisted light/dark/auto profile theme preferences by retrying theme application when Vuetify context isn’t ready, so the UI no longer stays stuck on light mode.
 
 ---
 
