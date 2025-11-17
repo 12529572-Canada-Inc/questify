@@ -89,6 +89,7 @@ describe('useQuestAiAssist', () => {
         constraints: 'Two week deadline',
         currentValue: 'Launch quest',
         modelType: 'gpt-4o-mini',
+        images: [],
       },
     })
     expect(composable.dialogOpen.value).toBe(true)

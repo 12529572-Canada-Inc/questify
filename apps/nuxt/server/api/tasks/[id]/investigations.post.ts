@@ -1,6 +1,7 @@
 import { normalizeModelType } from '../../../utils/model-options'
 import { prisma } from 'shared/server'
 import { requireTaskOwner } from '../../../utils/ownership'
+import { sanitizeImageInputs } from '../../../utils/sanitizers'
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event)
@@ -12,6 +13,7 @@ export default defineEventHandler(async (event) => {
 
   const body = (await readBody<TaskInvestigationBody>(event)) || {} as TaskInvestigationBody
   const prompt = typeof body.prompt === 'string' ? body.prompt.trim() : null
+  const images = sanitizeImageInputs(body.images, { fieldLabel: 'investigation images' })
 
   if (prompt && prompt.length > 1000) {
     throw createError({ status: 400, statusText: 'Investigation context is too long' })
@@ -28,6 +30,7 @@ export default defineEventHandler(async (event) => {
       prompt,
       status: 'pending',
       modelType: selectedModelType,
+      images,
     },
   })
 
@@ -39,6 +42,7 @@ export default defineEventHandler(async (event) => {
       taskId: id,
       prompt,
       modelType: selectedModelType,
+      images,
     })
   }
   else {

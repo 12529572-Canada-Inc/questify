@@ -121,6 +121,7 @@ describe('API /api/tasks/[id]/investigations.post', () => {
         prompt: 'Explore risks and opportunities',
         status: 'pending',
         modelType: 'gpt-4o-mini',
+        images: [],
       },
     })
     expect(addMock).toHaveBeenCalledWith('investigate-task', {
@@ -128,6 +129,7 @@ describe('API /api/tasks/[id]/investigations.post', () => {
       taskId: 'task-1',
       prompt: 'Explore risks and opportunities',
       modelType: 'gpt-4o-mini',
+      images: [],
     })
     expect(response.investigation).toEqual({
       id: 'inv-1',

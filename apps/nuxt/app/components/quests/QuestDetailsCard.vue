@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import QuestDetailsSections from './QuestDetailsSections.vue'
 import QuestTasksTabs from './QuestTasksTabs.vue'
 import QuestVisibilityToggle from './QuestVisibilityToggle.vue'
+import QuestImageGallery from './QuestImageGallery.vue'
 import type { QuestTaskSection, QuestTaskTab, TaskWithInvestigations } from '~/types/quest-tasks'
 import type { Quest } from '@prisma/client'
 import { useAiModels } from '~/composables/useAiModels'
@@ -116,6 +117,10 @@ const questModel = computed(() => findModelById(props.quest.modelType))
       </div>
     </v-card-title>
     <v-card-text class="d-flex flex-column gap-4">
+      <QuestImageGallery
+        v-if="quest.images && quest.images.length > 0"
+        :images="quest.images"
+      />
       <QuestDetailsSections :quest="quest" />
     </v-card-text>
     <v-divider class="my-4" />

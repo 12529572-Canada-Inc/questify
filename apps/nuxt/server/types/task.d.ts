@@ -8,4 +8,5 @@ declare interface TaskBody {
 declare interface TaskInvestigationBody {
   prompt?: string | null
   modelType?: string | null
+  images?: string[]
 }

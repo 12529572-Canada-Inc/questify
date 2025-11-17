@@ -116,7 +116,7 @@ describe('useQuestActions', () => {
       '/api/tasks/task-trim/investigations',
       expect.objectContaining({
         method: 'POST',
-        body: { prompt: 'Details please', modelType: 'gpt-4o' },
+        body: { prompt: 'Details please', modelType: 'gpt-4o', images: [] },
       }),
     )
     expect(refresh).toHaveBeenCalledTimes(1)

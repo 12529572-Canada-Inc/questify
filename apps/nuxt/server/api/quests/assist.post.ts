@@ -1,6 +1,7 @@
 import { parseJsonFromModel } from 'shared/server'
 import { runAiModel } from '../../utils/ai-runner'
 import { recordAiAssistUsage } from '../../utils/telemetry'
+import { sanitizeImageInputs } from '../../utils/sanitizers'
 
 type AiAssistField = 'title' | 'goal' | 'context' | 'constraints'
 
@@ -12,6 +13,7 @@ type AiAssistRequestBody = {
   constraints?: string
   currentValue?: string
   modelType?: string | null
+  images?: string[]
 }
 
 type Suggestion = {
@@ -124,13 +126,14 @@ const handler = defineEventHandler(async (event) => {
   }
 
   const currentValue = sanitizeInput(body.currentValue, 400)
+  const images = sanitizeImageInputs(body.images, { fieldLabel: 'assistant images' })
 
   const prompt = buildPrompt(field, sanitized, currentValue)
 
   const requestedModelId = typeof body.modelType === 'string' ? body.modelType : null
 
   try {
-    const { content, modelId } = await runAiModel(prompt, requestedModelId)
+    const { content, modelId } = await runAiModel(prompt, requestedModelId, true, images)
     const parsed = parseJsonFromModel<ParsedSuggestionPayload>(content)
     const suggestions = extractSuggestions(parsed)
 

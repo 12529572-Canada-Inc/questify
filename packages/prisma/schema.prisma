@@ -46,6 +46,7 @@ model Quest {
   goal        String?
   context     String?
   constraints String?
+  images      String[] @default([])
   isPublic    Boolean  @default(false)
   status      QuestStatus @default(draft)
   deletedAt   DateTime?
@@ -78,6 +79,7 @@ model TaskInvestigation {
   error         String?
   prompt        String?
   initiatedById String?
+  images        String[] @default([])
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   task          Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)

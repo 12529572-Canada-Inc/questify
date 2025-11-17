@@ -109,6 +109,7 @@ describe('API /api/quests (POST)', () => {
         ownerId: 'user-1',
         modelType: 'gpt-4o-mini',
         isPublic: false,
+        images: [],
       },
     })
     expect(queueAddMock).toHaveBeenCalledWith('decompose', {
@@ -118,6 +119,7 @@ describe('API /api/quests (POST)', () => {
       context: null,
       constraints: null,
       modelType: 'gpt-4o-mini',
+      images: [],
     })
     expect(response).toEqual({
       success: true,
@@ -168,6 +170,7 @@ describe('API /api/quests (POST)', () => {
         ownerId: 'user-1',
         modelType: 'gpt-4o-mini',
         isPublic: true,
+        images: [],
       },
     })
 
