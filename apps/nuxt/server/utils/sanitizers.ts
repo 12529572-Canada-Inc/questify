@@ -33,6 +33,19 @@ export function sanitizeOptionalTextInput(
 const DEFAULT_MAX_IMAGES = 3
 const DEFAULT_IMAGE_BYTES = 2 * 1024 * 1024
 
+function resolveMaxImageBytes(explicitMax?: number) {
+  if (typeof explicitMax === 'number' && Number.isFinite(explicitMax) && explicitMax > 0) {
+    return explicitMax
+  }
+
+  const configured = Number(process.env.NUXT_PUBLIC_IMAGE_MAX_SIZE_BYTES ?? DEFAULT_IMAGE_BYTES)
+  if (Number.isFinite(configured) && configured > 0) {
+    return configured
+  }
+
+  return DEFAULT_IMAGE_BYTES
+}
+
 function estimateDataUrlBytes(dataUrl: string) {
   const base64 = dataUrl.split(',')[1] || ''
   return Math.floor(base64.length * 3 / 4)
@@ -54,7 +67,7 @@ export function sanitizeImageInputs(
   }
 
   const maxImages = options.maxImages ?? DEFAULT_MAX_IMAGES
-  const maxBytes = options.maxBytes ?? DEFAULT_IMAGE_BYTES
+  const maxBytes = resolveMaxImageBytes(options.maxBytes)
   const fieldLabel = options.fieldLabel ?? 'image attachments'
 
   if (value.length > maxImages) {

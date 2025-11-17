@@ -6,9 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
-
-## [Unreleased]
-
+sfdf
 ---
 
 ## [1.14.1] - 2025-11-17
@@ -348,7 +346,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🛠 Fixes
 - Adjusted worker OpenAI chat payload typing for image parts to align with the newer SDK contract, restoring successful builds.
-- Made image attachment size configurable via `NUXT_PUBLIC_IMAGE_MAX_SIZE_BYTES` and wired Quest forms to reuse it.
+- Made image attachment size configurable via `NUXT_PUBLIC_IMAGE_MAX_SIZE_BYTES`, defaulting to 2MB and applying the same limit on both client and API validation to avoid oversized uploads.
 
 ---
 

@@ -11,7 +11,7 @@ const props = withDefaults(defineProps<{
 })
 
 const runtimeConfig = useRuntimeConfig()
-const imageMaxSizeBytes = Number(runtimeConfig.public.imageMaxSizeBytes ?? 200 * 1024 * 1024)
+const imageMaxSizeBytes = Number(runtimeConfig.public.imageMaxSizeBytes ?? 2 * 1024 * 1024)
 
 const {
   title,

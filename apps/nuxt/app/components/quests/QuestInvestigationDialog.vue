@@ -42,7 +42,7 @@ const imagesModel = computed({
 })
 
 const runtimeConfig = useRuntimeConfig()
-const imageMaxSizeBytes = Number(runtimeConfig.public.imageMaxSizeBytes ?? 200 * 1024 * 1024)
+const imageMaxSizeBytes = Number(runtimeConfig.public.imageMaxSizeBytes ?? 2 * 1024 * 1024)
 
 const hasContext = computed(() =>
   promptModel.value.trim().length > 0 || imagesModel.value.length > 0,
