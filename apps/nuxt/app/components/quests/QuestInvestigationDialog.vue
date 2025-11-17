@@ -89,6 +89,7 @@ function handleSubmit() {
         </div>
         <ImageAttachmentInput
           v-model="imagesModel"
+          :max-size-bytes="200 * 1024 * 1024"
           label="Add investigation images"
           hint="Upload or take photos that could help with the analysis."
           :max-images="3"

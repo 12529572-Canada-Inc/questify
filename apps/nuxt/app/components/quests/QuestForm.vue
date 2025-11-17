@@ -182,6 +182,7 @@ const {
 
     <ImageAttachmentInput
       v-model="images"
+      :max-size-bytes="200 * 1024 * 1024"
       label="Add supporting images"
       hint="Upload or take photos to give the Quest Agent more context."
       class="mt-4 mb-6"
