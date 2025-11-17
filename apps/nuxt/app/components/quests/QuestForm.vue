@@ -10,6 +10,9 @@ const props = withDefaults(defineProps<{
   makePublic: false,
 })
 
+const runtimeConfig = useRuntimeConfig()
+const imageMaxSizeBytes = Number(runtimeConfig.public.imageMaxSizeBytes ?? 200 * 1024 * 1024)
+
 const {
   title,
   goal,
@@ -182,7 +185,7 @@ const {
 
     <ImageAttachmentInput
       v-model="images"
-      :max-size-bytes="200 * 1024 * 1024"
+      :max-size-bytes="imageMaxSizeBytes"
       label="Add supporting images"
       hint="Upload or take photos to give the Quest Agent more context."
       class="mt-4 mb-6"

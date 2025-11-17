@@ -348,6 +348,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🛠 Fixes
 - Adjusted worker OpenAI chat payload typing for image parts to align with the newer SDK contract, restoring successful builds.
+- Made image attachment size configurable via `NUXT_PUBLIC_IMAGE_MAX_SIZE_BYTES` and wired Quest forms to reuse it.
 
 ---
 
