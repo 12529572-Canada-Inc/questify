@@ -13,7 +13,7 @@ const props = withDefaults(defineProps<{
   label: 'Add images',
   hint: 'Upload or snap a photo to share more context.',
   maxImages: 3,
-  maxSizeBytes: 2 * 1024 * 1024, // 2MB default ceiling
+  maxSizeBytes: 200 * 1024 * 1024, // 200MB default ceiling
   disabled: false,
 })
 
