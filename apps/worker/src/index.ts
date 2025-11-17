@@ -1,6 +1,7 @@
 import { Worker, type Job } from 'bullmq';
 import { QuestStatus } from '@prisma/client';
 import OpenAI from 'openai';
+import type { ChatCompletionContentPart } from 'openai/resources/chat/completions';
 import { findModelOption, resolveModelId, type AiModelOption } from 'shared';
 import { loadModelConfig, parseRedisUrl, parseJsonFromModel, prisma } from 'shared/server';
 import { config } from './config.js';
@@ -94,17 +95,21 @@ async function runModel(
         throw new Error(`Missing API client for provider ${model.provider}`);
       }
 
+      const imageParts: ChatCompletionContentPart[] = sanitizedImages.map(image => ({
+        type: 'image_url' as const,
+        image_url: { url: image, detail: 'auto' as const },
+      }));
+
+      const contentParts: ChatCompletionContentPart[] = [
+        { type: 'text', text: prompt },
+        ...imageParts,
+      ];
+
       const response = await openai.chat.completions.create({
         model: model.apiModel,
         messages: [{
           role: 'user',
-          content: [
-            { type: 'text', text: prompt },
-            ...sanitizedImages.map(image => ({
-              type: 'image_url',
-              image_url: { url: image, detail: 'auto' as const },
-            })),
-          ],
+          content: contentParts,
         }],
       });
       content = response?.choices[0].message?.content ?? '';
