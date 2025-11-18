@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.14.3] - 2025-11-17
+
+### 🛠 Fixes
+- Updated image upload limits to 1.5MB per image and 3MB total to comply with Vercel's request limit 
+
 ## [1.14.2] - 2025-11-17
 
 ### 🛠 Fixes
