@@ -39,18 +39,21 @@ const questMetrics = computed(() => [
     label: 'Total Quests',
     icon: 'mdi-compass-rose',
     value: metrics.value.totalQuests,
+    to: '/quests',
   },
   {
     key: 'active',
     label: 'Active Quests',
     icon: 'mdi-sword-cross',
     value: metrics.value.activeQuests,
+    to: '/quests/active',
   },
   {
     key: 'completed',
     label: 'Completed Quests',
     icon: 'mdi-check-circle',
     value: metrics.value.completedQuests,
+    to: '/quests/completed',
   },
 ])
 
@@ -60,18 +63,21 @@ const taskMetrics = computed(() => [
     label: 'Total Tasks',
     icon: 'mdi-clipboard-text',
     value: metrics.value.totalTasks,
+    to: '/tasks',
   },
   {
     key: 'tasks-completed',
     label: 'Completed Tasks',
     icon: 'mdi-clipboard-check',
     value: metrics.value.completedTasks,
+    to: '/tasks/completed',
   },
   {
     key: 'visibility',
     label: 'Private vs Public',
     icon: 'mdi-lock-open-variant',
     value: `${metrics.value.privateQuests}/${metrics.value.publicQuests}`,
+    to: '/quests',
   },
 ])
 
@@ -254,7 +260,11 @@ async function handleRefresh() {
                   cols="12"
                   sm="4"
                 >
-                  <div class="dashboard__metric">
+                  <NuxtLink
+                    :to="metric.to"
+                    class="dashboard__metric"
+                    :aria-label="metric.label"
+                  >
                     <v-icon
                       :icon="metric.icon"
                       size="28"
@@ -275,7 +285,7 @@ async function handleRefresh() {
                         {{ metric.label }}
                       </span>
                     </div>
-                  </div>
+                  </NuxtLink>
                 </v-col>
               </v-row>
             </v-card-text>
@@ -338,7 +348,11 @@ async function handleRefresh() {
               cols="12"
               sm="4"
             >
-              <div class="dashboard__metric dashboard__metric--compact">
+              <NuxtLink
+                :to="metric.to"
+                class="dashboard__metric dashboard__metric--compact"
+                :aria-label="metric.label"
+              >
                 <v-icon
                   :icon="metric.icon"
                   size="24"
@@ -359,7 +373,7 @@ async function handleRefresh() {
                     {{ metric.label }}
                   </span>
                 </div>
-              </div>
+              </NuxtLink>
             </v-col>
           </v-row>
         </v-card-text>
@@ -402,6 +416,11 @@ async function handleRefresh() {
   display: flex;
   align-items: center;
   gap: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+  border-radius: 8px;
+  padding: 8px 6px;
 }
 
 .dashboard__metric--compact .dashboard__metric-icon {
@@ -416,6 +435,11 @@ async function handleRefresh() {
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+
+.dashboard__metric:hover {
+  background: rgba(var(--v-theme-primary), 0.08);
+  transform: translateY(-1px);
 }
 
 .dashboard__metric-skeleton {
