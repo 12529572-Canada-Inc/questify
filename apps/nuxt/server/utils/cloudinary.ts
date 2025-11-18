@@ -44,5 +44,5 @@ export function signCloudinaryParams(params: Record<string, string | number | bo
     .map(([key, value]) => `${key}=${value}`)
     .join('&')
 
-  return crypto.createHash('sha1').update(filtered + apiSecret).digest('hex')
+  return crypto.createHash('sha256').update(filtered + apiSecret).digest('hex')
 }
