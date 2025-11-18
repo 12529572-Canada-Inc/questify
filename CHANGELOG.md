@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 🚀 Features
+- Integrated Cloudinary for image storage and delivery:
+    - Added Cloudinary configuration to Nuxt and worker environments, supporting `CLOUDINARY_URL` and related secrets.
+    - Updated image upload flows to store images in Cloudinary, replacing local storage and enabling CDN-backed delivery.
+    - Refactored server and worker image handling utilities to use Cloudinary APIs for upload, transformation, and deletion.
+    - Added documentation for required Cloudinary environment variables and migration steps.
+
 ---
 
 ## [1.14.3] - 2025-11-17
