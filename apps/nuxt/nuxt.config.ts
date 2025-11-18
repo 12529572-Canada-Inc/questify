@@ -8,8 +8,8 @@ const aiAssistEnabled = process.env.NUXT_FEATURE_AI_ASSIST === 'true'
 const defaultImageMaxSizeBytes = 1.5 * 1024 * 1024 // 1.5MB per image while storing media off-app
 const defaultImageTotalMaxBytes = 3 * 1024 * 1024 // 3MB across images to prevent runaway uploads
 
-const configuredImageMaxSizeBytes = Number(process.env.NUXT_PUBLIC_IMAGE_MAX_SIZE_BYTES ?? defaultImageMaxSizeBytes)
-const configuredImageTotalMaxBytes = Number(process.env.NUXT_PUBLIC_IMAGE_TOTAL_MAX_BYTES ?? defaultImageTotalMaxBytes)
+const configuredImageMaxSizeBytes = Number(process.env.IMAGE_MAX_SIZE_BYTES ?? defaultImageMaxSizeBytes)
+const configuredImageTotalMaxBytes = Number(process.env.IMAGE_TOTAL_MAX_BYTES ?? defaultImageTotalMaxBytes)
 
 const imageMaxSizeBytes = Number.isFinite(configuredImageMaxSizeBytes) && configuredImageMaxSizeBytes > 0
   ? configuredImageMaxSizeBytes
