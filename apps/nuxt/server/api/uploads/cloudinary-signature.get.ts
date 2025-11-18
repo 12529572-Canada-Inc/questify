@@ -9,11 +9,12 @@ const handler = defineEventHandler(async (event) => {
 
   const signatureAlgorithm = 'sha256' as const
 
-  const signature = signCloudinaryParams({
-    folder,
-    timestamp,
-    signature_algorithm: signatureAlgorithm,
-  }, config.apiSecret)
+  // Cloudinary computes the string to sign
+  // without the signature_algorithm flag.
+  const signature = signCloudinaryParams(
+    { folder, timestamp },
+    config.apiSecret,
+  )
 
   return {
     cloudName: config.cloudName,
