@@ -21,9 +21,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Added documentation for required Cloudinary environment variables and migration steps.
 - Support issue submissions now accept up to three image attachments (uploaded via Cloudinary) so reporters can include screenshots.
 
-### 🛠 Fixes
-- Cloudinary signature generation now uses HMAC-SHA256 while matching the expected string-to-sign, preventing invalid signature errors.
-
 ---
 
 ## [1.14.3] - 2025-11-17
