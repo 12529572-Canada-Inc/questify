@@ -11,6 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.15.0] - 2025-11-18
+
+### 🚀 Features
+- Integrated Cloudinary for image storage and delivery:
+    - Added Cloudinary configuration to Nuxt and worker environments, supporting `CLOUDINARY_URL` and related secrets.
+    - Updated image upload flows to store images in Cloudinary, replacing local storage and enabling CDN-backed delivery.
+    - Refactored server and worker image handling utilities to use Cloudinary APIs for upload, transformation, and deletion.
+    - Added documentation for required Cloudinary environment variables and migration steps.
+- Support issue submissions now accept up to three image attachments (uploaded via Cloudinary) so reporters can include screenshots.
+
+---
+
 ## [1.14.3] - 2025-11-17
 
 ### 🛠 Fixes
@@ -19,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.14.2] - 2025-11-17
 
 ### 🛠 Fixes
-- Made image attachment size configurable via `NUXT_PUBLIC_IMAGE_MAX_SIZE_BYTES`, defaulting to 2MB and applying the same limit on both client and API validation to avoid oversized uploads.
+- Made image attachment size configurable via `IMAGE_MAX_SIZE_BYTES`, defaulting to 2MB and applying the same limit on both client and API validation to avoid oversized uploads.
 
 ---
 

@@ -32,14 +32,16 @@ export function sanitizeOptionalTextInput(
 
 const DEFAULT_MAX_IMAGES = 3
 const DEFAULT_IMAGE_BYTES = 1.5 * 1024 * 1024 // 1.5MB per image
-const DEFAULT_TOTAL_IMAGE_BYTES = 3 * 1024 * 1024 // 3MB total to stay under Vercel's 4.5MB limit
+const DEFAULT_TOTAL_IMAGE_BYTES = 3 * 1024 * 1024 // 3MB combined cap
+
+const config = useRuntimeConfig()
 
 function resolveMaxImageBytes(explicitMax?: number) {
   if (typeof explicitMax === 'number' && Number.isFinite(explicitMax) && explicitMax > 0) {
     return explicitMax
   }
 
-  const configured = Number(process.env.NUXT_PUBLIC_IMAGE_MAX_SIZE_BYTES ?? DEFAULT_IMAGE_BYTES)
+  const configured = Number(config.public.imageMaxSizeBytes ?? DEFAULT_IMAGE_BYTES)
   if (Number.isFinite(configured) && configured > 0) {
     return configured
   }
@@ -52,7 +54,7 @@ function resolveMaxTotalImageBytes(explicitMax?: number) {
     return explicitMax
   }
 
-  const configured = Number(process.env.NUXT_PUBLIC_IMAGE_TOTAL_MAX_BYTES ?? DEFAULT_TOTAL_IMAGE_BYTES)
+  const configured = Number(config.public.imageTotalMaxBytes ?? DEFAULT_TOTAL_IMAGE_BYTES)
   if (Number.isFinite(configured) && configured > 0) {
     return configured
   }

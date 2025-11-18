@@ -7,6 +7,7 @@ import { useUiStore } from '~/stores/ui'
 import { useSnackbar } from '~/composables/useSnackbar'
 import { resolveApiError } from '~/utils/error'
 import type { SupportAssistantResponse } from '~/types/support'
+import ImageAttachmentInput from '~/components/common/ImageAttachmentInput.vue'
 
 const props = defineProps<{
   modelValue: boolean
@@ -34,6 +35,9 @@ const { aiAssistEnabled } = storeToRefs(uiStore)
 const { conversation } = storeToRefs(supportStore)
 const { showSnackbar } = useSnackbar()
 const route = useRoute()
+const runtimeConfig = useRuntimeConfig()
+const imageMaxSizeBytes = Number(runtimeConfig.public.imageMaxSizeBytes ?? 8 * 1024 * 1024)
+const imageTotalMaxBytes = Number(runtimeConfig.public.imageTotalMaxBytes ?? 24 * 1024 * 1024)
 
 const chatPrompt = computed(() => {
   const path = route.fullPath || route.path || '/'
@@ -61,6 +65,7 @@ const issueForm = reactive({
   title: '',
   category: 'Bug' as 'Bug' | 'Feature Request' | 'Question',
   description: '',
+  images: [] as string[],
 })
 
 const submitting = ref(false)
@@ -80,7 +85,7 @@ watch(dialogModel, (isOpen) => {
   }
 })
 
-watch(() => [issueForm.title, issueForm.category, issueForm.description], () => {
+watch(() => [issueForm.title, issueForm.category, issueForm.description, issueForm.images], () => {
   if (suppressFeedbackReset) {
     suppressFeedbackReset = false
     return
@@ -113,6 +118,7 @@ function clearIssueForm() {
   issueForm.title = ''
   issueForm.category = 'Bug'
   issueForm.description = ''
+  issueForm.images = []
 }
 
 async function handleSubmitIssue() {
@@ -458,6 +464,15 @@ function buildVisibleText(): string | undefined {
                 rows="4"
                 auto-grow
                 placeholder="Describe the problem, steps to reproduce, or idea."
+              />
+              <ImageAttachmentInput
+                v-model="issueForm.images"
+                class="support-assistant-dialog__field"
+                label="Add screenshots"
+                hint="Attach up to 3 images (uploads stored securely)."
+                :max-images="3"
+                :max-size-bytes="imageMaxSizeBytes"
+                :max-total-bytes="imageTotalMaxBytes"
               />
               <v-alert
                 v-if="submissionState !== 'idle'"

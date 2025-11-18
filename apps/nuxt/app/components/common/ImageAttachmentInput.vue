@@ -1,6 +1,15 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
+type CloudinarySignatureResponse = {
+  cloudName: string
+  apiKey: string
+  folder: string
+  timestamp: number
+  signatureAlgorithm?: 'sha256'
+  signature: string
+}
+
 const model = defineModel<string[]>({ default: [] })
 
 const props = withDefaults(defineProps<{
@@ -14,19 +23,23 @@ const props = withDefaults(defineProps<{
   label: 'Add images',
   hint: 'Upload or snap a photo to share more context.',
   maxImages: 3,
-  maxSizeBytes: 1.5 * 1024 * 1024, // 1.5MB per image (accounts for base64 encoding overhead)
-  maxTotalBytes: 3 * 1024 * 1024, // 3MB total to stay under Vercel's 4.5MB limit
+  maxSizeBytes: 1.5 * 1024 * 1024, // 1.5MB per image
+  maxTotalBytes: 3 * 1024 * 1024, // 3MB total
   disabled: false,
 })
 
 const error = ref<string | null>(null)
 const busy = ref(false)
 const fileInput = ref<HTMLInputElement | null>(null)
+const uploadedSizes = ref(new Map<string, number>())
 
 const remainingSlots = computed(() => Math.max(props.maxImages - model.value.length, 0))
 const isDisabled = computed(() => busy.value || props.disabled)
 const existingBytes = computed(() =>
   model.value.reduce((total, image) => {
+    if (uploadedSizes.value.has(image)) {
+      return total + (uploadedSizes.value.get(image) || 0)
+    }
     if (image.startsWith('data:image/')) {
       const base64 = image.split(',')[1] || ''
       return total + Math.floor(base64.length * 3 / 4)
@@ -47,21 +60,46 @@ function resetInput(event: Event) {
   }
 }
 
-function readFileAsDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onerror = () => reject(new Error('Failed to read image.'))
-    reader.onload = () => {
-      const result = reader.result
-      if (typeof result === 'string') {
-        resolve(result)
-      }
-      else {
-        reject(new Error('Unsupported image format.'))
-      }
-    }
-    reader.readAsDataURL(file)
+async function requestSignature() {
+  return $fetch<CloudinarySignatureResponse>('/api/uploads/cloudinary-signature')
+}
+
+async function uploadToCloudinary(file: File, signature: CloudinarySignatureResponse) {
+  const uploadUrl = `https://api.cloudinary.com/v1_1/${signature.cloudName}/auto/upload`
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('api_key', signature.apiKey)
+  formData.append('timestamp', String(signature.timestamp))
+  formData.append('signature', signature.signature)
+  if (signature.signatureAlgorithm) {
+    formData.append('signature_algorithm', signature.signatureAlgorithm)
+  }
+  formData.append('folder', signature.folder)
+
+  const response = await fetch(uploadUrl, {
+    method: 'POST',
+    body: formData,
   })
+
+  let payload: { secure_url?: string, error?: { message?: string } } = {}
+  try {
+    payload = await response.json()
+  }
+  catch {
+    // ignore parse failures and fall back to status text
+  }
+
+  if (!response.ok) {
+    const detail = payload?.error?.message || response.statusText || 'Upload failed.'
+    throw new Error(detail)
+  }
+
+  const secureUrl = typeof payload.secure_url === 'string' ? payload.secure_url.trim() : ''
+  if (!secureUrl) {
+    throw new Error('Upload succeeded but no image URL was returned.')
+  }
+
+  return secureUrl
 }
 
 async function handleFilesSelected(event: Event) {
@@ -82,6 +120,8 @@ async function handleFilesSelected(event: Event) {
     const nextImages: string[] = []
     let runningTotal = existingBytes.value
 
+    const signature = await requestSignature()
+
     for (const file of selected) {
       if (!file.type.startsWith('image/')) {
         error.value = 'Only image files are allowed.'
@@ -98,9 +138,16 @@ async function handleFilesSelected(event: Event) {
         continue
       }
 
-      const dataUrl = await readFileAsDataUrl(file)
-      runningTotal += file.size
-      nextImages.push(dataUrl)
+      try {
+        const imageUrl = await uploadToCloudinary(file, signature)
+        runningTotal += file.size
+        uploadedSizes.value.set(imageUrl, file.size)
+        nextImages.push(imageUrl)
+      }
+      catch (uploadError) {
+        const message = uploadError instanceof Error ? uploadError.message : 'Unable to upload image.'
+        error.value = message
+      }
     }
 
     if (nextImages.length) {
@@ -120,7 +167,11 @@ async function handleFilesSelected(event: Event) {
 
 function removeImage(index: number) {
   if (isDisabled.value) return
+  const removed = model.value[index]
   model.value = model.value.filter((_, idx) => idx !== index)
+  if (removed) {
+    uploadedSizes.value.delete(removed)
+  }
 }
 </script>
 
