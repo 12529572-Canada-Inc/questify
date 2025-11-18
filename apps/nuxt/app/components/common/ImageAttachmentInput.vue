@@ -6,6 +6,7 @@ type CloudinarySignatureResponse = {
   apiKey: string
   folder: string
   timestamp: number
+  signatureAlgorithm?: 'sha256'
   signature: string
 }
 
@@ -70,6 +71,9 @@ async function uploadToCloudinary(file: File, signature: CloudinarySignatureResp
   formData.append('api_key', signature.apiKey)
   formData.append('timestamp', String(signature.timestamp))
   formData.append('signature', signature.signature)
+  if (signature.signatureAlgorithm) {
+    formData.append('signature_algorithm', signature.signatureAlgorithm)
+  }
   formData.append('folder', signature.folder)
 
   const response = await fetch(uploadUrl, {

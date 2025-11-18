@@ -44,5 +44,6 @@ export function signCloudinaryParams(params: Record<string, string | number | bo
     .map(([key, value]) => `${key}=${value}`)
     .join('&')
 
-  return crypto.createHash('sha256').update(filtered + apiSecret).digest('hex')
+  // Use HMAC-SHA256 for signatures to avoid weak hash usage.
+  return crypto.createHmac('sha256', apiSecret).update(filtered).digest('hex')
 }

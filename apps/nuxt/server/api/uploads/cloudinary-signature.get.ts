@@ -7,9 +7,12 @@ const handler = defineEventHandler(async (event) => {
   const timestamp = Math.floor(Date.now() / 1000)
   const folder = `${config.uploadFolder}/${user.id}`
 
+  const signatureAlgorithm = 'sha256' as const
+
   const signature = signCloudinaryParams({
     folder,
     timestamp,
+    signature_algorithm: signatureAlgorithm,
   }, config.apiSecret)
 
   return {
@@ -17,6 +20,7 @@ const handler = defineEventHandler(async (event) => {
     apiKey: config.apiKey,
     folder,
     timestamp,
+    signatureAlgorithm,
     signature,
   }
 })
