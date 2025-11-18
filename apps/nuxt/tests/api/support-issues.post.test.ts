@@ -47,6 +47,7 @@ beforeEach(() => {
     category: 'Bug',
     description: 'Something is broken on this page.',
     route: '/quests/alpha',
+    images: ['https://example.com/screenshot.png'],
   })))
   Reflect.set(globalThis as GlobalWithMocks, 'createError', ({ status, statusText }) => {
     const error = new Error(statusText ?? 'Error') as Error & { statusCode?: number }
@@ -95,6 +96,7 @@ describe('API /api/support/issues (POST)', () => {
     expect(typeof requestBody.body).toBe('string')
     expect(requestBody.body).toContain('**Category:** Bug')
     expect(requestBody.body).toContain('/quests/alpha')
+    expect(requestBody.body).toContain('https://example.com/screenshot.png')
 
     expect(result).toEqual({
       success: true,
@@ -149,5 +151,15 @@ describe('API /api/support/issues (POST)', () => {
     expect(requestBody.body).toContain('**Page:** Unknown')
     expect(requestBody.body).toContain('_No additional details provided._')
     expect(result.issue.number).toBe(55)
+  })
+
+  it('rejects invalid images', async () => {
+    Reflect.set(globalThis as GlobalWithMocks, 'readBody', vi.fn(async () => ({
+      title: 'Valid',
+      category: 'Bug',
+      images: ['http://insecure.example.com/img.png'],
+    })))
+
+    await expect(handler({} as never)).rejects.toMatchObject({ statusCode: 400 })
   })
 })

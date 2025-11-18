@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Updated image upload flows to store images in Cloudinary, replacing local storage and enabling CDN-backed delivery.
     - Refactored server and worker image handling utilities to use Cloudinary APIs for upload, transformation, and deletion.
     - Added documentation for required Cloudinary environment variables and migration steps.
+- Support issue submissions now accept up to three image attachments (uploaded via Cloudinary) so reporters can include screenshots.
+
+### 🛠 Fixes
+- Cloudinary signature generation now uses HMAC-SHA256 while matching the expected string-to-sign, preventing invalid signature errors.
 
 ---
 

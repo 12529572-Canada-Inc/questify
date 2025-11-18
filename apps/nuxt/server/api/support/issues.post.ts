@@ -1,4 +1,5 @@
 import { createGithubIssue } from '../../utils/github'
+import { sanitizeImageInputs } from '../../utils/sanitizers'
 
 const ISSUE_CATEGORIES = ['Bug', 'Feature Request', 'Question'] as const
 type IssueCategory = typeof ISSUE_CATEGORIES[number]
@@ -8,6 +9,7 @@ type SubmitIssueBody = {
   category?: IssueCategory
   description?: string
   route?: string
+  images?: string[]
 }
 
 type SessionUser = {
@@ -28,12 +30,14 @@ export default defineEventHandler(async (event) => {
   const category = sanitizeCategory(body.category)
   const description = sanitizeDescription(body.description)
   const routePath = sanitizeRoute(body.route)
+  const images = sanitizeIssueImages(body.images)
 
   const issueBody = formatIssueBody({
     category,
     description,
     routePath,
     user: session.user as SessionUser,
+    images,
   })
 
   const issue = await createGithubIssue(event, {
@@ -110,6 +114,7 @@ function formatIssueBody(options: {
   description: string
   routePath: string
   user: SessionUser
+  images: string[]
 }) {
   const reporter = options.user.name?.trim()
     || options.user.email?.trim()
@@ -125,8 +130,21 @@ function formatIssueBody(options: {
     '### Description',
     options.description || '_No additional details provided._',
     '',
+    ...(options.images.length
+      ? [
+          '### Attachments',
+          ...options.images.map(url => `- ${url}`),
+          '',
+        ]
+      : []),
     '> Submitted via Questify Support Assistant.',
   ]
 
   return details.join('\n')
+}
+
+function sanitizeIssueImages(value: unknown) {
+  return sanitizeImageInputs(value, {
+    fieldLabel: 'issue attachments',
+  })
 }
