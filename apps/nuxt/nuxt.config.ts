@@ -5,8 +5,8 @@ import { loadModelConfig } from '../../packages/shared/src/model-config'
 
 const aiModelConfig = loadModelConfig()
 const aiAssistEnabled = process.env.NUXT_FEATURE_AI_ASSIST === 'true'
-const defaultImageMaxSizeBytes = 1.5 * 1024 * 1024 // 1.5MB per image (accounts for base64 encoding + JSON overhead)
-const defaultImageTotalMaxBytes = 3 * 1024 * 1024 // 3MB total to stay under Vercel's 4.5MB limit
+const defaultImageMaxSizeBytes = 1.5 * 1024 * 1024 // 1.5MB per image while storing media off-app
+const defaultImageTotalMaxBytes = 3 * 1024 * 1024 // 3MB across images to prevent runaway uploads
 
 const configuredImageMaxSizeBytes = Number(process.env.NUXT_PUBLIC_IMAGE_MAX_SIZE_BYTES ?? defaultImageMaxSizeBytes)
 const configuredImageTotalMaxBytes = Number(process.env.NUXT_PUBLIC_IMAGE_TOTAL_MAX_BYTES ?? defaultImageTotalMaxBytes)
@@ -90,6 +90,12 @@ export default defineNuxtConfig({
       repo: process.env.GITHUB_REPO_NAME || '',
       token: process.env.GITHUB_TOKEN || '',
     },
+    cloudinary: {
+      cloudName: process.env.CLOUDINARY_CLOUD_NAME || '',
+      apiKey: process.env.CLOUDINARY_API_KEY || '',
+      apiSecret: process.env.CLOUDINARY_API_SECRET || '',
+      uploadFolder: process.env.CLOUDINARY_UPLOAD_FOLDER || 'questify/quests',
+    },
 
     // 🌍 Client-exposed
     public: {
@@ -102,6 +108,10 @@ export default defineNuxtConfig({
       imageTotalMaxBytes,
       features: {
         aiAssist: aiAssistEnabled,
+      },
+      cloudinary: {
+        cloudName: process.env.CLOUDINARY_CLOUD_NAME || '',
+        uploadFolder: process.env.CLOUDINARY_UPLOAD_FOLDER || 'questify/quests',
       },
     },
   },

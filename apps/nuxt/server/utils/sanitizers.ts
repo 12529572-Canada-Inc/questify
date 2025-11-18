@@ -32,7 +32,7 @@ export function sanitizeOptionalTextInput(
 
 const DEFAULT_MAX_IMAGES = 3
 const DEFAULT_IMAGE_BYTES = 1.5 * 1024 * 1024 // 1.5MB per image
-const DEFAULT_TOTAL_IMAGE_BYTES = 3 * 1024 * 1024 // 3MB total to stay under Vercel's 4.5MB limit
+const DEFAULT_TOTAL_IMAGE_BYTES = 3 * 1024 * 1024 // 24MB combined cap
 
 function resolveMaxImageBytes(explicitMax?: number) {
   if (typeof explicitMax === 'number' && Number.isFinite(explicitMax) && explicitMax > 0) {
