@@ -14,6 +14,7 @@ const handler = defineEventHandler(async (event) => {
   const signature = signCloudinaryParams(
     { folder, timestamp },
     config.apiSecret,
+    signatureAlgorithm,
   )
 
   return {

@@ -37,13 +37,17 @@ export function resolveCloudinaryConfig(event: RuntimeConfigEvent): CloudinaryCo
   }
 }
 
-export function signCloudinaryParams(params: Record<string, string | number | boolean | undefined | null>, apiSecret: string) {
+export function signCloudinaryParams(
+  params: Record<string, string | number | boolean | undefined | null>,
+  apiSecret: string,
+  algorithm: 'sha256' | 'sha1' = 'sha256',
+) {
   const filtered = Object.entries(params)
     .filter(([, value]) => value !== undefined && value !== null && value !== '')
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([key, value]) => `${key}=${value}`)
     .join('&')
 
-  // Use HMAC-SHA256 for signatures to avoid weak hash usage.
-  return crypto.createHmac('sha256', apiSecret).update(filtered).digest('hex')
+  // Cloudinary signs with a hash of the string-to-sign followed by the API secret.
+  return crypto.createHash(algorithm).update(`${filtered}${apiSecret}`).digest('hex')
 }
