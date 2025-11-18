@@ -14,8 +14,8 @@ const props = withDefaults(defineProps<{
   label: 'Add images',
   hint: 'Upload or snap a photo to share more context.',
   maxImages: 3,
-  maxSizeBytes: 2 * 1024 * 1024, // 2MB default ceiling
-  maxTotalBytes: 4 * 1024 * 1024, // 4MB total ceiling
+  maxSizeBytes: 1.5 * 1024 * 1024, // 1.5MB per image (accounts for base64 encoding overhead)
+  maxTotalBytes: 3 * 1024 * 1024, // 3MB total to stay under Vercel's 4.5MB limit
   disabled: false,
 })
 
