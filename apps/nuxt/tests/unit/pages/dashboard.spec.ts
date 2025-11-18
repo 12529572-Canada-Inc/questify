@@ -1,8 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
-import { nextTick } from 'vue'
+import { nextTick, ref } from 'vue'
 import Dashboard from '../../../app/pages/dashboard.vue'
-import { ref } from 'vue'
 
 vi.mock('~/composables/useMetrics', () => ({
   useMetrics: async () => ({
