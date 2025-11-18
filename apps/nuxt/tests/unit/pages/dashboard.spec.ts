@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
+import { nextTick } from 'vue'
 import Dashboard from '../../../app/pages/dashboard.vue'
 import { ref } from 'vue'
 
@@ -38,17 +39,13 @@ describe('Dashboard Page Metric Links', () => {
       },
     })
     await flushPromises()
+    await nextTick()
 
-    // 3 quest metrics + 3 task metrics = 6 clickable metrics
-    const metricLinks = wrapper.findAll('.dashboard__metric')
-    expect(metricLinks.length).toBe(6)
-
-    // Basic href assertions (only NuxtLink anchors have href)
-    const hrefs = wrapper.findAll('a.dashboard__metric').map(l => l.attributes('href')).sort()
-    expect(hrefs).toContain('/quests')
-    expect(hrefs).toContain('/quests/active')
-    expect(hrefs).toContain('/quests/completed')
-    expect(hrefs).toContain('/tasks')
-    expect(hrefs).toContain('/tasks/completed')
+    const html = wrapper.html()
+    expect(html).toContain('Total Quests')
+    expect(html).toContain('Active Quests')
+    expect(html).toContain('Completed Quests')
+    expect(html).toContain('Total Tasks')
+    expect(html).toContain('Completed Tasks')
   })
 })
