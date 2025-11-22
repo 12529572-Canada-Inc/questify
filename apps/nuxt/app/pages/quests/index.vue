@@ -321,7 +321,7 @@ const noResultsCopy = computed(() => {
       class="quest-table"
       hover
     >
-      <template #item.title="{ item }">
+      <template #[`item.title`]="{ item }">
         <div class="quest-table__title">
           <div class="quest-table__title-text text-subtitle-2 font-weight-medium">
             {{ item.title }}
@@ -335,7 +335,7 @@ const noResultsCopy = computed(() => {
         </div>
       </template>
 
-      <template #item.status="{ item }">
+      <template #[`item.status`]="{ item }">
         <v-chip
           size="small"
           variant="tonal"
@@ -346,7 +346,7 @@ const noResultsCopy = computed(() => {
         </v-chip>
       </template>
 
-      <template #item.isPublic="{ item }">
+      <template #[`item.isPublic`]="{ item }">
         <v-chip
           size="small"
           color="primary"
@@ -356,11 +356,11 @@ const noResultsCopy = computed(() => {
         </v-chip>
       </template>
 
-      <template #item.updatedAt="{ item }">
+      <template #[`item.updatedAt`]="{ item }">
         {{ dateFormatter.format(new Date(item.updatedAt)) }}
       </template>
 
-      <template #item.actions="{ item }">
+      <template #[`item.actions`]="{ item }">
         <div class="d-flex gap-2 justify-end">
           <v-btn
             variant="text"
