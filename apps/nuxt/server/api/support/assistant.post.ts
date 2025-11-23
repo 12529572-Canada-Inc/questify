@@ -136,7 +136,7 @@ function buildPrompt(question: string, route: string, history: SupportChatMessag
 
 const handler = defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
-  const featureEnabled = Boolean(config.features?.aiAssist)
+  const featureEnabled = Boolean(config.public?.features?.aiAssist)
   if (!featureEnabled) {
     throw createError({ status: 404, statusText: 'AI assistance is disabled.' })
   }
