@@ -98,14 +98,6 @@ const metricsError = computed(() => error.value?.message ?? null)
 
 const quickLinks = [
   {
-    key: 'private',
-    title: 'Private Quests',
-    description: 'Review and manage the quests you own.',
-    icon: 'mdi-shield-check',
-    to: '/quests',
-    color: 'primary',
-  },
-  {
     key: 'public',
     title: 'Public Quests',
     description: 'Explore community quests and track new challenges.',
@@ -190,7 +182,7 @@ async function handleRefresh() {
           v-for="link in quickLinks"
           :key="link.key"
           cols="12"
-          md="6"
+          md="12"
         >
           <v-card
             :to="link.to"
