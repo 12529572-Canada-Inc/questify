@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch, watchEffect, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
 import { SUPPORTED_OAUTH_PROVIDERS, type OAuthProvider, type ThemePreference } from 'shared'
 import { useOAuthFlash } from '~/composables/useOAuthFlash'
 import { useSnackbar } from '~/composables/useSnackbar'
