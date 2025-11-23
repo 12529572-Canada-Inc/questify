@@ -53,7 +53,7 @@ const questMetrics = computed(() => [
     label: 'Completed Quests',
     icon: 'mdi-check-circle',
     value: metrics.value.completedQuests,
-    to: '/quests/completed',
+    to: '/quests?view=completed',
   },
 ])
 

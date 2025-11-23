@@ -28,10 +28,12 @@ function parseBooleanParam(value: unknown) {
 }
 
 const allowedStatuses = Object.values(QUEST_STATUS)
-type QuestViewFilter = 'active'
+type QuestViewFilter = 'active' | 'completed'
+const allowedViewFilters: QuestViewFilter[] = ['active', 'completed']
 
 const viewFilterStatusesMap: Record<QuestViewFilter, QuestStatus[]> = {
   active: [QUEST_STATUS.active],
+  completed: [QUEST_STATUS.completed],
 }
 
 function parseViewFilter(value: unknown): QuestViewFilter | null {
@@ -39,7 +41,9 @@ function parseViewFilter(value: unknown): QuestViewFilter | null {
     return null
   }
   const normalized = value.toLowerCase()
-  return normalized === 'active' ? 'active' : null
+  return allowedViewFilters.includes(normalized as QuestViewFilter)
+    ? normalized as QuestViewFilter
+    : null
 }
 
 function statusesForView(view: QuestViewFilter | null): QuestStatus[] {
