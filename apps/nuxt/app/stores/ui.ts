@@ -15,12 +15,12 @@ export const useUiStore = defineStore('ui', () => {
   const themePreference = ref<ThemePreference>(themePreferenceCookie.value ?? 'light')
   const themeMode = ref<ThemeMode>(resolveInitialTheme(themePreference.value))
   const runtimeConfig = useRuntimeConfig()
-  const aiAssistFeatureEnabled = Boolean(runtimeConfig.public?.features?.aiAssist)
+  const aiAssistFeatureEnabled = computed(() => Boolean(runtimeConfig.public?.features?.aiAssist))
   const aiAssistCookie = useCookie<'on' | 'off'>(AI_ASSIST_COOKIE_KEY, {
-    default: () => (aiAssistFeatureEnabled ? 'on' : 'off'),
+    default: () => (aiAssistFeatureEnabled.value ? 'on' : 'off'),
   })
   const aiAssistPreference = ref<'on' | 'off'>(
-    aiAssistFeatureEnabled
+    aiAssistFeatureEnabled.value
       ? (aiAssistCookie.value ?? 'on')
       : 'off',
   )
@@ -29,7 +29,7 @@ export const useUiStore = defineStore('ui', () => {
   let autoThemeInterval: ReturnType<typeof globalThis.setInterval> | null = null
 
   const isDarkMode = computed(() => themeMode.value === 'dark')
-  const aiAssistEnabled = computed(() => aiAssistFeatureEnabled && aiAssistPreference.value === 'on')
+  const aiAssistEnabled = computed(() => aiAssistFeatureEnabled.value && aiAssistPreference.value === 'on')
 
   function resolveThemeInstance() {
     if (cachedTheme) {
@@ -122,12 +122,12 @@ export const useUiStore = defineStore('ui', () => {
   }
 
   function setAiAssistEnabled(enabled: boolean) {
-    if (!aiAssistFeatureEnabled) return
+    if (!aiAssistFeatureEnabled.value) return
     aiAssistPreference.value = enabled ? 'on' : 'off'
   }
 
   function toggleAiAssist() {
-    if (!aiAssistFeatureEnabled) return
+    if (!aiAssistFeatureEnabled.value) return
     setAiAssistEnabled(!aiAssistEnabled.value)
   }
 
@@ -148,14 +148,14 @@ export const useUiStore = defineStore('ui', () => {
   }, { immediate: true })
 
   watch(aiAssistPreference, (value) => {
-    if (!aiAssistFeatureEnabled) {
+    if (!aiAssistFeatureEnabled.value) {
       aiAssistCookie.value = 'off'
       return
     }
     aiAssistCookie.value = value
   }, { immediate: true })
 
-  if (!aiAssistFeatureEnabled) {
+  if (!aiAssistFeatureEnabled.value) {
     aiAssistCookie.value = 'off'
   }
 

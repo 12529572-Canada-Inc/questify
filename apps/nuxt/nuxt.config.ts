@@ -4,11 +4,8 @@ import path from 'path'
 import { loadModelConfig } from '../../packages/shared/src/model-config'
 
 const aiModelConfig = loadModelConfig()
-const aiAssistEnabled = (() => {
-  const value = process.env.NUXT_FEATURE_AI_ASSIST ?? ''
-  const normalised = value.toString().trim().toLowerCase()
-  return normalised === 'true' || normalised === '1'
-})()
+const aiAssistEnabled = process.env.NUXT_FEATURE_AI_ASSIST === 'true'
+console.log(`AI Assist feature enabled: ${aiAssistEnabled}`)
 const defaultImageMaxSizeBytes = 1.5 * 1024 * 1024 // 1.5MB per image while storing media off-app
 const defaultImageTotalMaxBytes = 3 * 1024 * 1024 // 3MB across images to prevent runaway uploads
 
