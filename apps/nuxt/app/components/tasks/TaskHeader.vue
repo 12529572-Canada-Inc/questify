@@ -13,7 +13,7 @@ const props = withDefaults(defineProps<{
 </script>
 
 <template>
-  <section class="task-header mb-6">
+  <section class="task-header mb-4">
     <v-row class="task-header__row">
       <v-col
         cols="12"
