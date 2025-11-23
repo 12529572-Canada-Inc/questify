@@ -134,7 +134,7 @@ const questTableHeaders = [
   { title: 'Status', key: 'status', sortable: true },
   { title: 'Visibility', key: 'isPublic', sortable: false },
   { title: 'Updated', key: 'updatedAt', sortable: true },
-  { title: 'Actions', key: 'actions', sortable: false },
+  { title: 'Actions', key: 'actions', sortable: false, align: 'center' },
 ] as const
 
 const statusColorMap: Record<QuestStatus, string> = {
@@ -361,7 +361,7 @@ const noResultsCopy = computed(() => {
       </template>
 
       <template #[`item.actions`]="{ item }">
-        <div class="d-flex gap-2 justify-end">
+        <div class="d-flex gap-2 justify-center">
           <v-btn
             variant="text"
             size="small"
