@@ -23,6 +23,19 @@ export function useQuestTaskHighlight({
   completedTaskIds,
 }: Options) {
   const canAccessDom = typeof window !== 'undefined' && typeof document !== 'undefined'
+  function scrollTaskIntoView(taskId: string) {
+    if (!canAccessDom) {
+      return
+    }
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const target = document.querySelector<HTMLElement>(`[data-task-id="${taskId}"]`)
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+      })
+    })
+  }
 
   watch(
     [
@@ -46,10 +59,7 @@ export function useQuestTaskHighlight({
 
       if (canAccessDom) {
         await nextTick()
-        const target = document.querySelector<HTMLElement>(`[data-task-id="${taskId}"]`)
-        if (target) {
-          target.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        }
+        scrollTaskIntoView(taskId)
       }
     },
     { immediate: true },
