@@ -20,12 +20,12 @@ const showArchivedModel = computed({
 </script>
 
 <template>
-  <section class="quest-subheader mb-4">
-    <v-row class="quest-subheader__row">
+  <section class="quest-header mb-4">
+    <v-row class="quest-header__row">
       <v-col
         cols="12"
         sm="6"
-        class="quest-subheader__title"
+        class="quest-header__title"
       >
         <h2 class="text-h5 font-weight-bold text-white mb-0">
           {{ props.title }}
@@ -34,11 +34,11 @@ const showArchivedModel = computed({
       <v-col
         cols="12"
         sm="6"
-        class="quest-subheader__actions"
+        class="quest-header__actions"
       >
         <v-btn
           color="primary"
-          class="quest-subheader__create"
+          class="quest-header__create"
           :to="`/quests/new`"
         >
           Create Quest
@@ -48,7 +48,7 @@ const showArchivedModel = computed({
 
     <v-row
       v-if="canToggleArchived"
-      class="quest-subheader__filters"
+      class="quest-header__filters"
     >
       <v-col
         cols="12"
@@ -57,7 +57,7 @@ const showArchivedModel = computed({
         <v-switch
           v-model="showArchivedModel"
           inset
-          class="quest-subheader__archived-switch"
+          class="quest-header__archived-switch"
           color="secondary"
           label="Show Archived Quests"
         />
@@ -67,39 +67,39 @@ const showArchivedModel = computed({
 </template>
 
 <style scoped>
-.quest-subheader {
+.quest-header {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.quest-subheader__row {
+.quest-header__row {
   align-items: center;
 }
 
-.quest-subheader__actions {
+.quest-header__actions {
   display: flex;
   justify-content: flex-end;
 }
 
-.quest-subheader__create {
+.quest-header__create {
   min-width: 0;
 }
 
-.quest-subheader__filters {
+.quest-header__filters {
   margin-bottom: 0;
 }
 
-.quest-subheader__archived-switch {
+.quest-header__archived-switch {
   color: white;
 }
 
 @media (max-width: 600px) {
-  .quest-subheader__actions {
+  .quest-header__actions {
     justify-content: flex-start;
   }
 
-  .quest-subheader__create {
+  .quest-header__create {
     width: 100%;
   }
 }

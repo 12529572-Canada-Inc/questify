@@ -237,22 +237,13 @@ const noResultsCopy = computed(() => {
 
 <template>
   <v-container class="py-6">
-    <div class="d-flex flex-column flex-md-row justify-space-between align-start align-md-center gap-4 mb-6">
-      <div>
-        <h1 class="text-h5 font-weight-bold mb-2">
-          Tasks
-        </h1>
-        <p class="text-body-2 text-medium-emphasis mb-0">
-          Review and manage tasks across all of your quests.
-        </p>
-      </div>
-      <v-btn
-        color="primary"
-        :to="'/quests'"
-      >
-        Go to Quests
-      </v-btn>
-    </div>
+    <TaskHeader
+      title="Tasks"
+      description="Review and manage tasks across all your quests."
+      action-label="Go to Quests"
+      action-to="/quests"
+      action-icon="mdi-format-list-bulleted-square"
+    />
 
     <v-card class="mb-6">
       <v-card-text>
