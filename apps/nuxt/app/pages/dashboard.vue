@@ -46,7 +46,7 @@ const questMetrics = computed(() => [
     label: 'Active Quests',
     icon: 'mdi-sword-cross',
     value: metrics.value.activeQuests,
-    to: '/quests/active',
+    to: '/quests?view=active',
   },
   {
     key: 'completed',

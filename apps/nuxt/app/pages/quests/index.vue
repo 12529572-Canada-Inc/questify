@@ -28,6 +28,30 @@ function parseBooleanParam(value: unknown) {
 }
 
 const allowedStatuses = Object.values(QUEST_STATUS)
+type QuestViewFilter = 'active'
+
+const viewFilterStatusesMap: Record<QuestViewFilter, QuestStatus[]> = {
+  active: [QUEST_STATUS.active],
+}
+
+function parseViewFilter(value: unknown): QuestViewFilter | null {
+  if (typeof value !== 'string') {
+    return null
+  }
+  const normalized = value.toLowerCase()
+  return normalized === 'active' ? 'active' : null
+}
+
+function statusesForView(view: QuestViewFilter | null): QuestStatus[] {
+  return view ? viewFilterStatusesMap[view] : []
+}
+
+function statusesMatchView(statuses: QuestStatus[], view: QuestViewFilter | null) {
+  if (!view) {
+    return false
+  }
+  return arraysEqual(statuses, statusesForView(view))
+}
 
 function parseStatusQuery(value: unknown): QuestStatus[] {
   if (typeof value !== 'string') {
@@ -56,6 +80,10 @@ function normalizeRouteQuery(query: Record<string, unknown>): Record<string, str
   if (parseBooleanParam(query.archived)) {
     normalized.archived = 'true'
   }
+  const view = parseViewFilter(query.view)
+  if (view) {
+    normalized.view = view
+  }
   const statuses = parseStatusQuery(query.status)
   if (statuses.length > 0) {
     normalized.status = statuses.join(',')
@@ -80,7 +108,11 @@ if (!user.value) {
 }
 
 const showArchived = ref(parseBooleanParam(route.query.archived))
-const selectedStatuses = ref<QuestStatus[]>(parseStatusQuery(route.query.status))
+const viewFilter = ref<QuestViewFilter | null>(parseViewFilter(route.query.view))
+const initialStatuses = parseStatusQuery(route.query.status)
+const selectedStatuses = ref<QuestStatus[]>(
+  initialStatuses.length > 0 ? initialStatuses : statusesForView(viewFilter.value),
+)
 const searchTerm = ref(typeof route.query.search === 'string' ? route.query.search : '')
 const debouncedSearch = ref(searchTerm.value.trim())
 
@@ -162,7 +194,10 @@ const queryState = computed(() => {
   if (showArchived.value) {
     query.archived = 'true'
   }
-  if (selectedStatuses.value.length > 0) {
+  if (viewFilter.value) {
+    query.view = viewFilter.value
+  }
+  if (selectedStatuses.value.length > 0 && !statusesMatchView(selectedStatuses.value, viewFilter.value)) {
     query.status = selectedStatuses.value.join(',')
   }
   if (debouncedSearch.value) {
@@ -190,7 +225,15 @@ watch(() => route.query, (nextQuery) => {
     showArchived.value = nextArchived
   }
 
-  const nextStatuses = parseStatusQuery(nextQuery.status)
+  const nextView = parseViewFilter(nextQuery.view)
+  if (nextView !== viewFilter.value) {
+    viewFilter.value = nextView
+  }
+
+  const nextStatusesFromQuery = parseStatusQuery(nextQuery.status)
+  const nextStatuses = nextStatusesFromQuery.length > 0
+    ? nextStatusesFromQuery
+    : statusesForView(nextView)
   if (!arraysEqual(nextStatuses, selectedStatuses.value)) {
     selectedStatuses.value = nextStatuses
   }
@@ -199,6 +242,12 @@ watch(() => route.query, (nextQuery) => {
   if (nextSearch !== searchTerm.value) {
     searchTerm.value = nextSearch
     debouncedSearch.value = nextSearch.trim()
+  }
+})
+
+watch(selectedStatuses, (nextStatuses) => {
+  if (viewFilter.value && !statusesMatchView(nextStatuses, viewFilter.value)) {
+    viewFilter.value = null
   }
 })
 
