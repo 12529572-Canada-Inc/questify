@@ -25,9 +25,9 @@ const { consumeOAuthFlash } = useOAuthFlash()
 const profile = computed(() => profileStore.profile)
 const status = computed(() => profileStore.status)
 const saving = computed(() => profileStore.saving)
-const aiAssistEnabled = computed(() => uiStore.aiAssistEnabled)
-const aiAssistFeatureEnabled = computed(() => uiStore.aiAssistFeatureEnabled)
-const uiThemePreference = computed(() => uiStore.themePreference)
+const aiAssistEnabled = computed(() => uiStore?.aiAssistEnabled ?? false)
+const aiAssistFeatureEnabled = computed(() => uiStore?.aiAssistFeatureEnabled ?? false)
+const uiThemePreference = computed(() => uiStore?.themePreference ?? 'light')
 const linkedProviders = computed(() => userStore.providers ?? [])
 const sessionAvatar = computed(() => userStore.avatarUrl)
 
@@ -45,9 +45,6 @@ const remoteAvatarUrl = ref('')
 const formErrors = reactive<{ name?: string, email?: string, avatarUrl?: string }>({})
 const linking = ref<OAuthProvider | null>(null)
 const avatarInput = ref<HTMLInputElement | null>(null)
-
-// TODO: re-enable if we want to show whether an avatar is set
-// const hasAvatar = computed(() => Boolean(form.avatarUrl))
 const avatarIsUpload = computed(() => form.avatarUrl.startsWith('data:image/'))
 const avatarPreview = computed(() => form.avatarUrl || sessionAvatar.value || '')
 
@@ -377,7 +374,7 @@ onMounted(async () => {
       showSnackbar(`${label} account linked successfully.`, { variant: 'success' })
     }
     else if (flash.action === 'created') {
-      showSnackbar(`Signed up with ${label}.`, { variant: 'success' })
+      showSnackbar(`${label} account signed up.`, { variant: 'success' })
     }
     else {
       showSnackbar(`Signed in with ${label}.`, { variant: 'success' })
