@@ -1,4 +1,4 @@
-import { watch, type ComputedRef, type Ref } from 'vue'
+import { nextTick, watch, type ComputedRef, type Ref } from 'vue'
 import type { QuestTaskTab } from '~/types/quest-tasks'
 
 type Options = {
@@ -22,9 +22,30 @@ export function useQuestTaskHighlight({
   todoTaskIds,
   completedTaskIds,
 }: Options) {
+  const canAccessDom = typeof window !== 'undefined' && typeof document !== 'undefined'
+  function scrollTaskIntoView(taskId: string) {
+    if (!canAccessDom) {
+      return
+    }
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const target = document.querySelector<HTMLElement>(`[data-task-id="${taskId}"]`)
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+      })
+    })
+  }
+
   watch(
-    [highlightedTaskId, () => tasksLoading.value, todoTaskIds, completedTaskIds],
-    ([taskId, loading, todoIds, completedIds]) => {
+    [
+      highlightedTaskId,
+      () => tasksLoading.value,
+      todoTaskIds,
+      completedTaskIds,
+      () => taskTab.value,
+    ],
+    async ([taskId, loading, todoIds, completedIds]) => {
       if (!taskId || loading) {
         return
       }
@@ -34,6 +55,11 @@ export function useQuestTaskHighlight({
       }
       else if (completedIds.includes(taskId)) {
         taskTab.value = 'completed'
+      }
+
+      if (canAccessDom) {
+        await nextTick()
+        scrollTaskIntoView(taskId)
       }
     },
     { immediate: true },
