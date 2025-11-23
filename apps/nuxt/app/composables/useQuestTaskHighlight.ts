@@ -22,6 +22,8 @@ export function useQuestTaskHighlight({
   todoTaskIds,
   completedTaskIds,
 }: Options) {
+  const canAccessDom = typeof window !== 'undefined' && typeof document !== 'undefined'
+
   watch(
     [
       highlightedTaskId,
@@ -42,10 +44,12 @@ export function useQuestTaskHighlight({
         taskTab.value = 'completed'
       }
 
-      await nextTick()
-      const target = document.querySelector<HTMLElement>(`[data-task-id="${taskId}"]`)
-      if (target) {
-        target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      if (canAccessDom) {
+        await nextTick()
+        const target = document.querySelector<HTMLElement>(`[data-task-id="${taskId}"]`)
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
       }
     },
     { immediate: true },
