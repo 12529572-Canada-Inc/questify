@@ -635,25 +635,17 @@ function readFileAsDataUrl(file: File) {
                 <v-card-title class="text-h5 mb-2">
                   Quest AI Assistance
                 </v-card-title>
-                <v-card-subtitle class="mb-4">
+                <v-card-subtitle class="mb-4 text-wrap">
                   Control whether the “Improve with AI” helpers appear while creating quests.
                 </v-card-subtitle>
 
                 <v-row
-                  align="center"
+                  align="start"
                   class="profile-ai-toggle"
                 >
-                  <v-col cols="8">
-                    <p class="text-body-2 mb-2">
-                      When enabled, Questify can suggest better titles, goals, context, and constraints using your selected AI model.
-                    </p>
-                    <p class="text-body-2 text-medium-emphasis mb-0">
-                      Suggestions never overwrite your text until you accept them.
-                    </p>
-                  </v-col>
                   <v-col
-                    cols="4"
-                    class="text-right"
+                    cols="3"
+                    class="d-flex justify-end align-start"
                   >
                     <v-switch
                       v-model="aiAssistPreference"
@@ -662,6 +654,18 @@ function readFileAsDataUrl(file: File) {
                       :disabled="!aiAssistFeatureEnabled"
                       aria-label="Toggle quest AI assistance"
                     />
+                  </v-col>
+                  <v-col cols="9">
+                    <p class="text-body-2 mb-0">
+                      When enabled, Questify can suggest better titles, goals, context, and constraints using your selected AI model.
+                    </p>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col>
+                    <p class="text-body-2 text-medium-emphasis mb-0">
+                      Suggestions never overwrite your text until you accept them.
+                    </p>
                   </v-col>
                 </v-row>
 
