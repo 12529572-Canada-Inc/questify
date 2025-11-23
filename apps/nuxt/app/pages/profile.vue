@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch, watchEffect, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
 import { SUPPORTED_OAUTH_PROVIDERS, type OAuthProvider, type ThemePreference } from 'shared'
 import { useOAuthFlash } from '~/composables/useOAuthFlash'
 import { useSnackbar } from '~/composables/useSnackbar'
@@ -21,15 +22,9 @@ const session = useUserSession()
 const { showSnackbar } = useSnackbar()
 const { consumeOAuthFlash } = useOAuthFlash()
 
-// Create refs directly from store properties to avoid SSR issues with storeToRefs
-const profile = computed(() => profileStore.profile)
-const status = computed(() => profileStore.status)
-const saving = computed(() => profileStore.saving)
-const aiAssistEnabled = computed(() => uiStore?.aiAssistEnabled ?? false)
-const aiAssistFeatureEnabled = computed(() => uiStore?.aiAssistFeatureEnabled ?? false)
-const uiThemePreference = computed(() => uiStore?.themePreference ?? 'light')
-const linkedProviders = computed(() => userStore.providers ?? [])
-const sessionAvatar = computed(() => userStore.avatarUrl)
+const { profile, status, saving } = storeToRefs(profileStore)
+const { aiAssistEnabled, aiAssistFeatureEnabled, themePreference: uiThemePreference } = storeToRefs(uiStore)
+const { providers: linkedProviders, avatarUrl: sessionAvatar } = storeToRefs(userStore)
 
 const loading = computed(() => status.value === 'loading' && !profile.value)
 const loadError = computed(() => status.value === 'error' && !profile.value)
