@@ -24,16 +24,13 @@ const { consumeOAuthFlash } = useOAuthFlash()
 
 const { profile, status, saving } = storeToRefs(profileStore)
 const uiRefs = storeToRefs(uiStore)
-const aiAssistEnabled = uiRefs.aiAssistEnabled ?? ref(false)
-const aiAssistFeatureEnabled = uiRefs.aiAssistFeatureEnabled ?? ref(false)
-const uiThemePreference = uiRefs.themePreference ?? ref<ThemePreference>('light')
+const aiAssistFeatureEnabled = computed(() => uiRefs.aiAssistFeatureEnabled?.value ?? false)
+const aiAssistEnabled = computed(() => aiAssistFeatureEnabled.value && (uiRefs.aiAssistEnabled?.value ?? false))
+const uiThemePreference = computed<ThemePreference>(() => uiRefs.themePreference?.value ?? 'light')
 
 const userRefs = storeToRefs(userStore)
-const linkedProviders = userRefs.providers ?? ref<OAuthProvider[]>([])
-const sessionAvatar = userRefs.avatarUrl ?? ref<string | null>(null)
-
-console.log('AI Assist Feature Enabled:', aiAssistFeatureEnabled?.value)
-console.log('AI Assist Enabled:', aiAssistEnabled?.value)
+const linkedProviders = computed(() => userRefs.providers?.value ?? [])
+const sessionAvatar = computed(() => userRefs.avatarUrl?.value ?? null)
 
 const loading = computed(() => status.value === 'loading' && !profile.value)
 const loadError = computed(() => status.value === 'error' && !profile.value)
