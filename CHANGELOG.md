@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 🚀 Features
+- Added a reusable `QuestHeader` component and introduced a new `TaskHeader` hero so quests/tasks pages share consistent styling with clear CTAs.
+
+### ✅ Tests
+- Increased coverage by adding unit suites for `TaskHeader` plus behavioral tests for `useQuestTaskHighlight`, ensuring highlighted tasks scroll correctly when linked from the Tasks page.
+
 ---
 
 ## [1.15.0] - 2025-11-18
