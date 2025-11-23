@@ -23,11 +23,17 @@ const { showSnackbar } = useSnackbar()
 const { consumeOAuthFlash } = useOAuthFlash()
 
 const { profile, status, saving } = storeToRefs(profileStore)
-const { aiAssistEnabled, aiAssistFeatureEnabled, themePreference: uiThemePreference } = storeToRefs(uiStore)
-const { providers: linkedProviders, avatarUrl: sessionAvatar } = storeToRefs(userStore)
+const uiRefs = storeToRefs(uiStore)
+const aiAssistEnabled = uiRefs.aiAssistEnabled ?? ref(false)
+const aiAssistFeatureEnabled = uiRefs.aiAssistFeatureEnabled ?? ref(false)
+const uiThemePreference = uiRefs.themePreference ?? ref<ThemePreference>('light')
 
-// console.log('AI Assist Feature Enabled:', aiAssistFeatureEnabled?.value)
-// console.log('AI Assist Enabled:', aiAssistEnabled?.value)
+const userRefs = storeToRefs(userStore)
+const linkedProviders = userRefs.providers ?? ref<OAuthProvider[]>([])
+const sessionAvatar = userRefs.avatarUrl ?? ref<string | null>(null)
+
+console.log('AI Assist Feature Enabled:', aiAssistFeatureEnabled?.value)
+console.log('AI Assist Enabled:', aiAssistEnabled?.value)
 
 const loading = computed(() => status.value === 'loading' && !profile.value)
 const loadError = computed(() => status.value === 'error' && !profile.value)
