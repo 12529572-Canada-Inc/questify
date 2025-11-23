@@ -636,35 +636,26 @@ function readFileAsDataUrl(file: File) {
                   Control whether the “Improve with AI” helpers appear while creating quests.
                 </v-card-subtitle>
 
-                <v-row
-                  align="start"
-                  class="profile-ai-toggle"
-                >
-                  <v-col
-                    cols="3"
-                    class="d-flex justify-end align-start"
-                  >
+                <div class="profile-ai-toggle">
+                  <div class="profile-ai-copy">
+                    <p class="text-body-2 mb-2">
+                      When enabled, Questify can suggest better titles, goals, context, and constraints using your selected AI model.
+                    </p>
+                    <p class="text-body-2 text-medium-emphasis mb-0">
+                      Suggestions never overwrite your text until you accept them.
+                    </p>
+                  </div>
+                  <div class="profile-ai-switch d-flex align-start justify-end">
                     <v-switch
                       v-model="aiAssistPreference"
                       color="primary"
                       inset
+                      hide-details
                       :disabled="!aiAssistFeatureEnabled"
                       aria-label="Toggle quest AI assistance"
                     />
-                  </v-col>
-                  <v-col cols="9">
-                    <p class="text-body-2 mb-0">
-                      When enabled, Questify can suggest better titles, goals, context, and constraints using your selected AI model.
-                    </p>
-                  </v-col>
-                </v-row>
-                <v-row>
-                  <v-col>
-                    <p class="text-body-2 text-medium-emphasis mb-0">
-                      Suggestions never overwrite your text until you accept them.
-                    </p>
-                  </v-col>
-                </v-row>
+                  </div>
+                </div>
 
                 <v-alert
                   v-if="!aiAssistFeatureEnabled"
@@ -747,7 +738,20 @@ function readFileAsDataUrl(file: File) {
 }
 
 .profile-ai-toggle {
-  gap: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.profile-ai-copy {
+  flex: 1 1 260px;
+  max-width: 540px;
+}
+
+.profile-ai-switch {
+  min-width: 96px;
 }
 
 .profile-provider-item + .profile-provider-item {
