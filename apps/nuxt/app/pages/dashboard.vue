@@ -96,16 +96,17 @@ const welcomeName = computed(() => user.value?.name || user.value?.email || 'Adv
 const metricsPending = computed(() => pending.value)
 const metricsError = computed(() => error.value?.message ?? null)
 
-const quickLinks = [
+const quickLinks = computed(() => [
   {
     key: 'public',
     title: 'Public Quests',
     description: 'Explore community quests and track new challenges.',
+    value: `${metrics.value.publicQuests}`,
     icon: 'mdi-earth',
     to: '/quests/public',
     color: 'secondary',
   },
-]
+])
 
 async function handleRefresh() {
   await refresh()
@@ -189,7 +190,7 @@ async function handleRefresh() {
             class="dashboard__quick-link"
             hover
           >
-            <v-card-text class="d-flex align-center gap-4">
+            <v-card-text class="d-flex align-center justify-space-between gap-4">
               <v-avatar
                 :color="link.color"
                 size="48"
@@ -197,13 +198,17 @@ async function handleRefresh() {
               >
                 <v-icon :icon="link.icon" />
               </v-avatar>
-              <div class="d-flex flex-column gap-1">
+              <div class="d-flex flex-column gap-1 flex-grow-1">
                 <span class="text-subtitle-1 font-weight-medium">
                   {{ link.title }}
                 </span>
                 <span class="text-body-2 text-medium-emphasis">
                   {{ link.description }}
                 </span>
+              </div>
+              <div class="text-body-1 font-weight-medium text-nowrap">
+                <span class="text-h5 font-weight-bold text-primary">{{ link.value }}</span>
+                <span class="text-medium-emphasis"> active public quests</span>
               </div>
             </v-card-text>
           </v-card>
