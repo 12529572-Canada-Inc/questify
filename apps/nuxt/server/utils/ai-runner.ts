@@ -62,8 +62,7 @@ async function callOpenAi(client: OpenAiClient | null, model: AiModelOption, pro
   }
 
   const content = buildOpenAiContent(prompt, images)
-  const createCompletion = client.chat.completions.create as unknown as (args: unknown) => Promise<{ choices: Array<{ message?: { content?: string } }> }>
-  const response = await createCompletion({
+  const response = await client.chat.completions.create({
     model: model.apiModel,
     messages: [{ role: 'user', content }],
   })
