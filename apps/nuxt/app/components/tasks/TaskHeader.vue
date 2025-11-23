@@ -1,14 +1,12 @@
 <script setup lang="ts">
 const props = withDefaults(defineProps<{
   title?: string
-  description?: string
   actionLabel?: string
   actionTo?: string
   actionIcon?: string
   actionColor?: string
 }>(), {
   title: 'Tasks',
-  description: '',
   actionIcon: 'mdi-arrow-right',
   actionColor: 'primary',
 })
@@ -21,15 +19,9 @@ const props = withDefaults(defineProps<{
         cols="12"
         md="8"
       >
-        <h2 class="text-h5 text-md-h4 font-weight-bold mb-2">
+        <h2 class="text-h5 text-md-h4 font-weight-bold mb-2 text-white">
           {{ props.title }}
         </h2>
-        <p
-          v-if="props.description"
-          class="text-body-2 text-medium-emphasis mb-0"
-        >
-          {{ props.description }}
-        </p>
       </v-col>
       <v-col
         v-if="props.actionLabel && props.actionTo"

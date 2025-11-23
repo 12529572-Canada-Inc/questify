@@ -239,7 +239,6 @@ const noResultsCopy = computed(() => {
   <v-container class="py-6">
     <TaskHeader
       title="Tasks"
-      description="Review and manage tasks across all your quests."
       action-label="Go to Quests"
       action-to="/quests"
       action-icon="mdi-format-list-bulleted-square"
