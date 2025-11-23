@@ -22,12 +22,21 @@ const session = useUserSession()
 const { showSnackbar } = useSnackbar()
 const { consumeOAuthFlash } = useOAuthFlash()
 
-const { profile, status, saving } = storeToRefs(profileStore)
-const { aiAssistEnabled, aiAssistFeatureEnabled, themePreference: uiThemePreference } = storeToRefs(uiStore)
-const { providers: linkedProviders, avatarUrl: sessionAvatar } = storeToRefs(userStore)
+const profileStoreRefs = storeToRefs(profileStore)
+const uiStoreRefs = storeToRefs(uiStore)
+const userStoreRefs = storeToRefs(userStore)
 
-const loading = computed(() => status && profile && status.value === 'loading' && !profile.value)
-const loadError = computed(() => status && profile && status.value === 'error' && !profile.value)
+const profile = profileStoreRefs.profile ?? ref(null)
+const status = profileStoreRefs.status ?? ref('idle' as 'idle' | 'loading' | 'error')
+const saving = profileStoreRefs.saving ?? ref(false)
+const aiAssistEnabled = uiStoreRefs.aiAssistEnabled ?? ref(false)
+const aiAssistFeatureEnabled = uiStoreRefs.aiAssistFeatureEnabled ?? ref(false)
+const uiThemePreference = uiStoreRefs.themePreference ?? ref('light' as ThemePreference)
+const linkedProviders = userStoreRefs.providers ?? ref([])
+const sessionAvatar = userStoreRefs.avatarUrl ?? ref(undefined)
+
+const loading = computed(() => status.value === 'loading' && !profile.value)
+const loadError = computed(() => status.value === 'error' && !profile.value)
 
 const form = reactive({
   name: '',
@@ -44,7 +53,7 @@ const avatarInput = ref<HTMLInputElement | null>(null)
 // TODO: re-enable if we want to show whether an avatar is set
 // const hasAvatar = computed(() => Boolean(form.avatarUrl))
 const avatarIsUpload = computed(() => form.avatarUrl.startsWith('data:image/'))
-const avatarPreview = computed(() => form.avatarUrl || (sessionAvatar && sessionAvatar.value) || '')
+const avatarPreview = computed(() => form.avatarUrl || sessionAvatar.value || '')
 
 const themeOptions: Array<{ value: ThemePreference, label: string, description: string, icon: string }> = [
   {
@@ -68,20 +77,20 @@ const themeOptions: Array<{ value: ThemePreference, label: string, description: 
 ]
 
 function resetForm() {
-  if (!profile || !profile.value) {
+  if (!profile.value) {
     return
   }
 
   form.name = profile.value.name ?? ''
   form.email = profile.value.email
   form.avatarUrl = profile.value.avatarUrl ?? ''
-  form.themePreference = profile.value.themePreference ?? (uiThemePreference && uiThemePreference.value) ?? 'light'
+  form.themePreference = profile.value.themePreference ?? uiThemePreference.value ?? 'light'
   remoteAvatarUrl.value = isRemoteAvatar(form.avatarUrl) ? form.avatarUrl : ''
   clearErrors()
 }
 
 const normalisedProfile = computed(() => {
-  if (!profile || !profile.value) {
+  if (!profile.value) {
     return null
   }
   return {
@@ -113,7 +122,7 @@ const isDirty = computed(() => {
 })
 
 const aiAssistPreference = computed({
-  get: () => aiAssistEnabled ? aiAssistEnabled.value : false,
+  get: () => aiAssistEnabled.value,
   set: (value: boolean) => {
     uiStore.setAiAssistEnabled(Boolean(value))
     showSnackbar(value ? 'AI assistance enabled.' : 'AI assistance turned off.', { variant: 'success' })
@@ -132,7 +141,7 @@ const providerCatalog: Record<OAuthProvider, { label: string, icon: string }> = 
 }
 
 function isLinked(provider: OAuthProvider) {
-  return linkedProviders ? linkedProviders.value.includes(provider) : false
+  return linkedProviders.value.includes(provider)
 }
 
 function buttonLabel(provider: OAuthProvider) {
@@ -172,7 +181,7 @@ function validateForm() {
 }
 
 async function saveProfile() {
-  if (!profile || !profile.value) {
+  if (!profile.value) {
     return
   }
 
@@ -314,7 +323,7 @@ function startLink(provider: OAuthProvider) {
 }
 
 async function handleProvidersUpdated() {
-  if (linkedProviders && linking.value && linkedProviders.value.includes(linking.value)) {
+  if (linking.value && linkedProviders.value.includes(linking.value)) {
     linking.value = null
   }
   const flash = consumeOAuthFlash()
@@ -338,36 +347,30 @@ function handleOAuthError(value: unknown) {
   showSnackbar(`We couldn’t connect your ${label} account. Please try again.`, { variant: 'error' })
 }
 
-if (linkedProviders) {
-  watch(() => linkedProviders.value.slice(), handleProvidersUpdated)
-}
+watch(() => linkedProviders.value.slice(), handleProvidersUpdated)
 watch(() => route.query.oauthError, handleOAuthError, { immediate: true })
 
-if (profile) {
-  watch(profile, (value) => {
-    if (value) {
-      resetForm()
-    }
-  }, { immediate: true })
-}
+watch(profile, (value) => {
+  if (value) {
+    resetForm()
+  }
+}, { immediate: true })
 
 // Sync form theme changes to UI store immediately for real-time preview
-if (uiThemePreference) {
-  watch(() => form.themePreference, (newTheme) => {
-    if (newTheme && newTheme !== uiThemePreference.value) {
-      uiStore.setThemePreference(newTheme)
-    }
-  })
+watch(() => form.themePreference, (newTheme) => {
+  if (newTheme && newTheme !== uiThemePreference.value) {
+    uiStore.setThemePreference(newTheme)
+  }
+})
 
-  watchEffect(() => {
-    if (uiThemePreference.value && form.themePreference !== uiThemePreference.value && !isDirty.value) {
-      form.themePreference = uiThemePreference.value
-    }
-  })
-}
+watchEffect(() => {
+  if (uiThemePreference.value && form.themePreference !== uiThemePreference.value && !isDirty.value) {
+    form.themePreference = uiThemePreference.value
+  }
+})
 
 onMounted(async () => {
-  if (profile && !profile.value) {
+  if (!profile.value) {
     await profileStore.fetchProfile().catch(() => null)
   }
 
