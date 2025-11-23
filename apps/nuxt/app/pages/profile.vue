@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watch, watchEffect, onMounted, unref } from 'vue'
-import { storeToRefs } from 'pinia'
+import { computed, reactive, ref, watch, watchEffect, onMounted } from 'vue'
 import { SUPPORTED_OAUTH_PROVIDERS, type OAuthProvider, type ThemePreference } from 'shared'
 import { useOAuthFlash } from '~/composables/useOAuthFlash'
 import { useSnackbar } from '~/composables/useSnackbar'
@@ -22,16 +21,16 @@ const session = useUserSession()
 const { showSnackbar } = useSnackbar()
 const { consumeOAuthFlash } = useOAuthFlash()
 
-const { profile, status, saving } = storeToRefs(profileStore)
-const uiRefs = storeToRefs(uiStore)
-const userRefs = storeToRefs(userStore)
+const profile = computed(() => profileStore?.profile ?? null)
+const status = computed(() => profileStore?.status ?? 'idle')
+const saving = computed(() => profileStore?.saving ?? false)
 
-const aiAssistFeatureEnabled = computed(() => Boolean(unref(uiRefs.aiAssistFeatureEnabled)))
-const aiAssistEnabled = computed(() => aiAssistFeatureEnabled.value && Boolean(unref(uiRefs.aiAssistEnabled)))
-const uiThemePreference = computed<ThemePreference>(() => (unref(uiRefs.themePreference) ?? 'light') as ThemePreference)
+const aiAssistFeatureEnabled = computed(() => Boolean(uiStore?.aiAssistFeatureEnabled))
+const aiAssistEnabled = computed(() => aiAssistFeatureEnabled.value && Boolean(uiStore?.aiAssistEnabled))
+const uiThemePreference = computed<ThemePreference>(() => (uiStore?.themePreference ?? 'light') as ThemePreference)
 
-const linkedProviders = computed(() => unref(userRefs.providers) ?? [])
-const sessionAvatar = computed(() => unref(userRefs.avatarUrl) ?? '')
+const linkedProviders = computed(() => userStore?.providers ?? [])
+const sessionAvatar = computed(() => userStore?.avatarUrl ?? '')
 
 const loading = computed(() => status.value === 'loading' && !profile.value)
 const loadError = computed(() => status.value === 'error' && !profile.value)
@@ -51,7 +50,7 @@ const avatarInput = ref<HTMLInputElement | null>(null)
 // TODO: re-enable if we want to show whether an avatar is set
 // const hasAvatar = computed(() => Boolean(form.avatarUrl))
 const avatarIsUpload = computed(() => form.avatarUrl.startsWith('data:image/'))
-const avatarPreview = computed(() => form.avatarUrl || unref(sessionAvatar) || '')
+const avatarPreview = computed(() => form.avatarUrl || sessionAvatar.value || '')
 
 const themeOptions: Array<{ value: ThemePreference, label: string, description: string, icon: string }> = [
   {
@@ -345,7 +344,7 @@ function handleOAuthError(value: unknown) {
   showSnackbar(`We couldn’t connect your ${label} account. Please try again.`, { variant: 'error' })
 }
 
-watch(() => (unref(linkedProviders) ?? []).slice(), handleProvidersUpdated)
+watch(() => linkedProviders.value.slice(), handleProvidersUpdated)
 watch(() => route.query.oauthError, handleOAuthError, { immediate: true })
 
 watch(profile, (value) => {
