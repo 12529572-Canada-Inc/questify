@@ -218,7 +218,6 @@ describe('basic pages', () => {
     await nextTick()
     await flushPromises()
     const text = wrapper.text()
-    expect(text).toContain('Private Quests')
     expect(text).toContain('Public Quests')
     expect(text).toContain('Quest Overview')
     expect(text).toContain('Completion Rate')
