@@ -70,7 +70,7 @@ const taskMetrics = computed(() => [
     label: 'Completed Tasks',
     icon: 'mdi-clipboard-check',
     value: metrics.value.completedTasks,
-    to: '/tasks/completed',
+    to: '/tasks?view=completed',
   },
 ])
 
