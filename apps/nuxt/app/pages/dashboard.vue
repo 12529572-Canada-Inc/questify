@@ -72,13 +72,6 @@ const taskMetrics = computed(() => [
     value: metrics.value.completedTasks,
     to: '/tasks/completed',
   },
-  {
-    key: 'visibility',
-    label: 'Private vs Public',
-    icon: 'mdi-lock-open-variant',
-    value: `${metrics.value.privateQuests}/${metrics.value.publicQuests}`,
-    to: '/quests',
-  },
 ])
 
 const completionPercentage = computed(() => Math.round(metrics.value.completionRate * 100))
@@ -346,7 +339,7 @@ async function handleRefresh() {
               v-for="metric in taskMetrics"
               :key="metric.key"
               cols="12"
-              sm="4"
+              sm="6"
             >
               <NuxtLink
                 :to="metric.to"
