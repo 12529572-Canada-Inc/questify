@@ -26,6 +26,9 @@ const { profile, status, saving } = storeToRefs(profileStore)
 const { aiAssistEnabled, aiAssistFeatureEnabled, themePreference: uiThemePreference } = storeToRefs(uiStore)
 const { providers: linkedProviders, avatarUrl: sessionAvatar } = storeToRefs(userStore)
 
+// console.log('AI Assist Feature Enabled:', aiAssistFeatureEnabled?.value)
+// console.log('AI Assist Enabled:', aiAssistEnabled?.value)
+
 const loading = computed(() => status.value === 'loading' && !profile.value)
 const loadError = computed(() => status.value === 'error' && !profile.value)
 
