@@ -11,6 +11,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.16.0] - 2025-11-23
+
+### 🚀 Features
+- Added a reusable `QuestHeader` component and introduced a new `TaskHeader` hero so quests/tasks pages share consistent styling with clear CTAs.
+
+### 🛠 Fixes
+- Respected `NUXT_FEATURE_AI_ASSIST` across environments and UI by normalizing env parsing, making the feature-flag reactive in the UI store, and fixing OpenAI client invocation so AI assistance can be enabled and generate suggestions without runtime errors.
+
+### ✅ Tests
+- Increased coverage by adding unit suites for `TaskHeader` plus behavioral tests for `useQuestTaskHighlight`, ensuring highlighted tasks scroll correctly when linked from the Tasks page.
+
+---
+
 ## [1.15.0] - 2025-11-18
 
 ### 🚀 Features

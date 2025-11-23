@@ -10,7 +10,7 @@ declare module 'openai' {
   export interface ChatCompletionsClient {
     create(input: {
       model: string
-      messages: Array<{ role: string, content: string }>
+      messages: Array<{ role: string, content: unknown }>
     }): Promise<{ choices: ChatCompletionChoice[] }>
   }
 

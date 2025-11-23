@@ -40,9 +40,6 @@ const remoteAvatarUrl = ref('')
 const formErrors = reactive<{ name?: string, email?: string, avatarUrl?: string }>({})
 const linking = ref<OAuthProvider | null>(null)
 const avatarInput = ref<HTMLInputElement | null>(null)
-
-// TODO: re-enable if we want to show whether an avatar is set
-// const hasAvatar = computed(() => Boolean(form.avatarUrl))
 const avatarIsUpload = computed(() => form.avatarUrl.startsWith('data:image/'))
 const avatarPreview = computed(() => form.avatarUrl || sessionAvatar.value || '')
 
@@ -86,7 +83,7 @@ const normalisedProfile = computed(() => {
   }
   return {
     name: (profile.value.name ?? '').trim(),
-    email: profile.value.email.trim(),
+    email: profile.value.email?.trim?.() ?? '',
     avatarUrl: profile.value.avatarUrl ?? '',
     themePreference: profile.value.themePreference,
   }
@@ -372,7 +369,7 @@ onMounted(async () => {
       showSnackbar(`${label} account linked successfully.`, { variant: 'success' })
     }
     else if (flash.action === 'created') {
-      showSnackbar(`Signed up with ${label}.`, { variant: 'success' })
+      showSnackbar(`${label} account signed up.`, { variant: 'success' })
     }
     else {
       showSnackbar(`Signed in with ${label}.`, { variant: 'success' })
@@ -635,35 +632,30 @@ function readFileAsDataUrl(file: File) {
                 <v-card-title class="text-h5 mb-2">
                   Quest AI Assistance
                 </v-card-title>
-                <v-card-subtitle class="mb-4">
+                <v-card-subtitle class="mb-4 text-wrap">
                   Control whether the “Improve with AI” helpers appear while creating quests.
                 </v-card-subtitle>
 
-                <v-row
-                  align="center"
-                  class="profile-ai-toggle"
-                >
-                  <v-col cols="8">
+                <div class="profile-ai-toggle">
+                  <div class="profile-ai-copy">
                     <p class="text-body-2 mb-2">
                       When enabled, Questify can suggest better titles, goals, context, and constraints using your selected AI model.
                     </p>
                     <p class="text-body-2 text-medium-emphasis mb-0">
                       Suggestions never overwrite your text until you accept them.
                     </p>
-                  </v-col>
-                  <v-col
-                    cols="4"
-                    class="text-right"
-                  >
+                  </div>
+                  <div class="profile-ai-switch d-flex align-start justify-end">
                     <v-switch
                       v-model="aiAssistPreference"
                       color="primary"
                       inset
+                      hide-details
                       :disabled="!aiAssistFeatureEnabled"
                       aria-label="Toggle quest AI assistance"
                     />
-                  </v-col>
-                </v-row>
+                  </div>
+                </div>
 
                 <v-alert
                   v-if="!aiAssistFeatureEnabled"
@@ -746,7 +738,20 @@ function readFileAsDataUrl(file: File) {
 }
 
 .profile-ai-toggle {
-  gap: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.profile-ai-copy {
+  flex: 1 1 260px;
+  max-width: 540px;
+}
+
+.profile-ai-switch {
+  min-width: 96px;
 }
 
 .profile-provider-item + .profile-provider-item {

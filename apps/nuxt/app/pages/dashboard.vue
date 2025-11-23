@@ -39,18 +39,21 @@ const questMetrics = computed(() => [
     label: 'Total Quests',
     icon: 'mdi-compass-rose',
     value: metrics.value.totalQuests,
+    to: '/quests',
   },
   {
     key: 'active',
     label: 'Active Quests',
     icon: 'mdi-sword-cross',
     value: metrics.value.activeQuests,
+    to: '/quests?view=active',
   },
   {
     key: 'completed',
     label: 'Completed Quests',
     icon: 'mdi-check-circle',
     value: metrics.value.completedQuests,
+    to: '/quests?view=completed',
   },
 ])
 
@@ -60,18 +63,14 @@ const taskMetrics = computed(() => [
     label: 'Total Tasks',
     icon: 'mdi-clipboard-text',
     value: metrics.value.totalTasks,
+    to: '/tasks',
   },
   {
     key: 'tasks-completed',
     label: 'Completed Tasks',
     icon: 'mdi-clipboard-check',
     value: metrics.value.completedTasks,
-  },
-  {
-    key: 'visibility',
-    label: 'Private vs Public',
-    icon: 'mdi-lock-open-variant',
-    value: `${metrics.value.privateQuests}/${metrics.value.publicQuests}`,
+    to: '/tasks?view=completed',
   },
 ])
 
@@ -97,24 +96,17 @@ const welcomeName = computed(() => user.value?.name || user.value?.email || 'Adv
 const metricsPending = computed(() => pending.value)
 const metricsError = computed(() => error.value?.message ?? null)
 
-const quickLinks = [
-  {
-    key: 'private',
-    title: 'Private Quests',
-    description: 'Review and manage the quests you own.',
-    icon: 'mdi-shield-check',
-    to: '/quests',
-    color: 'primary',
-  },
+const quickLinks = computed(() => [
   {
     key: 'public',
     title: 'Public Quests',
     description: 'Explore community quests and track new challenges.',
+    value: `${metrics.value.publicQuests}`,
     icon: 'mdi-earth',
     to: '/quests/public',
     color: 'secondary',
   },
-]
+])
 
 async function handleRefresh() {
   await refresh()
@@ -191,14 +183,14 @@ async function handleRefresh() {
           v-for="link in quickLinks"
           :key="link.key"
           cols="12"
-          md="6"
+          md="12"
         >
           <v-card
             :to="link.to"
             class="dashboard__quick-link"
             hover
           >
-            <v-card-text class="d-flex align-center gap-4">
+            <v-card-text class="d-flex align-center justify-space-between gap-4">
               <v-avatar
                 :color="link.color"
                 size="48"
@@ -206,13 +198,17 @@ async function handleRefresh() {
               >
                 <v-icon :icon="link.icon" />
               </v-avatar>
-              <div class="d-flex flex-column gap-1">
+              <div class="d-flex flex-column gap-1 flex-grow-1">
                 <span class="text-subtitle-1 font-weight-medium">
                   {{ link.title }}
                 </span>
                 <span class="text-body-2 text-medium-emphasis">
                   {{ link.description }}
                 </span>
+              </div>
+              <div class="text-body-1 font-weight-medium text-nowrap">
+                <span class="text-h5 font-weight-bold text-primary">{{ link.value }}</span>
+                <span class="text-medium-emphasis"> active public quests</span>
               </div>
             </v-card-text>
           </v-card>
@@ -254,7 +250,11 @@ async function handleRefresh() {
                   cols="12"
                   sm="4"
                 >
-                  <div class="dashboard__metric">
+                  <NuxtLink
+                    :to="metric.to"
+                    class="dashboard__metric"
+                    :aria-label="metric.label"
+                  >
                     <v-icon
                       :icon="metric.icon"
                       size="28"
@@ -275,7 +275,7 @@ async function handleRefresh() {
                         {{ metric.label }}
                       </span>
                     </div>
-                  </div>
+                  </NuxtLink>
                 </v-col>
               </v-row>
             </v-card-text>
@@ -336,9 +336,13 @@ async function handleRefresh() {
               v-for="metric in taskMetrics"
               :key="metric.key"
               cols="12"
-              sm="4"
+              sm="6"
             >
-              <div class="dashboard__metric dashboard__metric--compact">
+              <NuxtLink
+                :to="metric.to"
+                class="dashboard__metric dashboard__metric--compact"
+                :aria-label="metric.label"
+              >
                 <v-icon
                   :icon="metric.icon"
                   size="24"
@@ -359,7 +363,7 @@ async function handleRefresh() {
                     {{ metric.label }}
                   </span>
                 </div>
-              </div>
+              </NuxtLink>
             </v-col>
           </v-row>
         </v-card-text>
@@ -402,6 +406,11 @@ async function handleRefresh() {
   display: flex;
   align-items: center;
   gap: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+  border-radius: 8px;
+  padding: 8px 6px;
 }
 
 .dashboard__metric--compact .dashboard__metric-icon {
@@ -416,6 +425,11 @@ async function handleRefresh() {
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+
+.dashboard__metric:hover {
+  background: rgba(var(--v-theme-primary), 0.08);
+  transform: translateY(-1px);
 }
 
 .dashboard__metric-skeleton {

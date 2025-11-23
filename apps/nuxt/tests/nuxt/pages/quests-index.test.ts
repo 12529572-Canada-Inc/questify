@@ -1,8 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { type Component, h, Suspense } from 'vue'
+import { reactive, type Component, h, Suspense } from 'vue'
 import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
-import QuestsIndexPage from '~/pages/quests/index.vue'
 import { useQuestStore } from '~/stores/quest'
 import { useUserStore } from '~/stores/user'
 import { createQuest } from '../../unit/support/sample-data'
@@ -18,15 +17,58 @@ const switchStub = {
   template: '<label><input type="checkbox" :checked="modelValue" @change="$emit(\'update:modelValue\', $event.target.checked)" /></label>',
 }
 
-const questListStub = {
-  props: ['quests', 'currentUserId'],
-  template: '<ul><li v-for="quest in quests" :key="quest.id">{{ quest.title }}</li></ul>',
+const textFieldStub = {
+  props: ['modelValue'],
+  emits: ['update:modelValue'],
+  template: '<input type="text" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+}
+
+const selectStub = {
+  props: ['modelValue'],
+  emits: ['update:modelValue'],
+  template: '<input class="select-stub" type="text" :value="Array.isArray(modelValue) ? modelValue.join(\',\') : modelValue" @input="$emit(\'update:modelValue\', $event.target.value ? $event.target.value.split(\',\') : [])" />',
+}
+
+const dataTableStub = {
+  props: ['items'],
+  template: `
+    <div class="quest-table-stub">
+      <div
+        v-for="item in items"
+        :key="item.id"
+        class="quest-row"
+      >
+        <div class="quest-cell">
+          <slot name="item.title" :item="item">
+            <span>{{ item.title }}</span>
+          </slot>
+        </div>
+        <div class="quest-cell">
+          <slot name="item.status" :item="item" />
+        </div>
+        <div class="quest-cell">
+          <slot name="item.isPublic" :item="item" />
+        </div>
+        <div class="quest-cell">
+          <slot name="item.updatedAt" :item="item" />
+        </div>
+        <div class="quest-cell">
+          <slot name="item.actions" :item="item" />
+        </div>
+      </div>
+      <div
+        v-if="!items?.length"
+        class="quest-empty"
+      >
+        <slot name="no-data">No quests</slot>
+      </div>
+    </div>
+  `,
 }
 
 const questDeleteDialogStub = { template: '<div class="quest-delete-dialog" />' }
 
 function createGlobalOptions(overrides: {
-  questList?: Component
   questDeleteDialog?: Component
 } = {}) {
   return {
@@ -44,19 +86,41 @@ function createGlobalOptions(overrides: {
       VCol: { template: '<div><slot /></div>' },
       VBtn: buttonStub,
       VSwitch: switchStub,
-      QuestList: overrides.questList ?? questListStub,
+      VTextField: textFieldStub,
+      VSelect: selectStub,
+      VCard: { template: '<div class="v-card"><slot /></div>' },
+      VCardText: { template: '<div><slot /></div>' },
+      VChip: { template: '<span class="chip"><slot /></span>' },
+      VDataTable: dataTableStub,
+      VIcon: { template: '<i><slot /></i>' },
+      VDivider: { template: '<hr />' },
       QuestDeleteDialog: overrides.questDeleteDialog ?? questDeleteDialogStub,
     },
   }
 }
 
 describe('quests index page', () => {
-  beforeEach(() => {
+  const routerReplace = vi.fn().mockResolvedValue(undefined)
+  const route = reactive({
+    query: {},
+    path: '/quests',
+  })
+  let QuestsIndexPage: typeof import('~/pages/quests/index.vue')['default']
+
+  beforeEach(async () => {
     setActivePinia(createPinia())
+    routerReplace.mockClear()
+    route.query = {}
+    vi.stubGlobal('useRoute', () => route)
+    vi.stubGlobal('useRouter', () => ({
+      replace: routerReplace,
+    }))
+    QuestsIndexPage = (await import('~/pages/quests/index.vue')).default
   })
 
   afterEach(() => {
     vi.restoreAllMocks()
+    vi.unstubAllGlobals()
   })
 
   it('renders quests returned from the data provider', async () => {
@@ -102,7 +166,6 @@ describe('quests index page', () => {
       },
     }, {
       global: createGlobalOptions({
-        questList: { props: ['quests', 'currentUserId'], template: '<div class="quest-list" />' },
         questDeleteDialog: { template: '<div />' },
       }),
     })
