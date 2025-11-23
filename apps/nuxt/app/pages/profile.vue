@@ -26,8 +26,8 @@ const { profile, status, saving } = storeToRefs(profileStore)
 const { aiAssistEnabled, aiAssistFeatureEnabled, themePreference: uiThemePreference } = storeToRefs(uiStore)
 const { providers: linkedProviders, avatarUrl: sessionAvatar } = storeToRefs(userStore)
 
-const loading = computed(() => status.value === 'loading' && !profile.value)
-const loadError = computed(() => status.value === 'error' && !profile.value)
+const loading = computed(() => status && profile && status.value === 'loading' && !profile.value)
+const loadError = computed(() => status && profile && status.value === 'error' && !profile.value)
 
 const form = reactive({
   name: '',
@@ -44,7 +44,7 @@ const avatarInput = ref<HTMLInputElement | null>(null)
 // TODO: re-enable if we want to show whether an avatar is set
 // const hasAvatar = computed(() => Boolean(form.avatarUrl))
 const avatarIsUpload = computed(() => form.avatarUrl.startsWith('data:image/'))
-const avatarPreview = computed(() => form.avatarUrl || sessionAvatar.value || '')
+const avatarPreview = computed(() => form.avatarUrl || (sessionAvatar && sessionAvatar.value) || '')
 
 const themeOptions: Array<{ value: ThemePreference, label: string, description: string, icon: string }> = [
   {
@@ -68,20 +68,20 @@ const themeOptions: Array<{ value: ThemePreference, label: string, description: 
 ]
 
 function resetForm() {
-  if (!profile.value) {
+  if (!profile || !profile.value) {
     return
   }
 
   form.name = profile.value.name ?? ''
   form.email = profile.value.email
   form.avatarUrl = profile.value.avatarUrl ?? ''
-  form.themePreference = profile.value.themePreference ?? uiThemePreference.value ?? 'light'
+  form.themePreference = profile.value.themePreference ?? (uiThemePreference && uiThemePreference.value) ?? 'light'
   remoteAvatarUrl.value = isRemoteAvatar(form.avatarUrl) ? form.avatarUrl : ''
   clearErrors()
 }
 
 const normalisedProfile = computed(() => {
-  if (!profile.value) {
+  if (!profile || !profile.value) {
     return null
   }
   return {
@@ -113,7 +113,7 @@ const isDirty = computed(() => {
 })
 
 const aiAssistPreference = computed({
-  get: () => aiAssistEnabled.value,
+  get: () => aiAssistEnabled ? aiAssistEnabled.value : false,
   set: (value: boolean) => {
     uiStore.setAiAssistEnabled(Boolean(value))
     showSnackbar(value ? 'AI assistance enabled.' : 'AI assistance turned off.', { variant: 'success' })
@@ -132,7 +132,7 @@ const providerCatalog: Record<OAuthProvider, { label: string, icon: string }> = 
 }
 
 function isLinked(provider: OAuthProvider) {
-  return linkedProviders.value.includes(provider)
+  return linkedProviders ? linkedProviders.value.includes(provider) : false
 }
 
 function buttonLabel(provider: OAuthProvider) {
@@ -172,7 +172,7 @@ function validateForm() {
 }
 
 async function saveProfile() {
-  if (!profile.value) {
+  if (!profile || !profile.value) {
     return
   }
 
@@ -314,7 +314,7 @@ function startLink(provider: OAuthProvider) {
 }
 
 async function handleProvidersUpdated() {
-  if (linking.value && linkedProviders.value.includes(linking.value)) {
+  if (linkedProviders && linking.value && linkedProviders.value.includes(linking.value)) {
     linking.value = null
   }
   const flash = consumeOAuthFlash()
@@ -338,30 +338,36 @@ function handleOAuthError(value: unknown) {
   showSnackbar(`We couldn’t connect your ${label} account. Please try again.`, { variant: 'error' })
 }
 
-watch(() => linkedProviders.value.slice(), handleProvidersUpdated)
+if (linkedProviders) {
+  watch(() => linkedProviders.value.slice(), handleProvidersUpdated)
+}
 watch(() => route.query.oauthError, handleOAuthError, { immediate: true })
 
-watch(profile, (value) => {
-  if (value) {
-    resetForm()
-  }
-}, { immediate: true })
+if (profile) {
+  watch(profile, (value) => {
+    if (value) {
+      resetForm()
+    }
+  }, { immediate: true })
+}
 
 // Sync form theme changes to UI store immediately for real-time preview
-watch(() => form.themePreference, (newTheme) => {
-  if (newTheme && newTheme !== uiThemePreference.value) {
-    uiStore.setThemePreference(newTheme)
-  }
-})
+if (uiThemePreference) {
+  watch(() => form.themePreference, (newTheme) => {
+    if (newTheme && newTheme !== uiThemePreference.value) {
+      uiStore.setThemePreference(newTheme)
+    }
+  })
 
-watchEffect(() => {
-  if (uiThemePreference?.value && form.themePreference !== uiThemePreference.value && !isDirty.value) {
-    form.themePreference = uiThemePreference.value
-  }
-})
+  watchEffect(() => {
+    if (uiThemePreference.value && form.themePreference !== uiThemePreference.value && !isDirty.value) {
+      form.themePreference = uiThemePreference.value
+    }
+  })
+}
 
 onMounted(async () => {
-  if (!profile.value) {
+  if (profile && !profile.value) {
     await profileStore.fetchProfile().catch(() => null)
   }
 
