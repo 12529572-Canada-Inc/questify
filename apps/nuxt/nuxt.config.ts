@@ -72,12 +72,9 @@ export default defineNuxtConfig({
 
   // 🧩 Runtime configuration
   runtimeConfig: {
+    // 🔒 Server-only (not exposed to client)
     aiModels: aiModelConfig.models,
     aiModelDefaultId: aiModelConfig.defaultModelId,
-    features: {
-      aiAssist: aiAssistEnabled,
-    },
-    // 🔒 Server-only (not exposed to client)
     redis: {
       host: process.env.REDIS_HOST || 'localhost',
       port: process.env.REDIS_PORT || '6379',
@@ -96,7 +93,6 @@ export default defineNuxtConfig({
       apiSecret: process.env.CLOUDINARY_API_SECRET || '',
       uploadFolder: process.env.CLOUDINARY_UPLOAD_FOLDER || 'questify/quests',
     },
-
     // 🌍 Client-exposed
     public: {
       appEnv: process.env.NODE_ENV,
