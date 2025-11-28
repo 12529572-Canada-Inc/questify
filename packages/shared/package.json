@@ -23,7 +23,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@prisma/client": "5.22.0",
+    "@prisma/client": "6.17.1",
     "crypto": "^1.0.1",
     "jsonrepair": "^3.6.1"
   },
