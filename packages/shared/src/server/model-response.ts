@@ -36,7 +36,7 @@ export function parseJsonFromModel<T extends JsonShape>(content: string): T {
   let cleaned = content.trim().replace(/\\n/g, '\n')
 
   // Prefer content inside a fenced block when the model wraps JSON
-  const fenced = cleaned.match(/```(?:json)?\\s*([\\s\\S]*?)```/i)
+  const fenced = cleaned.match(/```(?:json)?\s*([\s\S]*?)```/i)
   if (fenced?.[1]) {
     cleaned = fenced[1].trim()
   }
