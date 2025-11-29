@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 🧰 Maintenance
+- Upgraded Prisma to v6.17.1 and aligned TypeScript/node toolchain + Prisma client generation to keep lint/typecheck workflows passing.
+
 ---
 
 ## [1.16.0] - 2025-11-23
