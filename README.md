@@ -15,8 +15,9 @@ Questify turns personal and team goals into narrative quests powered by AI-assis
 
 ## Requirements
 
-- Node.js 18+
+- Node.js 18.18+ (Prisma 6 minimum)
 - pnpm 8+
+- TypeScript 5.1+ (repo pins 5.6.x for tooling)
 - Docker (for local Postgres + Redis)
 
 ## Quick Start

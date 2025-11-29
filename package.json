@@ -1,6 +1,9 @@
 {
   "name": "questify",
   "private": true,
+  "engines": {
+    "node": ">=18.18.0"
+  },
   "scripts": {
     "build": "pnpm --recursive build",
     "dev:nuxt": "pnpm --filter nuxt dev",
