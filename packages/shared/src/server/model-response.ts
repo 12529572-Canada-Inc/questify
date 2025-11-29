@@ -15,6 +15,21 @@ function ensureJsonShape(value: unknown): JsonShape {
   throw new Error('Model response was not a JSON object or array')
 }
 
+function normalizeJsonShape(value: JsonShape): JsonShape {
+  if (!Array.isArray(value)) {
+    return value
+  }
+
+  const filtered = (value as unknown[]).filter(
+    item => item !== '' && item !== null && item !== undefined,
+  )
+  if (filtered.length === 1 && Array.isArray(filtered[0])) {
+    return normalizeJsonShape(filtered[0] as JsonShape)
+  }
+
+  return filtered as JsonObject[]
+}
+
 export function parseJsonFromModel<T extends JsonShape>(content: string): T {
   if (!content) return [] as unknown as T
 
@@ -35,13 +50,13 @@ export function parseJsonFromModel<T extends JsonShape>(content: string): T {
 
   try {
     const parsed = JSON.parse(cleaned)
-    return ensureJsonShape(parsed) as T
+    return normalizeJsonShape(ensureJsonShape(parsed)) as T
   }
   catch {
     try {
       const repaired = jsonrepair(cleaned)
       const parsed = JSON.parse(repaired)
-      return ensureJsonShape(parsed) as T
+      return normalizeJsonShape(ensureJsonShape(parsed)) as T
     }
     catch (repairError) {
       console.error('Failed to parse JSON from response:', cleaned)
