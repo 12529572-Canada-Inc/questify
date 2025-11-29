@@ -18,11 +18,20 @@ function ensureJsonShape(value: unknown): JsonShape {
 export function parseJsonFromModel<T extends JsonShape>(content: string): T {
   if (!content) return [] as unknown as T
 
-  const cleaned = content
-    .trim()
-    .replace(/^```json\s*/i, '')
-    .replace(/```$/, '')
-    .replace(/\\n/g, '\n')
+  let cleaned = content.trim().replace(/\\n/g, '\n')
+
+  // Prefer content inside a fenced block when the model wraps JSON
+  const fenced = cleaned.match(/```(?:json)?\\s*([\\s\\S]*?)```/i)
+  if (fenced?.[1]) {
+    cleaned = fenced[1].trim()
+  }
+  else {
+    // Otherwise, strip any leading commentary before the first JSON character
+    const firstJsonIndex = cleaned.search(/[\\[{]/)
+    if (firstJsonIndex > 0) {
+      cleaned = cleaned.slice(firstJsonIndex)
+    }
+  }
 
   try {
     const parsed = JSON.parse(cleaned)
@@ -40,4 +49,3 @@ export function parseJsonFromModel<T extends JsonShape>(content: string): T {
     }
   }
 }
-
