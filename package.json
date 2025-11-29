@@ -4,6 +4,11 @@
   "engines": {
     "node": ">=18.18.0"
   },
+  "pnpm": {
+    "overrides": {
+      "magicast": "0.3.5"
+    }
+  },
   "scripts": {
     "build": "pnpm --recursive build",
     "dev:nuxt": "pnpm --filter nuxt dev",
@@ -12,7 +17,7 @@
     "format:nuxt": "pnpm --filter nuxt format",
     "format:worker": "pnpm --filter worker format",
     "lint": "pnpm lint:nuxt && pnpm lint:worker",
-    "lint:nuxt": "pnpm --filter nuxt lint && pnpm --filter nuxt lint:types",
+    "lint:nuxt": "pnpm prisma:generate && pnpm --filter nuxt lint && pnpm --filter nuxt lint:types",
     "lint:worker": "pnpm --filter worker lint",
     "nuxt:clean": "pnpm --filter nuxt clean",
     "nuxt:info": "pnpm --filter nuxt dlx nuxi info",
