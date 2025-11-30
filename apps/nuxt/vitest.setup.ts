@@ -143,9 +143,15 @@ if (!globalThis.useCookie) {
 }
 
 vi.mock('vuetify', () => ({
-  useTheme: () => ({
-    global: {
-      name: { value: 'light' as 'light' | 'dark' },
-    },
-  }),
+  useTheme: () => {
+    const themeMock = {
+      global: {
+        name: { value: 'light' as 'light' | 'dark' },
+      },
+      change: vi.fn((val: 'light' | 'dark') => {
+        themeMock.global.name.value = val
+      }),
+    }
+    return themeMock
+  },
 }))
