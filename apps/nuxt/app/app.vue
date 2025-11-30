@@ -30,7 +30,7 @@ watch(themeMode, (mode) => {
   background: radial-gradient(
     circle at 16% 20%,
     rgba(var(--v-theme-primary), 0.12),
-    rgba(var(--v-theme-surface), 0.94) 50%
+    rgba(var(--v-theme-surface-variant, var(--v-theme-surface)), 0.92) 52%
   );
   background-color: rgb(var(--v-theme-background));
   background-size: 220% 220%;
