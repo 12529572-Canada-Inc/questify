@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 🛠 Fixes
+- Improved theme handling: profile-selected light/dark/auto preferences now apply instantly across the app, and dark mode uses higher-contrast tokens (background/surfaces, on-surface text, outlines, and accents) for better readability.
+
 ### 🧰 Maintenance
 - Upgraded Prisma to v6.17.1, aligned TypeScript/node toolchain + Prisma client generation to keep lint/typecheck workflows passing, and hardened model JSON parsing for fenced AI outputs used by the worker.
 
