@@ -403,6 +403,58 @@ describe('worker entrypoint', () => {
     expect(fetchSpy).toHaveBeenCalledWith('https://api.anthropic.com/v1/messages', expect.any(Object));
   });
 
+  it('marks quests failed when the anthropic API responds with an error', async () => {
+    loadModelConfigMock.mockReturnValue({
+      models: [{
+        id: 'claude-3',
+        label: 'Claude',
+        provider: 'anthropic',
+        providerLabel: 'Anthropic',
+        description: '',
+        tags: [],
+        apiModel: 'claude-3',
+        default: true,
+      }],
+      defaultModelId: 'claude-3',
+      source: 'default',
+    });
+    Object.assign(configMock, {
+      openaiApiKey: '',
+      deepseekApiKey: '',
+      anthropicApiKey: 'anthropic-key',
+    });
+    parseJsonFromModelMock.mockReturnValue([]);
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+    fetchSpy.mockResolvedValueOnce({
+      ok: false,
+      statusText: 'Bad Request',
+      text: async () => 'anthropic failure',
+      json: async () => ({}),
+    } as unknown as Response);
+
+    await importWorker();
+    const processor = WorkerMock.mock.calls[0][1];
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    await processor({
+      name: 'decompose',
+      data: {
+        questId: 'quest-anthropic-error',
+        title: 'Anthropic Failure',
+      },
+    } as never);
+
+    expect(fetchSpy).toHaveBeenCalledWith('https://api.anthropic.com/v1/messages', expect.any(Object));
+    expect(questUpdateMock).toHaveBeenCalledWith({
+      where: { id: 'quest-anthropic-error' },
+      data: { status: QUEST_STATUS.failed },
+    });
+    expect(parseJsonFromModelMock).not.toHaveBeenCalled();
+
+    errorSpy.mockRestore();
+    fetchSpy.mockRestore();
+  });
+
   it('marks quests as failed when decomposition throws', async () => {
     configMock.redisUrl = 'redis://redis-host:6379';
     openAiCreateMock.mockRejectedValue(new Error('openai failure'));
