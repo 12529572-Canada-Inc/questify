@@ -1,6 +1,6 @@
 {
     "nuxt": {
-        "statements": 58.12,
+        "statements": 60,
         "branches": 72.49,
         "functions": 51.94,
         "lines": 58.12
