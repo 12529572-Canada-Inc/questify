@@ -1,3 +1,18 @@
+<script setup lang="ts">
+import { watch } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useTheme } from 'vuetify'
+import { useUiStore } from '~/stores/ui'
+
+const uiStore = useUiStore()
+const { themeMode } = storeToRefs(uiStore)
+const theme = useTheme()
+
+watch(themeMode, (mode) => {
+  theme.global.name.value = mode
+}, { immediate: true })
+</script>
+
 <template>
   <v-app>
     <GlobalSnackbar />
