@@ -9,6 +9,10 @@ const { themeMode } = storeToRefs(uiStore)
 const theme = useTheme()
 
 watch(themeMode, (mode) => {
+  if (typeof theme.change === 'function') {
+    theme.change(mode)
+    return
+  }
   theme.global.name.value = mode
 }, { immediate: true })
 </script>

@@ -59,11 +59,11 @@ export const useUiStore = defineStore('ui', () => {
       change?: (theme: string) => void
     }
 
-    if (typeof themeWithChange.global?.change === 'function') {
-      themeWithChange.global.change(mode)
-    }
-    else if (typeof themeWithChange.change === 'function') {
+    if (typeof themeWithChange.change === 'function') {
       themeWithChange.change(mode)
+    }
+    else if (typeof themeWithChange.global?.change === 'function') {
+      themeWithChange.global.change(mode)
     }
     else {
       theme.global.name.value = mode
