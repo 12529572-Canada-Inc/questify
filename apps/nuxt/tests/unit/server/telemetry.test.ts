@@ -1,16 +1,25 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { getAiAssistMetrics, recordAiAssistUsage } from '../../../server/utils/telemetry'
 
-const globalStore = globalThis as typeof globalThis & { [key: symbol]: unknown }
-const telemetryKey = Symbol.for('questify.telemetry.aiAssist')
-
 describe('server/utils/telemetry', () => {
   beforeEach(() => {
-    delete globalStore[telemetryKey]
+    const store = getAiAssistMetrics()
+    Object.keys(store.fields).forEach((field) => {
+      store.fields[field as keyof typeof store.fields] = 0
+    })
+    if ('total' in store) {
+      store.total = 0
+    }
   })
 
   afterEach(() => {
-    delete globalStore[telemetryKey]
+    const store = getAiAssistMetrics()
+    Object.keys(store.fields).forEach((field) => {
+      store.fields[field as keyof typeof store.fields] = 0
+    })
+    if ('total' in store) {
+      store.total = 0
+    }
   })
 
   it('tracks totals per field', () => {
