@@ -8,7 +8,6 @@ const normalizeModelTypeMock = vi.fn()
 vi.mock('openai', () => {
   class OpenAI {
     chat = { completions: { create: openAiCreateMock } }
-    constructor() {}
   }
   return { default: OpenAI }
 })
