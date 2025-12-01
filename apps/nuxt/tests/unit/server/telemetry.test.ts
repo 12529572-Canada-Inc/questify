@@ -3,22 +3,30 @@ import { getAiAssistMetrics, recordAiAssistUsage } from '../../../server/utils/t
 
 describe('server/utils/telemetry', () => {
   beforeEach(() => {
-    const store = getAiAssistMetrics()
-    Object.keys(store.fields).forEach((field) => {
-      store.fields[field as keyof typeof store.fields] = 0
-    })
-    if ('total' in store) {
-      store.total = 0
+    const telemetryKey = Symbol.for('questify.telemetry.aiAssist')
+    const globalStore = globalThis as typeof globalThis & { [key: symbol]: unknown }
+    globalStore[telemetryKey] = {
+      total: 0,
+      fields: {
+        title: 0,
+        goal: 0,
+        context: 0,
+        constraints: 0,
+      },
     }
   })
 
   afterEach(() => {
-    const store = getAiAssistMetrics()
-    Object.keys(store.fields).forEach((field) => {
-      store.fields[field as keyof typeof store.fields] = 0
-    })
-    if ('total' in store) {
-      store.total = 0
+    const telemetryKey = Symbol.for('questify.telemetry.aiAssist')
+    const globalStore = globalThis as typeof globalThis & { [key: symbol]: unknown }
+    globalStore[telemetryKey] = {
+      total: 0,
+      fields: {
+        title: 0,
+        goal: 0,
+        context: 0,
+        constraints: 0,
+      },
     }
   })
 
