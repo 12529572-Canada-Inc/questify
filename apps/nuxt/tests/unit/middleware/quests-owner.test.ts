@@ -60,7 +60,7 @@ describe('middleware/quests-owner', () => {
   it('fetches session when the user is not logged in', async () => {
     const middleware = (await import('../../../app/middleware/quests-owner')).default
 
-    await middleware()
+    await middleware({} as never, {} as never)
 
     expect(fetchSession).toHaveBeenCalled()
   })
@@ -73,7 +73,7 @@ describe('middleware/quests-owner', () => {
     })
 
     const middleware = (await import('../../../app/middleware/quests-owner')).default
-    await middleware()
+    await middleware({} as never, {} as never)
 
     expect(fetchQuests).toHaveBeenCalledTimes(1)
     expect(showSnackbar).toHaveBeenCalledWith('You need to create your first quest!', { variant: 'info' })
@@ -86,7 +86,7 @@ describe('middleware/quests-owner', () => {
     refs.hasQuests.value = true
 
     const middleware = (await import('../../../app/middleware/quests-owner')).default
-    await middleware()
+    await middleware({} as never, {} as never)
 
     expect(fetchQuests).not.toHaveBeenCalled()
     expect(showSnackbar).not.toHaveBeenCalled()
