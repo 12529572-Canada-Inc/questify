@@ -1,15 +1,28 @@
-import { computed, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, onMounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useSnackbar } from './useSnackbar'
-import { resolveApiError } from '~/utils/error'
+import { extractStatusCode, resolveApiError } from '~/utils/error'
 import { useQuestStore } from '~/stores/quest'
+import { useUserStore } from '~/stores/user'
 import { useAiModels } from './useAiModels'
 
 interface UseQuestFormOptions {
   onSuccess?: (questId: string) => void
   initialIsPublic?: boolean
 }
+
+type QuestDraft = {
+  title: string
+  goal: string
+  context: string
+  constraints: string
+  modelType: string
+  isPublic: boolean
+  images: string[]
+}
+
+const QUEST_DRAFT_STORAGE_KEY = 'quest-create-draft'
 
 /**
  * Manages state, validation, and submission workflow for the quest creation form,
@@ -19,9 +32,12 @@ interface UseQuestFormOptions {
  */
 export function useQuestForm(options: UseQuestFormOptions = {}) {
   const router = useRouter()
+  const route = useRoute()
   const { showSnackbar } = useSnackbar()
   const questStore = useQuestStore()
+  const userStore = useUserStore()
   const { loaded } = storeToRefs(questStore)
+  const { loggedIn } = storeToRefs(userStore)
 
   const title = ref('')
   const goal = ref('')
@@ -57,11 +73,165 @@ export function useQuestForm(options: UseQuestFormOptions = {}) {
 
   const isSubmitDisabled = computed(() => !valid.value || loading.value)
 
+  function hasDraftContent(draft: QuestDraft) {
+    return (
+      [draft.title, draft.goal, draft.context, draft.constraints]
+        .some(value => typeof value === 'string' && value.trim().length > 0)
+      || draft.images.length > 0
+    )
+  }
+
+  function persistDraftToStorage() {
+    if (!import.meta.client) {
+      return
+    }
+
+    const draft: QuestDraft = {
+      title: title.value,
+      goal: goal.value,
+      context: context.value,
+      constraints: constraints.value,
+      modelType: modelType.value,
+      isPublic: isPublic.value,
+      images: images.value,
+    }
+
+    if (!hasDraftContent(draft)) {
+      return
+    }
+
+    try {
+      sessionStorage.setItem(QUEST_DRAFT_STORAGE_KEY, JSON.stringify(draft))
+    }
+    catch (err) {
+      if (import.meta.dev) {
+        console.warn('Failed to persist quest draft to storage:', err)
+      }
+    }
+  }
+
+  function readDraftFromStorage(): QuestDraft | null {
+    if (!import.meta.client) {
+      return null
+    }
+
+    try {
+      const raw = sessionStorage.getItem(QUEST_DRAFT_STORAGE_KEY)
+      if (!raw) {
+        return null
+      }
+
+      const parsed = JSON.parse(raw)
+      if (!parsed || typeof parsed !== 'object') {
+        return null
+      }
+
+      const draft = parsed as Partial<QuestDraft>
+      return {
+        title: draft.title ?? '',
+        goal: draft.goal ?? '',
+        context: draft.context ?? '',
+        constraints: draft.constraints ?? '',
+        modelType: draft.modelType ?? '',
+        isPublic: Boolean(draft.isPublic),
+        images: Array.isArray(draft.images) ? draft.images.filter((img): img is string => typeof img === 'string') : [],
+      }
+    }
+    catch (err) {
+      if (import.meta.dev) {
+        console.warn('Failed to read quest draft from storage:', err)
+      }
+      return null
+    }
+  }
+
+  function clearDraftStorage() {
+    if (!import.meta.client) {
+      return
+    }
+
+    try {
+      sessionStorage.removeItem(QUEST_DRAFT_STORAGE_KEY)
+    }
+    catch (err) {
+      if (import.meta.dev) {
+        console.warn('Failed to clear quest draft storage:', err)
+      }
+    }
+  }
+
+  function applyDraft(draft: QuestDraft) {
+    title.value = draft.title ?? ''
+    goal.value = draft.goal ?? ''
+    context.value = draft.context ?? ''
+    constraints.value = draft.constraints ?? ''
+    if (draft.modelType) {
+      modelType.value = draft.modelType
+    }
+    isPublic.value = Boolean(draft.isPublic)
+    images.value = draft.images
+  }
+
+  function normalizeBooleanFlag(value: unknown): boolean {
+    if (Array.isArray(value)) {
+      return value.some(entry => normalizeBooleanFlag(entry))
+    }
+
+    if (typeof value !== 'string') {
+      return false
+    }
+
+    const normalized = value.trim().toLowerCase()
+    return normalized === 'true' || normalized === '1' || normalized === 'yes'
+  }
+
+  function buildAuthRedirectPath() {
+    const resolved = router.resolve({
+      path: route.path,
+      query: { ...route.query, restoreDraft: '1' },
+    })
+
+    return resolved.href || resolved.fullPath || '/quests/new?restoreDraft=1'
+  }
+
+  async function handleAuthRedirect() {
+    persistDraftToStorage()
+    showSnackbar('Please log in to create your quest. We saved your draft.', { variant: 'info' })
+
+    await router.push({
+      path: '/auth/login',
+      query: { redirectTo: buildAuthRedirectPath() },
+    })
+  }
+
+  onMounted(() => {
+    if (!normalizeBooleanFlag(route.query.restoreDraft)) {
+      return
+    }
+
+    const draft = readDraftFromStorage()
+    if (!draft) {
+      return
+    }
+
+    applyDraft(draft)
+    showSnackbar('Restored your quest draft after login.', { variant: 'info' })
+  })
+
   async function submit() {
     loading.value = true
     error.value = null
 
     try {
+      if (!loggedIn.value) {
+        await userStore.fetchSession().catch(() => null)
+      }
+
+      if (!loggedIn.value) {
+        await handleAuthRedirect()
+        return
+      }
+
       const sanitizedTitle = title.value.trim()
 
       const res = await $fetch<CreateQuestResponse>('/api/quests', {
@@ -80,6 +250,7 @@ export function useQuestForm(options: UseQuestFormOptions = {}) {
       if (res.success && res.quest?.id) {
         options.onSuccess?.(res.quest.id)
         showSnackbar('Quest created successfully.', { variant: 'success' })
+        clearDraftStorage()
         if (loaded.value) {
           await questStore.fetchQuests({ force: true }).catch(() => null)
         }
@@ -92,6 +263,13 @@ export function useQuestForm(options: UseQuestFormOptions = {}) {
       showSnackbar(message, { variant: 'error' })
     }
     catch (e: unknown) {
+      const statusCode = extractStatusCode(e)
+
+      if (statusCode === 401) {
+        await handleAuthRedirect()
+        return
+      }
+
       const message = resolveApiError(e, 'Error creating quest')
       error.value = message
       showSnackbar(message, { variant: 'error' })

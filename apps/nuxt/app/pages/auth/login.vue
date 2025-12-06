@@ -37,6 +37,14 @@ const redirectPath = computed(() => {
   return '/dashboard'
 })
 
+const signupPath = computed(() => {
+  const raw = route.query.redirectTo
+  if (typeof raw === 'string' && raw.startsWith('/')) {
+    return `/auth/signup?redirectTo=${encodeURIComponent(raw)}`
+  }
+  return '/auth/signup'
+})
+
 if (import.meta.client) {
   watch(() => route.query.oauthError, (value) => {
     if (typeof value !== 'string') {
@@ -123,7 +131,7 @@ const providerLabels: Record<OAuthProvider, string> = {
     :loading="loading"
     :error="error"
     switch-label="Don't have an account? Sign up"
-    switch-to="/auth/signup"
+    :switch-to="signupPath"
     @submit="submit"
   >
     <v-text-field
