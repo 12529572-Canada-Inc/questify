@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 🛠 Fixes
 - Improved theme handling: profile-selected light/dark/auto preferences now apply instantly across the app, and dark mode uses higher-contrast tokens (background/surfaces, on-surface text, outlines, and accents) for better readability.
 - Raised Nuxt coverage guardrails by adding tests for AI runner fallbacks, telemetry, cloudinary utilities, audit logging, and quests-owner middleware; coverage runs now exceed the 60% statement/line threshold enforced in CI.
-- Quest creation now redirects unauthenticated users to login/signup with their draft auto-saved and restored after auth, preventing server errors and keeping the previously entered form data intact.
+- Quest creation now redirects unauthenticated users to login/signup with their draft auto-saved/restored after auth, and the create form persists across refreshes or navigation so previously entered details aren’t lost.
 
 ### 🧰 Maintenance
 - Upgraded Prisma to v6.17.1, aligned TypeScript/node toolchain + Prisma client generation to keep lint/typecheck workflows passing, and hardened model JSON parsing for fenced AI outputs used by the worker.

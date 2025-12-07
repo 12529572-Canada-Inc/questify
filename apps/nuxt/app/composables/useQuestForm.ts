@@ -1,6 +1,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
+import { watchDebounced } from '@vueuse/core'
 import { useSnackbar } from './useSnackbar'
 import { extractStatusCode, resolveApiError } from '~/utils/error'
 import { useQuestStore } from '~/stores/quest'
@@ -77,7 +78,7 @@ export function useQuestForm(options: UseQuestFormOptions = {}) {
     return (
       [draft.title, draft.goal, draft.context, draft.constraints]
         .some(value => typeof value === 'string' && value.trim().length > 0)
-      || draft.images.length > 0
+        || draft.images.length > 0
     )
   }
 
@@ -97,6 +98,7 @@ export function useQuestForm(options: UseQuestFormOptions = {}) {
     }
 
     if (!hasDraftContent(draft)) {
+      clearDraftStorage()
       return
     }
 
@@ -172,26 +174,13 @@ export function useQuestForm(options: UseQuestFormOptions = {}) {
     images.value = draft.images
   }
 
-  function normalizeBooleanFlag(value: unknown): boolean {
-    if (Array.isArray(value)) {
-      return value.some(entry => normalizeBooleanFlag(entry))
-    }
-
-    if (typeof value !== 'string') {
-      return false
-    }
-
-    const normalized = value.trim().toLowerCase()
-    return normalized === 'true' || normalized === '1' || normalized === 'yes'
-  }
-
   function buildAuthRedirectPath() {
     const resolved = router.resolve({
       path: route.path,
-      query: { ...route.query, restoreDraft: '1' },
+      query: { ...route.query },
     })
 
-    return resolved.href || resolved.fullPath || '/quests/new?restoreDraft=1'
+    return resolved.href || resolved.fullPath || route.fullPath || '/quests/new'
   }
 
   async function handleAuthRedirect() {
@@ -205,18 +194,29 @@ export function useQuestForm(options: UseQuestFormOptions = {}) {
   }
 
   onMounted(() => {
-    if (!normalizeBooleanFlag(route.query.restoreDraft)) {
-      return
-    }
-
     const draft = readDraftFromStorage()
-    if (!draft) {
+    if (!draft || !hasDraftContent(draft)) {
       return
     }
 
     applyDraft(draft)
-    showSnackbar('Restored your quest draft after login.', { variant: 'info' })
   })
+
+  watchDebounced(
+    () => ({
+      title: title.value,
+      goal: goal.value,
+      context: context.value,
+      constraints: constraints.value,
+      modelType: modelType.value,
+      isPublic: isPublic.value,
+      images: images.value,
+    }),
+    () => {
+      persistDraftToStorage()
+    },
+    { debounce: 300, maxWait: 800 },
+  )
 
   async function submit() {
     loading.value = true
