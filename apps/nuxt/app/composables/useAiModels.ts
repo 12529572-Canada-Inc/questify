@@ -15,28 +15,35 @@ export function useAiModels() {
   const configuredDefaultId = runtimeConfig.public.aiModelDefaultId as string | undefined
 
   const models = computed<AiModelOption[]>(() => {
-    return Array.isArray(configuredModels) && configuredModels.length > 0
+    const source = Array.isArray(configuredModels) && configuredModels.length > 0
       ? configuredModels
       : defaultAiModels
+    return source.map(model => ({
+      ...model,
+      enabled: model.enabled !== false,
+    }))
   })
 
+  const enabledModels = computed(() => models.value.filter(model => model.enabled !== false))
+
   const defaultModel = computed(() => {
-    if (!models.value.length) return null
+    if (!enabledModels.value.length) return null
     const preferredId = configuredDefaultId ?? DEFAULT_MODEL_ID
-    return findModelOption(models.value, preferredId) ?? models.value[0]
+    return findModelOption(enabledModels.value, preferredId) ?? enabledModels.value[0]
   })
 
   function findModelById(id?: string | null) {
-    if (!models.value.length) return null
+    if (!enabledModels.value.length) return null
     if (id && id.trim().length > 0) {
-      const match = findModelOption(models.value, id.trim())
+      const match = findModelOption(enabledModels.value, id.trim())
       if (match) return match
     }
-    return defaultModel.value ?? models.value[0]
+    return defaultModel.value ?? enabledModels.value[0]
   }
 
   return {
     models,
+    enabledModels,
     defaultModel,
     findModelById,
   }

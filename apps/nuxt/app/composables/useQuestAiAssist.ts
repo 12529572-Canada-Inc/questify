@@ -68,9 +68,12 @@ export function useQuestAiAssist(options: {
 
   const activeFieldLabel = computed(() => (state.activeField ? FIELD_LABELS[state.activeField] : ''))
 
+  const hasEnabledModel = computed(() => modelOptions.value.some(model => model.enabled !== false))
+
   const activeModel = computed(() => {
     const id = state.lastModelId ?? modelType.value
-    return modelOptions.value.find(model => model.id === id) ?? null
+    const enabledOptions = modelOptions.value.filter(model => model.enabled !== false)
+    return enabledOptions.find(model => model.id === id) ?? enabledOptions[0] ?? null
   })
 
   function buildPayload(field: AiAssistField): AssistPayload {
@@ -81,7 +84,7 @@ export function useQuestAiAssist(options: {
       context: toPayloadValue(fields.context.value),
       constraints: toPayloadValue(fields.constraints.value),
       currentValue: toPayloadValue(fields[field].value),
-      modelType: modelType.value || null,
+      modelType: activeModel.value?.id ?? modelType.value || null,
       images: images?.value ?? [],
     }
   }
@@ -116,7 +119,11 @@ export function useQuestAiAssist(options: {
   }
 
   async function requestAssistance(field: AiAssistField) {
-    if (!isEnabled.value || state.loading) {
+    if (!isEnabled.value || state.loading) return
+    if (!hasEnabledModel.value) {
+      const message = 'No AI models are configured for this environment.'
+      state.error = message
+      showSnackbar(message, { variant: 'warning' })
       return
     }
 
@@ -126,7 +133,11 @@ export function useQuestAiAssist(options: {
   }
 
   async function regenerateSuggestions() {
-    if (!isEnabled.value || state.loading || !state.activeField) {
+    if (!isEnabled.value || state.loading || !state.activeField) return
+    if (!hasEnabledModel.value) {
+      const message = 'No AI models are configured for this environment.'
+      state.error = message
+      showSnackbar(message, { variant: 'warning' })
       return
     }
 

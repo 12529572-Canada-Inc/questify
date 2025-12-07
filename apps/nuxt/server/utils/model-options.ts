@@ -6,11 +6,14 @@ import { DEFAULT_MODEL_ID, defaultAiModels, findModelOption, resolveModelId, typ
 
 function readConfiguredModels(): AiModelOption[] {
   const config = useRuntimeConfig()
-  const models = config.aiModels as AiModelOption[] | undefined
-  if (Array.isArray(models) && models.length > 0) {
-    return models
+  const rawModels = (config.aiModels as AiModelOption[] | undefined) ?? []
+  const normalized = (Array.isArray(rawModels) && rawModels.length > 0 ? rawModels : defaultAiModels)
+    .map(model => ({ ...model, enabled: model.enabled !== false }))
+  const enabled = normalized.filter(model => model.enabled !== false)
+  if (enabled.length === 0) {
+    throw new Error('No AI models are enabled. Configure at least one AI provider.')
   }
-  return defaultAiModels
+  return enabled
 }
 
 export function getAiModelOptions() {
