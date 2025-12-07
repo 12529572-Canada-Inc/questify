@@ -185,14 +185,15 @@ export function findModelOption(models: AiModelOption[], id?: string | null) {
 
 export function resolveModelId(models: AiModelOption[], id?: string | null) {
   const enabledModels = models.filter(model => model.enabled !== false)
-  const match = enabledModels.find(model => model.id === id) ?? findModelOption(models, id)
+  const match = enabledModels.find(model => model.id === id)
+
+  const defaultModel = enabledModels.find(model => model.default)
+    ?? enabledModels[0]
+    ?? models.find(model => model.default)
+    ?? models[0]
   if (match) {
     return match.id
   }
 
-  const defaultModel = enabledModels.find(model => model.default)
-    ?? models.find(model => model.default)
-    ?? enabledModels[0]
-    ?? models[0]
   return defaultModel?.id ?? DEFAULT_MODEL_ID
 }
