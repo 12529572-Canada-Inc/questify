@@ -27,7 +27,7 @@ const showArchivedModel = computed({
         sm="6"
         class="quest-header__title"
       >
-        <h2 class="text-h5 text-md-h4 font-weight-bold text-white mb-0">
+        <h2 class="text-h5 text-md-h4 font-weight-bold mb-0">
           {{ props.title }}
         </h2>
       </v-col>
