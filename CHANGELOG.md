@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🧰 Maintenance
 - Upgraded Prisma to v6.17.1, aligned TypeScript/node toolchain + Prisma client generation to keep lint/typecheck workflows passing, and hardened model JSON parsing for fenced AI outputs used by the worker.
+- Simplified `QuestHeader` by removing the unused `canToggleArchived` prop; archived filters now rely on the main quests list controls.
 
 ---
 
