@@ -84,7 +84,7 @@ export function useQuestAiAssist(options: {
       context: toPayloadValue(fields.context.value),
       constraints: toPayloadValue(fields.constraints.value),
       currentValue: toPayloadValue(fields[field].value),
-      modelType: activeModel.value?.id ?? modelType.value || null,
+      modelType: activeModel.value?.id ?? modelType.value ?? null,
       images: images?.value ?? [],
     }
   }

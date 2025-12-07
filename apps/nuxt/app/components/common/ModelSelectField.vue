@@ -12,7 +12,7 @@ const isExternallyDisabled = computed(() => {
 
 const props = defineProps<{ models: AiModelOption[] }>()
 
-const enabledModels = computed(() => props.models.filter(item => item.enabled !== false))
+const enabledModels = computed<AiModelOption[]>(() => props.models.filter(item => item.enabled !== false))
 const hasEnabledModels = computed(() => enabledModels.value.length > 0)
 
 const selectedModel = computed(() =>
@@ -30,16 +30,21 @@ function getModelByValue(value: string): AiModelOption | undefined {
   return props.models.find(m => m.id === value)
 }
 
-watch([model, enabledModels], ([current], [_enabled]) => {
-  if (!_enabled.length) {
-    model.value = ''
-    return
-  }
-  const isCurrentEnabled = _enabled.some(item => item.id === current)
-  if (!isCurrentEnabled) {
-    model.value = _enabled[0]?.id ?? null
-  }
-}, { immediate: true })
+watch(
+  () => [model.value, enabledModels.value] as [string | null, AiModelOption[]],
+  ([current, enabled]) => {
+    const list = Array.isArray(enabled) ? enabled : []
+    if (!list.length) {
+      model.value = ''
+      return
+    }
+    const isCurrentEnabled = list.some(item => item?.id === current)
+    if (!isCurrentEnabled) {
+      model.value = list[0]?.id ?? ''
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
