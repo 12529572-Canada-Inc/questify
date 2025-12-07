@@ -76,16 +76,16 @@ describe('server/utils/ai-runner', () => {
   it('calls anthropic and returns parsed text content', async () => {
     process.env.ANTHROPIC_API_KEY = 'anthropic-key'
     getAiModelOptionsMock.mockReturnValue([{
-      id: 'claude-3-sonnet',
+      id: 'claude-3.5-sonnet',
       provider: 'anthropic',
-      apiModel: 'claude-3-sonnet-20240229',
-      label: 'Claude 3 Sonnet',
+      apiModel: 'claude-3-5-sonnet-20241022',
+      label: 'Claude 3.5 Sonnet',
       providerLabel: 'Anthropic',
       description: '',
       tags: [],
       default: true,
     }])
-    getDefaultModelIdMock.mockReturnValue('claude-3-sonnet')
+    getDefaultModelIdMock.mockReturnValue('claude-3.5-sonnet')
     normalizeModelTypeMock.mockImplementation((requested, fallback) => requested ?? fallback)
 
     const fetchMock = vi.fn(async () => ({
@@ -99,6 +99,6 @@ describe('server/utils/ai-runner', () => {
     const result = await runAiModel('Anthropic prompt')
 
     expect(fetchMock).toHaveBeenCalled()
-    expect(result).toEqual({ content: 'assistant output', modelId: 'claude-3-sonnet' })
+    expect(result).toEqual({ content: 'assistant output', modelId: 'claude-3.5-sonnet' })
   })
 })

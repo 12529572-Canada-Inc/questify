@@ -363,16 +363,16 @@ describe('worker entrypoint', () => {
   it('uses anthropic models when configured', async () => {
     loadModelConfigMock.mockReturnValue({
       models: [{
-        id: 'claude-3-sonnet',
-        label: 'Claude 3 Sonnet',
+        id: 'claude-3.5-sonnet',
+        label: 'Claude 3.5 Sonnet',
         provider: 'anthropic',
         providerLabel: 'Anthropic',
         description: '',
         tags: [],
-        apiModel: 'claude-3-sonnet-20240229',
+        apiModel: 'claude-3-5-sonnet-20241022',
         default: true,
       }],
-      defaultModelId: 'claude-3-sonnet',
+      defaultModelId: 'claude-3.5-sonnet',
       source: 'default',
     });
     Object.assign(configMock, {
@@ -406,16 +406,16 @@ describe('worker entrypoint', () => {
   it('marks quests failed when the anthropic API responds with an error', async () => {
     loadModelConfigMock.mockReturnValue({
       models: [{
-        id: 'claude-3-sonnet',
-        label: 'Claude 3 Sonnet',
+        id: 'claude-3.5-sonnet',
+        label: 'Claude 3.5 Sonnet',
         provider: 'anthropic',
         providerLabel: 'Anthropic',
         description: '',
         tags: [],
-        apiModel: 'claude-3-sonnet-20240229',
+        apiModel: 'claude-3-5-sonnet-20241022',
         default: true,
       }],
-      defaultModelId: 'claude-3-sonnet',
+      defaultModelId: 'claude-3.5-sonnet',
       source: 'default',
     });
     Object.assign(configMock, {
@@ -771,16 +771,16 @@ describe('worker entrypoint', () => {
   it('marks quest failed when anthropic key is missing for anthropic model', async () => {
     loadModelConfigMock.mockReturnValue({
       models: [{
-        id: 'claude-3-sonnet',
-        label: 'Claude 3 Sonnet',
+        id: 'claude-3.5-sonnet',
+        label: 'Claude 3.5 Sonnet',
         provider: 'anthropic',
         providerLabel: 'Anthropic',
         description: '',
         tags: [],
-        apiModel: 'claude-3-sonnet-20240229',
+        apiModel: 'claude-3-5-sonnet-20241022',
         default: true,
       }],
-      defaultModelId: 'claude-3-sonnet',
+      defaultModelId: 'claude-3.5-sonnet',
       source: 'default',
     });
     Object.assign(configMock, {
