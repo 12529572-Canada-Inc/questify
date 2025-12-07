@@ -73,7 +73,7 @@ export const defaultAiModels: AiModelOption[] = [
     providerLabel: 'Anthropic',
     description: 'Polished writing style with excellent context retention.',
     tags: ['Writing', 'Balanced'],
-    apiModel: 'claude-3-sonnet',
+    apiModel: 'claude-3-sonnet-20240229',
   },
   {
     id: 'claude-3-opus',
@@ -82,7 +82,7 @@ export const defaultAiModels: AiModelOption[] = [
     providerLabel: 'Anthropic',
     description: 'Premium reasoning depth for strategic investigations.',
     tags: ['Reasoning', 'Premium'],
-    apiModel: 'claude-3-opus',
+    apiModel: 'claude-3-opus-20240229',
   },
   {
     id: 'deepseek-chat',

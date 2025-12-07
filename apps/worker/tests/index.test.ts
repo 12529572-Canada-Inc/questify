@@ -363,16 +363,16 @@ describe('worker entrypoint', () => {
   it('uses anthropic models when configured', async () => {
     loadModelConfigMock.mockReturnValue({
       models: [{
-        id: 'claude-3',
-        label: 'Claude',
+        id: 'claude-3-sonnet',
+        label: 'Claude 3 Sonnet',
         provider: 'anthropic',
         providerLabel: 'Anthropic',
         description: '',
         tags: [],
-        apiModel: 'claude-3',
+        apiModel: 'claude-3-sonnet-20240229',
         default: true,
       }],
-      defaultModelId: 'claude-3',
+      defaultModelId: 'claude-3-sonnet',
       source: 'default',
     });
     Object.assign(configMock, {
@@ -406,16 +406,16 @@ describe('worker entrypoint', () => {
   it('marks quests failed when the anthropic API responds with an error', async () => {
     loadModelConfigMock.mockReturnValue({
       models: [{
-        id: 'claude-3',
-        label: 'Claude',
+        id: 'claude-3-sonnet',
+        label: 'Claude 3 Sonnet',
         provider: 'anthropic',
         providerLabel: 'Anthropic',
         description: '',
         tags: [],
-        apiModel: 'claude-3',
+        apiModel: 'claude-3-sonnet-20240229',
         default: true,
       }],
-      defaultModelId: 'claude-3',
+      defaultModelId: 'claude-3-sonnet',
       source: 'default',
     });
     Object.assign(configMock, {
@@ -771,16 +771,16 @@ describe('worker entrypoint', () => {
   it('marks quest failed when anthropic key is missing for anthropic model', async () => {
     loadModelConfigMock.mockReturnValue({
       models: [{
-        id: 'claude-3',
-        label: 'Claude',
+        id: 'claude-3-sonnet',
+        label: 'Claude 3 Sonnet',
         provider: 'anthropic',
         providerLabel: 'Anthropic',
         description: '',
         tags: [],
-        apiModel: 'claude-3',
+        apiModel: 'claude-3-sonnet-20240229',
         default: true,
       }],
-      defaultModelId: 'claude-3',
+      defaultModelId: 'claude-3-sonnet',
       source: 'default',
     });
     Object.assign(configMock, {
