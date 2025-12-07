@@ -163,14 +163,14 @@ export function useQuestForm(options: UseQuestFormOptions = {}) {
   }
 
   function applyDraft(draft: QuestDraft) {
-    title.value = draft.title ?? ''
-    goal.value = draft.goal ?? ''
-    context.value = draft.context ?? ''
-    constraints.value = draft.constraints ?? ''
+    title.value = draft.title
+    goal.value = draft.goal
+    context.value = draft.context
+    constraints.value = draft.constraints
     if (draft.modelType) {
       modelType.value = draft.modelType
     }
-    isPublic.value = Boolean(draft.isPublic)
+    isPublic.value = draft.isPublic
     images.value = draft.images
   }
 
@@ -180,7 +180,7 @@ export function useQuestForm(options: UseQuestFormOptions = {}) {
       query: { ...route.query },
     })
 
-    return resolved.href || resolved.fullPath || route.fullPath || '/quests/new'
+    return resolved.href || resolved.fullPath || route.fullPath
   }
 
   async function handleAuthRedirect() {
