@@ -314,10 +314,7 @@ const noResultsCopy = computed(() => {
 
 <template>
   <v-container class="py-6">
-    <QuestHeader
-      v-model:show-archived="showArchived"
-      :can-toggle-archived="false"
-    />
+    <QuestHeader />
 
     <v-card class="mb-6">
       <v-card-text>
