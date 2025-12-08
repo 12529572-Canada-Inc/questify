@@ -69,7 +69,13 @@ export function loadModelConfig(options: LoadOptions = {}): ModelConfigResult {
   const fromFile = fromJson ? null : readConfigFile(fileOverride)
 
   const models = sanitizeModelOptions(fromJson ?? fromFile ?? defaultAiModels)
-  const defaultModelId = models.find(model => model.default)?.id ?? models[0]?.id ?? DEFAULT_MODEL_ID
+  const enabledModels = models.filter(model => model.enabled !== false)
+  const defaultModelId = (
+    enabledModels.find(model => model.default)
+    ?? enabledModels[0]
+    ?? models.find(model => model.default)
+    ?? models[0]
+  )?.id ?? DEFAULT_MODEL_ID
 
   return {
     models,

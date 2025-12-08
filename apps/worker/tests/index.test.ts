@@ -363,16 +363,16 @@ describe('worker entrypoint', () => {
   it('uses anthropic models when configured', async () => {
     loadModelConfigMock.mockReturnValue({
       models: [{
-        id: 'claude-3',
-        label: 'Claude',
+        id: 'claude-3.5-sonnet',
+        label: 'Claude 3.5 Sonnet',
         provider: 'anthropic',
         providerLabel: 'Anthropic',
         description: '',
         tags: [],
-        apiModel: 'claude-3',
+        apiModel: 'claude-3-5-sonnet-20241022',
         default: true,
       }],
-      defaultModelId: 'claude-3',
+      defaultModelId: 'claude-3.5-sonnet',
       source: 'default',
     });
     Object.assign(configMock, {
@@ -406,16 +406,16 @@ describe('worker entrypoint', () => {
   it('marks quests failed when the anthropic API responds with an error', async () => {
     loadModelConfigMock.mockReturnValue({
       models: [{
-        id: 'claude-3',
-        label: 'Claude',
+        id: 'claude-3.5-sonnet',
+        label: 'Claude 3.5 Sonnet',
         provider: 'anthropic',
         providerLabel: 'Anthropic',
         description: '',
         tags: [],
-        apiModel: 'claude-3',
+        apiModel: 'claude-3-5-sonnet-20241022',
         default: true,
       }],
-      defaultModelId: 'claude-3',
+      defaultModelId: 'claude-3.5-sonnet',
       source: 'default',
     });
     Object.assign(configMock, {
@@ -771,16 +771,16 @@ describe('worker entrypoint', () => {
   it('marks quest failed when anthropic key is missing for anthropic model', async () => {
     loadModelConfigMock.mockReturnValue({
       models: [{
-        id: 'claude-3',
-        label: 'Claude',
+        id: 'claude-3.5-sonnet',
+        label: 'Claude 3.5 Sonnet',
         provider: 'anthropic',
         providerLabel: 'Anthropic',
         description: '',
         tags: [],
-        apiModel: 'claude-3',
+        apiModel: 'claude-3-5-sonnet-20241022',
         default: true,
       }],
-      defaultModelId: 'claude-3',
+      defaultModelId: 'claude-3.5-sonnet',
       source: 'default',
     });
     Object.assign(configMock, {

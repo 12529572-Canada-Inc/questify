@@ -46,12 +46,15 @@ export function useQuestForm(options: UseQuestFormOptions = {}) {
   const constraints = ref('')
   const isPublic = ref(Boolean(options.initialIsPublic))
   const showOptionalFields = ref(false)
-  const { models: aiModels, defaultModel } = useAiModels()
-  const modelType = ref(defaultModel.value?.id ?? 'gpt-4o-mini')
+  const { models: aiModels, defaultModel, findModelById } = useAiModels()
+  const modelType = ref(defaultModel.value?.id ?? '')
   const images = ref<string[]>([])
+  const hasValidModelSelection = computed(() => Boolean(findModelById(modelType.value)))
 
   watch(defaultModel, (next) => {
-    if (next && !modelType.value) {
+    if (!next) return
+    const selected = findModelById(modelType.value)
+    if (!selected) {
       modelType.value = next.id
     }
   })
@@ -72,7 +75,7 @@ export function useQuestForm(options: UseQuestFormOptions = {}) {
     }
   }, { immediate: true })
 
-  const isSubmitDisabled = computed(() => !valid.value || loading.value)
+  const isSubmitDisabled = computed(() => !valid.value || loading.value || !hasValidModelSelection.value)
 
   function hasDraftContent(draft: QuestDraft) {
     return (
@@ -167,9 +170,8 @@ export function useQuestForm(options: UseQuestFormOptions = {}) {
     goal.value = draft.goal
     context.value = draft.context
     constraints.value = draft.constraints
-    if (draft.modelType) {
-      modelType.value = draft.modelType
-    }
+    const draftModel = draft.modelType ? findModelById(draft.modelType) : null
+    modelType.value = draftModel?.id ?? defaultModel.value?.id ?? modelType.value
     isPublic.value = draft.isPublic
     images.value = draft.images
   }

@@ -4,6 +4,24 @@ import path from 'path'
 import { loadModelConfig } from '../../packages/shared/src/model-config'
 
 const aiModelConfig = loadModelConfig()
+const providerAvailability = {
+  openai: Boolean(process.env.OPENAI_API_KEY),
+  anthropic: Boolean(process.env.ANTHROPIC_API_KEY),
+  deepseek: Boolean(process.env.DEEPSEEK_API_KEY),
+} as const
+const aiModelsWithAvailability = aiModelConfig.models.map(model => ({
+  ...model,
+  enabled: model.enabled !== false && providerAvailability[model.provider] !== false,
+}))
+const hasEnabledDefault = aiModelsWithAvailability.some(model => model.default && model.enabled !== false)
+const firstEnabledModel = aiModelsWithAvailability.find(model => model.enabled !== false)
+const normalizedAiModels = hasEnabledDefault || !firstEnabledModel
+  ? aiModelsWithAvailability
+  : aiModelsWithAvailability.map(model => (model.id === firstEnabledModel.id ? { ...model, default: true } : model))
+const aiModelDefaultId = aiModelsWithAvailability.find(model => model.default && model.enabled !== false)?.id
+  ?? normalizedAiModels.find(model => model.default)?.id
+  ?? normalizedAiModels.find(model => model.enabled !== false)?.id
+  ?? aiModelConfig.defaultModelId
 const aiAssistEnabled = process.env.NUXT_FEATURE_AI_ASSIST === 'true'
 const defaultImageMaxSizeBytes = 1.5 * 1024 * 1024 // 1.5MB per image while storing media off-app
 const defaultImageTotalMaxBytes = 3 * 1024 * 1024 // 3MB across images to prevent runaway uploads
@@ -73,8 +91,8 @@ export default defineNuxtConfig({
   // 🧩 Runtime configuration
   runtimeConfig: {
     // 🔒 Server-only (not exposed to client)
-    aiModels: aiModelConfig.models,
-    aiModelDefaultId: aiModelConfig.defaultModelId,
+    aiModels: normalizedAiModels,
+    aiModelDefaultId,
     redis: {
       host: process.env.REDIS_HOST || 'localhost',
       port: process.env.REDIS_PORT || '6379',
@@ -98,8 +116,8 @@ export default defineNuxtConfig({
       appEnv: process.env.NODE_ENV,
       apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || '/api',
       questifyVersion: '4.1.3',
-      aiModels: aiModelConfig.models,
-      aiModelDefaultId: aiModelConfig.defaultModelId,
+      aiModels: normalizedAiModels,
+      aiModelDefaultId,
       imageMaxSizeBytes,
       imageTotalMaxBytes,
       features: {

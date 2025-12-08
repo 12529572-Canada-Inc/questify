@@ -34,4 +34,15 @@ describe('loadModelConfig', () => {
       warnSpy.mockRestore()
     }
   })
+
+  it('prefers an enabled default when an explicit default is disabled', () => {
+    const json = JSON.stringify([
+      { ...loadModelConfig().models[0], id: 'disabled', enabled: false, default: true },
+      { ...loadModelConfig().models[1], id: 'enabled', enabled: true, default: false },
+    ])
+
+    const config = loadModelConfig({ jsonOverride: json })
+
+    expect(config.defaultModelId).toBe('enabled')
+  })
 })
