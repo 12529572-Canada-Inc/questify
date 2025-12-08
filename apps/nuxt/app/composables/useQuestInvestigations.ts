@@ -21,7 +21,7 @@ export function useQuestInvestigations(options: {
   questModelType?: MaybeRef<string | null>
 }) {
   const { investigateTask, todoTasks, completedTasks, questModelType } = options
-  const { models: modelOptions, findModelById } = useAiModels()
+  const { models: modelOptions, findModelById, defaultModel } = useAiModels()
 
   const investigationError = ref<string | null>(null)
   const investigatingTaskIds = ref<Set<string>>(new Set())
@@ -33,7 +33,7 @@ export function useQuestInvestigations(options: {
   const investigationImages = ref<string[]>([])
   const investigationTargetTask = ref<TaskWithInvestigations | null>(null)
   const questModel = computed(() => unref(questModelType) ?? null)
-  const investigationModelType = ref(findModelById(questModel.value)?.id ?? findModelById(null)?.id ?? 'gpt-4o-mini')
+  const investigationModelType = ref((findModelById(questModel.value) ?? defaultModel.value)?.id ?? '')
 
   const allTasks = computed(() => [...unref(todoTasks), ...unref(completedTasks)])
 
@@ -50,7 +50,7 @@ export function useQuestInvestigations(options: {
     investigationPrompt.value = ''
     investigationImages.value = []
     investigationDialogError.value = null
-    investigationModelType.value = findModelById(questModel.value)?.id ?? findModelById(null)?.id ?? investigationModelType.value
+    investigationModelType.value = (findModelById(questModel.value) ?? defaultModel.value)?.id ?? investigationModelType.value
     investigationDialogOpen.value = true
   }
 
@@ -78,6 +78,12 @@ export function useQuestInvestigations(options: {
       return
     }
 
+    const selectedModel = findModelById(investigationModelType.value)
+    if (!selectedModel) {
+      investigationDialogError.value = 'No AI models are configured for this environment.'
+      return
+    }
+
     const taskId = investigationTargetTask.value.id
     const prompt = investigationPrompt.value.trim()
 
@@ -100,7 +106,7 @@ export function useQuestInvestigations(options: {
     try {
       await investigateTask(taskId, {
         prompt,
-        modelType: investigationModelType.value,
+        modelType: selectedModel.id,
         images: investigationImages.value,
       })
       investigationDialogOpen.value = false
@@ -145,7 +151,7 @@ export function useQuestInvestigations(options: {
 
   watch(questModel, (next) => {
     if (!investigationDialogOpen.value) {
-      investigationModelType.value = findModelById(next)?.id ?? investigationModelType.value
+      investigationModelType.value = (findModelById(next) ?? defaultModel.value)?.id ?? investigationModelType.value
     }
   }, { immediate: true })
 

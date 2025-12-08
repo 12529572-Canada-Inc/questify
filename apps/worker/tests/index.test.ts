@@ -363,16 +363,16 @@ describe('worker entrypoint', () => {
   it('uses anthropic models when configured', async () => {
     loadModelConfigMock.mockReturnValue({
       models: [{
-        id: 'claude-3',
-        label: 'Claude',
+        id: 'claude-3.5-sonnet',
+        label: 'Claude 3.5 Sonnet',
         provider: 'anthropic',
         providerLabel: 'Anthropic',
         description: '',
         tags: [],
-        apiModel: 'claude-3',
+        apiModel: 'claude-3-5-sonnet-20241022',
         default: true,
       }],
-      defaultModelId: 'claude-3',
+      defaultModelId: 'claude-3.5-sonnet',
       source: 'default',
     });
     Object.assign(configMock, {
@@ -401,6 +401,58 @@ describe('worker entrypoint', () => {
     } as never);
 
     expect(fetchSpy).toHaveBeenCalledWith('https://api.anthropic.com/v1/messages', expect.any(Object));
+  });
+
+  it('marks quests failed when the anthropic API responds with an error', async () => {
+    loadModelConfigMock.mockReturnValue({
+      models: [{
+        id: 'claude-3.5-sonnet',
+        label: 'Claude 3.5 Sonnet',
+        provider: 'anthropic',
+        providerLabel: 'Anthropic',
+        description: '',
+        tags: [],
+        apiModel: 'claude-3-5-sonnet-20241022',
+        default: true,
+      }],
+      defaultModelId: 'claude-3.5-sonnet',
+      source: 'default',
+    });
+    Object.assign(configMock, {
+      openaiApiKey: '',
+      deepseekApiKey: '',
+      anthropicApiKey: 'anthropic-key',
+    });
+    parseJsonFromModelMock.mockReturnValue([]);
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+    fetchSpy.mockResolvedValueOnce({
+      ok: false,
+      statusText: 'Bad Request',
+      text: async () => 'anthropic failure',
+      json: async () => ({}),
+    } as unknown as Response);
+
+    await importWorker();
+    const processor = WorkerMock.mock.calls[0][1];
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    await processor({
+      name: 'decompose',
+      data: {
+        questId: 'quest-anthropic-error',
+        title: 'Anthropic Failure',
+      },
+    } as never);
+
+    expect(fetchSpy).toHaveBeenCalledWith('https://api.anthropic.com/v1/messages', expect.any(Object));
+    expect(questUpdateMock).toHaveBeenCalledWith({
+      where: { id: 'quest-anthropic-error' },
+      data: { status: QUEST_STATUS.failed },
+    });
+    expect(parseJsonFromModelMock).not.toHaveBeenCalled();
+
+    errorSpy.mockRestore();
+    fetchSpy.mockRestore();
   });
 
   it('marks quests as failed when decomposition throws', async () => {
@@ -719,16 +771,16 @@ describe('worker entrypoint', () => {
   it('marks quest failed when anthropic key is missing for anthropic model', async () => {
     loadModelConfigMock.mockReturnValue({
       models: [{
-        id: 'claude-3',
-        label: 'Claude',
+        id: 'claude-3.5-sonnet',
+        label: 'Claude 3.5 Sonnet',
         provider: 'anthropic',
         providerLabel: 'Anthropic',
         description: '',
         tags: [],
-        apiModel: 'claude-3',
+        apiModel: 'claude-3-5-sonnet-20241022',
         default: true,
       }],
-      defaultModelId: 'claude-3',
+      defaultModelId: 'claude-3.5-sonnet',
       source: 'default',
     });
     Object.assign(configMock, {

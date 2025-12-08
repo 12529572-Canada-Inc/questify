@@ -45,6 +45,14 @@ const redirectPath = computed(() => {
   return '/dashboard'
 })
 
+const loginPath = computed(() => {
+  const raw = route.query.redirectTo
+  if (typeof raw === 'string' && raw.startsWith('/')) {
+    return `/auth/login?redirectTo=${encodeURIComponent(raw)}`
+  }
+  return '/auth/login'
+})
+
 if (import.meta.client) {
   watch(loggedIn, (value) => {
     if (value && !hasNavigatedAfterAuth.value) {
@@ -125,7 +133,7 @@ const providerLabels: Record<OAuthProvider, string> = {
     :loading="loading"
     :error="error"
     switch-label="Already have an account? Log in"
-    switch-to="/auth/login"
+    :switch-to="loginPath"
     @submit="submit"
   >
     <v-text-field

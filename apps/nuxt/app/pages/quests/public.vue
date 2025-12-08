@@ -278,7 +278,7 @@ const errorMessage = computed(() => {
         cols="12"
         md="8"
       >
-        <h1 class="text-h4 font-weight-bold text-white mb-2">
+        <h1 class="text-h4 font-weight-bold mb-2">
           Public Quests
         </h1>
         <p class="result-summary">
@@ -402,7 +402,7 @@ const errorMessage = computed(() => {
         color="primary"
         class="mb-3"
       />
-      <h2 class="text-h6 text-white mb-2">
+      <h2 class="text-h6 mb-2">
         No quests match your filters yet
       </h2>
       <p class="text-body-2 text-medium-emphasis mb-4">
@@ -462,7 +462,5 @@ const errorMessage = computed(() => {
 
 .result-summary {
   font-size: 1rem;
-  /* TODO: Update color to match design */
-  color: white;
 }
 </style>
