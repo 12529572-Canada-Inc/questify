@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Stay tuned for upcoming features and improvements!
+
+---
+
+## [1.17.0] - 2025-12-07
+
 ### 🛠 Fixes
 - Model selectors now disable providers missing API keys so quests and investigations can't be submitted with unconfigured AI models for the current deployment.
 - Improved theme handling: profile-selected light/dark/auto preferences now apply instantly across the app, and dark mode uses higher-contrast tokens (background/surfaces, on-surface text, outlines, and accents) for better readability.
