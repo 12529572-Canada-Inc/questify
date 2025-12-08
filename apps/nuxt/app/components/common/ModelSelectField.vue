@@ -119,7 +119,7 @@ watch(
     >
       <div class="model-select-field__tags">
         <v-chip
-          v-for="tag in selectedModel?.tags ?? []"
+          v-for="tag in selectedModel.tags"
           :key="tag"
           size="small"
           label
@@ -129,7 +129,7 @@ watch(
         </v-chip>
       </div>
       <p class="text-body-2 text-medium-emphasis mb-0">
-        {{ selectedModel?.description }}
+        {{ selectedModel.description }}
       </p>
     </div>
   </div>
