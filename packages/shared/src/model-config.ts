@@ -72,8 +72,8 @@ export function loadModelConfig(options: LoadOptions = {}): ModelConfigResult {
   const enabledModels = models.filter(model => model.enabled !== false)
   const defaultModelId = (
     enabledModels.find(model => model.default)
-    ?? models.find(model => model.default)
     ?? enabledModels[0]
+    ?? models.find(model => model.default)
     ?? models[0]
   )?.id ?? DEFAULT_MODEL_ID
 
