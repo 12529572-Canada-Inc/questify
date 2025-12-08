@@ -54,8 +54,8 @@ export function useQuestForm(options: UseQuestFormOptions = {}) {
   watch(defaultModel, (next) => {
     if (!next) return
     const selected = findModelById(modelType.value)
-    if (!selected || modelType.value !== selected.id) {
-      modelType.value = selected?.id ?? next.id
+    if (!selected) {
+      modelType.value = next.id
     }
   })
 
