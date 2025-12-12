@@ -21,6 +21,17 @@ export function useModelPersonas() {
   )
 
   const { data, pending, error, refresh } = useAsyncData<PersonasResponse>('model-personas', async () => {
+    if (!featureEnabled) {
+      const fallbackPersonas = mergePersonasWithModels([], models.value)
+      const recommendedFallback = fallbackPersonas.find(persona => persona.enabled !== false) ?? fallbackPersonas[0]
+      return {
+        featureEnabled,
+        variant,
+        personas: fallbackPersonas,
+        recommendedKey: recommendedFallback?.key ?? null,
+      }
+    }
+
     const payload = await $fetch<PersonasResponse>('/api/models/personas').catch(() => null)
     if (payload?.personas?.length) {
       return payload
