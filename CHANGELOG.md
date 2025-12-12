@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Stay tuned for upcoming features and improvements!
+### 🚀 Features
+- Introduced feature-flagged AI Model Personas with Prisma-backed metadata, a Nuxt personas API, telemetry events, and a new persona selector UI for quest creation/investigations (includes recommended defaults, disabled states, and fallback chips).
 
 ---
 
