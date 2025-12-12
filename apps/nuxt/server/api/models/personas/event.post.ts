@@ -1,4 +1,4 @@
-import { recordModelPersonaEvent, type PersonaTelemetryAttributes } from '../../utils/persona-telemetry'
+import { recordModelPersonaEvent, type PersonaTelemetryAttributes } from '../../../utils/persona-telemetry'
 
 const allowedEvents = new Set([
   'model_persona_viewed',
