@@ -18,6 +18,7 @@ const props = withDefaults(defineProps<{
 
 const runtimeConfig = useRuntimeConfig()
 const environment = runtimeConfig.public.appEnv || 'local'
+const nuxtApp = (globalThis as typeof globalThis & { useNuxtApp?: () => { $fetch?: typeof $fetch } }).useNuxtApp?.()
 
 const {
   personas,
@@ -104,7 +105,10 @@ function formatContext(context: PersonaWithModel['contextLength']) {
 
 async function trackEvent(eventName: string, persona: PersonaWithModel | null) {
   if (!showPersonaUi.value || !persona) return
-  await $fetch('/api/models/personas/event', {
+  const fetcher = nuxtApp?.$fetch ?? (globalThis as typeof globalThis & { $fetch?: typeof $fetch }).$fetch
+  if (!fetcher) return
+
+  const result = fetcher('/api/models/personas/event', {
     method: 'POST',
     body: {
       event: eventName,
@@ -116,7 +120,9 @@ async function trackEvent(eventName: string, persona: PersonaWithModel | null) {
         environment,
       },
     },
-  }).catch(() => null)
+  })
+
+  await Promise.resolve(result).catch(() => null)
 }
 
 async function handleHover(persona: PersonaWithModel) {

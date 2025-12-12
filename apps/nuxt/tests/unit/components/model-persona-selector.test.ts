@@ -55,6 +55,8 @@ vi.mock('~/composables/useModelPersonas', () => {
 })
 
 const originalRuntimeConfig = (globalThis as typeof globalThis & { useRuntimeConfig?: () => unknown }).useRuntimeConfig
+const originalFetch = (globalThis as typeof globalThis & { $fetch?: unknown }).$fetch
+const originalUseNuxtApp = (globalThis as typeof globalThis & { useNuxtApp?: unknown }).useNuxtApp
 
 describe('ModelPersonaSelector', () => {
   beforeEach(() => {
@@ -68,6 +70,8 @@ describe('ModelPersonaSelector', () => {
         },
       },
     })))
+    Reflect.set(globalThis, '$fetch', vi.fn())
+    Reflect.set(globalThis, 'useNuxtApp', vi.fn(() => ({ $fetch: (globalThis as typeof globalThis & { $fetch?: unknown }).$fetch })))
   })
 
   afterEach(() => {
@@ -76,6 +80,18 @@ describe('ModelPersonaSelector', () => {
     }
     else {
       Reflect.deleteProperty(globalThis, 'useRuntimeConfig')
+    }
+    if (originalFetch) {
+      Reflect.set(globalThis, '$fetch', originalFetch)
+    }
+    else {
+      Reflect.deleteProperty(globalThis, '$fetch')
+    }
+    if (originalUseNuxtApp) {
+      Reflect.set(globalThis, 'useNuxtApp', originalUseNuxtApp)
+    }
+    else {
+      Reflect.deleteProperty(globalThis, 'useNuxtApp')
     }
   })
 
@@ -101,14 +117,12 @@ describe('ModelPersonaSelector', () => {
 
   it('sends telemetry when a persona is selected', async () => {
     const telemetryMock = vi.fn()
+    Reflect.set(globalThis, '$fetch', telemetryMock)
     const wrapper = mountWithBase(ModelPersonaSelector, {
       props: { models: defaultAiModels },
       global: {
         stubs: {
           VTooltip: true,
-        },
-        mocks: {
-          $fetch: telemetryMock,
         },
       },
     })
