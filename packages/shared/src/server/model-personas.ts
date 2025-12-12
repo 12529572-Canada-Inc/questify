@@ -1,4 +1,4 @@
-import type { AiModelOption } from '../ai-models'
+import type { AiModelOption, AiProvider } from '../ai-models'
 import {
   defaultModelPersonas,
   mergePersonasWithModels,
@@ -21,6 +21,7 @@ export async function loadModelPersonas(): Promise<ModelPersona[]> {
 
     return sanitizeModelPersonas(records.map(record => ({
       ...record,
+      provider: record.provider as AiProvider,
       enabled: record.active,
     })))
   }

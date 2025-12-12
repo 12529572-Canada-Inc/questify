@@ -1,4 +1,4 @@
-import { recordModelPersonaEvent, type PersonaTelemetryAttributes } from '~/server/utils/persona-telemetry'
+import { recordModelPersonaEvent, type PersonaTelemetryAttributes } from '../../utils/persona-telemetry'
 
 const allowedEvents = new Set([
   'model_persona_viewed',
@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
 
   if (!eventName || !allowedEvents.has(eventName)) {
     throw createError({
-      statusCode: 400,
+      status: 400,
       statusMessage: 'Invalid persona event',
     })
   }
@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
   const attrs = body?.attributes ?? {}
   if (!attrs.personaKey || typeof attrs.personaKey !== 'string') {
     throw createError({
-      statusCode: 400,
+      status: 400,
       statusMessage: 'Missing persona key',
     })
   }
