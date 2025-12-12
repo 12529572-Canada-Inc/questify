@@ -5,43 +5,41 @@ import { defaultAiModels } from 'shared/ai-models'
 import ModelPersonaSelector from '../../../app/components/common/ModelPersonaSelector.vue'
 import { mountWithBase } from '../support/mount-options'
 
-const personasFixture: PersonaWithModel[] = [
-  {
-    key: 'swift-scout',
-    name: 'Swift Scout',
-    tagline: 'Fast drafts',
-    bestFor: ['Brainstorm', 'Summaries'],
-    speed: 'fastest',
-    cost: 'low',
-    contextLength: 'short',
-    provider: 'openai',
-    modelId: 'gpt-4o-mini',
-    modelLabel: 'GPT-4o mini',
-    providerLabel: 'OpenAI',
-    tags: ['fast'],
-    recommended: true,
-    recommendedReason: 'Fast and low-cost for drafts and quick replies.',
-    enabled: true,
-  },
-  {
-    key: 'strategist',
-    name: 'Strategist',
-    tagline: 'Reasoning heavy',
-    bestFor: ['Plans'],
-    speed: 'fast',
-    cost: 'high',
-    contextLength: 'long',
-    provider: 'openai',
-    modelId: 'gpt-4.1',
-    modelLabel: 'GPT-4.1',
-    providerLabel: 'OpenAI',
-    tags: ['reasoning'],
-    enabled: true,
-  },
-]
-
 vi.mock('~/composables/useModelPersonas', () => {
-  const personas = ref<PersonaWithModel[]>(personasFixture)
+  const personas = ref<PersonaWithModel[]>([
+    {
+      key: 'swift-scout',
+      name: 'Swift Scout',
+      tagline: 'Fast drafts',
+      bestFor: ['Brainstorm', 'Summaries'],
+      speed: 'fastest',
+      cost: 'low',
+      contextLength: 'short',
+      provider: 'openai',
+      modelId: 'gpt-4o-mini',
+      modelLabel: 'GPT-4o mini',
+      providerLabel: 'OpenAI',
+      tags: ['fast'],
+      recommended: true,
+      recommendedReason: 'Fast and low-cost for drafts and quick replies.',
+      enabled: true,
+    },
+    {
+      key: 'strategist',
+      name: 'Strategist',
+      tagline: 'Reasoning heavy',
+      bestFor: ['Plans'],
+      speed: 'fast',
+      cost: 'high',
+      contextLength: 'long',
+      provider: 'openai',
+      modelId: 'gpt-4.1',
+      modelLabel: 'GPT-4.1',
+      providerLabel: 'OpenAI',
+      tags: ['reasoning'],
+      enabled: true,
+    },
+  ])
   const recommendedKey = ref('swift-scout')
   return {
     useModelPersonas: () => ({
