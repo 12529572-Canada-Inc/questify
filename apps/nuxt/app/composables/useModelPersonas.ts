@@ -1,6 +1,5 @@
 import { computed } from 'vue'
-import type { AiModelOption } from 'shared/ai-models'
-import { defaultAiModels } from 'shared/ai-models'
+import { defaultAiModels, type AiModelOption } from 'shared/ai-models'
 import { mergePersonasWithModels, type PersonaWithModel } from 'shared/model-personas'
 
 type PersonasResponse = {

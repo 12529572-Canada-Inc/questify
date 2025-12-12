@@ -29,3 +29,5 @@ export async function loadModelPersonas(): Promise<ModelPersona[]> {
     return [...defaultModelPersonas]
   }
 }
+
+export { mergePersonasWithModels }
