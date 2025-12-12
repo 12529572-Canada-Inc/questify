@@ -1,6 +1,49 @@
 import { hashPassword, prisma } from 'shared/server'
+import { defaultModelPersonas } from 'shared'
 import fs from 'fs';
 import { ensureSuperAdmin, syncPrivilegesAndRoles } from './utils/accessControl'
+
+async function seedModelPersonas() {
+  console.log('🎭 Seeding model personas...')
+  for (const persona of defaultModelPersonas) {
+    await prisma.modelPersona.upsert({
+      where: { key: persona.key },
+      update: {
+        name: persona.name,
+        tagline: persona.tagline,
+        avatarUrl: persona.avatarUrl ?? null,
+        bestFor: persona.bestFor,
+        speed: persona.speed,
+        cost: persona.cost,
+        contextLength: persona.contextLength,
+        provider: persona.provider,
+        modelId: persona.modelId,
+        notes: persona.notes ?? null,
+        infoUrl: persona.infoUrl ?? null,
+        recommended: Boolean(persona.recommended),
+        recommendedReason: persona.recommendedReason ?? null,
+        active: persona.active !== false,
+      },
+      create: {
+        key: persona.key,
+        name: persona.name,
+        tagline: persona.tagline,
+        avatarUrl: persona.avatarUrl ?? null,
+        bestFor: persona.bestFor,
+        speed: persona.speed,
+        cost: persona.cost,
+        contextLength: persona.contextLength,
+        provider: persona.provider,
+        modelId: persona.modelId,
+        notes: persona.notes ?? null,
+        infoUrl: persona.infoUrl ?? null,
+        recommended: Boolean(persona.recommended),
+        recommendedReason: persona.recommendedReason ?? null,
+        active: persona.active !== false,
+      },
+    })
+  }
+}
 
 async function main() {
   console.log("🌱 Seeding database...")
@@ -24,6 +67,8 @@ async function main() {
 
   console.log("🔐 Ensuring Super Admin exists...")
   await ensureSuperAdmin(prisma)
+
+  await seedModelPersonas()
 
   // Check if there are existing quests
   const existingQuests = await prisma.quest.count()
