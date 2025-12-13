@@ -264,13 +264,14 @@ export function mergePersonasWithModels(personas: ModelPersona[], models: AiMode
     const model = normalizedModels.find(item => item.id === persona.modelId)
     const disabledReason = persona.disabledReason
       ?? (!model ? 'Model not configured' : model.enabled === false ? 'Provider not configured' : null)
+    const enabled = Boolean(model) && persona.active !== false && persona.enabled !== false && model.enabled !== false
 
     personasByModel.set(persona.modelId, {
       ...persona,
       modelLabel: model?.label ?? persona.modelId,
       providerLabel: model?.providerLabel ?? persona.provider,
       tags: model?.tags ?? [],
-      enabled: persona.active !== false && persona.enabled !== false && model?.enabled !== false,
+      enabled,
       disabledReason,
     })
   }
