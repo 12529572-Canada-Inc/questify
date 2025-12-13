@@ -179,16 +179,11 @@ async function selectPersona(persona: PersonaWithModel) {
         We could not load persona metadata. Falling back to available models.
       </v-alert>
 
-      <v-row
-        class="persona-grid"
-        dense
-      >
-        <v-col
+      <div class="persona-grid">
+        <div
           v-for="persona in personas"
           :key="persona.key"
-          cols="12"
-          sm="6"
-          md="4"
+          class="persona-grid__item"
         >
           <v-card
             :elevation="isSelected(persona) ? 6 : 1"
@@ -347,8 +342,8 @@ async function selectPersona(persona: PersonaWithModel) {
               </p>
             </div>
           </v-card>
-        </v-col>
-      </v-row>
+        </div>
+      </div>
 
       <div
         v-if="loading"
@@ -374,6 +369,7 @@ async function selectPersona(persona: PersonaWithModel) {
 
 .persona-card {
   height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -461,5 +457,15 @@ async function selectPersona(persona: PersonaWithModel) {
     flex-direction: column;
     align-items: flex-start;
   }
+}
+
+.persona-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 12px;
+}
+
+.persona-grid__item {
+  min-width: 0;
 }
 </style>
