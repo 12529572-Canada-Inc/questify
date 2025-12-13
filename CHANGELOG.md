@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🚀 Features
 - Introduced feature-flagged AI Model Personas with Prisma-backed metadata, a Nuxt personas API, telemetry events, and a new persona selector UI for quest creation/investigations (includes recommended defaults, disabled states, and fallback chips).
+- Persona chooser now shows the selected persona inline and moves the rest into a modal grid that auto-fits to the container, preventing card text from being clipped while keeping the page uncluttered.
+
+### 🧰 Maintenance
+- Documented `NUXT_FEATURE_MODEL_PERSONAS` and `NUXT_MODEL_PERSONA_VARIANT` (control | pilot | full) in `apps/nuxt/.env.example`.
+- Dropped the `updatedAt` default on `ModelPersona` to rely on application-driven timestamps.
 
 ---
 
