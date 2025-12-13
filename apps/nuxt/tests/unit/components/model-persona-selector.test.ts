@@ -129,9 +129,10 @@ describe('ModelPersonaSelector', () => {
     })
 
     await nextTick()
-    const changeButton = wrapper.findAll('button').find(btn => btn.text().includes('Change persona'))
-    expect(changeButton).toBeTruthy()
-    await changeButton!.trigger('click')
+    const selectedCard = wrapper.find('.selected-persona .persona-card')
+    expect(selectedCard.exists()).toBe(true)
+    await selectedCard.trigger('click')
+    await nextTick()
 
     const dialogCard = wrapper.findAll('.persona-grid__item .persona-card')[0]
     expect(dialogCard).toBeTruthy()

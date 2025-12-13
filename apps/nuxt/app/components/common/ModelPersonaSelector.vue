@@ -86,6 +86,11 @@ function isSelected(persona: PersonaWithModel) {
   return persona.modelId === modelValue.value
 }
 
+function openDialog() {
+  if (props.disabled) return
+  dialogOpen.value = true
+}
+
 function formatSpeed(speed: PersonaWithModel['speed']) {
   if (speed === 'fastest') return 'Speed: Fastest'
   if (speed === 'faster') return 'Speed: Faster'
@@ -194,6 +199,7 @@ async function selectPersona(persona: PersonaWithModel) {
           ]"
           elevation="4"
           variant="outlined"
+          @click="openDialog"
         >
           <div class="persona-card__header">
             <div class="persona-card__identity">
@@ -289,10 +295,10 @@ async function selectPersona(persona: PersonaWithModel) {
             </div>
           </div>
 
-          <div class="persona-card__footer">
-            <div class="persona-card__meta">
-              <span class="text-caption text-medium-emphasis">
-                {{ selectedPersona.providerLabel ?? selectedPersona.provider }} • {{ selectedPersona.modelLabel ?? selectedPersona.modelId }}
+        <div class="persona-card__footer">
+          <div class="persona-card__meta">
+            <span class="text-caption text-medium-emphasis">
+              {{ selectedPersona.providerLabel ?? selectedPersona.provider }} • {{ selectedPersona.modelLabel ?? selectedPersona.modelId }}
               </span>
               <v-tooltip
                 text="Provider and model details"
@@ -342,16 +348,6 @@ async function selectPersona(persona: PersonaWithModel) {
             </p>
           </div>
         </v-card>
-
-        <div class="persona-selector__actions">
-          <v-btn
-            variant="tonal"
-            color="primary"
-            @click="dialogOpen = true"
-          >
-            Change persona
-          </v-btn>
-        </div>
       </div>
 
       <v-dialog
@@ -572,11 +568,6 @@ async function selectPersona(persona: PersonaWithModel) {
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-
-.persona-selector__actions {
-  display: flex;
-  justify-content: flex-end;
 }
 
 .persona-card {
