@@ -27,20 +27,22 @@ export default defineEventHandler(async (event) => {
   if (!eventName || !allowedEvents.has(eventName)) {
     throw createError({
       status: 400,
-      statusMessage: 'Invalid persona event',
+      statusText: 'Invalid persona event',
     })
   }
 
-  const attrs = body?.attributes ?? {}
-  if (!attrs.personaKey || typeof attrs.personaKey !== 'string') {
+  const attrs = (body?.attributes ?? {}) as Partial<PersonaTelemetryAttributes>
+  const personaKey = typeof attrs.personaKey === 'string' ? attrs.personaKey.trim() : ''
+
+  if (!personaKey) {
     throw createError({
       status: 400,
-      statusMessage: 'Missing persona key',
+      statusText: 'Missing persona key',
     })
   }
 
   recordModelPersonaEvent(eventName as any, {
-    personaKey: attrs.personaKey.trim(),
+    personaKey,
     provider: attrs.provider,
     modelId: attrs.modelId,
     surface: attrs.surface,
