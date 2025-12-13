@@ -9,6 +9,7 @@ describe('server/api/models/personas/event.post', () => {
   type HandlerEvent = Parameters<typeof handler>[0]
 
   beforeEach(() => {
+    vi.restoreAllMocks()
     Reflect.set(globalStore, 'useRuntimeConfig', () => ({
       public: { features: { modelPersonas: true } },
     }))
