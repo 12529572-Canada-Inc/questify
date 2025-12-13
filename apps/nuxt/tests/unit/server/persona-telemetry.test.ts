@@ -6,7 +6,7 @@ const TELEMETRY_KEY = Symbol.for('questify.telemetry.modelPersonas')
 describe('server/utils/persona-telemetry', () => {
   beforeEach(() => {
     const globalStore = globalThis as typeof globalThis & { [key: symbol]: unknown }
-    delete globalStore[TELEMETRY_KEY]
+    globalStore[TELEMETRY_KEY] = undefined
   })
 
   it('tracks totals and dimension buckets', () => {

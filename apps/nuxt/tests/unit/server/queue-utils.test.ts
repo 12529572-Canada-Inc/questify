@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { NitroApp } from 'nitropack'
 import { setupQueue } from '../../../server/utils/queue'
 import { parseRedisUrl } from 'shared/server'
 
@@ -12,24 +13,26 @@ vi.mock('shared/server', () => ({
 
 describe('server/utils/queue', () => {
   const originalEnv = process.env.NODE_ENV
-  const originalRuntimeConfig = globalThis.useRuntimeConfig
+  const globalStore = globalThis as typeof globalThis & { useRuntimeConfig?: () => unknown }
+  const originalRuntimeConfig = globalStore.useRuntimeConfig
+  type TestEvent = { context: Record<string, unknown> }
 
   beforeEach(() => {
     process.env.NODE_ENV = 'development'
-    globalThis.useRuntimeConfig = () => ({
+    Reflect.set(globalStore, 'useRuntimeConfig', () => ({
       redis: { url: 'redis://localhost:6379', host: 'localhost', port: 6379, password: '', tls: false },
-    })
+    }))
   })
 
   afterEach(() => {
     process.env.NODE_ENV = originalEnv
-    if (originalRuntimeConfig) globalThis.useRuntimeConfig = originalRuntimeConfig
+    if (originalRuntimeConfig) Reflect.set(globalStore, 'useRuntimeConfig', originalRuntimeConfig)
   })
 
   it('skips queue setup in test environments', () => {
     process.env.NODE_ENV = 'test'
     const hook = vi.fn()
-    const nitroApp = { hooks: { hook } } as any
+    const nitroApp = { hooks: { hook } } as unknown as NitroApp
     const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
 
     setupQueue({ nitroApp, queueName: 'test-queue', contextKey: 'questQueue', label: 'Quest' })
@@ -40,9 +43,9 @@ describe('server/utils/queue', () => {
   })
 
   it('attaches queue to nitro context when enabled', () => {
-    const event = { context: {} }
-    const hook = vi.fn((name: string, cb: (event: any) => void) => cb(event))
-    const nitroApp = { hooks: { hook } } as any
+    const event: TestEvent = { context: {} }
+    const hook = vi.fn((name: string, cb: (event: TestEvent) => void) => cb(event))
+    const nitroApp = { hooks: { hook } } as unknown as NitroApp
 
     setupQueue({ nitroApp, queueName: 'quest-queue', contextKey: 'questQueue', label: 'Quest' })
 
@@ -51,14 +54,14 @@ describe('server/utils/queue', () => {
   })
 
   it('builds queue connection from config when redis url is not parsed', () => {
-    vi.mocked(parseRedisUrl).mockReturnValueOnce(null as any)
-    const event = { context: {} as Record<string, any> }
-    const hook = vi.fn((name: string, cb: (event: any) => void) => cb(event))
-    const nitroApp = { hooks: { hook } } as any
+    vi.mocked(parseRedisUrl).mockReturnValueOnce(null)
+    const event: TestEvent = { context: {} }
+    const hook = vi.fn((name: string, cb: (event: TestEvent) => void) => cb(event))
+    const nitroApp = { hooks: { hook } } as unknown as NitroApp
 
     setupQueue({ nitroApp, queueName: 'task-queue', contextKey: 'taskQueue', label: 'Task' })
 
-    const assigned = event.context.taskQueue
+    const assigned = event.context.taskQueue as { options: { connection: { host: string } } }
     expect(assigned.options.connection.host).toBe('localhost')
   })
 })

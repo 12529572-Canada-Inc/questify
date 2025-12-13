@@ -25,10 +25,12 @@ vi.mock('shared/server', async () => {
 })
 
 describe('server/api/models/personas.get', () => {
-  const originalRuntimeConfig = globalThis.useRuntimeConfig
+  const globalStore = globalThis as typeof globalThis & { useRuntimeConfig?: () => unknown }
+  const originalRuntimeConfig = globalStore.useRuntimeConfig
+  type HandlerEvent = Parameters<typeof handler>[0]
 
   beforeEach(() => {
-    globalThis.useRuntimeConfig = () => ({
+    Reflect.set(globalStore, 'useRuntimeConfig', () => ({
       aiModels: undefined,
       public: {
         aiModels: [],
@@ -37,11 +39,11 @@ describe('server/api/models/personas.get', () => {
           modelPersonasVariant: 'pilot',
         },
       },
-    })
+    }))
   })
 
   afterEach(() => {
-    if (originalRuntimeConfig) globalThis.useRuntimeConfig = originalRuntimeConfig
+    if (originalRuntimeConfig) Reflect.set(globalStore, 'useRuntimeConfig', originalRuntimeConfig)
   })
 
   it('returns merged personas with defaults and recommended key', async () => {
@@ -60,7 +62,7 @@ describe('server/api/models/personas.get', () => {
       },
     ])
 
-    const result = await handler({} as any)
+    const result = await handler({} as HandlerEvent)
 
     expect(result.featureEnabled).toBe(true)
     expect(result.variant).toBe('pilot')
@@ -70,7 +72,7 @@ describe('server/api/models/personas.get', () => {
 
   it('uses provided aiModels when present', async () => {
     const customModels = defaultAiModels.slice(0, 1)
-    globalThis.useRuntimeConfig = () => ({
+    Reflect.set(globalStore, 'useRuntimeConfig', () => ({
       aiModels: customModels,
       public: {
         aiModels: customModels,
@@ -79,9 +81,9 @@ describe('server/api/models/personas.get', () => {
           modelPersonasVariant: 'full',
         },
       },
-    })
+    }))
 
-    const result = await handler({} as any)
+    const result = await handler({} as HandlerEvent)
     const merged = mergePersonasWithModels([{ key: 'test-persona', name: 'Test Persona', tagline: '', bestFor: [], speed: 'fast', cost: 'low', contextLength: 'medium', provider: 'openai', modelId: 'gpt-4o-mini' }], customModels)
 
     expect(result.variant).toBe('full')
@@ -113,7 +115,7 @@ describe('server/api/models/personas.get', () => {
       apiModel: 'gpt-4o',
       enabled: true,
     }]
-    globalThis.useRuntimeConfig = () => ({
+    Reflect.set(globalStore, 'useRuntimeConfig', () => ({
       aiModels: singleModel,
       public: {
         aiModels: singleModel,
@@ -122,9 +124,9 @@ describe('server/api/models/personas.get', () => {
           modelPersonasVariant: 'pilot',
         },
       },
-    })
+    }))
 
-    const result = await handler({} as any)
+    const result = await handler({} as HandlerEvent)
 
     expect(result.recommendedKey).toBe('fallback-persona')
   })

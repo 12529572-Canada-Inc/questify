@@ -3,7 +3,8 @@ import { defaultAiModels } from 'shared/ai-models'
 import { getAiModelOptions, getDefaultModelId, normalizeModelType, getModelMeta } from '../../../server/utils/model-options'
 
 describe('server/utils/model-options', () => {
-  const originalRuntimeConfig = globalThis.useRuntimeConfig
+  const globalStore = globalThis as typeof globalThis & { useRuntimeConfig?: () => unknown }
+  const originalRuntimeConfig = globalStore.useRuntimeConfig
 
   const baseConfig = {
     aiModels: defaultAiModels,
@@ -12,11 +13,11 @@ describe('server/utils/model-options', () => {
   }
 
   afterEach(() => {
-    if (originalRuntimeConfig) globalThis.useRuntimeConfig = originalRuntimeConfig
+    if (originalRuntimeConfig) Reflect.set(globalStore, 'useRuntimeConfig', originalRuntimeConfig)
   })
 
   it('returns enabled models and falls back to defaults when config is empty', () => {
-    globalThis.useRuntimeConfig = () => ({ ...baseConfig, aiModels: [] })
+    Reflect.set(globalStore, 'useRuntimeConfig', () => ({ ...baseConfig, aiModels: [] }))
     const models = getAiModelOptions()
 
     expect(models.length).toBeGreaterThan(0)
@@ -24,26 +25,26 @@ describe('server/utils/model-options', () => {
   })
 
   it('throws when no models are enabled', () => {
-    globalThis.useRuntimeConfig = () => ({
+    Reflect.set(globalStore, 'useRuntimeConfig', () => ({
       ...baseConfig,
       aiModels: defaultAiModels.map(model => ({ ...model, enabled: false })),
-    })
+    }))
 
     expect(() => getAiModelOptions()).toThrow('No AI models are enabled')
   })
 
   it('honors explicit default id and trims values', () => {
-    globalThis.useRuntimeConfig = () => ({
+    Reflect.set(globalStore, 'useRuntimeConfig', () => ({
       ...baseConfig,
       aiModelDefaultId: '  custom-model ',
       aiModels: defaultAiModels,
-    })
+    }))
 
     expect(getDefaultModelId()).toBe('custom-model')
   })
 
   it('normalizes requested model ids with fallbacks and metadata lookup', () => {
-    globalThis.useRuntimeConfig = () => ({ ...baseConfig })
+    Reflect.set(globalStore, 'useRuntimeConfig', () => ({ ...baseConfig }))
     const normalized = normalizeModelType('  gpt-4o ')
     expect(normalized).toBe('gpt-4o')
 
