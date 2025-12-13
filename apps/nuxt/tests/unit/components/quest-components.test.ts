@@ -70,6 +70,7 @@ const vuetifyStubFlags = {
   VProgressCircular: true,
   VSpacer: true,
   ModelSelectField: true,
+  ModelPersonaSelector: true,
   QuestAiSuggestionDialog: true,
 }
 
@@ -368,6 +369,7 @@ describe('quest components', () => {
       global: {
         stubs: {
           ModelSelectField: true,
+          ModelPersonaSelector: true,
         },
       },
     })

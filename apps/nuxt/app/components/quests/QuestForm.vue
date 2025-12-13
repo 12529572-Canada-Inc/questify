@@ -84,9 +84,10 @@ const {
       </v-btn>
     </div>
 
-    <ModelSelectField
+    <ModelPersonaSelector
       v-model="modelType"
       :models="modelOptions"
+      surface="quest-create"
       class="mb-4"
     />
 
