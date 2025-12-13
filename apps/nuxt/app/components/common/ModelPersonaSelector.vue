@@ -295,10 +295,10 @@ async function selectPersona(persona: PersonaWithModel) {
             </div>
           </div>
 
-        <div class="persona-card__footer">
-          <div class="persona-card__meta">
-            <span class="text-caption text-medium-emphasis">
-              {{ selectedPersona.providerLabel ?? selectedPersona.provider }} • {{ selectedPersona.modelLabel ?? selectedPersona.modelId }}
+          <div class="persona-card__footer">
+            <div class="persona-card__meta">
+              <span class="text-caption text-medium-emphasis">
+                {{ selectedPersona.providerLabel ?? selectedPersona.provider }} • {{ selectedPersona.modelLabel ?? selectedPersona.modelId }}
               </span>
               <v-tooltip
                 text="Provider and model details"
@@ -320,7 +320,10 @@ async function selectPersona(persona: PersonaWithModel) {
                   <p class="mb-1">
                     Model ID: {{ selectedPersona.modelId }}
                   </p>
-                  <p v-if="selectedPersona.infoUrl" class="mb-0">
+                  <p
+                    v-if="selectedPersona.infoUrl"
+                    class="mb-0"
+                  >
                     <a
                       :href="selectedPersona.infoUrl"
                       target="_blank"
@@ -500,7 +503,10 @@ async function selectPersona(persona: PersonaWithModel) {
                           <p class="mb-1">
                             Model ID: {{ persona.modelId }}
                           </p>
-                          <p v-if="persona.infoUrl" class="mb-0">
+                          <p
+                            v-if="persona.infoUrl"
+                            class="mb-0"
+                          >
                             <a
                               :href="persona.infoUrl"
                               target="_blank"

@@ -1,5 +1,4 @@
-type PersonaTelemetryEvent =
-  | 'model_persona_viewed'
+type PersonaTelemetryEvent = 'model_persona_viewed'
   | 'model_persona_hovered'
   | 'model_persona_selected'
   | 'model_persona_recommended_shown'

@@ -1,12 +1,20 @@
 import { recordModelPersonaEvent, type PersonaTelemetryAttributes } from '../../../utils/persona-telemetry'
 
-const allowedEvents = new Set([
+const allowedEventNames = [
   'model_persona_viewed',
   'model_persona_hovered',
   'model_persona_selected',
   'model_persona_recommended_shown',
   'model_persona_recommended_accepted',
-])
+] as const
+
+type PersonaEventName = typeof allowedEventNames[number]
+
+const allowedEvents = new Set<PersonaEventName>(allowedEventNames)
+
+function isPersonaEventName(value: string): value is PersonaEventName {
+  return allowedEvents.has(value as PersonaEventName)
+}
 
 type PersonaEventBody = {
   event?: string
@@ -24,7 +32,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody<PersonaEventBody>(event).catch(() => null)
   const eventName = body?.event
 
-  if (!eventName || !allowedEvents.has(eventName)) {
+  if (!eventName || !isPersonaEventName(eventName)) {
     throw createError({
       status: 400,
       statusText: 'Invalid persona event',
@@ -41,7 +49,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  recordModelPersonaEvent(eventName as any, {
+  recordModelPersonaEvent(eventName, {
     personaKey,
     provider: attrs.provider,
     modelId: attrs.modelId,
