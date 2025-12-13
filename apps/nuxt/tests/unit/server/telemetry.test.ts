@@ -63,4 +63,22 @@ describe('server/utils/telemetry', () => {
       },
     })
   })
+
+  it('initializes telemetry store when unset', () => {
+    const telemetryKey = Symbol.for('questify.telemetry.aiAssist')
+    const globalStore = globalThis as typeof globalThis & { [key: symbol]: unknown }
+    globalStore[telemetryKey] = undefined
+
+    const metrics = getAiAssistMetrics()
+
+    expect(metrics).toEqual({
+      total: 0,
+      fields: {
+        title: 0,
+        goal: 0,
+        context: 0,
+        constraints: 0,
+      },
+    })
+  })
 })

@@ -69,9 +69,10 @@ function handleSubmit() {
         Investigate Task
       </v-card-title>
       <v-card-text class="d-flex flex-column gap-4">
-        <ModelSelectField
+        <ModelPersonaSelector
           v-model="modelTypeModel"
           :models="props.models"
+          surface="investigation-dialog"
           :disabled="submitting"
         />
         <div>
