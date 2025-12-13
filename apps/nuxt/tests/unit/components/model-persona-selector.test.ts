@@ -132,8 +132,10 @@ describe('ModelPersonaSelector', () => {
     const changeButton = wrapper.findAll('button').find(btn => btn.text().includes('Change persona'))
     expect(changeButton).toBeTruthy()
     await changeButton!.trigger('click')
+
     const dialogCard = wrapper.findAll('.persona-grid__item .persona-card')[0]
-    await dialogCard.trigger('click')
+    expect(dialogCard).toBeTruthy()
+    await dialogCard?.trigger('click')
 
     expect(telemetryMock).toHaveBeenCalledWith(
       '/api/models/personas/event',
