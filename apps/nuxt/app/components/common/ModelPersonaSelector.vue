@@ -19,6 +19,7 @@ const props = withDefaults(defineProps<{
 const runtimeConfig = useRuntimeConfig()
 const environment = runtimeConfig.public.appEnv || 'local'
 const nuxtApp = (globalThis as typeof globalThis & { useNuxtApp?: () => { $fetch?: typeof $fetch } }).useNuxtApp?.()
+const dialogOpen = ref(false)
 
 const {
   personas,
@@ -133,6 +134,7 @@ async function handleHover(persona: PersonaWithModel) {
 async function selectPersona(persona: PersonaWithModel) {
   if (persona.enabled === false || props.disabled) return
   modelValue.value = persona.modelId
+  dialogOpen.value = false
   await trackEvent('model_persona_selected', persona)
   if (persona.key === recommendedKey.value) {
     await trackEvent('model_persona_recommended_accepted', persona)
@@ -179,171 +181,370 @@ async function selectPersona(persona: PersonaWithModel) {
         We could not load persona metadata. Falling back to available models.
       </v-alert>
 
-      <div class="persona-grid">
-        <div
-          v-for="persona in personas"
-          :key="persona.key"
-          class="persona-grid__item"
+      <div class="selected-persona">
+        <p class="text-body-2 text-medium-emphasis mb-2">
+          Selected persona
+        </p>
+        <v-card
+          v-if="selectedPersona"
+          :class="[
+            'persona-card',
+            'persona-card--selected',
+            { 'persona-card--disabled': selectedPersona.enabled === false || disabled },
+          ]"
+          elevation="4"
+          variant="outlined"
         >
-          <v-card
-            :elevation="isSelected(persona) ? 6 : 1"
-            :class="[
-              'persona-card',
-              { 'persona-card--selected': isSelected(persona), 'persona-card--disabled': persona.enabled === false || disabled },
-            ]"
-            variant="outlined"
-            @click="selectPersona(persona)"
-            @mouseenter="handleHover(persona)"
-          >
-            <div class="persona-card__header">
-              <div class="persona-card__identity">
-                <v-avatar
-                  size="44"
-                  color="primary"
-                  variant="tonal"
-                >
-                  <span class="text-subtitle-1 font-weight-medium">{{ persona.name.charAt(0) }}</span>
-                </v-avatar>
-                <div class="persona-card__title">
-                  <p class="mb-0 text-subtitle-1 text-high-emphasis">
-                    {{ persona.name }}
-                  </p>
-                  <p class="mb-0 text-caption text-medium-emphasis">
-                    {{ persona.tagline || `${persona.providerLabel ?? persona.provider} • ${persona.modelLabel ?? persona.modelId}` }}
-                  </p>
-                </div>
-              </div>
-              <div class="persona-card__chips">
-                <v-chip
-                  v-if="persona.key === recommendedKey"
-                  size="x-small"
-                  color="primary"
-                  variant="flat"
-                  class="text-uppercase font-weight-medium"
-                >
-                  Recommended
-                </v-chip>
-                <v-chip
-                  v-if="persona.enabled === false || disabled"
-                  size="x-small"
-                  color="warning"
-                  variant="tonal"
-                  class="text-uppercase font-weight-medium"
-                >
-                  Unavailable
-                </v-chip>
-              </div>
-            </div>
-
-            <div class="persona-card__body">
-              <div class="persona-card__badges">
-                <v-chip
-                  size="x-small"
-                  variant="tonal"
-                  color="primary"
-                >
-                  {{ formatSpeed(persona.speed) }}
-                </v-chip>
-                <v-chip
-                  size="x-small"
-                  variant="tonal"
-                  color="secondary"
-                >
-                  {{ formatCost(persona.cost) }}
-                </v-chip>
-                <v-chip
-                  size="x-small"
-                  variant="tonal"
-                  color="info"
-                >
-                  {{ formatContext(persona.contextLength) }}
-                </v-chip>
-              </div>
-
-              <ul
-                v-if="persona.bestFor.length"
-                class="persona-card__bestfor"
+          <div class="persona-card__header">
+            <div class="persona-card__identity">
+              <v-avatar
+                size="44"
+                color="primary"
+                variant="tonal"
               >
-                <li
-                  v-for="item in persona.bestFor"
-                  :key="item"
-                >
-                  {{ item }}
-                </li>
-              </ul>
-
-              <div
-                v-else
-                class="persona-card__fallback"
-              >
-                <v-chip
-                  size="small"
-                  label
-                  variant="outlined"
-                >
-                  {{ persona.providerLabel ?? persona.provider }} • {{ persona.modelLabel ?? persona.modelId }}
-                </v-chip>
-                <p class="mb-0 text-body-2 text-medium-emphasis">
-                  Generic provider selection. Detailed persona metadata not available.
+                <span class="text-subtitle-1 font-weight-medium">{{ selectedPersona.name.charAt(0) }}</span>
+              </v-avatar>
+              <div class="persona-card__title">
+                <p class="mb-0 text-subtitle-1 text-high-emphasis">
+                  {{ selectedPersona.name }}
+                </p>
+                <p class="mb-0 text-caption text-medium-emphasis">
+                  {{ selectedPersona.tagline || `${selectedPersona.providerLabel ?? selectedPersona.provider} • ${selectedPersona.modelLabel ?? selectedPersona.modelId}` }}
                 </p>
               </div>
             </div>
-
-            <div class="persona-card__footer">
-              <div class="persona-card__meta">
-                <span class="text-caption text-medium-emphasis">
-                  {{ persona.providerLabel ?? persona.provider }} • {{ persona.modelLabel ?? persona.modelId }}
-                </span>
-                <v-tooltip
-                  text="Provider and model details"
-                  location="top"
-                >
-                  <template #activator="{ props: tooltipProps }">
-                    <v-btn
-                      v-bind="tooltipProps"
-                      icon="mdi-information-outline"
-                      variant="text"
-                      density="comfortable"
-                      size="small"
-                    />
-                  </template>
-                  <div class="text-body-2">
-                    <p class="mb-1">
-                      Provider: {{ persona.providerLabel ?? persona.provider }}
-                    </p>
-                    <p class="mb-1">
-                      Model ID: {{ persona.modelId }}
-                    </p>
-                    <p v-if="persona.infoUrl" class="mb-0">
-                      <a
-                        :href="persona.infoUrl"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Release notes
-                      </a>
-                    </p>
-                  </div>
-                </v-tooltip>
-              </div>
-
-              <p
-                v-if="persona.key === recommendedKey && persona.recommendedReason"
-                class="text-caption text-medium-emphasis mb-0"
+            <div class="persona-card__chips">
+              <v-chip
+                v-if="selectedPersona.key === recommendedKey"
+                size="x-small"
+                color="primary"
+                variant="flat"
+                class="text-uppercase font-weight-medium"
               >
-                Why recommended: {{ persona.recommendedReason }}
-              </p>
-
-              <p
-                v-if="persona.disabledReason"
-                class="text-caption text-error mb-0"
+                Recommended
+              </v-chip>
+              <v-chip
+                v-if="selectedPersona.enabled === false || disabled"
+                size="x-small"
+                color="warning"
+                variant="tonal"
+                class="text-uppercase font-weight-medium"
               >
-                {{ persona.disabledReason }}
+                Unavailable
+              </v-chip>
+            </div>
+          </div>
+
+          <div class="persona-card__body">
+            <div class="persona-card__badges">
+              <v-chip
+                size="x-small"
+                variant="tonal"
+                color="primary"
+              >
+                {{ formatSpeed(selectedPersona.speed) }}
+              </v-chip>
+              <v-chip
+                size="x-small"
+                variant="tonal"
+                color="secondary"
+              >
+                {{ formatCost(selectedPersona.cost) }}
+              </v-chip>
+              <v-chip
+                size="x-small"
+                variant="tonal"
+                color="info"
+              >
+                {{ formatContext(selectedPersona.contextLength) }}
+              </v-chip>
+            </div>
+
+            <ul
+              v-if="selectedPersona.bestFor.length"
+              class="persona-card__bestfor"
+            >
+              <li
+                v-for="item in selectedPersona.bestFor"
+                :key="item"
+              >
+                {{ item }}
+              </li>
+            </ul>
+
+            <div
+              v-else
+              class="persona-card__fallback"
+            >
+              <v-chip
+                size="small"
+                label
+                variant="outlined"
+              >
+                {{ selectedPersona.providerLabel ?? selectedPersona.provider }} • {{ selectedPersona.modelLabel ?? selectedPersona.modelId }}
+              </v-chip>
+              <p class="mb-0 text-body-2 text-medium-emphasis">
+                Generic provider selection. Detailed persona metadata not available.
               </p>
             </div>
-          </v-card>
+          </div>
+
+          <div class="persona-card__footer">
+            <div class="persona-card__meta">
+              <span class="text-caption text-medium-emphasis">
+                {{ selectedPersona.providerLabel ?? selectedPersona.provider }} • {{ selectedPersona.modelLabel ?? selectedPersona.modelId }}
+              </span>
+              <v-tooltip
+                text="Provider and model details"
+                location="top"
+              >
+                <template #activator="{ props: tooltipProps }">
+                  <v-btn
+                    v-bind="tooltipProps"
+                    icon="mdi-information-outline"
+                    variant="text"
+                    density="comfortable"
+                    size="small"
+                  />
+                </template>
+                <div class="text-body-2">
+                  <p class="mb-1">
+                    Provider: {{ selectedPersona.providerLabel ?? selectedPersona.provider }}
+                  </p>
+                  <p class="mb-1">
+                    Model ID: {{ selectedPersona.modelId }}
+                  </p>
+                  <p v-if="selectedPersona.infoUrl" class="mb-0">
+                    <a
+                      :href="selectedPersona.infoUrl"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Release notes
+                    </a>
+                  </p>
+                </div>
+              </v-tooltip>
+            </div>
+
+            <p
+              v-if="selectedPersona.key === recommendedKey && selectedPersona.recommendedReason"
+              class="text-caption text-medium-emphasis mb-0"
+            >
+              Why recommended: {{ selectedPersona.recommendedReason }}
+            </p>
+
+            <p
+              v-if="selectedPersona.disabledReason"
+              class="text-caption text-error mb-0"
+            >
+              {{ selectedPersona.disabledReason }}
+            </p>
+          </div>
+        </v-card>
+
+        <div class="persona-selector__actions">
+          <v-btn
+            variant="tonal"
+            color="primary"
+            @click="dialogOpen = true"
+          >
+            Change persona
+          </v-btn>
         </div>
       </div>
+
+      <v-dialog
+        v-model="dialogOpen"
+        max-width="940"
+        scrollable
+      >
+        <v-card>
+          <v-card-title class="d-flex justify-space-between align-center">
+            <span class="text-subtitle-1">Choose a persona</span>
+            <v-btn
+              icon="mdi-close"
+              variant="text"
+              @click="dialogOpen = false"
+            />
+          </v-card-title>
+          <v-card-text>
+            <div class="persona-grid">
+              <div
+                v-for="persona in personas"
+                :key="persona.key"
+                class="persona-grid__item"
+              >
+                <v-card
+                  :elevation="isSelected(persona) ? 6 : 1"
+                  :class="[
+                    'persona-card',
+                    { 'persona-card--selected': isSelected(persona), 'persona-card--disabled': persona.enabled === false || disabled },
+                  ]"
+                  variant="outlined"
+                  @click="selectPersona(persona)"
+                  @mouseenter="handleHover(persona)"
+                >
+                  <div class="persona-card__header">
+                    <div class="persona-card__identity">
+                      <v-avatar
+                        size="44"
+                        color="primary"
+                        variant="tonal"
+                      >
+                        <span class="text-subtitle-1 font-weight-medium">{{ persona.name.charAt(0) }}</span>
+                      </v-avatar>
+                      <div class="persona-card__title">
+                        <p class="mb-0 text-subtitle-1 text-high-emphasis">
+                          {{ persona.name }}
+                        </p>
+                        <p class="mb-0 text-caption text-medium-emphasis">
+                          {{ persona.tagline || `${persona.providerLabel ?? persona.provider} • ${persona.modelLabel ?? persona.modelId}` }}
+                        </p>
+                      </div>
+                    </div>
+                    <div class="persona-card__chips">
+                      <v-chip
+                        v-if="persona.key === recommendedKey"
+                        size="x-small"
+                        color="primary"
+                        variant="flat"
+                        class="text-uppercase font-weight-medium"
+                      >
+                        Recommended
+                      </v-chip>
+                      <v-chip
+                        v-if="persona.enabled === false || disabled"
+                        size="x-small"
+                        color="warning"
+                        variant="tonal"
+                        class="text-uppercase font-weight-medium"
+                      >
+                        Unavailable
+                      </v-chip>
+                    </div>
+                  </div>
+
+                  <div class="persona-card__body">
+                    <div class="persona-card__badges">
+                      <v-chip
+                        size="x-small"
+                        variant="tonal"
+                        color="primary"
+                      >
+                        {{ formatSpeed(persona.speed) }}
+                      </v-chip>
+                      <v-chip
+                        size="x-small"
+                        variant="tonal"
+                        color="secondary"
+                      >
+                        {{ formatCost(persona.cost) }}
+                      </v-chip>
+                      <v-chip
+                        size="x-small"
+                        variant="tonal"
+                        color="info"
+                      >
+                        {{ formatContext(persona.contextLength) }}
+                      </v-chip>
+                    </div>
+
+                    <ul
+                      v-if="persona.bestFor.length"
+                      class="persona-card__bestfor"
+                    >
+                      <li
+                        v-for="item in persona.bestFor"
+                        :key="item"
+                      >
+                        {{ item }}
+                      </li>
+                    </ul>
+
+                    <div
+                      v-else
+                      class="persona-card__fallback"
+                    >
+                      <v-chip
+                        size="small"
+                        label
+                        variant="outlined"
+                      >
+                        {{ persona.providerLabel ?? persona.provider }} • {{ persona.modelLabel ?? persona.modelId }}
+                      </v-chip>
+                      <p class="mb-0 text-body-2 text-medium-emphasis">
+                        Generic provider selection. Detailed persona metadata not available.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="persona-card__footer">
+                    <div class="persona-card__meta">
+                      <span class="text-caption text-medium-emphasis">
+                        {{ persona.providerLabel ?? persona.provider }} • {{ persona.modelLabel ?? persona.modelId }}
+                      </span>
+                      <v-tooltip
+                        text="Provider and model details"
+                        location="top"
+                      >
+                        <template #activator="{ props: tooltipProps }">
+                          <v-btn
+                            v-bind="tooltipProps"
+                            icon="mdi-information-outline"
+                            variant="text"
+                            density="comfortable"
+                            size="small"
+                          />
+                        </template>
+                        <div class="text-body-2">
+                          <p class="mb-1">
+                            Provider: {{ persona.providerLabel ?? persona.provider }}
+                          </p>
+                          <p class="mb-1">
+                            Model ID: {{ persona.modelId }}
+                          </p>
+                          <p v-if="persona.infoUrl" class="mb-0">
+                            <a
+                              :href="persona.infoUrl"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              Release notes
+                            </a>
+                          </p>
+                        </div>
+                      </v-tooltip>
+                    </div>
+
+                    <p
+                      v-if="persona.key === recommendedKey && persona.recommendedReason"
+                      class="text-caption text-medium-emphasis mb-0"
+                    >
+                      Why recommended: {{ persona.recommendedReason }}
+                    </p>
+
+                    <p
+                      v-if="persona.disabledReason"
+                      class="text-caption text-error mb-0"
+                    >
+                      {{ persona.disabledReason }}
+                    </p>
+                  </div>
+                </v-card>
+              </div>
+            </div>
+          </v-card-text>
+          <v-card-actions class="d-flex justify-end">
+            <v-btn
+              variant="text"
+              @click="dialogOpen = false"
+            >
+              Close
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
 
       <div
         v-if="loading"
@@ -365,6 +566,17 @@ async function selectPersona(persona: PersonaWithModel) {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+}
+
+.selected-persona {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.persona-selector__actions {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .persona-card {

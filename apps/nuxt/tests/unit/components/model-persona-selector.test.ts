@@ -113,6 +113,7 @@ describe('ModelPersonaSelector', () => {
     const emitted = wrapper.emitted('update:modelValue')
     expect(emitted?.[0]?.[0]).toBe('gpt-4o-mini')
     expect(wrapper.find('.persona-card--selected').exists()).toBe(true)
+    expect(wrapper.text()).toContain('Selected persona')
   })
 
   it('sends telemetry when a persona is selected', async () => {
@@ -128,7 +129,11 @@ describe('ModelPersonaSelector', () => {
     })
 
     await nextTick()
-    await wrapper.find('.persona-card').trigger('click')
+    const changeButton = wrapper.findAll('button').find(btn => btn.text().includes('Change persona'))
+    expect(changeButton).toBeTruthy()
+    await changeButton!.trigger('click')
+    const dialogCard = wrapper.findAll('.persona-grid__item .persona-card')[0]
+    await dialogCard.trigger('click')
 
     expect(telemetryMock).toHaveBeenCalledWith(
       '/api/models/personas/event',
