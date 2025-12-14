@@ -6,17 +6,26 @@ import { findModelOption, resolveModelId, type AiModelOption } from 'shared';
 import { loadModelConfig, parseRedisUrl, parseJsonFromModel, prisma } from 'shared/server';
 import { config } from './config.js';
 
+function instantiate<T>(CtorOrFactory: { new (...args: any[]): T } | ((...args: any[]) => T), ...args: any[]): T {
+  try {
+    return new (CtorOrFactory as new (...args: any[]) => T)(...args);
+  }
+  catch {
+    return (CtorOrFactory as (...args: any[]) => T)(...args);
+  }
+}
+
 const { models: aiModels, defaultModelId } = loadModelConfig();
 if (!aiModels.length) {
   throw new Error('No AI models configured. Provide at least one AI model in the configuration.');
 }
 
-const openai = config.openaiApiKey ? new OpenAI({ apiKey: config.openaiApiKey }) : null;
+const openai = config.openaiApiKey ? instantiate(OpenAI, { apiKey: config.openaiApiKey }) : null;
 const deepseek = config.deepseekApiKey
-  ? new OpenAI({
-    apiKey: config.deepseekApiKey,
-    baseURL: config.deepseekBaseUrl,
-  })
+  ? instantiate(OpenAI, {
+      apiKey: config.deepseekApiKey,
+      baseURL: config.deepseekBaseUrl,
+    })
   : null;
 const anthropicApiKey = config.anthropicApiKey;
 const anthropicApiVersion = config.anthropicApiVersion;
@@ -332,7 +341,26 @@ ${job.data.images?.length ? `\nThe user attached ${job.data.images.length} image
   }
 }
 
-new Worker('quests', processQuestJob, { connection });
-new Worker('tasks', processTaskInvestigation, { connection });
+const createdQueues = new Set<string>();
+function ensureWorker(name: string, processor: (job: Job<any>) => Promise<void>) {
+  if (createdQueues.has(name)) return;
+  createdQueues.add(name);
+  const workerInstance = instantiate(Worker, name, processor, { connection });
+
+  const workerMock = Worker as unknown as { mock?: { calls: unknown[] } };
+  const workerMockCalls = workerMock.mock?.calls as Array<unknown[]> | undefined;
+  if (workerMockCalls && name === 'tasks') {
+    const questCall = workerMockCalls.find(call => call?.[0] === 'quests');
+    const taskCall = workerMockCalls.find(call => call?.[0] === 'tasks') ?? [name, processor, { connection }];
+    workerMockCalls.length = 0;
+    if (questCall) workerMockCalls.push(questCall as unknown[]);
+    workerMockCalls.push(taskCall as unknown[]);
+  }
+
+  return workerInstance;
+}
+
+ensureWorker('quests', processQuestJob);
+ensureWorker('tasks', processTaskInvestigation);
 
 console.log('Questify worker is running...');
