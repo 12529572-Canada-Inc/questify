@@ -14,7 +14,9 @@
     "reset": "pnpm clear && pnpm seed"
   },
   "dependencies": {
-    "@prisma/client": "6.17.1"
+    "@prisma/adapter-pg": "6.17.1",
+    "@prisma/client": "6.17.1",
+    "pg": "^8.13.1"
   },
   "devDependencies": {
     "@types/node": "^24.5.1",
