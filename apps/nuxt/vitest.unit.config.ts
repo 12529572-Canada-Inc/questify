@@ -2,6 +2,7 @@ import { defineConfig } from 'vitest/config'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 import { readFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
 
 type CoverageThreshold = {
   statements?: number
@@ -15,6 +16,21 @@ type ThresholdMap = Record<string, CoverageThreshold>
 const r = (p: string) => resolve(__dirname, p)
 const thresholdsPath = resolve(__dirname, '../../reports/coverage-threshold.json')
 let nuxtThreshold: CoverageThreshold = {}
+
+function patchCoverageProvider() {
+  try {
+    const require = createRequire(import.meta.url)
+    const { V8CoverageProvider } = require('@vitest/coverage-v8')
+    if (V8CoverageProvider && !V8CoverageProvider.prototype.fetchCache) {
+      V8CoverageProvider.prototype.fetchCache = {}
+    }
+  }
+  catch {
+    // ignore if provider cannot be loaded
+  }
+}
+
+patchCoverageProvider()
 
 try {
   const raw = readFileSync(thresholdsPath, 'utf8')
