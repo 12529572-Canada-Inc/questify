@@ -28,7 +28,6 @@ catch {
 export default defineConfig({
   test: {
     environment: 'node',
-    setupFiles: ['tests/coverage-setup.ts'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'json-summary', 'html'],

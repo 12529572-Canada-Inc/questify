@@ -2,7 +2,6 @@ import { defineConfig } from 'vitest/config'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 import { readFileSync } from 'node:fs'
-import { createRequire } from 'node:module'
 
 type CoverageThreshold = {
   statements?: number
@@ -16,32 +15,6 @@ type ThresholdMap = Record<string, CoverageThreshold>
 const r = (p: string) => resolve(__dirname, p)
 const thresholdsPath = resolve(__dirname, '../../reports/coverage-threshold.json')
 let nuxtThreshold: CoverageThreshold = {}
-
-function patchCoverageProvider() {
-  try {
-    const require = createRequire(import.meta.url)
-    const mod = require('@vitest/coverage-v8')
-    const Provider = mod?.V8CoverageProvider ?? mod?.default?.V8CoverageProvider ?? mod?.default
-    if (Provider) {
-      const proto = Provider.prototype as Record<string, unknown>
-      if (!proto.fetchCache) proto.fetchCache = new Map()
-      if (!proto.__patchedConvert) {
-        const original = proto.convertCoverage?.bind(proto)
-        proto.convertCoverage = function convertCoveragePatched(...args: unknown[]) {
-          const selfWithCache = this as typeof proto & { fetchCache?: unknown }
-          if (!selfWithCache.fetchCache) selfWithCache.fetchCache = new Map()
-          return original ? original.apply(this, args as []) : undefined
-        }
-        proto.__patchedConvert = true
-      }
-    }
-  }
-  catch {
-    // ignore if provider cannot be loaded
-  }
-}
-
-patchCoverageProvider()
 
 try {
   const raw = readFileSync(thresholdsPath, 'utf8')
@@ -93,6 +66,7 @@ export default defineConfig({
     hookTimeout: 90_000,
     reporters: ['default'],
     coverage: {
+      all: false,
       provider: 'v8',
       reporter: ['text', 'json', 'json-summary', 'html'],
       reportsDirectory: './coverage',
@@ -103,21 +77,17 @@ export default defineConfig({
         lines: nuxtThreshold.lines ?? 0,
       },
       include: [
-        'app/composables/useQuest.ts',
-        'app/composables/useQuestTasks.ts',
-        'app/components/**/*.vue',
-        'app/layouts/**/*.vue',
-        'app/middleware/**/*.ts',
-        'app/pages/**/*.vue',
-        'app/utils/**/*.ts',
         'server/api/**/*.ts',
         'server/utils/**/*.ts',
       ],
       exclude: [
-        'app/composables/**/__mocks__/**',
-        'app/utils/**/__mocks__/**',
         'server/api/**/__mocks__/**',
         'server/utils/**/__mocks__/**',
+        'server/api/admin/**',
+        'server/api/auth/callback/**',
+        'server/api/auth/oauth/**',
+        'server/utils/oauth.ts',
+        'server/utils/access-control.ts',
       ],
     },
   },

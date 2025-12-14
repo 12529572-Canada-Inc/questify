@@ -6,7 +6,8 @@
   },
   "pnpm": {
     "overrides": {
-      "magicast": "0.3.5"
+      "magicast": "0.3.5",
+      "@vitest/coverage-v8": "4.0.15"
     }
   },
   "scripts": {

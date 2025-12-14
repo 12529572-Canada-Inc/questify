@@ -2,7 +2,6 @@ import { config } from 'dotenv'
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch, useAttrs } from 'vue'
-import { createRequire } from 'node:module'
 import type { Ref } from 'vue'
 import { vi } from 'vitest'
 import { splitTextIntoSegments } from './app/utils/text-with-links'
@@ -156,15 +155,3 @@ vi.mock('vuetify', () => ({
     return themeMock
   },
 }))
-
-// Ensure coverage plugin stays compatible with Vitest v4 in CI.
-try {
-  const require = createRequire(import.meta.url)
-  const { V8CoverageProvider } = require('@vitest/coverage-v8')
-  if (V8CoverageProvider && !V8CoverageProvider.prototype.fetchCache) {
-    V8CoverageProvider.prototype.fetchCache = {}
-  }
-}
-catch {
-  // ignore if coverage plugin is unavailable
-}
