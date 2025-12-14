@@ -44,6 +44,8 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'happy-dom',
+    restoreMocks: true,
+    clearMocks: true,
     include: ['tests/{api,unit}/**/*.{test,spec}.ts'],
     exclude: [
       '**/node_modules/**',

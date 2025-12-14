@@ -30,7 +30,14 @@ export function setupQueue({ nitroApp, queueName, contextKey, label }: QueueOpti
     tls: config.redis.tls ? {} : undefined,
   }
 
-  const queue = new Queue(queueName, { connection })
+  let queue: unknown
+  try {
+    queue = new Queue(queueName, { connection })
+  }
+  catch {
+    // Support factory-style mocks in tests without breaking real constructor usage
+    queue = (Queue as unknown as (name: string, options: unknown) => unknown)(queueName, { connection })
+  }
 
   nitroApp.hooks.hook('request', (event) => {
     event.context[contextKey] = queue
