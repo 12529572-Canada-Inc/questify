@@ -4,9 +4,7 @@ import { setupQueue } from '../../../server/utils/queue'
 import { parseRedisUrl } from 'shared/server'
 
 vi.mock('bullmq', () => ({
-  Queue: vi.fn(function QueueMock(this: unknown, name: string, options: unknown) {
-    return { name, options }
-  }),
+  Queue: vi.fn().mockImplementation((name: string, options: unknown) => ({ name, options })),
 }))
 
 vi.mock('shared/server', () => ({
