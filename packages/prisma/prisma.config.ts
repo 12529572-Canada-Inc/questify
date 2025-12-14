@@ -1,6 +1,12 @@
 import { PrismaPg } from '@prisma/adapter-pg'
 import { defineConfig } from 'prisma/config'
 import { Pool } from 'pg'
+import { config as loadEnv } from 'dotenv'
+import { resolve } from 'node:path'
+
+// Ensure DATABASE_URL is available when Prisma CLI loads this config.
+loadEnv({ path: resolve(__dirname, '.env') })
+loadEnv({ path: resolve(__dirname, '../../.env') })
 
 const databaseUrl = process.env.DATABASE_URL
 
@@ -13,5 +19,6 @@ const adapter = new PrismaPg(pool)
 
 export default defineConfig({
   schema: './schema.prisma',
+  experimental: { adapter: true },
   adapter: async () => adapter,
 })
