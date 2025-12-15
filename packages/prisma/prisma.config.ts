@@ -19,11 +19,6 @@ const adapter = new PrismaPg(pool)
 
 export default defineConfig({
   schema: './schema.prisma',
-  // Cast to tolerate older Prisma type definitions while migrate deploy requires datasource.
-  datasource: {
-    url: databaseUrl,
-    shadowDatabaseUrl: process.env.SHADOW_DATABASE_URL,
-  },
   experimental: { adapter: true },
   adapter: async () => adapter,
-} as unknown)
+})
