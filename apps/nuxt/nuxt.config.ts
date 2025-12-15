@@ -23,6 +23,8 @@ const aiModelDefaultId = aiModelsWithAvailability.find(model => model.default &&
   ?? normalizedAiModels.find(model => model.enabled !== false)?.id
   ?? aiModelConfig.defaultModelId
 const aiAssistEnabled = process.env.NUXT_FEATURE_AI_ASSIST === 'true'
+const modelPersonasEnabled = process.env.NUXT_FEATURE_MODEL_PERSONAS === 'true'
+const modelPersonasVariant = process.env.NUXT_MODEL_PERSONA_VARIANT ?? 'control'
 const defaultImageMaxSizeBytes = 1.5 * 1024 * 1024 // 1.5MB per image while storing media off-app
 const defaultImageTotalMaxBytes = 3 * 1024 * 1024 // 3MB across images to prevent runaway uploads
 
@@ -122,6 +124,8 @@ export default defineNuxtConfig({
       imageTotalMaxBytes,
       features: {
         aiAssist: aiAssistEnabled,
+        modelPersonas: modelPersonasEnabled,
+        modelPersonasVariant,
       },
       cloudinary: {
         cloudName: process.env.CLOUDINARY_CLOUD_NAME || '',

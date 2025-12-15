@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 enum QuestStatus {
@@ -19,6 +18,24 @@ enum ThemePreference {
   light
   dark
   auto
+}
+
+enum PersonaSpeed {
+  fast
+  faster
+  fastest
+}
+
+enum PersonaCost {
+  low
+  medium
+  high
+}
+
+enum PersonaContext {
+  short
+  medium
+  long
 }
 
 model User {
@@ -131,6 +148,31 @@ model UserRole {
 
   @@id([userId, roleId])
   @@index([roleId])
+}
+
+model ModelPersona {
+  id                String          @id @default(cuid())
+  key               String          @unique
+  name              String
+  tagline           String
+  avatarUrl         String?
+  bestFor           String[]        @default([])
+  speed             PersonaSpeed
+  cost              PersonaCost
+  contextLength     PersonaContext
+  provider          String
+  modelId           String
+  notes             String?
+  infoUrl           String?
+  recommended       Boolean         @default(false)
+  recommendedReason String?
+  active            Boolean         @default(true)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@index([provider])
+  @@index([modelId])
+  @@index([active])
 }
 
 model AdminAuditLog {
