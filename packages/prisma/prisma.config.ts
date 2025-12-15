@@ -1,5 +1,5 @@
 import { PrismaPg } from '@prisma/adapter-pg'
-import { defineConfig } from 'prisma/config'
+import { defineConfig, env } from 'prisma/config'
 import { Pool } from 'pg'
 import { config as loadEnv } from 'dotenv'
 import { resolve } from 'node:path'
@@ -19,6 +19,10 @@ const adapter = new PrismaPg(pool)
 
 export default defineConfig({
   schema: './schema.prisma',
+  datasource: {
+    url: env<{ DATABASE_URL: string }>('DATABASE_URL'),
+    shadowDatabaseUrl: process.env.SHADOW_DATABASE_URL,
+  },
   experimental: { adapter: true },
   adapter: async () => adapter,
 })
