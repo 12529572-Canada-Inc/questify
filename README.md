@@ -15,16 +15,18 @@ Questify turns personal and team goals into narrative quests powered by AI-assis
 
 ## Requirements
 
-- Node.js 18.18+ (Prisma 6 minimum)
+- Node.js 20.19+ (Prisma 7 requirement)
 - pnpm 8+
 - TypeScript 5.1+ (repo pins 5.6.x for tooling)
 - Docker (for local Postgres + Redis)
+- Prisma 7 with the PostgreSQL adapter; `DATABASE_URL` must be set (in `.env` or `packages/prisma/.env`) before running `pnpm install` so `prisma generate` can bootstrap during prepare.
 
 ## Quick Start
 
 ```bash
 pnpm install
 cp .env.example .env          # adjust secrets as needed
+cp packages/prisma/.env.example packages/prisma/.env  # ensure DATABASE_URL is present for Prisma adapter config
 docker compose up -d          # launches Postgres (5432) + Redis (6379)
 pnpm prisma:migrate
 pnpm prisma:seed
