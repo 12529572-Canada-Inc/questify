@@ -23,6 +23,5 @@ export default defineConfig({
     url: env<{ DATABASE_URL: string }>('DATABASE_URL'),
     shadowDatabaseUrl: process.env.SHADOW_DATABASE_URL,
   },
-  experimental: { adapter: true },
   adapter: async () => adapter,
 })
