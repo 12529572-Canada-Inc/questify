@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 🧰 Maintenance
 - Documented `NUXT_FEATURE_MODEL_PERSONAS` and `NUXT_MODEL_PERSONA_VARIANT` (control | pilot | full) in `apps/nuxt/.env.example`.
 - Dropped the `updatedAt` default on `ModelPersona` to rely on application-driven timestamps.
+- Upgraded Prisma to v7 with the PostgreSQL adapter via `prisma.config.ts`, loading `DATABASE_URL` from repo or package `.env` during prepare; aligned shared client initialization to the adapter and raised the Node engine requirement to 20.19+ to satisfy Prisma’s minimum (Node engines updated in `package.json`).
 
 ---
 

@@ -23,9 +23,11 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@prisma/client": "6.17.1",
+    "@prisma/adapter-pg": "7.0.0",
+    "@prisma/client": "7.0.0",
     "crypto": "^1.0.1",
-    "jsonrepair": "^3.6.1"
+    "jsonrepair": "^3.6.1",
+    "pg": "^8.13.1"
   },
   "devDependencies": {
     "@types/node": "^24.6.2",
