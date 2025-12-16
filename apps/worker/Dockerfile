@@ -22,11 +22,7 @@ COPY packages ./packages/
 RUN pnpm config set enable-pre-post-scripts true
 
 # ---- Install dependencies ----
-RUN pnpm install --frozen-lockfile
-
-# ---- Run safe prepare ----
-# Ensures Prisma client is generated safely, even if optional
-RUN sh ./scripts/prepare-safe.sh || echo "⚠️ Safe prepare failed — continuing anyway."
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # ---- Build apps ----
 RUN pnpm build
@@ -35,4 +31,5 @@ RUN pnpm build
 WORKDIR /app/apps/worker
 
 # ---- Runtime ----
-CMD ["node", "dist/index.js"]
+# Generate Prisma client at runtime with provided DATABASE_URL, then start worker
+CMD ["sh", "-c", "pnpm --filter prisma generate && node dist/index.js"]
