@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.18.2] - 2025-12-16
+
+### 🛠 Fixes
+- Resolved deployment issues by ensuring `DATABASE_URL` is correctly set in GitHub Actions workflow for Prisma client generation and migration steps.
+
+---
+
 ## [1.18.0] - 2025-12-15
 
 ### 🚀 Features
