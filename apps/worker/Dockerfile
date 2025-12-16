@@ -1,6 +1,9 @@
 # ---- Base image ----
 FROM node:24-alpine
 
+# Allow overriding at build time; defaults to placeholder so prisma generate can run for typings.
+ARG DATABASE_URL=postgresql://placeholder:placeholder@localhost:5432/placeholder
+
 # ---- System setup ----
 WORKDIR /app
 
@@ -23,6 +26,9 @@ RUN pnpm config set enable-pre-post-scripts true
 
 # ---- Install dependencies ----
 RUN pnpm install --frozen-lockfile --ignore-scripts
+
+# ---- Generate Prisma client for typechecking/build (uses placeholder DATABASE_URL) ----
+RUN DATABASE_URL=$DATABASE_URL pnpm --filter prisma generate
 
 # ---- Build apps ----
 RUN pnpm build
