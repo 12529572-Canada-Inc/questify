@@ -26,6 +26,8 @@ jobs:
 
             - name: Install dependencies
               run: pnpm install
+              env:
+                  DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
             # --- Prisma Database Setup ---
             - name: Generate Prisma Client
