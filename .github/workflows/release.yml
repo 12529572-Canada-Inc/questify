@@ -32,6 +32,8 @@ jobs:
             # --- Prisma Database Setup ---
             - name: Generate Prisma Client
               run: pnpm prisma:generate
+              env:
+                  DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
             - name: Deploy Prisma Migrations
               working-directory: packages/prisma
