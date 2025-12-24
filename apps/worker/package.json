@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@prisma/client": "7.0.0",
-    "bullmq": "^4.0.0",
+    "bullmq": "^5.66.2",
     "dotenv": "^17.2.2",
     "openai": "^4.0.0",
     "shared": "workspace:*",
