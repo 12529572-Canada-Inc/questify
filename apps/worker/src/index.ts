@@ -45,7 +45,7 @@ function truncateText(value: string, maxChars = logMaxChars) {
   return `${value.slice(0, maxChars)}... [truncated ${value.length - maxChars} chars]`;
 }
 
-function summarizeOptionalText(value: string | null | undefined, maxChars: number) {
+function truncateOptionalText(value: string | null | undefined, maxChars: number) {
   if (typeof value !== 'string') {
     return null;
   }
@@ -187,10 +187,10 @@ type DecomposeJobData = {
 function summarizeQuestJob(data: DecomposeJobData) {
   return {
     questId: data.questId,
-    title: summarizeOptionalText(data.title, 160),
-    goal: summarizeOptionalText(data.goal, 200),
-    context: summarizeOptionalText(data.context, 200),
-    constraints: summarizeOptionalText(data.constraints, 200),
+    title: truncateOptionalText(data.title, 160),
+    goal: truncateOptionalText(data.goal, 200),
+    context: truncateOptionalText(data.context, 200),
+    constraints: truncateOptionalText(data.constraints, 200),
     modelType: data.modelType ?? null,
     images: summarizeImages(data.images),
   };
