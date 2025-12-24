@@ -285,6 +285,42 @@ describe('worker entrypoint', () => {
     });
   });
 
+  it('truncates long log previews and drops blank optional fields', async () => {
+    configMock.redisUrl = 'redis://redis-host:6379';
+    configMock.logMaxChars = 10;
+    configMock.aiMaxResponseTokens = 0;
+    parseJsonFromModelMock.mockReturnValue([]);
+    openAiCreateMock.mockResolvedValue({
+      choices: [{ message: { content: '[]' } }],
+    });
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    await importWorker();
+
+    const processor = WorkerMock.mock.calls[0][1];
+    await processor({
+      name: 'decompose',
+      data: {
+        questId: 'quest-truncate',
+        title: 'Quest Title That Should Truncate Logs',
+        goal: '   ',
+        context: 'Context to force prompt truncation',
+        constraints: '  ',
+      },
+    } as never);
+
+    const promptPreviewCall = logSpy.mock.calls.find(
+      ([label]) => label === 'Prompt preview:',
+    );
+
+    expect(promptPreviewCall?.[1]).toContain('[truncated');
+    expect(openAiCreateMock).toHaveBeenCalledWith(expect.objectContaining({
+      max_tokens: 1200,
+    }));
+
+    logSpy.mockRestore();
+  });
+
   it('handles quest decomposition with image attachments (OpenAI multimodal)', async () => {
     parseJsonFromModelMock.mockReturnValue([]);
     openAiCreateMock.mockResolvedValue({
