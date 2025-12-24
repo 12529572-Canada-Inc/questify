@@ -79,6 +79,8 @@ const configMock = {
   anthropicApiVersion: '2023-06-01',
   deepseekApiKey: '',
   deepseekBaseUrl: 'https://api.deepseek.com/v1',
+  aiMaxResponseTokens: 1200,
+  logMaxChars: 1200,
   redisHost: 'fallback-host',
   redisPort: 6380,
   redisPassword: 'fallback-pass',
@@ -168,6 +170,8 @@ describe('worker entrypoint', () => {
       anthropicApiVersion: '2023-06-01',
       deepseekApiKey: '',
     deepseekBaseUrl: 'https://api.deepseek.com/v1',
+      aiMaxResponseTokens: 1200,
+      logMaxChars: 1200,
       redisHost: 'fallback-host',
       redisPort: 6380,
       redisPassword: 'fallback-pass',
@@ -245,8 +249,9 @@ describe('worker entrypoint', () => {
     await processor(job);
 
     expect(OpenAIMock).toHaveBeenCalledWith({ apiKey: 'test-openai-key' });
-    expect(openAiCreateMock).toHaveBeenCalledWith({
+    expect(openAiCreateMock).toHaveBeenCalledWith(expect.objectContaining({
       model: 'gpt-4o-mini',
+      max_tokens: 1200,
       messages: [
         {
           role: 'user',
@@ -255,7 +260,7 @@ describe('worker entrypoint', () => {
           ]),
         },
       ],
-    });
+    }));
     expect(parseJsonFromModelMock).toHaveBeenCalledWith('model-content');
     expect(taskDeleteManyMock).toHaveBeenCalledWith({ where: { questId: 'quest-1' } });
     expect(taskCreateManyMock).toHaveBeenCalledWith({
