@@ -187,7 +187,7 @@ type DecomposeJobData = {
 function summarizeQuestJob(data: DecomposeJobData) {
   return {
     questId: data.questId,
-    title: truncateText(data.title, 160),
+    title: summarizeOptionalText(data.title, 160),
     goal: summarizeOptionalText(data.goal, 200),
     context: summarizeOptionalText(data.context, 200),
     constraints: summarizeOptionalText(data.constraints, 200),
