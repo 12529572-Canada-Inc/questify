@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [1.19.0] - 2025-12-24
+
 ### 🛠 Fixes
 - Reduced worker memory pressure by capping AI response tokens and truncating verbose logs, with new `AI_MAX_RESPONSE_TOKENS` and `WORKER_LOG_MAX_CHARS` tuning knobs.
 
