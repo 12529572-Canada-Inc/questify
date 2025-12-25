@@ -38,6 +38,7 @@ pnpm dev:worker               # runs the queue worker with hot reload
 
 - `.env` in the repository root configures both Nuxt runtime config and worker bindings.
 - **AI Assist prerequisites:** Set `NUXT_FEATURE_AI_ASSIST=true` and provide at least one provider key (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, or `DEEPSEEK_API_KEY` + `DEEPSEEK_BASE_URL` if overriding the default) so the worker and Nuxt API can call the selected model. Optional catalog overrides use `AI_MODEL_CONFIG_JSON` or `AI_MODEL_CONFIG_PATH`. Individual users can toggle assistance in **Settings → Quest AI Assistance**.
+- **Worker tuning:** `AI_MAX_RESPONSE_TOKENS` caps AI output tokens (default 1200) and `WORKER_LOG_MAX_CHARS` truncates prompt/response logs (default 1200) to reduce worker memory pressure.
 - **Quest image uploads:** Configure Cloudinary with `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET`. The Nuxt API signs uploads at `/api/uploads/cloudinary-signature`, and the UI sends quest/investigation images directly to Cloudinary to avoid API payload limits. Customize the target folder with `CLOUDINARY_UPLOAD_FOLDER` (defaults to `questify/quests`).
 - **Support assistant issue submission:** Provide a GitHub personal access token (`GITHUB_TOKEN`) plus `GITHUB_REPO_OWNER` and `GITHUB_REPO_NAME`. Use the `repo` scope for private repositories or `public_repo` for public ones so the in-app form can create issues.
 - Redis credentials map to `runtimeConfig.redis` (Nuxt) and `packages/shared/src/config/redis.ts` (worker).

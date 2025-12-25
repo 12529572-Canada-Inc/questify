@@ -1,4 +1,4 @@
-# Coverage Report – 2025-12-13
+# Coverage Report – 2025-12-24
 
 Generated with `pnpm test:coverage`.
 
@@ -6,6 +6,6 @@ Minimum guardrails live in `reports/coverage-threshold.json`.
 
 | Workspace | Statements | Branches | Functions | Lines |
 |-----------|------------|----------|-----------|-------|
-| Nuxt (`apps/nuxt`) | 63.21% | 72.62% | 56.73% | 63.21% |
-| Worker (`apps/worker`) | 100.00% | 85.47% | 100.00% | 100.00% |
-| Shared (`packages/shared`) | 92.04% | 73.65% | 95.23% | 92.04% |
+| Nuxt (`apps/nuxt`) | 88.91% | 73.79% | 92.92% | 89.40% |
+| Worker (`apps/worker`) | 100.00% | 87.85% | 100.00% | 100.00% |
+| Shared (`packages/shared`) | 84.13% | 74.17% | 100.00% | 86.11% |

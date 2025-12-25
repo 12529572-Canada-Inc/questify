@@ -28,6 +28,40 @@ const connection = parseRedisUrl(config.redisUrl) || {
   tls: config.redisTls ? {} : undefined,
 };
 
+function resolvePositiveNumber(value: number | undefined, fallback: number) {
+  if (typeof value === 'number' && Number.isFinite(value) && value > 0) {
+    return value;
+  }
+  return fallback;
+}
+
+const logMaxChars = resolvePositiveNumber(config.logMaxChars, 1200);
+const maxResponseTokens = resolvePositiveNumber(config.aiMaxResponseTokens, 1200);
+
+function truncateText(value: string, maxChars = logMaxChars) {
+  if (value.length <= maxChars) {
+    return value;
+  }
+  return `${value.slice(0, maxChars)}... [truncated ${value.length - maxChars} chars]`;
+}
+
+function truncateOptionalText(value: string | null | undefined, maxChars: number) {
+  if (typeof value !== 'string') {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  return truncateText(trimmed, maxChars);
+}
+
+function summarizeImages(images?: string[]) {
+  return Array.isArray(images) ? images.length : 0;
+}
+
 function resolveModel(modelId?: string | null): AiModelOption {
   const normalizedId = resolveModelId(aiModels, modelId ?? defaultModelId);
   return findModelOption(aiModels, normalizedId) ?? aiModels[0];
@@ -41,6 +75,7 @@ async function callOpenAiClient(client: OpenAI | null, model: AiModelOption, pro
   const response = await client.chat.completions.create({
     model: model.apiModel,
     messages: [{ role: 'user', content: prompt }],
+    max_tokens: maxResponseTokens,
   });
 
   return response.choices[0].message?.content ?? '';
@@ -61,7 +96,7 @@ async function callAnthropicModel(model: AiModelOption, prompt: string) {
     body: JSON.stringify({
       model: model.apiModel,
       messages: [{ role: 'user', content: prompt }],
-      max_tokens: 1200,
+      max_tokens: maxResponseTokens,
     }),
   });
 
@@ -111,6 +146,7 @@ async function runModel(
           role: 'user',
           content: contentParts,
         }],
+        max_tokens: maxResponseTokens,
       });
       content = response?.choices[0].message?.content ?? '';
     }
@@ -148,13 +184,25 @@ type DecomposeJobData = {
   images?: string[]
 }
 
+function summarizeQuestJob(data: DecomposeJobData) {
+  return {
+    questId: data.questId,
+    title: truncateOptionalText(data.title, 160),
+    goal: truncateOptionalText(data.goal, 200),
+    context: truncateOptionalText(data.context, 200),
+    constraints: truncateOptionalText(data.constraints, 200),
+    modelType: data.modelType ?? null,
+    images: summarizeImages(data.images),
+  };
+}
+
 async function processQuestJob(job: Job<DecomposeJobData>) {
   if (job.name !== 'decompose') {
     console.warn('Unknown quest job:', job.name);
     return;
   }
 
-  console.log('Decomposing quest:', job.data);
+  console.log('Decomposing quest:', summarizeQuestJob(job.data));
   const { questId, title, goal, context, constraints, images } = job.data;
 
   const promptSections = [
@@ -172,11 +220,11 @@ ${promptSections.join('\n')}
 ${images?.length ? `\nThe user attached ${images.length} image(s); incorporate visual details if your model supports images.\n` : ''}
 
 Return the plan as a JSON array where each item has the shape {"title": string, "details": string}.`;
-  console.log('Prompt:', prompt);
+  console.log('Prompt preview:', truncateText(prompt));
 
   try {
     const { content, modelId } = await runModel(prompt, job.data.modelType, true, images);
-    console.log(`AI (${modelId}) content:`, content);
+    console.log(`AI (${modelId}) content preview:`, truncateText(content));
 
     type GeneratedTask = {
       title?: string
@@ -186,7 +234,15 @@ Return the plan as a JSON array where each item has the shape {"title": string, 
     const tasks = parseJsonFromModel<GeneratedTask[]>(content);
     const parsedTasks = Array.isArray(tasks) ? tasks : [];
 
-    console.log('Parsed tasks:', parsedTasks);
+    const parsedTaskTitles = parsedTasks
+      .map(taskDefinition => (typeof taskDefinition?.title === 'string' ? taskDefinition.title.trim() : ''))
+      .filter(titleText => titleText.length > 0)
+      .slice(0, 3)
+      .map(titleText => truncateText(titleText, 120));
+    console.log('Parsed tasks summary:', {
+      count: parsedTasks.length,
+      sampleTitles: parsedTaskTitles,
+    });
 
     const preparedTasks = parsedTasks
       .map((taskDefinition, index) => {
@@ -306,7 +362,7 @@ ${job.data.images?.length ? `\nThe user attached ${job.data.images.length} image
       true,
       job.data.images,
     );
-    console.log(`Investigation content (${modelId}):`, content);
+    console.log(`Investigation content (${modelId}) preview:`, truncateText(content));
 
     const result = parseJsonFromModel<{ summary?: string; details?: string }>(content);
 

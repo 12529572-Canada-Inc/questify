@@ -23,6 +23,8 @@ describe('worker config', () => {
     process.env.ANTHROPIC_API_VERSION = '2023-01-01'
     process.env.DEEPSEEK_API_KEY = 'deepseek-key'
     process.env.DEEPSEEK_BASE_URL = 'https://api.custom-deepseek.com/v1'
+    process.env.AI_MAX_RESPONSE_TOKENS = '900'
+    process.env.WORKER_LOG_MAX_CHARS = '500'
 
     const { config } = await import('../src/config.js')
 
@@ -32,6 +34,8 @@ describe('worker config', () => {
       anthropicApiVersion: '2023-01-01',
       deepseekApiKey: 'deepseek-key',
       deepseekBaseUrl: 'https://api.custom-deepseek.com/v1',
+      aiMaxResponseTokens: 900,
+      logMaxChars: 500,
       redisHost: 'redis-host',
       redisPort: 6385,
       redisPassword: 'redis-pass',
@@ -61,6 +65,8 @@ describe('worker config', () => {
     expect(config.anthropicApiVersion).toBe('2023-06-01')
     expect(config.deepseekApiKey).toBe('')
     expect(config.deepseekBaseUrl).toBe('https://api.deepseek.com/v1')
+    expect(config.aiMaxResponseTokens).toBeUndefined()
+    expect(config.logMaxChars).toBeUndefined()
     expect(config.redisHost).toBe('localhost')
     expect(config.redisPort).toBe(6379)
     expect(config.redisPassword).toBeUndefined()

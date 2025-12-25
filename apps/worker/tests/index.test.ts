@@ -79,6 +79,8 @@ const configMock = {
   anthropicApiVersion: '2023-06-01',
   deepseekApiKey: '',
   deepseekBaseUrl: 'https://api.deepseek.com/v1',
+  aiMaxResponseTokens: 1200,
+  logMaxChars: 1200,
   redisHost: 'fallback-host',
   redisPort: 6380,
   redisPassword: 'fallback-pass',
@@ -168,6 +170,8 @@ describe('worker entrypoint', () => {
       anthropicApiVersion: '2023-06-01',
       deepseekApiKey: '',
     deepseekBaseUrl: 'https://api.deepseek.com/v1',
+      aiMaxResponseTokens: 1200,
+      logMaxChars: 1200,
       redisHost: 'fallback-host',
       redisPort: 6380,
       redisPassword: 'fallback-pass',
@@ -245,8 +249,9 @@ describe('worker entrypoint', () => {
     await processor(job);
 
     expect(OpenAIMock).toHaveBeenCalledWith({ apiKey: 'test-openai-key' });
-    expect(openAiCreateMock).toHaveBeenCalledWith({
+    expect(openAiCreateMock).toHaveBeenCalledWith(expect.objectContaining({
       model: 'gpt-4o-mini',
+      max_tokens: 1200,
       messages: [
         {
           role: 'user',
@@ -255,7 +260,7 @@ describe('worker entrypoint', () => {
           ]),
         },
       ],
-    });
+    }));
     expect(parseJsonFromModelMock).toHaveBeenCalledWith('model-content');
     expect(taskDeleteManyMock).toHaveBeenCalledWith({ where: { questId: 'quest-1' } });
     expect(taskCreateManyMock).toHaveBeenCalledWith({
@@ -278,6 +283,42 @@ describe('worker entrypoint', () => {
       where: { id: 'quest-1' },
       data: { status: QUEST_STATUS.active },
     });
+  });
+
+  it('truncates long log previews and drops blank optional fields', async () => {
+    configMock.redisUrl = 'redis://redis-host:6379';
+    configMock.logMaxChars = 10;
+    configMock.aiMaxResponseTokens = 0;
+    parseJsonFromModelMock.mockReturnValue([]);
+    openAiCreateMock.mockResolvedValue({
+      choices: [{ message: { content: '[]' } }],
+    });
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    await importWorker();
+
+    const processor = WorkerMock.mock.calls[0][1];
+    await processor({
+      name: 'decompose',
+      data: {
+        questId: 'quest-truncate',
+        title: 'Quest Title That Should Truncate Logs',
+        goal: '   ',
+        context: 'Context to force prompt truncation',
+        constraints: '  ',
+      },
+    } as never);
+
+    const promptPreviewCall = logSpy.mock.calls.find(
+      ([label]) => label === 'Prompt preview:',
+    );
+
+    expect(promptPreviewCall?.[1]).toContain('[truncated');
+    expect(openAiCreateMock).toHaveBeenCalledWith(expect.objectContaining({
+      max_tokens: 1200,
+    }));
+
+    logSpy.mockRestore();
   });
 
   it('handles quest decomposition with image attachments (OpenAI multimodal)', async () => {
