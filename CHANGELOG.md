@@ -11,10 +11,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.19.0] - 2025-12-24
+
+### 🛠 Fixes
+- Reduced worker memory pressure by capping AI response tokens and truncating verbose logs, with new `AI_MAX_RESPONSE_TOKENS` and `WORKER_LOG_MAX_CHARS` tuning knobs.
+
+---
+
 ## [1.18.2] - 2025-12-16
 
 ### 🛠 Fixes
 - Resolved deployment issues by ensuring `DATABASE_URL` is correctly set in GitHub Actions workflow for Prisma client generation and migration steps.
+
+---
+
+## [1.18.1] - 2025-12-16
+
+### 🛠 Fixes
+- Fixed Prisma client generation by updating the GitHub Actions workflow to set `DATABASE_URL` during the build process.
 
 ---
 
