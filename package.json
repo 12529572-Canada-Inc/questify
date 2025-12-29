@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.43.1",
-    "@oxc-minify/binding-darwin-arm64": "0.96.0",
+    "@oxc-minify/binding-darwin-arm64": "0.106.0",
     "@oxc-minify/binding-linux-x64-gnu": "0.105.0",
     "@oxc-parser/binding-darwin-arm64": "0.105.0",
     "@oxc-transform/binding-darwin-arm64": "0.94.0",
