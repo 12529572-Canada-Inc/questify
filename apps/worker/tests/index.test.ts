@@ -68,11 +68,15 @@ import * as shared from 'shared/server';
 const originalParseJsonFromModel = shared.parseJsonFromModel;
 
 const workerInstance = {};
-const WorkerMock = vi.fn(() => workerInstance);
+const WorkerMock = vi.fn(function Worker() {
+  return workerInstance;
+});
 const openAiCreateMock = vi.fn();
-const OpenAIMock = vi.fn(() => ({
-  chat: { completions: { create: openAiCreateMock } },
-}));
+const OpenAIMock = vi.fn(function OpenAI() {
+  return {
+    chat: { completions: { create: openAiCreateMock } },
+  };
+});
 const configMock = {
   openaiApiKey: 'test-openai-key',
   anthropicApiKey: '',
