@@ -1,8 +1,9 @@
-import { config } from 'dotenv'
+import { config as dotenvConfig } from 'dotenv'
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch, useAttrs } from 'vue'
 import type { Ref } from 'vue'
+import { config as testUtilsConfig } from '@vue/test-utils'
 import { vi } from 'vitest'
 import { splitTextIntoSegments } from './app/utils/text-with-links'
 
@@ -30,7 +31,7 @@ declare global {
   }) | undefined
 }
 
-config({ path: '.env.test' })
+dotenvConfig({ path: '.env.test' })
 
 const nuxtTsconfigPath = resolve(process.cwd(), '.nuxt/tsconfig.json')
 if (!existsSync(nuxtTsconfigPath)) {
@@ -155,3 +156,38 @@ vi.mock('vuetify', () => ({
     return themeMock
   },
 }))
+
+const existingIsCustomElement = testUtilsConfig.global.config?.compilerOptions?.isCustomElement
+testUtilsConfig.global.config = {
+  ...testUtilsConfig.global.config,
+  compilerOptions: {
+    ...testUtilsConfig.global.config?.compilerOptions,
+    isCustomElement: (tag: string) => {
+      if (typeof existingIsCustomElement === 'function' && existingIsCustomElement(tag)) {
+        return true
+      }
+      return tag.startsWith('v-')
+    },
+  },
+}
+
+testUtilsConfig.global.stubs = {
+  ...testUtilsConfig.global.stubs,
+  ImageAttachmentInput: true,
+  QuestAiSuggestionDialog: true,
+  MarkdownBlock: true,
+  QuestTaskInvestigationList: true,
+  QuestTaskListItemCompact: true,
+  QuestTaskListItem: true,
+  QuestTaskSection: true,
+  PublicQuestCard: true,
+  SupportAssistant: true,
+}
+
+const originalConsoleWarn = console.warn
+console.warn = (...args: unknown[]) => {
+  if (typeof args[0] === 'string' && args[0].includes('<Suspense> is an experimental feature')) {
+    return
+  }
+  originalConsoleWarn(...args)
+}
