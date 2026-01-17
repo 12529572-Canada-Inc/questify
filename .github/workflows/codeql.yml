@@ -36,15 +36,14 @@ jobs:
               if: matrix.language == 'javascript-typescript'
               run: corepack enable
 
+            - name: Install dependencies
+              if: matrix.language == 'javascript-typescript'
+              run: pnpm install --frozen-lockfile --ignore-scripts
+
             - name: Initialize CodeQL
               uses: github/codeql-action/init@v3
               with:
                   languages: ${{ matrix.language }}
                   build-mode: none
-
-            - name: Install dependencies
-              if: matrix.language == 'javascript-typescript'
-              run: pnpm install --frozen-lockfile --ignore-scripts
-
             - name: Perform CodeQL Analysis
               uses: github/codeql-action/analyze@v3
