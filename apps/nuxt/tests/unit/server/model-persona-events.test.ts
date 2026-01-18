@@ -17,6 +17,7 @@ describe('server/api/models/personas/event.post', () => {
   afterEach(() => {
     if (originalRuntimeConfig) Reflect.set(globalStore, 'useRuntimeConfig', originalRuntimeConfig)
     if (originalReadBody) Reflect.set(globalStore, 'readBody', originalReadBody)
+    vi.restoreAllMocks()
   })
 
   it('records a valid persona event', async () => {

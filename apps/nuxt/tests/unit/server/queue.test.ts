@@ -18,7 +18,9 @@ type GlobalWithMocks = typeof globalThis & {
 const queueInstance = { id: 'queue-instance' }
 
 const mocks = vi.hoisted(() => ({
-  Queue: vi.fn(() => queueInstance),
+  Queue: vi.fn(function Queue() {
+    return queueInstance
+  }),
   parseRedisUrl: vi.fn(),
 }))
 
