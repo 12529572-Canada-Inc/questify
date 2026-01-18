@@ -17,7 +17,7 @@
     "format": "eslint . --fix",
     "test:nuxt": "vitest run --config vitest.config.mts",
     "test:unit": "vitest run --config vitest.unit.config.ts",
-    "test:coverage": "pnpm dev:prepare && vitest run --config vitest.unit.config.ts --coverage",
+    "test:coverage": "pnpm dev:prepare && vitest run --config vitest.unit.coverage.config.ts",
     "test:e2e": "playwright test",
     "test": "pnpm dev:prepare && pnpm test:nuxt && pnpm test:unit"
   },
