@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 🧪 Tests
+- Aligned Vitest coverage tooling to v4 across workspaces to avoid mixed-version coverage failures in CI.
+- Stubbed auto-imported Nuxt/Vuetify components and treated `v-` tags as custom elements in Vitest setup to reduce unit test warnings.
+
 ---
 
 ## [1.19.0] - 2025-12-24
